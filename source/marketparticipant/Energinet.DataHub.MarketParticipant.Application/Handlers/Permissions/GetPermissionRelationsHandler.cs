@@ -45,15 +45,17 @@ public sealed class GetPermissionRelationsHandler
 
     private static Stream WriteRecordsToStream(IEnumerable<PermissionRelationRecord> records)
     {
-        using var stringWriter = new StringWriter();
-        stringWriter.WriteLine("PermissionName;MarketRole;UserRole");
+        var stream = new MemoryStream();
+        using var streamWriter = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true);
+        streamWriter.WriteLine("PermissionName;MarketRole;UserRole");
 
         foreach (var record in records)
         {
-            stringWriter.WriteLine($"{record.Permission};{record.MarketRole};{record.UserRole}");
+            streamWriter.WriteLine($"{record.Permission};{record.MarketRole};{record.UserRole}");
         }
 
-        var stream = new MemoryStream(Encoding.UTF8.GetBytes(stringWriter.ToString()));
+        streamWriter.Flush();
+        streamWriter.BaseStream.Position = 0;
         return stream;
     }
 }
