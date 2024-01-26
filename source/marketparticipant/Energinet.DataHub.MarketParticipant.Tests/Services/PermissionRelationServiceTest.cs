@@ -73,8 +73,6 @@ public class PermissionRelationServiceTest
         // Assert
         var testPermissions = BuildTestPermissions().ToList();
         var marketRoles = Enum.GetValues<EicFunction>();
-        Assert.NotNull(records);
-        Assert.NotEmpty(records);
         Assert.Equal(26, records.Count);
         Assert.Equal(2, records.Count(e => e.Permission == PermissionId.ActorsManage.ToString()));
         Assert.Equal(2, records.Count(e => e.Permission == PermissionId.CalculationsManage.ToString()));
