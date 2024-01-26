@@ -98,7 +98,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         {
             if (!_userContext.CurrentUser.IsFas)
             {
-                Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return Unauthorized();
             }
 
