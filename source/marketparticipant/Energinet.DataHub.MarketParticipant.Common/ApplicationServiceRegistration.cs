@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IValidator<GetPermissionDetailsCommand>, GetPermissionDetailsCommandRuleSet>();
             services.AddScoped<IValidator<InviteUserCommand>, InviteUserCommandRuleSet>();
             services.AddScoped<IValidator<ReInviteUserCommand>, ReInviteUserCommandRuleSet>();
-            services.AddScoped<IValidator<SendUserInviteEmailCommand>, SendUserInviteEmailCommandRuleSet>();
+            services.AddScoped<IValidator<SendEmailCommand>, SendEmailCommandRuleSet>();
             services.AddScoped<IValidator<GetPermissionAuditLogsCommand>, GetPermissionAuditLogEntriesCommandRuleSet>();
             services.AddScoped<IValidator<GetUserRolesToPermissionCommand>, GetUserRolesToPermissionCommandRuleSet>();
             services.AddScoped<IValidator<DeactivateUserRoleCommand>, DeactivateUserRoleCommandRuleSet>();

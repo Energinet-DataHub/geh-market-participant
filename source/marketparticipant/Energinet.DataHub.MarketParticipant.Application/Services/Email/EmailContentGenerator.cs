@@ -15,20 +15,24 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services.Email;
 
 public sealed class EmailContentGenerator : IEmailContentGenerator
 {
-    public async Task<GeneratedEmail> GenerateAsync(EmailTemplate emailTemplate, IReadOnlyDictionary<string, string> parameters)
+    public async Task<GeneratedEmail> GenerateAsync(EmailTemplate emailTemplate, IReadOnlyDictionary<string, string> additionalParameters)
     {
-        ArgumentNullException.ThrowIfNull(parameters);
+        ArgumentNullException.ThrowIfNull(emailTemplate);
+        ArgumentNullException.ThrowIfNull(additionalParameters);
 
-        var htmlTemplate = await GetTemplateAsync(emailTemplate).ConfigureAwait(false);
+        var htmlTemplate = await GetTemplateAsync(emailTemplate.TemplateId).ConfigureAwait(false);
+        var composite = emailTemplate.TemplateParameters.Concat(additionalParameters);
 
-        var emailContent = InstantiateEmailContentFromTemplate(htmlTemplate, parameters);
+        var emailContent = InstantiateEmailContentFromTemplate(htmlTemplate, composite);
         var emailSubject = ReadTitleFromHtml(emailContent);
 
         return new GeneratedEmail(emailSubject, emailContent);
@@ -45,7 +49,7 @@ public sealed class EmailContentGenerator : IEmailContentGenerator
         return emailContent.Substring(titleStart + 7, titleEnd - titleStart - 7);
     }
 
-    private static string InstantiateEmailContentFromTemplate(string htmlTemplate, IReadOnlyDictionary<string, string> parameters)
+    private static string InstantiateEmailContentFromTemplate(string htmlTemplate, IEnumerable<KeyValuePair<string, string>> parameters)
     {
         foreach (var parameter in parameters)
         {
@@ -55,14 +59,14 @@ public sealed class EmailContentGenerator : IEmailContentGenerator
         return htmlTemplate;
     }
 
-    private static async Task<string> GetTemplateAsync(EmailTemplate emailTemplate)
+    private static async Task<string> GetTemplateAsync(EmailTemplateId emailTemplateId)
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = $"Energinet.DataHub.MarketParticipant.Application.Services.Email.Templates.{emailTemplate}.html";
+        var resourceName = $"Energinet.DataHub.MarketParticipant.Application.Services.Email.Templates.{emailTemplateId}.html";
 
         var templateStream = assembly.GetManifestResourceStream(resourceName);
         if (templateStream == null)
-            throw new InvalidOperationException($"{nameof(EmailContentGenerator)} could not find template {emailTemplate}.");
+            throw new InvalidOperationException($"{nameof(EmailContentGenerator)} could not find template {emailTemplateId}.");
 
         await using (templateStream.ConfigureAwait(false))
         {

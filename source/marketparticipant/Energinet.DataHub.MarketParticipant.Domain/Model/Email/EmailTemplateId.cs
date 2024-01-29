@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+public enum EmailTemplateId
 {
-    public sealed record SendUserInviteEmailCommand : IRequest<Unit>;
+    UserInvite = 1,
+    UserAssignedToActor = 2,
 }

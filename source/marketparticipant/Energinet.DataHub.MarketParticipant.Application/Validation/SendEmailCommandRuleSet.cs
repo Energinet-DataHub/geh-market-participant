@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+using Energinet.DataHub.MarketParticipant.Application.Commands;
+using FluentValidation;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public enum EmailEventType
+    public sealed class SendEmailCommandRuleSet : AbstractValidator<SendEmailCommand>
     {
-        UserInvite = 1,
-        UserAssignedToActor = 2
     }
 }

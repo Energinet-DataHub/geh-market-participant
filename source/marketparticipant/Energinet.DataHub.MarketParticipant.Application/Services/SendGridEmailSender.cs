@@ -16,10 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services.Email;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Microsoft.Extensions.Logging;
 using SendGrid;
-using SendGrid.Helpers.Errors.Model;
 using SendGrid.Helpers.Mail;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
 
@@ -49,11 +48,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             ArgumentNullException.ThrowIfNull(emailAddress);
             ArgumentNullException.ThrowIfNull(emailEvent);
 
-            var template = SelectTemplate(emailEvent);
-            var parameters = GatherTemplateParameters(emailEvent);
-
             var generatedEmail = await _emailHtmlGenerator
-                .GenerateAsync(template, parameters)
+                .GenerateAsync(emailEvent.EmailTemplate, GatherTemplateParameters())
                 .ConfigureAwait(false);
 
             return await SendAsync(
@@ -64,26 +60,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 .ConfigureAwait(false);
         }
 
-        private static EmailTemplate SelectTemplate(EmailEvent emailEvent)
+        private IReadOnlyDictionary<string, string> GatherTemplateParameters()
         {
-            return emailEvent.EmailEventType switch
-            {
-                EmailEventType.UserInvite => EmailTemplate.UserInvite,
-                EmailEventType.UserAssignedToActor => EmailTemplate.UserAssignedToActor,
-                _ => throw new NotFoundException("EmailEventType not recognized"),
-            };
-        }
-
-        private IReadOnlyDictionary<string, string> GatherTemplateParameters(EmailEvent emailEvent)
-        {
-            // TODO: Read data from somewhere.
             return new Dictionary<string, string>
             {
                 { "environment", _config.EnvironmentDescription ?? string.Empty },
-                { "user_name", "Test User Name" },
-                { "actor_org", "ActorOrg" },
-                { "actor_gln", "ActorGln" },
-                { "actor_name", "ActorName" },
                 { "invite_link", _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge" },
             };
         }

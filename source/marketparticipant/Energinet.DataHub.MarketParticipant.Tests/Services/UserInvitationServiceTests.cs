@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
@@ -70,6 +71,8 @@ public sealed class UserInvitationServiceTests
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
@@ -79,6 +82,8 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
@@ -103,6 +108,8 @@ public sealed class UserInvitationServiceTests
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
@@ -119,6 +126,8 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
@@ -150,6 +159,8 @@ public sealed class UserInvitationServiceTests
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
@@ -191,6 +202,8 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
@@ -220,6 +233,8 @@ public sealed class UserInvitationServiceTests
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
@@ -242,6 +257,8 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
@@ -266,6 +283,8 @@ public sealed class UserInvitationServiceTests
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
@@ -300,6 +319,8 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
@@ -322,6 +343,8 @@ public sealed class UserInvitationServiceTests
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
@@ -356,6 +379,8 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
@@ -386,6 +411,8 @@ public sealed class UserInvitationServiceTests
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
@@ -420,6 +447,8 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
@@ -435,7 +464,7 @@ public sealed class UserInvitationServiceTests
         emailEventRepositoryMock.Verify(emailEventRepository => emailEventRepository.InsertAsync(
             It.Is<EmailEvent>(emailEvent =>
                 emailEvent.Email == _validInvitation.Email &&
-                emailEvent.EmailEventType == EmailEventType.UserAssignedToActor)));
+                emailEvent.EmailTemplate.TemplateId == EmailTemplateId.UserAssignedToActor)));
     }
 
     [Fact]
@@ -445,6 +474,8 @@ public sealed class UserInvitationServiceTests
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
@@ -460,6 +491,8 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
@@ -480,6 +513,8 @@ public sealed class UserInvitationServiceTests
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
@@ -512,6 +547,8 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
@@ -530,6 +567,8 @@ public sealed class UserInvitationServiceTests
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
@@ -566,6 +605,8 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogRepository.Object,
             userIdentityAuditLogRepository.Object,

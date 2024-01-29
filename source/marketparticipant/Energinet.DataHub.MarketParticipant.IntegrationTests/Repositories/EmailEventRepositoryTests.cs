@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -27,6 +28,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
     [IntegrationTest]
     public sealed class EmailEventRepositoryTests
     {
+        private readonly UserInviteEmailTemplate _emailTemplate = new(EmailTemplateId.UserInvite, new Dictionary<string, string>());
+
         private readonly MarketParticipantDatabaseFixture _fixture;
 
         public EmailEventRepositoryTests(MarketParticipantDatabaseFixture fixture)
@@ -46,14 +49,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var emailEventRepository = new EmailEventRepository(context);
 
             var emailRandom = new MockedEmailAddress();
-            var newEmailEvent = new EmailEvent(emailRandom, EmailEventType.UserInvite);
+            var newEmailEvent = new EmailEvent(emailRandom, _emailTemplate);
 
             // act
             await emailEventRepository.InsertAsync(newEmailEvent);
 
             // assert
             var emailEventRepository2 = new EmailEventRepository(context2);
-            var savedEvents = await emailEventRepository2.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite);
+            var savedEvents = await emailEventRepository2.GetAllPendingEmailEventsAsync();
             Assert.Single(savedEvents, e => e.Email.Equals(emailRandom));
         }
 
@@ -70,14 +73,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var emailEventRepository1 = new EmailEventRepository(context1);
 
             var emailRandom = new MockedEmailAddress();
-            var newEmailEvent = new EmailEvent(emailRandom, EmailEventType.UserInvite);
+            var newEmailEvent = new EmailEvent(emailRandom, _emailTemplate);
 
             // act
             await emailEventRepository1.InsertAsync(newEmailEvent);
 
             var emailEventRepository2 = new EmailEventRepository(context2);
             var savedEvents = (await emailEventRepository2
-                .GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite))
+                .GetAllPendingEmailEventsAsync())
                 .ToList();
             var elementToMarkAsSent = savedEvents.Single(e => e.Email.Equals(emailRandom));
             await emailEventRepository2.MarkAsSentAsync(elementToMarkAsSent);
@@ -85,7 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // assert
             var emailEventRepository3 = new EmailEventRepository(context3);
             var savedEventsSent = (await emailEventRepository3
-                    .GetAllEmailEventByTypeAsync(EmailEventType.UserInvite))
+                .GetAllPendingEmailEventsAsync())
                 .ToList();
             Assert.Single(savedEventsSent, e => e.Email.Equals(emailRandom) && e.Sent != null);
         }

@@ -15,8 +15,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +43,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             {
                 Email = emailEvent.Email.Address,
                 Created = DateTimeOffset.UtcNow,
-                EmailEventType = (int)emailEvent.EmailEventType
+                TemplateId = (int)emailEvent.EmailTemplate.TemplateId,
+                TemplateParameters = JsonSerializer.Serialize(emailEvent.EmailTemplate.TemplateParameters),
             };
 
             _context.EmailEventEntries.Add(emailEventEntity);
@@ -64,33 +67,43 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             throw new NotFoundException($"Email event with id {emailEvent.Id} was not found");
         }
 
-        public async Task<IEnumerable<EmailEvent>> GetAllEmailsToBeSentByTypeAsync(params EmailEventType[] emailEventTypes)
+        public async Task<IEnumerable<EmailEvent>> GetAllPendingEmailEventsAsync()
         {
             var emailToBeSent = await _context.EmailEventEntries
-                .Where(e => e.Sent == null && emailEventTypes.Contains((EmailEventType)e.EmailEventType))
-                .ToListAsync()
-                .ConfigureAwait(false);
-            return emailToBeSent.Select(MapTo);
-        }
-
-        public async Task<IEnumerable<EmailEvent>> GetAllEmailEventByTypeAsync(EmailEventType emailEventType)
-        {
-            var emailToBeSent = await _context.EmailEventEntries
-                .Where(e => e.EmailEventType == (int)emailEventType)
+                .Where(e => e.Sent == null)
                 .ToListAsync()
                 .ConfigureAwait(false);
 
             return emailToBeSent.Select(MapTo);
         }
 
-        private static EmailEvent MapTo(EmailEventEntity emailEventEntities)
+        private static EmailEvent MapTo(EmailEventEntity emailEventEntity)
         {
+            var templateId = (EmailTemplateId)emailEventEntity.TemplateId;
+            var templateParameters = JsonSerializer.Deserialize<Dictionary<string, string>>(emailEventEntity.TemplateParameters);
+            if (templateParameters == null)
+                throw new InvalidOperationException($"Template parameters for event {emailEventEntity.Id} are invalid.");
+
+            EmailTemplate mailTemplate;
+
+            switch (templateId)
+            {
+                case EmailTemplateId.UserInvite:
+                    mailTemplate = new UserInviteEmailTemplate(templateId, templateParameters);
+                    break;
+                case EmailTemplateId.UserAssignedToActor:
+                    mailTemplate = new UserInviteEmailTemplate(templateId, templateParameters);
+                    break;
+                default:
+                    throw new InvalidOperationException($"Template id for event {emailEventEntity.Id} is invalid.");
+            }
+
             return new EmailEvent(
-                emailEventEntities.Id,
-                new EmailAddress(emailEventEntities.Email),
-                emailEventEntities.Created,
-                emailEventEntities.Sent,
-                (EmailEventType)emailEventEntities.EmailEventType);
+                emailEventEntity.Id,
+                new EmailAddress(emailEventEntity.Email),
+                emailEventEntity.Created,
+                emailEventEntity.Sent,
+                mailTemplate);
         }
     }
 }

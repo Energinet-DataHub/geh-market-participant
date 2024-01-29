@@ -81,7 +81,7 @@ internal static class TestPreparationEntities
     public static EmailEventEntity ValidEmailEvent => new()
     {
         Email = new MockedEmailAddress(),
-        EmailEventType = 1,
+        TemplateId = 1,
         Created = DateTimeOffset.UtcNow,
         Sent = null
     };

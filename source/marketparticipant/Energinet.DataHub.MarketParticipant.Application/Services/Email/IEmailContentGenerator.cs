@@ -14,10 +14,11 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services.Email;
 
 public interface IEmailContentGenerator
 {
-    Task<GeneratedEmail> GenerateAsync(EmailTemplate emailTemplate, IReadOnlyDictionary<string, string> parameters);
+    Task<GeneratedEmail> GenerateAsync(EmailTemplate emailTemplate, IReadOnlyDictionary<string, string> additionalParameters);
 }
