@@ -31,12 +31,12 @@ internal static class EmailSenderRegistration
             var configuration = provider.GetRequiredService<InviteConfig>();
             var senGridClient = provider.GetRequiredService<ISendGridClient>();
             var logger = provider.GetRequiredService<ILogger<SendGridEmailSender>>();
-            var emailSourceGenerator = provider.GetRequiredService<IEmailContentGenerator>();
+            var emailContentGenerator = provider.GetRequiredService<IEmailContentGenerator>();
 
             return new SendGridEmailSender(
                 configuration,
                 senGridClient,
-                emailSourceGenerator,
+                emailContentGenerator,
                 logger);
         });
     }

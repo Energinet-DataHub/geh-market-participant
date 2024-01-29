@@ -29,18 +29,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
         private readonly InviteConfig _config;
         private readonly ILogger<SendGridEmailSender> _logger;
         private readonly ISendGridClient _client;
-        private readonly IEmailContentGenerator _emailHtmlGenerator;
+        private readonly IEmailContentGenerator _emailContentGenerator;
 
         public SendGridEmailSender(
             InviteConfig config,
             ISendGridClient sendGridClient,
-            IEmailContentGenerator emailHtmlGenerator,
+            IEmailContentGenerator emailContentGenerator,
             ILogger<SendGridEmailSender> logger)
         {
             _config = config;
             _logger = logger;
             _client = sendGridClient;
-            _emailHtmlGenerator = emailHtmlGenerator;
+            _emailContentGenerator = emailContentGenerator;
         }
 
         public async Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent)
@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             ArgumentNullException.ThrowIfNull(emailAddress);
             ArgumentNullException.ThrowIfNull(emailEvent);
 
-            var generatedEmail = await _emailHtmlGenerator
+            var generatedEmail = await _emailContentGenerator
                 .GenerateAsync(emailEvent.EmailTemplate, GatherTemplateParameters())
                 .ConfigureAwait(false);
 
