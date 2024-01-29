@@ -62,9 +62,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 
         private IReadOnlyDictionary<string, string> GatherTemplateParameters()
         {
+            var environmentShort = string.Empty;
+            var environmentLong = string.Empty;
+
+            if (_config.EnvironmentDescription != null)
+            {
+                environmentShort = $"({_config.EnvironmentDescription})";
+                environmentLong = $"(Miljø: {_config.EnvironmentDescription})";
+            }
+
             return new Dictionary<string, string>
             {
-                { "environment", _config.EnvironmentDescription ?? string.Empty },
+                { "environment_short", environmentShort },
+                { "environment_long", environmentLong },
                 { "invite_link", _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge" },
             };
         }

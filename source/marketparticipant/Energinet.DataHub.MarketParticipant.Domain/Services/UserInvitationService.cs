@@ -188,7 +188,7 @@ public sealed class UserInvitationService : IUserInvitationService
                 .AddOrUpdateAsync(user)
                 .ConfigureAwait(false);
 
-            var mailTemplate = new UserAssignedToActorEmailTemplate(userIdentity, organization, actor);
+            var mailTemplate = new UserInviteEmailTemplate(userIdentity, organization, actor);
             await _emailEventRepository
                 .InsertAsync(new EmailEvent(userIdentity.Email, mailTemplate))
                 .ConfigureAwait(false);
