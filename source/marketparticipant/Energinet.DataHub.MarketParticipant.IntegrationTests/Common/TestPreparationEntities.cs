@@ -82,8 +82,9 @@ internal static class TestPreparationEntities
     {
         Email = new MockedEmailAddress(),
         TemplateId = 1,
+        TemplateParameters = "{}",
         Created = DateTimeOffset.UtcNow,
-        Sent = null
+        Sent = null,
     };
 
     public static GridAreaEntity ValidGridArea => new()
