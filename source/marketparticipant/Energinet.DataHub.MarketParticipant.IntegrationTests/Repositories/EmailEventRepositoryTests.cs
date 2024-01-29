@@ -90,7 +90,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var savedEventsSent = (await emailEventRepository3
                 .GetAllPendingEmailEventsAsync())
                 .ToList();
-            Assert.Single(savedEventsSent, e => e.Email.Equals(emailRandom) && e.Sent != null);
+
+            Assert.All(savedEventsSent, e => Assert.NotEqual(emailRandom, e.Email));
         }
     }
 }
