@@ -93,6 +93,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IValidator<RemoveActorCredentialsCommand>, RemoveActorCredentialsCommandRuleSet>();
             services.AddScoped<IValidator<GetActorCredentialsCommand>, GetActorCredentialsCommandRuleSet>();
             services.AddScoped<IValidator<ActorRequestSecretCommand>, ActorRequestSecretCommandRuleSet>();
+            services.AddScoped<IValidator<GetPermissionRelationsCommand>, GetPermissionsRelationCommandRuleSet>();
 
             services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
             services.AddScoped<IActorClientSecretService, ActorClientSecretService>();
@@ -100,6 +101,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>();
             services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();
             services.AddScoped<ICertificateValidation, NoCertificateValidation>();
+            services.AddScoped<IPermissionRelationService, PermissionRelationService>();
         }
     }
 }
