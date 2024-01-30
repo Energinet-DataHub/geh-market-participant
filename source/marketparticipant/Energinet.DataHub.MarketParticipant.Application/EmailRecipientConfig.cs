@@ -12,16 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.MarketParticipant.Application;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-
-public sealed class EmailEventEntity
-{
-    public int Id { get; set; }
-    public string Email { get; set; } = null!;
-    public DateTimeOffset Created { get; set; }
-    public DateTimeOffset? Sent { get; set; }
-    public int TemplateId { get; set; }
-    public string TemplateParameters { get; set; } = null!;
-}
+public sealed record EmailRecipientConfig(
+    string SenderEmail,
+    string BccEmail,
+    string UserInviteFlow,
+    string? EnvironmentDescription);

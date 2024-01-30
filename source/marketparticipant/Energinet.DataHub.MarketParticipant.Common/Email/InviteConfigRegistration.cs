@@ -28,12 +28,12 @@ internal static class InviteConfigRegistration
         {
             var configuration = provider.GetRequiredService<IConfiguration>();
 
-            var from = configuration.GetSetting(Settings.UserInviteFromEmail);
-            var bcc = configuration.GetSetting(Settings.UserInviteBccEmail);
+            var sender = configuration.GetSetting(Settings.SenderEmail);
+            var bcc = configuration.GetSetting(Settings.BccEmail);
             var userFlow = configuration.GetSetting(Settings.UserInviteFlow);
             var environmentDescription = configuration.GetOptionalSetting(Settings.EnvironmentDescription);
 
-            return new InviteConfig(from, bcc, userFlow, environmentDescription);
+            return new EmailRecipientConfig(sender, bcc, userFlow, environmentDescription);
         });
     }
 }

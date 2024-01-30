@@ -27,6 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
 
             builder.ToTable("EmailEvent");
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.TemplateId).HasColumnName("EmailEventType");
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
         }
     }

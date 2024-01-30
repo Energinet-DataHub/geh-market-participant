@@ -13,80 +13,89 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Application.Services.Email;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Microsoft.Extensions.Logging;
 using SendGrid;
-using SendGrid.Helpers.Errors.Model;
 using SendGrid.Helpers.Mail;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
-    public class SendGridEmailSender : IEmailSender
+    public sealed class SendGridEmailSender : IEmailSender
     {
-        private readonly InviteConfig _config;
+        private readonly EmailRecipientConfig _config;
         private readonly ILogger<SendGridEmailSender> _logger;
         private readonly ISendGridClient _client;
+        private readonly IEmailContentGenerator _emailContentGenerator;
 
         public SendGridEmailSender(
-            InviteConfig config,
+            EmailRecipientConfig config,
             ISendGridClient sendGridClient,
+            IEmailContentGenerator emailContentGenerator,
             ILogger<SendGridEmailSender> logger)
         {
             _config = config;
             _logger = logger;
             _client = sendGridClient;
+            _emailContentGenerator = emailContentGenerator;
         }
 
-        public Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent)
+        public async Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent)
         {
             ArgumentNullException.ThrowIfNull(emailAddress);
             ArgumentNullException.ThrowIfNull(emailEvent);
 
-            return emailEvent.EmailEventType switch
+            var generatedEmail = await _emailContentGenerator
+                .GenerateAsync(emailEvent.EmailTemplate, GatherTemplateParameters())
+                .ConfigureAwait(false);
+
+            return await SendAsync(
+                new SendGrid.Helpers.Mail.EmailAddress(_config.SenderEmail),
+                new SendGrid.Helpers.Mail.EmailAddress(emailAddress.Address),
+                generatedEmail.Subject,
+                generatedEmail.HtmlContent)
+                .ConfigureAwait(false);
+        }
+
+        private IReadOnlyDictionary<string, string> GatherTemplateParameters()
+        {
+            var environmentShort = string.Empty;
+            var environmentLong = string.Empty;
+
+            if (_config.EnvironmentDescription != null)
             {
-                EmailEventType.UserInvite => SendUserInviteAsync(emailAddress),
-                EmailEventType.UserAssignedToActor => SendUserAssignedToActorAsync(emailAddress),
-                _ => throw new NotFoundException("EmailEventType not recognized"),
+                environmentShort = $"({_config.EnvironmentDescription})";
+                environmentLong = $"(Miljø: {_config.EnvironmentDescription})";
+            }
+
+            return new Dictionary<string, string>
+            {
+                { "environment_short", environmentShort },
+                { "environment_long", environmentLong },
+                { "invite_link", _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge" },
             };
         }
 
-        private async Task<bool> SendUserInviteAsync(EmailAddress userEmailAddress)
-        {
-            var inviteUrl = _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge";
-            var from = new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail);
-            var to = new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address);
-            var subject = $"Invitation til DataHub {_config.EnvironmentDescription}";
-            var htmlContent = $"Invitation til DataHub {_config.EnvironmentDescription}<br /><br />Bliv oprettet <a href=\"{inviteUrl}\">her</a>" +
-                              $"<br /><br />Brugeroprettelsen skal færdiggøres indenfor 24 timer.";
-            return await SendAsync(userEmailAddress, from, to, subject, htmlContent).ConfigureAwait(false);
-        }
-
-        private async Task<bool> SendUserAssignedToActorAsync(EmailAddress userEmailAddress)
-        {
-            return await SendAsync(
-                userEmailAddress,
-                from: new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail),
-                to: new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address),
-                subject: $"Inviteret til ny aktør i DataHub {_config.EnvironmentDescription}",
-                htmlContent: $"Du er blevet inviteret til en ny aktør. Du kan tilgå den nye aktør i DataHub {_config.EnvironmentDescription}.").ConfigureAwait(false);
-        }
-
-        private async Task<bool> SendAsync(EmailAddress userEmailAddress, SendGrid.Helpers.Mail.EmailAddress from, SendGrid.Helpers.Mail.EmailAddress to, string subject, string htmlContent)
+        private async Task<bool> SendAsync(
+            SendGrid.Helpers.Mail.EmailAddress from,
+            SendGrid.Helpers.Mail.EmailAddress to,
+            string subject,
+            string htmlContent)
         {
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
-            msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteBccEmail));
+            msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.BccEmail));
 
             var response = await _client.SendEmailAsync(msg).ConfigureAwait(false);
-
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("User invite email sent successfully to {Address}.", userEmailAddress.Address);
+                _logger.LogInformation("Email sent successfully to {Address}.", to.Email);
             }
             else
             {
-                throw new NotSupportedException("User invite email return error response code:  " + response.StatusCode);
+                throw new NotSupportedException("Email failed with error code: " + response.StatusCode);
             }
 
             return response.IsSuccessStatusCode;

@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands;
-using FluentValidation;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Email;
+
+public abstract class EmailTemplate
 {
-    public sealed class SendUserInviteEmailCommandRuleSet : AbstractValidator<SendUserInviteEmailCommand>
+    protected EmailTemplate(EmailTemplateId id, IReadOnlyDictionary<string, string> parameters)
     {
+        TemplateId = id;
+        TemplateParameters = parameters;
     }
+
+    public EmailTemplateId TemplateId { get; set; }
+    public IReadOnlyDictionary<string, string> TemplateParameters { get; }
 }
