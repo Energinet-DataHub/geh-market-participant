@@ -12,22 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
+namespace Energinet.DataHub.MarketParticipant.Application.Services.Email;
 
-/// <summary>
-/// Send email interface
-/// </summary>
-public interface IEmailSender
+public interface IEmailContentGenerator
 {
-    /// <summary>
-    /// Send email to user by email event type
-    /// </summary>
-    /// <param name="emailAddress">email address for recipient</param>
-    /// <param name="emailEvent">email event type</param>
-    /// <returns>email send task</returns>
-    Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent);
+    Task<GeneratedEmail> GenerateAsync(EmailTemplate emailTemplate, IReadOnlyDictionary<string, string> additionalParameters);
 }

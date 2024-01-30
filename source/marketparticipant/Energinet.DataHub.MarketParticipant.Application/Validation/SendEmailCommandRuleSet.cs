@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed record SendUserInviteEmailCommand : IRequest<Unit>;
+    public sealed class SendEmailCommandRuleSet : AbstractValidator<SendEmailCommand>
+    {
+    }
 }
