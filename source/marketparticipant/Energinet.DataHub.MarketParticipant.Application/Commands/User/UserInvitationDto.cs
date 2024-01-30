@@ -19,6 +19,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
 public sealed record UserInvitationDto(
     string Email,
-    UserDetailsDto? UserDetails,
+    InvitationUserDetailsDto? InvitationUserDetails,
     Guid AssignedActor,
     IEnumerable<Guid> AssignedRoles);

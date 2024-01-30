@@ -69,7 +69,7 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
 
         var invitation = new UserInvitationDto(
             TestUserEmail,
-            new UserDetailsDto(
+            new InvitationUserDetailsDto(
                 "Invitation Integration Tests",
                 "(Always safe to delete)",
                 "+45 70000000"),

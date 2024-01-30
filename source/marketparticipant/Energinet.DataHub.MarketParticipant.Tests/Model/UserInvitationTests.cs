@@ -17,6 +17,7 @@ using System.ComponentModel.DataAnnotations;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Xunit;
 using Xunit.Categories;
@@ -28,17 +29,18 @@ public sealed class UserInvitationTests
 {
     private readonly UserInvitation _validInvitation = new(
         new MockedEmailAddress(),
-        new UserDetails(
+        new InvitationUserDetails(
             "John",
             "Doe",
-            new PhoneNumber("+45 00000000")),
+            new PhoneNumber("+45 00000000"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 00000000"))),
         new Actor(
             new ActorId(Guid.NewGuid()),
             new OrganizationId(Guid.NewGuid()),
             null,
             new MockedGln(),
             ActorStatus.New,
-            new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
+            new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty), },
             new ActorName("fake_value"),
             null),
         new[]
@@ -57,7 +59,7 @@ public sealed class UserInvitationTests
         // Arrange + Act
         var actual = new UserInvitation(
             _validInvitation.Email,
-            _validInvitation.UserDetails,
+            _validInvitation.InvitationUserDetails,
             _validInvitation.AssignedActor,
             _validInvitation.AssignedRoles);
 
@@ -88,7 +90,7 @@ public sealed class UserInvitationTests
         {
             var actual = new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.UserDetails,
+                _validInvitation.InvitationUserDetails,
                 testActor,
                 _validInvitation.AssignedRoles);
 
@@ -98,7 +100,7 @@ public sealed class UserInvitationTests
         {
             Assert.Throws<ValidationException>(() => new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.UserDetails,
+                _validInvitation.InvitationUserDetails,
                 testActor,
                 _validInvitation.AssignedRoles));
         }
@@ -122,7 +124,7 @@ public sealed class UserInvitationTests
         {
             var actual = new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.UserDetails,
+                _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
                 new[] { testRole });
 
@@ -132,7 +134,7 @@ public sealed class UserInvitationTests
         {
             Assert.Throws<ValidationException>(() => new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.UserDetails,
+                _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
                 new[] { testRole }));
         }
@@ -157,7 +159,7 @@ public sealed class UserInvitationTests
         {
             var actual = new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.UserDetails,
+                _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
                 new[] { testRole });
 
@@ -167,7 +169,7 @@ public sealed class UserInvitationTests
         {
             Assert.Throws<ValidationException>(() => new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.UserDetails,
+                _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
                 new[] { testRole }));
         }

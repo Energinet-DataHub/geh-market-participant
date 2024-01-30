@@ -56,10 +56,11 @@ public sealed class UserInvitationServiceTests
 
     private readonly UserInvitation _validInvitation = new(
         new MockedEmailAddress(),
-        new UserDetails(
+        new InvitationUserDetails(
             "John",
             "Doe",
-            new PhoneNumber("+45 00000000")),
+            new PhoneNumber("+45 00000000"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 00000000"))),
         _validActor,
         new[]
         {
@@ -215,9 +216,9 @@ public sealed class UserInvitationServiceTests
             externalId,
             _validInvitation.Email,
             UserIdentityStatus.Active,
-            _validInvitation.UserDetails!.FirstName,
-            _validInvitation.UserDetails.LastName,
-            _validInvitation.UserDetails.PhoneNumber,
+            _validInvitation.InvitationUserDetails!.FirstName,
+            _validInvitation.InvitationUserDetails.LastName,
+            _validInvitation.InvitationUserDetails.PhoneNumber,
             DateTimeOffset.UtcNow,
             AuthenticationMethod.Undetermined,
             new Mock<IList<LoginIdentity>>().Object);
@@ -286,9 +287,9 @@ public sealed class UserInvitationServiceTests
                 new ExternalUserId(Guid.NewGuid()),
                 _validInvitation.Email,
                 UserIdentityStatus.Active,
-                _validInvitation.UserDetails!.FirstName,
-                _validInvitation.UserDetails.LastName,
-                _validInvitation.UserDetails.PhoneNumber,
+                _validInvitation.InvitationUserDetails!.FirstName,
+                _validInvitation.InvitationUserDetails.LastName,
+                _validInvitation.InvitationUserDetails.PhoneNumber,
                 DateTimeOffset.UtcNow,
                 AuthenticationMethod.Undetermined,
                 new Mock<IList<LoginIdentity>>().Object));
@@ -354,9 +355,9 @@ public sealed class UserInvitationServiceTests
             externalId,
             _validInvitation.Email,
             UserIdentityStatus.Active,
-            _validInvitation.UserDetails!.FirstName,
-            _validInvitation.UserDetails.LastName,
-            _validInvitation.UserDetails.PhoneNumber,
+            _validInvitation.InvitationUserDetails!.FirstName,
+            _validInvitation.InvitationUserDetails.LastName,
+            _validInvitation.InvitationUserDetails.PhoneNumber,
             DateTimeOffset.UtcNow,
             AuthenticationMethod.Undetermined,
             new Mock<IList<LoginIdentity>>().Object);
@@ -428,9 +429,9 @@ public sealed class UserInvitationServiceTests
             externalId,
             _validInvitation.Email,
             UserIdentityStatus.Active,
-            _validInvitation.UserDetails!.FirstName,
-            _validInvitation.UserDetails.LastName,
-            _validInvitation.UserDetails.PhoneNumber,
+            _validInvitation.InvitationUserDetails!.FirstName,
+            _validInvitation.InvitationUserDetails.LastName,
+            _validInvitation.InvitationUserDetails.PhoneNumber,
             DateTimeOffset.UtcNow,
             AuthenticationMethod.Undetermined,
             new Mock<IList<LoginIdentity>>().Object);
@@ -510,9 +511,9 @@ public sealed class UserInvitationServiceTests
             externalId,
             _validInvitation.Email,
             UserIdentityStatus.Active,
-            _validInvitation.UserDetails!.FirstName,
-            _validInvitation.UserDetails.LastName,
-            _validInvitation.UserDetails.PhoneNumber,
+            _validInvitation.InvitationUserDetails!.FirstName,
+            _validInvitation.InvitationUserDetails.LastName,
+            _validInvitation.InvitationUserDetails.PhoneNumber,
             DateTimeOffset.UtcNow,
             AuthenticationMethod.Undetermined,
             new Mock<IList<LoginIdentity>>().Object);
@@ -747,9 +748,9 @@ public sealed class UserInvitationServiceTests
         userIdentityRepositoryMock.Verify(
             userIdentityRepository => userIdentityRepository.CreateAsync(It.Is<UserIdentity>(userIdentity =>
                 userIdentity.Email == _validInvitation.Email &&
-                userIdentity.PhoneNumber == _validInvitation.UserDetails!.PhoneNumber &&
-                userIdentity.FirstName == _validInvitation.UserDetails.FirstName &&
-                userIdentity.LastName == _validInvitation.UserDetails.LastName)),
+                userIdentity.PhoneNumber == _validInvitation.InvitationUserDetails!.PhoneNumber &&
+                userIdentity.FirstName == _validInvitation.InvitationUserDetails.FirstName &&
+                userIdentity.LastName == _validInvitation.InvitationUserDetails.LastName)),
             Times.Once);
     }
 }

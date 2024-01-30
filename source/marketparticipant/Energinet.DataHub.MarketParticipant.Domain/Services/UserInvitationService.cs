@@ -19,7 +19,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -75,7 +74,7 @@ public sealed class UserInvitationService : IUserInvitationService
         var invitedUser = await GetUserAsync(invitation.Email).ConfigureAwait(false);
         if (invitedUser == null)
         {
-            if (invitation.UserDetails == null)
+            if (invitation.InvitationUserDetails == null)
             {
                 // silently return to not leak information about whether the user exists or not
                 return;
@@ -90,10 +89,10 @@ public sealed class UserInvitationService : IUserInvitationService
             var userIdentity = new UserIdentity(
                 sharedId,
                 invitation.Email,
-                invitation.UserDetails.FirstName,
-                invitation.UserDetails.LastName,
-                invitation.UserDetails.PhoneNumber,
-                new SmsAuthenticationMethod(invitation.UserDetails.PhoneNumber));
+                invitation.InvitationUserDetails.FirstName,
+                invitation.InvitationUserDetails.LastName,
+                invitation.InvitationUserDetails.PhoneNumber,
+                invitation.InvitationUserDetails.AuthenticationMethod);
 
             var userIdentityId = await _userIdentityRepository
                 .CreateAsync(userIdentity)
@@ -140,7 +139,7 @@ public sealed class UserInvitationService : IUserInvitationService
 
             if (userIdentityModified)
             {
-                await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation.UserDetails!).ConfigureAwait(false);
+                await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation.InvitationUserDetails!).ConfigureAwait(false);
             }
 
             await _userInviteAuditLogRepository
@@ -219,18 +218,18 @@ public sealed class UserInvitationService : IUserInvitationService
             : null;
     }
 
-    private async Task AuditLogUserIdentityAsync(UserId invitedUserId, AuditIdentity invitationSentBy, UserDetails userDetails)
+    private async Task AuditLogUserIdentityAsync(UserId invitedUserId, AuditIdentity invitationSentBy, InvitationUserDetails invitationUserDetails)
     {
         await _userIdentityAuditLogRepository
-            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.FirstName, userDetails.FirstName, null)
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.FirstName, invitationUserDetails.FirstName, null)
             .ConfigureAwait(false);
 
         await _userIdentityAuditLogRepository
-            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.LastName, userDetails.LastName, null)
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.LastName, invitationUserDetails.LastName, null)
             .ConfigureAwait(false);
 
         await _userIdentityAuditLogRepository
-            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.PhoneNumber, userDetails.PhoneNumber.Number, null)
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.PhoneNumber, invitationUserDetails.PhoneNumber.Number, null)
             .ConfigureAwait(false);
     }
 }

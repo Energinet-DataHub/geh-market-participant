@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record UserDetails(string FirstName, string LastName, PhoneNumber PhoneNumber);
+public sealed record InvitationUserDetails(string FirstName, string LastName, PhoneNumber PhoneNumber, AuthenticationMethod AuthenticationMethod);

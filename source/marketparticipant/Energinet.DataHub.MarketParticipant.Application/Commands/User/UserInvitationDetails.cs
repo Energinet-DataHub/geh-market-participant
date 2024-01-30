@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record UserDetailsDto(
+public sealed record InvitationUserDetailsDto(
     string FirstName,
     string LastName,
     string PhoneNumber);

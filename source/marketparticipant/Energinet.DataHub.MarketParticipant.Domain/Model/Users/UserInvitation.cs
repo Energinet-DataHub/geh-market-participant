@@ -22,12 +22,12 @@ public sealed class UserInvitation
 {
     public UserInvitation(
         EmailAddress email,
-        UserDetails? userDetails,
+        InvitationUserDetails? invitationUserDetails,
         Actor assignedActor,
         IReadOnlyCollection<UserRole> assignedRoles)
     {
         Email = email;
-        UserDetails = userDetails;
+        InvitationUserDetails = invitationUserDetails;
         AssignedActor = assignedActor;
         AssignedRoles = assignedRoles;
 
@@ -36,7 +36,7 @@ public sealed class UserInvitation
     }
 
     public EmailAddress Email { get; }
-    public UserDetails? UserDetails { get; }
+    public InvitationUserDetails? InvitationUserDetails { get; }
     public Actor AssignedActor { get; }
     public IReadOnlyCollection<UserRole> AssignedRoles { get; }
 
