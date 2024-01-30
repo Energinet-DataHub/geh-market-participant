@@ -50,8 +50,8 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
         
         component markpartApi "markpartApiUsers" {
             title "[Component] DataHub 3.0 - Market Participant User Web API"
-            include ->markpartUserIdentityRepository->
             include ->markpartUserController->
+            include ->markpartUserIdentityRepository->
             include ->markpartPermissionController->
             include ->markpartUserRoleController->
             include ->markpartUserRoleAssignmentController->
