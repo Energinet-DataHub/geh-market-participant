@@ -54,14 +54,17 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
         var assignedActor = await GetActorAsync(request.Invitation.AssignedActor).ConfigureAwait(false);
         var assignedRoles = await GetUserRolesAsync(request.Invitation.AssignedRoles).ConfigureAwait(false);
 
-        var phoneNumber = new PhoneNumber(request.Invitation.PhoneNumber);
+        var details = request.Invitation.InvitationUserDetails != null
+            ? new InvitationUserDetails(
+                request.Invitation.InvitationUserDetails.FirstName,
+                request.Invitation.InvitationUserDetails.LastName,
+                new PhoneNumber(request.Invitation.InvitationUserDetails.PhoneNumber),
+                new SmsAuthenticationMethod(new PhoneNumber(request.Invitation.InvitationUserDetails.PhoneNumber)))
+            : null;
 
         var invitation = new UserInvitation(
             new EmailAddress(request.Invitation.Email),
-            request.Invitation.FirstName,
-            request.Invitation.LastName,
-            phoneNumber,
-            new SmsAuthenticationMethod(phoneNumber),
+            details,
             assignedActor,
             assignedRoles);
 

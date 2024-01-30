@@ -69,9 +69,10 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
 
         var invitation = new UserInvitationDto(
             TestUserEmail,
-            "Invitation Integration Tests",
-            "(Always safe to delete)",
-            "+45 70000000",
+            new InvitationUserDetailsDto(
+                "Invitation Integration Tests",
+                "(Always safe to delete)",
+                "+45 70000000"),
             actor.Id,
             new[] { userRole.Id });
 
