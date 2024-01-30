@@ -77,6 +77,7 @@ public sealed class UserInvitationService : IUserInvitationService
         {
             if (invitation.UserDetails == null)
             {
+                // silently return to not leak information about whether the user exists or not
                 return;
             }
 
@@ -100,8 +101,8 @@ public sealed class UserInvitationService : IUserInvitationService
 
             invitedUser = new User(invitation.AssignedActor.Id, sharedId, userIdentityId);
             invitedUser.ActivateUserExpiration();
-
             userIdentityModified = true;
+
             mailTemplate = new UserInviteEmailTemplate(userIdentity, organization, invitation.AssignedActor);
         }
         else
