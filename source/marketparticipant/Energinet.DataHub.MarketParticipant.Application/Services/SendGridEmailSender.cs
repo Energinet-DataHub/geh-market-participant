@@ -26,13 +26,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
     public sealed class SendGridEmailSender : IEmailSender
     {
-        private readonly InviteConfig _config;
+        private readonly EmailRecipientConfig _config;
         private readonly ILogger<SendGridEmailSender> _logger;
         private readonly ISendGridClient _client;
         private readonly IEmailContentGenerator _emailContentGenerator;
 
         public SendGridEmailSender(
-            InviteConfig config,
+            EmailRecipientConfig config,
             ISendGridClient sendGridClient,
             IEmailContentGenerator emailContentGenerator,
             ILogger<SendGridEmailSender> logger)
@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 .ConfigureAwait(false);
 
             return await SendAsync(
-                new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail),
+                new SendGrid.Helpers.Mail.EmailAddress(_config.SenderEmail),
                 new SendGrid.Helpers.Mail.EmailAddress(emailAddress.Address),
                 generatedEmail.Subject,
                 generatedEmail.HtmlContent)
@@ -86,16 +86,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             string htmlContent)
         {
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
-            msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteBccEmail));
+            msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.BccEmail));
 
             var response = await _client.SendEmailAsync(msg).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("User invite email sent successfully to {Address}.", to.Email);
+                _logger.LogInformation("Email sent successfully to {Address}.", to.Email);
             }
             else
             {
-                throw new NotSupportedException("User invite email return error response code:  " + response.StatusCode);
+                throw new NotSupportedException("Email failed with error code: " + response.StatusCode);
             }
 
             return response.IsSuccessStatusCode;
