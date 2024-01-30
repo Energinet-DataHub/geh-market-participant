@@ -43,6 +43,8 @@ public sealed class InvitationController : ControllerBase
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<ActionResult> InviteUserAsync([FromBody] UserInvitationDto userInvitation)
     {
+        ArgumentNullException.ThrowIfNull(userInvitation);
+
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(userInvitation.AssignedActor))
             return Unauthorized();
 

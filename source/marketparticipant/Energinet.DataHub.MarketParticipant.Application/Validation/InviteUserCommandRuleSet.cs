@@ -25,27 +25,30 @@ public sealed class InviteUserCommandRuleSet : AbstractValidator<InviteUserComma
             .NotNull()
             .ChildRules(invitationRules =>
             {
-                invitationRules
-                    .RuleFor(invitation => invitation.FirstName)
-                    .NotEmpty()
-                    .MaximumLength(64);
+                When(x => x.Invitation.UserDetails != null, () =>
+                {
+                    invitationRules
+                        .RuleFor(invitation => invitation.UserDetails!.FirstName)
+                        .NotEmpty()
+                        .MaximumLength(64);
 
-                invitationRules
-                    .RuleFor(invitation => invitation.LastName)
-                    .NotEmpty()
-                    .MaximumLength(64);
+                    invitationRules
+                        .RuleFor(invitation => invitation.UserDetails!.LastName)
+                        .NotEmpty()
+                        .MaximumLength(64);
+
+                    invitationRules
+                        .RuleFor(invitation => invitation.UserDetails!.PhoneNumber)
+                        .NotEmpty()
+                        .MaximumLength(30)
+                        .Matches("^\\+[0-9]+ [0-9]+$");
+                });
 
                 invitationRules
                     .RuleFor(invitation => invitation.Email)
                     .NotEmpty()
                     .EmailAddress()
                     .MaximumLength(64);
-
-                invitationRules
-                    .RuleFor(invitation => invitation.PhoneNumber)
-                    .NotEmpty()
-                    .MaximumLength(30)
-                    .Matches("^\\+[0-9]+ [0-9]+$");
 
                 invitationRules
                     .RuleFor(invitation => invitation.AssignedActor)

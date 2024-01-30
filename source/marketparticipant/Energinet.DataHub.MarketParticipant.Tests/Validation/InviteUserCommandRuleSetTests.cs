@@ -27,9 +27,10 @@ public sealed class InviteUserCommandRuleSetTests
 {
     private readonly UserInvitationDto _validInvitation = new(
         "fake@value",
-        "fake_value",
-        "fake_value",
-        "+45 00000000",
+        new UserDetailsDto(
+            "fake_value",
+            "fake_value",
+            "+45 00000000"),
         Guid.NewGuid(),
         new[] { Guid.NewGuid() });
 
@@ -97,10 +98,16 @@ public sealed class InviteUserCommandRuleSetTests
     public async Task Validate_InvitationFirstName_ValidatesProperty(string? value, bool isValid)
     {
         // Arrange
-        const string propertyName = $"{nameof(InviteUserCommand.Invitation)}.{nameof(UserInvitationDto.FirstName)}";
+        const string propertyName = $"{nameof(InviteUserCommand.Invitation)}.{nameof(UserInvitationDto.UserDetails)}.{nameof(UserInvitationDto.UserDetails.FirstName)}";
 
         var target = new InviteUserCommandRuleSet();
-        var invitation = _validInvitation with { FirstName = value! };
+        var invitation = _validInvitation with
+        {
+            UserDetails = _validInvitation.UserDetails! with
+            {
+                FirstName = value!,
+            },
+        };
 
         var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
@@ -130,10 +137,16 @@ public sealed class InviteUserCommandRuleSetTests
     public async Task Validate_InvitationLastName_ValidatesProperty(string? value, bool isValid)
     {
         // Arrange
-        const string propertyName = $"{nameof(InviteUserCommand.Invitation)}.{nameof(UserInvitationDto.LastName)}";
+        const string propertyName = $"{nameof(InviteUserCommand.Invitation)}.{nameof(UserInvitationDto.UserDetails)}.{nameof(UserInvitationDto.UserDetails.LastName)}";
 
         var target = new InviteUserCommandRuleSet();
-        var invitation = _validInvitation with { LastName = value! };
+        var invitation = _validInvitation with
+        {
+            UserDetails = _validInvitation.UserDetails! with
+            {
+                LastName = value!,
+            },
+        };
 
         var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
@@ -171,10 +184,16 @@ public sealed class InviteUserCommandRuleSetTests
     public async Task Validate_InvitationPhoneNumber_ValidatesProperty(string? value, bool isValid)
     {
         // Arrange
-        const string propertyName = $"{nameof(InviteUserCommand.Invitation)}.{nameof(UserInvitationDto.PhoneNumber)}";
+        const string propertyName = $"{nameof(InviteUserCommand.Invitation)}.{nameof(UserInvitationDto.UserDetails)}.{nameof(UserInvitationDto.UserDetails.PhoneNumber)}";
 
         var target = new InviteUserCommandRuleSet();
-        var invitation = _validInvitation with { PhoneNumber = value! };
+        var invitation = _validInvitation with
+        {
+            UserDetails = _validInvitation.UserDetails! with
+            {
+                PhoneNumber = value!,
+            },
+        };
 
         var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 

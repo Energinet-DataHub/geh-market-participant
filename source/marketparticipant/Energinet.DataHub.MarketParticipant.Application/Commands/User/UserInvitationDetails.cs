@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record UserInvitationDto(
-    string Email,
-    UserDetailsDto? UserDetails,
-    Guid AssignedActor,
-    IEnumerable<Guid> AssignedRoles);
+public sealed record UserDetailsDto(
+    string FirstName,
+    string LastName,
+    string PhoneNumber);

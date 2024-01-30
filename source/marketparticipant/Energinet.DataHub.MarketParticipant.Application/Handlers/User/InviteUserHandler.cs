@@ -21,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
@@ -54,14 +53,16 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
         var assignedActor = await GetActorAsync(request.Invitation.AssignedActor).ConfigureAwait(false);
         var assignedRoles = await GetUserRolesAsync(request.Invitation.AssignedRoles).ConfigureAwait(false);
 
-        var phoneNumber = new PhoneNumber(request.Invitation.PhoneNumber);
+        var details = request.Invitation.UserDetails != null
+            ? new UserDetails(
+                request.Invitation.UserDetails.FirstName,
+                request.Invitation.UserDetails.LastName,
+                new PhoneNumber(request.Invitation.UserDetails.PhoneNumber))
+            : null;
 
         var invitation = new UserInvitation(
             new EmailAddress(request.Invitation.Email),
-            request.Invitation.FirstName,
-            request.Invitation.LastName,
-            phoneNumber,
-            new SmsAuthenticationMethod(phoneNumber),
+            details,
             assignedActor,
             assignedRoles);
 
