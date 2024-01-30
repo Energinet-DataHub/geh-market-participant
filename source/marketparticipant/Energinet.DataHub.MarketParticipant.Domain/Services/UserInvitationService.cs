@@ -101,10 +101,6 @@ public sealed class UserInvitationService : IUserInvitationService
             invitedUser = new User(invitation.AssignedActor.Id, sharedId, userIdentityId);
             invitedUser.ActivateUserExpiration();
 
-            await _userRepository
-                .AddOrUpdateAsync(invitedUser)
-                .ConfigureAwait(false);
-
             userIdentityModified = true;
             mailTemplate = new UserInviteEmailTemplate(userIdentity, organization, invitation.AssignedActor);
         }
