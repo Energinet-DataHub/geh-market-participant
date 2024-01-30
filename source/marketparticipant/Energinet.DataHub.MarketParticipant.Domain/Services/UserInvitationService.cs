@@ -128,7 +128,7 @@ public sealed class UserInvitationService : IUserInvitationService
 
         await using (uow.ConfigureAwait(false))
         {
-            await _userRepository
+            var invitedUserId = await _userRepository
                 .AddOrUpdateAsync(invitedUser)
                 .ConfigureAwait(false);
 
@@ -140,11 +140,11 @@ public sealed class UserInvitationService : IUserInvitationService
 
             if (userIdentityModified)
             {
-                await AuditLogUserIdentityAsync(invitedUser.Id, auditIdentity, invitation.UserDetails!).ConfigureAwait(false);
+                await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation.UserDetails!).ConfigureAwait(false);
             }
 
             await _userInviteAuditLogRepository
-                .AuditAsync(invitedUser.Id, auditIdentity, invitation.AssignedActor.Id)
+                .AuditAsync(invitedUserId, auditIdentity, invitation.AssignedActor.Id)
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
