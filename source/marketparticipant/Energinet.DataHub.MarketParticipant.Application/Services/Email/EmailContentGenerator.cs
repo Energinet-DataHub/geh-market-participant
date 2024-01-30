@@ -22,7 +22,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services.Email;
 
-// TODO: Add tests.
 public sealed class EmailContentGenerator : IEmailContentGenerator
 {
     public async Task<GeneratedEmail> GenerateAsync(EmailTemplate emailTemplate, IReadOnlyDictionary<string, string> additionalParameters)

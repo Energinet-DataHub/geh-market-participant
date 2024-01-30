@@ -25,8 +25,8 @@ public sealed class UserAssignedToActorEmailTemplate : EmailTemplate
     {
     }
 
-    public UserAssignedToActorEmailTemplate(EmailTemplateId id, IReadOnlyDictionary<string, string> parameters)
-        : base(id, parameters)
+    public UserAssignedToActorEmailTemplate(IReadOnlyDictionary<string, string> parameters)
+        : base(EmailTemplateId.UserAssignedToActor, parameters)
     {
     }
 

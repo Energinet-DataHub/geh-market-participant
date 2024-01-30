@@ -30,10 +30,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class SendEmailHandlerTests
     {
-        private readonly UserInviteEmailTemplate _emailTemplate = new(EmailTemplateId.UserInvite, new Dictionary<string, string>());
+        private readonly UserInviteEmailTemplate _emailTemplate = new(new Dictionary<string, string>());
 
         [Fact]
-        public async Task Handle_EmailEventFound_EmailsSent()
+        public async Task Handle_EmailEventFound_EmailIsSent()
         {
             // arrange
             var events = new[]

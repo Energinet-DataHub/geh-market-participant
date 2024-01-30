@@ -25,8 +25,8 @@ public sealed class UserInviteEmailTemplate : EmailTemplate
     {
     }
 
-    public UserInviteEmailTemplate(EmailTemplateId id, IReadOnlyDictionary<string, string> parameters)
-        : base(id, parameters)
+    public UserInviteEmailTemplate(IReadOnlyDictionary<string, string> parameters)
+        : base(EmailTemplateId.UserInvite, parameters)
     {
     }
 

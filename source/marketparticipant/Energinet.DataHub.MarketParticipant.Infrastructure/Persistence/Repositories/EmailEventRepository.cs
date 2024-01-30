@@ -79,20 +79,19 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         private static EmailEvent MapTo(EmailEventEntity emailEventEntity)
         {
-            var templateId = (EmailTemplateId)emailEventEntity.TemplateId;
             var templateParameters = JsonSerializer.Deserialize<Dictionary<string, string>>(emailEventEntity.TemplateParameters);
             if (templateParameters == null)
                 throw new InvalidOperationException($"Template parameters for event {emailEventEntity.Id} are invalid.");
 
             EmailTemplate mailTemplate;
 
-            switch (templateId)
+            switch ((EmailTemplateId)emailEventEntity.TemplateId)
             {
                 case EmailTemplateId.UserInvite:
-                    mailTemplate = new UserInviteEmailTemplate(templateId, templateParameters);
+                    mailTemplate = new UserInviteEmailTemplate(templateParameters);
                     break;
                 case EmailTemplateId.UserAssignedToActor:
-                    mailTemplate = new UserInviteEmailTemplate(templateId, templateParameters);
+                    mailTemplate = new UserInviteEmailTemplate(templateParameters);
                     break;
                 default:
                     throw new InvalidOperationException($"Template id for event {emailEventEntity.Id} is invalid.");

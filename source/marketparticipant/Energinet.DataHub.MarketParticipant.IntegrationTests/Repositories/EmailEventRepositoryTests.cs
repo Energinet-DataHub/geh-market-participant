@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
     [IntegrationTest]
     public sealed class EmailEventRepositoryTests
     {
-        private readonly UserInviteEmailTemplate _emailTemplate = new(EmailTemplateId.UserInvite, new Dictionary<string, string>());
+        private readonly UserInviteEmailTemplate _emailTemplate = new(new Dictionary<string, string>());
 
         private readonly MarketParticipantDatabaseFixture _fixture;
 
