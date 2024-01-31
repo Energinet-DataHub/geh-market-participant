@@ -29,17 +29,18 @@ public sealed class UserInvitationTests
 {
     private readonly UserInvitation _validInvitation = new(
         new MockedEmailAddress(),
-        "John",
-        "Doe",
-        new PhoneNumber("00000000"),
-        new SmsAuthenticationMethod(new PhoneNumber("+45 00000000")),
+        new InvitationUserDetails(
+            "John",
+            "Doe",
+            new PhoneNumber("+45 00000000"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 00000000"))),
         new Actor(
             new ActorId(Guid.NewGuid()),
             new OrganizationId(Guid.NewGuid()),
             null,
             new MockedGln(),
             ActorStatus.New,
-            new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
+            new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty), },
             new ActorName("fake_value"),
             null),
         new[]
@@ -49,7 +50,7 @@ public sealed class UserInvitationTests
                 "fake_value",
                 UserRoleStatus.Active,
                 Array.Empty<PermissionId>(),
-                EicFunction.BalanceResponsibleParty)
+                EicFunction.BalanceResponsibleParty),
         });
 
     [Fact]
@@ -58,10 +59,7 @@ public sealed class UserInvitationTests
         // Arrange + Act
         var actual = new UserInvitation(
             _validInvitation.Email,
-            _validInvitation.FirstName,
-            _validInvitation.LastName,
-            _validInvitation.PhoneNumber,
-            _validInvitation.RequiredAuthentication,
+            _validInvitation.InvitationUserDetails,
             _validInvitation.AssignedActor,
             _validInvitation.AssignedRoles);
 
@@ -92,10 +90,7 @@ public sealed class UserInvitationTests
         {
             var actual = new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.FirstName,
-                _validInvitation.LastName,
-                _validInvitation.PhoneNumber,
-                _validInvitation.RequiredAuthentication,
+                _validInvitation.InvitationUserDetails,
                 testActor,
                 _validInvitation.AssignedRoles);
 
@@ -105,10 +100,7 @@ public sealed class UserInvitationTests
         {
             Assert.Throws<ValidationException>(() => new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.FirstName,
-                _validInvitation.LastName,
-                _validInvitation.PhoneNumber,
-                _validInvitation.RequiredAuthentication,
+                _validInvitation.InvitationUserDetails,
                 testActor,
                 _validInvitation.AssignedRoles));
         }
@@ -132,10 +124,7 @@ public sealed class UserInvitationTests
         {
             var actual = new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.FirstName,
-                _validInvitation.LastName,
-                _validInvitation.PhoneNumber,
-                _validInvitation.RequiredAuthentication,
+                _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
                 new[] { testRole });
 
@@ -145,10 +134,7 @@ public sealed class UserInvitationTests
         {
             Assert.Throws<ValidationException>(() => new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.FirstName,
-                _validInvitation.LastName,
-                _validInvitation.PhoneNumber,
-                _validInvitation.RequiredAuthentication,
+                _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
                 new[] { testRole }));
         }
@@ -173,10 +159,7 @@ public sealed class UserInvitationTests
         {
             var actual = new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.FirstName,
-                _validInvitation.LastName,
-                _validInvitation.PhoneNumber,
-                _validInvitation.RequiredAuthentication,
+                _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
                 new[] { testRole });
 
@@ -186,10 +169,7 @@ public sealed class UserInvitationTests
         {
             Assert.Throws<ValidationException>(() => new UserInvitation(
                 _validInvitation.Email,
-                _validInvitation.FirstName,
-                _validInvitation.LastName,
-                _validInvitation.PhoneNumber,
-                _validInvitation.RequiredAuthentication,
+                _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
                 new[] { testRole }));
         }

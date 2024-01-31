@@ -56,10 +56,11 @@ public sealed class UserInvitationServiceTests
 
     private readonly UserInvitation _validInvitation = new(
         new MockedEmailAddress(),
-        "John",
-        "Doe",
-        new PhoneNumber("00000000"),
-        new SmsAuthenticationMethod(new PhoneNumber("+45 00000000")),
+        new InvitationUserDetails(
+            "John",
+            "Doe",
+            new PhoneNumber("+45 00000000"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 00000000"))),
         _validActor,
         new[]
         {
@@ -69,7 +70,7 @@ public sealed class UserInvitationServiceTests
                 "fake_value",
                 UserRoleStatus.Active,
                 Array.Empty<PermissionId>(),
-                EicFunction.BalanceResponsibleParty)
+                EicFunction.BalanceResponsibleParty),
         });
 
     private readonly UserId _validInvitedByUserId = new(Guid.NewGuid());
@@ -215,9 +216,9 @@ public sealed class UserInvitationServiceTests
             externalId,
             _validInvitation.Email,
             UserIdentityStatus.Active,
-            _validInvitation.FirstName,
-            _validInvitation.LastName,
-            _validInvitation.PhoneNumber,
+            _validInvitation.InvitationUserDetails!.FirstName,
+            _validInvitation.InvitationUserDetails.LastName,
+            _validInvitation.InvitationUserDetails.PhoneNumber,
             DateTimeOffset.UtcNow,
             AuthenticationMethod.Undetermined,
             new Mock<IList<LoginIdentity>>().Object);
@@ -286,9 +287,9 @@ public sealed class UserInvitationServiceTests
                 new ExternalUserId(Guid.NewGuid()),
                 _validInvitation.Email,
                 UserIdentityStatus.Active,
-                _validInvitation.FirstName,
-                _validInvitation.LastName,
-                _validInvitation.PhoneNumber,
+                _validInvitation.InvitationUserDetails!.FirstName,
+                _validInvitation.InvitationUserDetails.LastName,
+                _validInvitation.InvitationUserDetails.PhoneNumber,
                 DateTimeOffset.UtcNow,
                 AuthenticationMethod.Undetermined,
                 new Mock<IList<LoginIdentity>>().Object));
@@ -354,9 +355,9 @@ public sealed class UserInvitationServiceTests
             externalId,
             _validInvitation.Email,
             UserIdentityStatus.Active,
-            _validInvitation.FirstName,
-            _validInvitation.LastName,
-            _validInvitation.PhoneNumber,
+            _validInvitation.InvitationUserDetails!.FirstName,
+            _validInvitation.InvitationUserDetails.LastName,
+            _validInvitation.InvitationUserDetails.PhoneNumber,
             DateTimeOffset.UtcNow,
             AuthenticationMethod.Undetermined,
             new Mock<IList<LoginIdentity>>().Object);
@@ -428,9 +429,9 @@ public sealed class UserInvitationServiceTests
             externalId,
             _validInvitation.Email,
             UserIdentityStatus.Active,
-            _validInvitation.FirstName,
-            _validInvitation.LastName,
-            _validInvitation.PhoneNumber,
+            _validInvitation.InvitationUserDetails!.FirstName,
+            _validInvitation.InvitationUserDetails.LastName,
+            _validInvitation.InvitationUserDetails.PhoneNumber,
             DateTimeOffset.UtcNow,
             AuthenticationMethod.Undetermined,
             new Mock<IList<LoginIdentity>>().Object);
@@ -510,9 +511,9 @@ public sealed class UserInvitationServiceTests
             externalId,
             _validInvitation.Email,
             UserIdentityStatus.Active,
-            _validInvitation.FirstName,
-            _validInvitation.LastName,
-            _validInvitation.PhoneNumber,
+            _validInvitation.InvitationUserDetails!.FirstName,
+            _validInvitation.InvitationUserDetails.LastName,
+            _validInvitation.InvitationUserDetails.PhoneNumber,
             DateTimeOffset.UtcNow,
             AuthenticationMethod.Undetermined,
             new Mock<IList<LoginIdentity>>().Object);
@@ -747,9 +748,9 @@ public sealed class UserInvitationServiceTests
         userIdentityRepositoryMock.Verify(
             userIdentityRepository => userIdentityRepository.CreateAsync(It.Is<UserIdentity>(userIdentity =>
                 userIdentity.Email == _validInvitation.Email &&
-                userIdentity.PhoneNumber == _validInvitation.PhoneNumber &&
-                userIdentity.FirstName == _validInvitation.FirstName &&
-                userIdentity.LastName == _validInvitation.LastName)),
+                userIdentity.PhoneNumber == _validInvitation.InvitationUserDetails!.PhoneNumber &&
+                userIdentity.FirstName == _validInvitation.InvitationUserDetails.FirstName &&
+                userIdentity.LastName == _validInvitation.InvitationUserDetails.LastName)),
             Times.Once);
     }
 }

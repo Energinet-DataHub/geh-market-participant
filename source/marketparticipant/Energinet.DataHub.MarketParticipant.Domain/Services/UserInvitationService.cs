@@ -74,6 +74,12 @@ public sealed class UserInvitationService : IUserInvitationService
         var invitedUser = await GetUserAsync(invitation.Email).ConfigureAwait(false);
         if (invitedUser == null)
         {
+            if (invitation.InvitationUserDetails == null)
+            {
+                // silently return to not leak information about whether the user exists or not
+                return;
+            }
+
             await _organizationDomainValidationService
                 .ValidateUserEmailInsideOrganizationDomainsAsync(invitation.AssignedActor, invitation.Email)
                 .ConfigureAwait(false);
@@ -83,10 +89,10 @@ public sealed class UserInvitationService : IUserInvitationService
             var userIdentity = new UserIdentity(
                 sharedId,
                 invitation.Email,
-                invitation.FirstName,
-                invitation.LastName,
-                invitation.PhoneNumber,
-                invitation.RequiredAuthentication);
+                invitation.InvitationUserDetails.FirstName,
+                invitation.InvitationUserDetails.LastName,
+                invitation.InvitationUserDetails.PhoneNumber,
+                invitation.InvitationUserDetails.AuthenticationMethod);
 
             var userIdentityId = await _userIdentityRepository
                 .CreateAsync(userIdentity)
@@ -133,7 +139,7 @@ public sealed class UserInvitationService : IUserInvitationService
 
             if (userIdentityModified)
             {
-                await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation).ConfigureAwait(false);
+                await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation.InvitationUserDetails!).ConfigureAwait(false);
             }
 
             await _userInviteAuditLogRepository
@@ -212,18 +218,18 @@ public sealed class UserInvitationService : IUserInvitationService
             : null;
     }
 
-    private async Task AuditLogUserIdentityAsync(UserId invitedUserId, AuditIdentity invitationSentBy, UserInvitation invitation)
+    private async Task AuditLogUserIdentityAsync(UserId invitedUserId, AuditIdentity invitationSentBy, InvitationUserDetails invitationUserDetails)
     {
         await _userIdentityAuditLogRepository
-            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.FirstName, invitation.FirstName, null)
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.FirstName, invitationUserDetails.FirstName, null)
             .ConfigureAwait(false);
 
         await _userIdentityAuditLogRepository
-            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.LastName, invitation.LastName, null)
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.LastName, invitationUserDetails.LastName, null)
             .ConfigureAwait(false);
 
         await _userIdentityAuditLogRepository
-            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.PhoneNumber, invitation.PhoneNumber.Number, null)
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.PhoneNumber, invitationUserDetails.PhoneNumber.Number, null)
             .ConfigureAwait(false);
     }
 }
