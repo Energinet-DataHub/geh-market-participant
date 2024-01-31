@@ -269,4 +269,23 @@ public sealed class InviteUserCommandRuleSetTests
         Assert.False(result.IsValid);
         Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
     }
+
+    [Fact]
+    public async Task Validate_InvitationUserDetailsNotSet_IsValid()
+    {
+        // arrange
+        var invitation = _validInvitation with
+        {
+            InvitationUserDetails = null,
+        };
+
+        // act
+        var result = await new InviteUserCommandRuleSet().ValidateAsync(
+            new InviteUserCommand(
+                invitation,
+                _validInvitedByUserId));
+
+        // assert
+        Assert.True(result.IsValid);
+    }
 }
