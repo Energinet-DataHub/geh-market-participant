@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record InviteConfig(
-    string UserInviteFromEmail,
-    string UserInviteBccEmail,
-    string UserInviteFlow,
-    string? EnvironmentDescription);
+public sealed record InvitationUserDetailsDto(
+    string FirstName,
+    string LastName,
+    string PhoneNumber);

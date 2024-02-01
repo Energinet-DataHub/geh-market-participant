@@ -15,7 +15,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
@@ -23,18 +22,12 @@ public sealed class UserInvitation
 {
     public UserInvitation(
         EmailAddress email,
-        string firstName,
-        string lastName,
-        PhoneNumber phoneNumber,
-        AuthenticationMethod requiredAuthentication,
+        InvitationUserDetails? invitationUserDetails,
         Actor assignedActor,
         IReadOnlyCollection<UserRole> assignedRoles)
     {
         Email = email;
-        FirstName = firstName;
-        LastName = lastName;
-        PhoneNumber = phoneNumber;
-        RequiredAuthentication = requiredAuthentication;
+        InvitationUserDetails = invitationUserDetails;
         AssignedActor = assignedActor;
         AssignedRoles = assignedRoles;
 
@@ -43,10 +36,7 @@ public sealed class UserInvitation
     }
 
     public EmailAddress Email { get; }
-    public string FirstName { get; }
-    public string LastName { get; }
-    public PhoneNumber PhoneNumber { get; }
-    public AuthenticationMethod RequiredAuthentication { get; }
+    public InvitationUserDetails? InvitationUserDetails { get; }
     public Actor AssignedActor { get; }
     public IReadOnlyCollection<UserRole> AssignedRoles { get; }
 

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
+namespace Energinet.DataHub.MarketParticipant.Application.Services.Email;
 
-public sealed record UserInvitationDto(
-    string Email,
-    InvitationUserDetailsDto? InvitationUserDetails,
-    Guid AssignedActor,
-    IEnumerable<Guid> AssignedRoles);
+public interface IEmailContentGenerator
+{
+    Task<GeneratedEmail> GenerateAsync(EmailTemplate emailTemplate, IReadOnlyDictionary<string, string> additionalParameters);
+}

@@ -12,11 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+using System.Collections.Generic;
+
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Email;
+
+public abstract class EmailTemplate
 {
-    public enum EmailEventType
+    protected EmailTemplate(EmailTemplateId id, IReadOnlyDictionary<string, string> parameters)
     {
-        UserInvite = 1,
-        UserAssignedToActor = 2
+        TemplateId = id;
+        TemplateParameters = parameters;
     }
+
+    public EmailTemplateId TemplateId { get; set; }
+    public IReadOnlyDictionary<string, string> TemplateParameters { get; }
 }

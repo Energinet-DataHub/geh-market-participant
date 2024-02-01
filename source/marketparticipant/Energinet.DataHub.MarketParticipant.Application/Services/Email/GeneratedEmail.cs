@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
+namespace Energinet.DataHub.MarketParticipant.Application.Services.Email;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
+public sealed class GeneratedEmail
+{
+    public GeneratedEmail(string subject, string htmlContent)
+    {
+        Subject = subject;
+        HtmlContent = htmlContent;
+    }
 
-public sealed record UserInvitationDto(
-    string Email,
-    InvitationUserDetailsDto? InvitationUserDetails,
-    Guid AssignedActor,
-    IEnumerable<Guid> AssignedRoles);
+    public string Subject { get; }
+    public string HtmlContent { get; }
+}

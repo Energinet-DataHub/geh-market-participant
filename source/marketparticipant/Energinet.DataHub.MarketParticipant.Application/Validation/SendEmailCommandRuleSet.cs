@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
-
-public sealed record UserInvitationDto(
-    string Email,
-    InvitationUserDetailsDto? InvitationUserDetails,
-    Guid AssignedActor,
-    IEnumerable<Guid> AssignedRoles);
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
+{
+    public sealed class SendEmailCommandRuleSet : AbstractValidator<SendEmailCommand>
+    {
+    }
+}

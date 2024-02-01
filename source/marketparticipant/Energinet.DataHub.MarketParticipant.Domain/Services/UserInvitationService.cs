@@ -17,6 +17,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
@@ -27,6 +28,8 @@ public sealed class UserInvitationService : IUserInvitationService
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IEmailEventRepository _emailEventRepository;
+    private readonly IActorRepository _actorRepository;
+    private readonly IOrganizationRepository _organizationRepository;
     private readonly IOrganizationDomainValidationService _organizationDomainValidationService;
     private readonly IUserInviteAuditLogRepository _userInviteAuditLogRepository;
     private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
@@ -37,6 +40,8 @@ public sealed class UserInvitationService : IUserInvitationService
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
         IEmailEventRepository emailEventRepository,
+        IActorRepository actorRepository,
+        IOrganizationRepository organizationRepository,
         IOrganizationDomainValidationService organizationDomainValidationService,
         IUserInviteAuditLogRepository userInviteAuditLogRepository,
         IUserIdentityAuditLogRepository userIdentityAuditLogRepository,
@@ -46,6 +51,8 @@ public sealed class UserInvitationService : IUserInvitationService
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
         _emailEventRepository = emailEventRepository;
+        _actorRepository = actorRepository;
+        _organizationRepository = organizationRepository;
         _organizationDomainValidationService = organizationDomainValidationService;
         _userInviteAuditLogRepository = userInviteAuditLogRepository;
         _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
@@ -57,12 +64,22 @@ public sealed class UserInvitationService : IUserInvitationService
     {
         ArgumentNullException.ThrowIfNull(invitation);
 
-        var mailEventType = EmailEventType.UserAssignedToActor;
+        var organization = await _organizationRepository
+            .GetAsync(invitation.AssignedActor.OrganizationId)
+            .ConfigureAwait(false) ?? throw new InvalidOperationException($"Organization {invitation.AssignedActor.OrganizationId.Value} was not found.");
+
+        EmailTemplate mailTemplate;
         var userIdentityModified = false;
 
         var invitedUser = await GetUserAsync(invitation.Email).ConfigureAwait(false);
         if (invitedUser == null)
         {
+            if (invitation.InvitationUserDetails == null)
+            {
+                // silently return to not leak information about whether the user exists or not
+                return;
+            }
+
             await _organizationDomainValidationService
                 .ValidateUserEmailInsideOrganizationDomainsAsync(invitation.AssignedActor, invitation.Email)
                 .ConfigureAwait(false);
@@ -72,10 +89,10 @@ public sealed class UserInvitationService : IUserInvitationService
             var userIdentity = new UserIdentity(
                 sharedId,
                 invitation.Email,
-                invitation.FirstName,
-                invitation.LastName,
-                invitation.PhoneNumber,
-                invitation.RequiredAuthentication);
+                invitation.InvitationUserDetails.FirstName,
+                invitation.InvitationUserDetails.LastName,
+                invitation.InvitationUserDetails.PhoneNumber,
+                invitation.InvitationUserDetails.AuthenticationMethod);
 
             var userIdentityId = await _userIdentityRepository
                 .CreateAsync(userIdentity)
@@ -83,9 +100,19 @@ public sealed class UserInvitationService : IUserInvitationService
 
             invitedUser = new User(invitation.AssignedActor.Id, sharedId, userIdentityId);
             invitedUser.ActivateUserExpiration();
-
-            mailEventType = EmailEventType.UserInvite;
             userIdentityModified = true;
+
+            mailTemplate = new UserInviteEmailTemplate(userIdentity, organization, invitation.AssignedActor);
+        }
+        else
+        {
+            var userIdentity = await _userIdentityRepository
+                .GetAsync(invitedUser.ExternalId)
+                .ConfigureAwait(false);
+
+            NotFoundValidationException.ThrowIfNull(userIdentity, invitedUser.ExternalId.Value);
+
+            mailTemplate = new UserAssignedToActorEmailTemplate(userIdentity, organization, invitation.AssignedActor);
         }
 
         foreach (var assignedRole in invitation.AssignedRoles)
@@ -105,14 +132,14 @@ public sealed class UserInvitationService : IUserInvitationService
                 .ConfigureAwait(false);
 
             await _emailEventRepository
-                .InsertAsync(new EmailEvent(invitation.Email, mailEventType))
+                .InsertAsync(new EmailEvent(invitation.Email, mailTemplate))
                 .ConfigureAwait(false);
 
             var auditIdentity = new AuditIdentity(invitationSentByUserId);
 
             if (userIdentityModified)
             {
-                await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation).ConfigureAwait(false);
+                await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation.InvitationUserDetails!).ConfigureAwait(false);
             }
 
             await _userInviteAuditLogRepository
@@ -127,7 +154,9 @@ public sealed class UserInvitationService : IUserInvitationService
     {
         ArgumentNullException.ThrowIfNull(user);
 
-        var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
+        var userIdentity = await _userIdentityRepository
+            .GetAsync(user.ExternalId)
+            .ConfigureAwait(false);
 
         NotFoundValidationException.ThrowIfNull(
             userIdentity,
@@ -140,6 +169,14 @@ public sealed class UserInvitationService : IUserInvitationService
             throw new ValidationException($"The current user invitation for user {user.Id} is not expired and cannot be re-invited.")
                 .WithErrorCode("user.invite.not_expired");
         }
+
+        var actor = await _actorRepository
+            .GetAsync(user.AdministratedBy)
+            .ConfigureAwait(false) ?? throw new InvalidOperationException($"Actor {user.AdministratedBy.Value} was not found.");
+
+        var organization = await _organizationRepository
+            .GetAsync(actor.OrganizationId)
+            .ConfigureAwait(false) ?? throw new InvalidOperationException($"Organization {actor.OrganizationId.Value} was not found.");
 
         user.ActivateUserExpiration();
 
@@ -157,8 +194,9 @@ public sealed class UserInvitationService : IUserInvitationService
                 .AddOrUpdateAsync(user)
                 .ConfigureAwait(false);
 
+            var mailTemplate = new UserInviteEmailTemplate(userIdentity, organization, actor);
             await _emailEventRepository
-                .InsertAsync(new EmailEvent(userIdentity.Email, EmailEventType.UserInvite))
+                .InsertAsync(new EmailEvent(userIdentity.Email, mailTemplate))
                 .ConfigureAwait(false);
 
             await _userInviteAuditLogRepository
@@ -180,18 +218,18 @@ public sealed class UserInvitationService : IUserInvitationService
             : null;
     }
 
-    private async Task AuditLogUserIdentityAsync(UserId invitedUserId, AuditIdentity invitationSentBy, UserInvitation invitation)
+    private async Task AuditLogUserIdentityAsync(UserId invitedUserId, AuditIdentity invitationSentBy, InvitationUserDetails invitationUserDetails)
     {
         await _userIdentityAuditLogRepository
-            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.FirstName, invitation.FirstName, null)
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.FirstName, invitationUserDetails.FirstName, null)
             .ConfigureAwait(false);
 
         await _userIdentityAuditLogRepository
-            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.LastName, invitation.LastName, null)
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.LastName, invitationUserDetails.LastName, null)
             .ConfigureAwait(false);
 
         await _userIdentityAuditLogRepository
-            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.PhoneNumber, invitation.PhoneNumber.Number, null)
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.PhoneNumber, invitationUserDetails.PhoneNumber.Number, null)
             .ConfigureAwait(false);
     }
 }

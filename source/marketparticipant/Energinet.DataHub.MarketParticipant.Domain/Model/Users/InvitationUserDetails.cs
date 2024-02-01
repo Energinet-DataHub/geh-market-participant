@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands;
-using FluentValidation;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
-{
-    public sealed class SendUserInviteEmailCommandRuleSet : AbstractValidator<SendUserInviteEmailCommand>
-    {
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+
+public sealed record InvitationUserDetails(string FirstName, string LastName, PhoneNumber PhoneNumber, AuthenticationMethod AuthenticationMethod);

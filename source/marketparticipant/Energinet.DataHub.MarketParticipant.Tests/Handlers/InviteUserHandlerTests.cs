@@ -22,7 +22,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
@@ -37,9 +36,10 @@ public sealed class InviteUserHandlerTests
 {
     private static readonly UserInvitationDto _validInvitation = new(
         "fake@value",
-        "fake_value",
-        "fake_value",
-        "+45 70000000",
+        new InvitationUserDetailsDto(
+            "fake_value",
+            "fake_value",
+            "+45 70000000"),
         Guid.NewGuid(),
         new[] { Guid.NewGuid() });
 
@@ -200,10 +200,9 @@ public sealed class InviteUserHandlerTests
         userInvitationServiceMock.Verify(userInvitationService => userInvitationService.InviteUserAsync(
             It.Is<UserInvitation>(ui =>
                 ui.Email.Address == _validInvitation.Email &&
-                ui.FirstName == _validInvitation.FirstName &&
-                ui.LastName == _validInvitation.LastName &&
-                ui.PhoneNumber.Number == _validInvitation.PhoneNumber &&
-                ui.RequiredAuthentication is SmsAuthenticationMethod &&
+                ui.InvitationUserDetails!.FirstName == _validInvitation.InvitationUserDetails!.FirstName &&
+                ui.InvitationUserDetails!.LastName == _validInvitation.InvitationUserDetails!.LastName &&
+                ui.InvitationUserDetails!.PhoneNumber.Number == _validInvitation.InvitationUserDetails!.PhoneNumber &&
                 ui.AssignedActor.Id.Value == _validInvitation.AssignedActor &&
                 ui.AssignedRoles.Single().Id.Value == _validInvitation.AssignedRoles.Single()),
             It.Is<UserId>(u => u.Value == _validInvitedByUserId)));
