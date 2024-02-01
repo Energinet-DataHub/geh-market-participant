@@ -58,7 +58,6 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             include ->markpartUserOverviewController->
             include ->markpartInvitationController->
         }
-        
         component markpartOrganizationManager "MarkpartOrganizationManager" {
             title "[Component] DataHub 3.0 - Market Participant Organization Manager"
             include markpartUserIdentityRepositoryInOrganizationManager->
