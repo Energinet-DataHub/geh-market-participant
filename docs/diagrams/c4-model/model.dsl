@@ -39,7 +39,7 @@ markpartDomain = group "Market Participant" {
         this -> markpartKeyVault "Signs, and reads public key for, tokens." "Microsoft.Graph/https"
         this -> markpartCertKeyVault "Manages active DH2 certificates used for B2B authentication." "Microsoft.Graph/https"
 
-        markpartUserIdentityRepository = component "UserIdentityRepository" {
+        markpartUserIdentityRepositoryInMarkpartApi = component "UserIdentityRepository" {
             description "Manages access to B2C user data through GraphAPI."
 
             # Common relationships
@@ -53,7 +53,7 @@ markpartDomain = group "Market Participant" {
             this -> markpartDb "Writes/reads from" "EF Core"
 
             # Common relationships
-            this -> markpartUserIdentityRepository "Accesses user information" "Microsoft.Graph/https"
+            this -> markpartUserIdentityRepositoryInMarkpartApi "Accesses user information" "Microsoft.Graph/https"
         }
 
         markpartPermissionController = component "PermissionController" {
@@ -77,7 +77,7 @@ markpartDomain = group "Market Participant" {
             this -> markpartDb "Writes/reads from" "EF Core"
 
             # Common relationships
-            this -> markpartUserIdentityRepository "Accesses user information" "Microsoft.Graph/https"
+            this -> markpartUserIdentityRepositoryInMarkpartApi "Accesses user information" "Microsoft.Graph/https"
         }
 
         markpartUserOverviewController = component "UserOverviewController" {
@@ -87,7 +87,7 @@ markpartDomain = group "Market Participant" {
             this -> markpartDb "Reads from" "EF Core"
 
             # Common relationships
-            this -> markpartUserIdentityRepository "Accesses user information" "Microsoft.Graph/https"
+            this -> markpartUserIdentityRepositoryInMarkpartApi "Accesses user information" "Microsoft.Graph/https"
         }
 
         markpartInvitationController = component "InvitationController" {
@@ -97,28 +97,7 @@ markpartDomain = group "Market Participant" {
             this -> markpartDb "Writes/reads from" "EF Core"
 
             # Common relationships
-            this -> markpartUserIdentityRepository "Accesses user information" "Microsoft.Graph/https"
-        }
-
-        markpartEmailEventTimerTrigger = component "EmailEventTimerTrigger" {
-            description "Timer Trigger dispatching invitation mails prepared by InvitationController."
-
-            # Domain relationships
-            this -> markpartDb "Writes/reads from" "EF Core"
-
-            # Common relationships
-            this -> dh3.sharedExternalSendGrid "Sends invitation mail" "SendGrid/https"
-            this -> markpartUserIdentityRepository "Accesses user information" "Microsoft.Graph/https"
-        }
-
-        markpartUserInvitationExpiredTimerTrigger = component "UserInvitationExpiredTimerTrigger" {
-            description "Timer Trigger checking for users with expired invitations. Users with expired invitations are disable in B2C."
-
-            # Domain relationships
-            this -> markpartDb "Reads from" "EF Core"
-
-            # Common relationships
-            this -> markpartUserIdentityRepository "Accesses user information" "Microsoft.Graph/https"
+            this -> markpartUserIdentityRepositoryInMarkpartApi "Accesses user information" "Microsoft.Graph/https"
         }
     }
 
@@ -138,6 +117,13 @@ markpartDomain = group "Market Participant" {
         description "Synchronizes Azure B2C user and actor state with the domain."
         technology "Azure function, C#"
         tags "Microsoft Azure - Function Apps" "Titans"
+
+        markpartUserIdentityRepositoryInOrganizationManager = component "UserIdentityRepository" {
+            description "Manages access to B2C user data through GraphAPI."
+
+            # Common relationships
+            this -> dh3.sharedB2C "Accesses user information" "Microsoft.Graph/https"
+        }
 
         markpartEventActorSynchronizer = component "Actor Synchronizer" {
             description "Creates B2C application registration for newly created actors."
@@ -162,6 +148,16 @@ markpartDomain = group "Market Participant" {
 
             # Domain relationships
             this -> markpartDb "Reads data regarding newly invited users." "EF Core"
+        }
+
+        markpartUserInvitationExpiredTimerTrigger = component "UserInvitationExpiredTimerTrigger" {
+            description "Timer Trigger checking for users with expired invitations. Users with expired invitations are disable in B2C."
+
+            # Domain relationships
+            this -> markpartDb "Reads from" "EF Core"
+
+            # Common relationships
+            this -> markpartUserIdentityRepositoryInOrganizationManager "Accesses user information" "Microsoft.Graph/https"
         }
     }
 }
