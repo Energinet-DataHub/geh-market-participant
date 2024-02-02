@@ -94,6 +94,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IValidator<GetActorCredentialsCommand>, GetActorCredentialsCommandRuleSet>();
             services.AddScoped<IValidator<ActorRequestSecretCommand>, ActorRequestSecretCommandRuleSet>();
             services.AddScoped<IValidator<GetPermissionRelationsCommand>, GetPermissionsRelationCommandRuleSet>();
+            services.AddScoped<IValidator<GetUserProfileCommand>, GetUserProfileCommandRuleSet>();
 
             services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
             services.AddScoped<IActorClientSecretService, ActorClientSecretService>();
