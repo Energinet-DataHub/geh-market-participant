@@ -147,14 +147,11 @@ public class UserController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("{userId:guid}/userprofile")]
+    [HttpGet("userprofile")]
     [AuthorizeUser]
-    public async Task<ActionResult<GetUserProfileResponse>> GetUserProfileAsync(Guid userId)
+    public async Task<ActionResult<GetUserProfileResponse>> GetUserProfileAsync()
     {
-        if (userId != _userContext.CurrentUser.UserId)
-            return Unauthorized();
-
-        var command = new GetUserProfileCommand(userId);
+        var command = new GetUserProfileCommand(_userContext.CurrentUser.UserId);
 
         var userProfile = await _mediator
             .Send(command)
@@ -163,15 +160,10 @@ public class UserController : ControllerBase
         return Ok(userProfile);
     }
 
-    [HttpPut("{userId:guid}/userprofile")]
+    [HttpPut("userprofile")]
     [AuthorizeUser]
-    public async Task<ActionResult> UpdateUserProfileAsync(
-        Guid userId,
-        UserProfileUpdateDto userProfileUpdateDto)
+    public async Task<ActionResult> UpdateUserProfileAsync(UserProfileUpdateDto userProfileUpdateDto)
     {
-        if (userId != _userContext.CurrentUser.UserId)
-            return Unauthorized();
-
         ArgumentNullException.ThrowIfNull(userProfileUpdateDto);
 
         var command = new UpdateUserIdentityCommand(
@@ -179,7 +171,7 @@ public class UserController : ControllerBase
                 userProfileUpdateDto.FirstName,
                 userProfileUpdateDto.LastName,
                 userProfileUpdateDto.PhoneNumber),
-            userId);
+            _userContext.CurrentUser.UserId);
 
         await _mediator.Send(command).ConfigureAwait(false);
         return Ok();
