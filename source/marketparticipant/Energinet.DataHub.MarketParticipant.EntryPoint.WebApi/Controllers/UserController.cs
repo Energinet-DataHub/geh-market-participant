@@ -147,6 +147,44 @@ public class UserController : ControllerBase
         return Ok();
     }
 
+    [HttpGet("{userId:guid}/userprofile")]
+    [AuthorizeUser]
+    public async Task<ActionResult<GetUserProfileResponse>> GetUserProfileAsync(Guid userId)
+    {
+        if (userId != _userContext.CurrentUser.UserId)
+            return Unauthorized();
+
+        var command = new GetUserProfileCommand(userId);
+
+        var userProfile = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok(userProfile);
+    }
+
+    [HttpPut("{userId:guid}/userprofile")]
+    [AuthorizeUser]
+    public async Task<ActionResult> UpdateUserProfileAsync(
+        Guid userId,
+        UserProfileUpdateDto userProfileUpdateDto)
+    {
+        if (userId != _userContext.CurrentUser.UserId)
+            return Unauthorized();
+
+        ArgumentNullException.ThrowIfNull(userProfileUpdateDto);
+
+        var command = new UpdateUserIdentityCommand(
+            new UserIdentityUpdateDto(
+                userProfileUpdateDto.FirstName,
+                userProfileUpdateDto.LastName,
+                userProfileUpdateDto.PhoneNumber),
+            userId);
+
+        await _mediator.Send(command).ConfigureAwait(false);
+        return Ok();
+    }
+
     [HttpPost("initiate-mitid-signup")]
     public async Task<ActionResult> InitiateMitIdSignupAsync()
     {
