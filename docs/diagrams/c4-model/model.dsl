@@ -98,6 +98,7 @@ markpartDomain = group "Market Participant" {
 
             # Common relationships
             this -> markpartUserIdentityRepositoryInMarkpartApi "Accesses user information" "Microsoft.Graph/https"
+            bffApi -> this
         }
     }
 

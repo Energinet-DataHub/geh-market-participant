@@ -57,6 +57,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             include ->markpartUserRoleAssignmentController->
             include ->markpartUserOverviewController->
             include ->markpartInvitationController->
+            include bffApi
         }
 
         component markpartOrganizationManager "MarkpartOrganizationManager" {
