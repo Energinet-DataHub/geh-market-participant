@@ -30,6 +30,16 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
             var first = NamingConvention.Regex.Match(x);
             var second = NamingConvention.Regex.Match(y);
 
+            if (first.Groups["type"].Value == "Seed" && second.Groups["type"].Value != "Seed")
+            {
+                return 1;
+            }
+
+            if (first.Groups["type"].Value != "Seed" && second.Groups["type"].Value == "Seed")
+            {
+                return -1;
+            }
+
             if (first.Groups["timestamp"].Value == second.Groups["timestamp"].Value)
             {
                 return first.Groups["type"].Value == second.Groups["type"].Value
