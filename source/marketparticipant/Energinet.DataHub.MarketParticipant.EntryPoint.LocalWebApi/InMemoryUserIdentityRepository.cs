@@ -20,8 +20,9 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 
 public sealed class InMemoryUserIdentityRepository : IUserIdentityRepository
 {
