@@ -31,6 +31,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -99,6 +100,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
         protected override void Configure(IConfiguration configuration, IServiceCollection services)
         {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services
                 .AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
