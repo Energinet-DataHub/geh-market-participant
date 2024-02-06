@@ -5,7 +5,7 @@ param (
 
 # Check if connection string is provided
 if (-not $ConnectionString) {
-    Write-Host "Please provide a connection string."
+    Write-Host "Please provide a connection string. Example: -ConnectionString ('Server=localhost;Database=DATABASENAMEHERE;Integrated Security=True;Connect Timeout=60;TrustServerCertificate=True;') or ('Data Source=(localdb)\\MSSQLLocalDB;Database=DATABASENAMEHERE;Integrated Security=True;Connect Timeout=60;TrustServerCertificate=True;') "
     exit
 }
 
