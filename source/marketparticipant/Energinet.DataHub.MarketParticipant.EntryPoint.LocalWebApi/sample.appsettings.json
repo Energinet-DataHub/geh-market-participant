@@ -1,0 +1,19 @@
+{
+  "SQL_MP_DB_CONNECTION_STRING": "Connection string to local database.",
+  "ALLOW_ALL_TOKENS": true,
+  "TOKEN_KEY_NAME": "token-sign",
+  "TOKEN_KEY_VAULT": "https://kvault-token-sign.vault.azure.net/",
+
+  "INTERNAL_OPEN_ID_URL": "https://datahub.dk/.well-known/openid-configuration",
+  "EXTERNAL_OPEN_ID_URL": "https://datahub.dk/.well-known/openid-configuration",
+  "BACKEND_BFF_APP_ID": "00000000-0000-0000-0000-000000000000",
+
+  "AZURE_B2C_BACKEND_ID": "00000000-0000-0000-0000-000000000000",
+  "AZURE_B2C_BACKEND_OBJECT_ID": "00000000-0000-0000-0000-000000000000",
+  "AZURE_B2C_BACKEND_SPN_OBJECT_ID": "00000000-0000-0000-0000-000000000000",
+  "AZURE_B2C_SPN_ID": "00000000-0000-0000-0000-000000000000",
+  "AZURE_B2C_SPN_SECRET": "00000000-0000-0000-0000-000000000000",
+  "AZURE_B2C_TENANT": "devDataHubB2C.onmicrosoft.com",
+
+  "CERTIFICATES_KEY_VAULT": "https://datahub.dk/kv"
+}

@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:49261;http://localhost:49262"
+    }
+  }
+}
