@@ -6,7 +6,7 @@
 
   "INTERNAL_OPEN_ID_URL": "https://datahub.dk/.well-known/openid-configuration",
   "EXTERNAL_OPEN_ID_URL": "https://datahub.dk/.well-known/openid-configuration",
-  "BACKEND_BFF_APP_ID": "The client id of the 'backend-bff-app' application registration.",
+  "BACKEND_BFF_APP_ID": "00000000-0000-0000-0000-000000000000",
 
   "AZURE_B2C_BACKEND_ID": "00000000-0000-0000-0000-000000000000",
   "AZURE_B2C_BACKEND_OBJECT_ID": "00000000-0000-0000-0000-000000000000",
