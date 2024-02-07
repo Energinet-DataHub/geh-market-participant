@@ -14,14 +14,20 @@
 
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 
-public static class DummyAuthenticationExtensions
+public class NoAuthStartup : WebApi.Startup
 {
-    public static void AddDummyJwtBearerAuthentication(this IServiceCollection services)
+    public NoAuthStartup(IConfiguration configuration)
+        : base(configuration)
+    {
+    }
+
+    protected override void SetupAuthentication(IConfiguration configuration, IServiceCollection services)
     {
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -43,7 +49,7 @@ public static class DummyAuthenticationExtensions
             ValidateLifetime = false,
             RequireExpirationTime = false,
             RequireSignedTokens = false,
-            SignatureValidator = (t, p) => new JwtSecurityToken(t)
+            SignatureValidator = (t, _) => new JwtSecurityToken(t),
 #pragma warning restore CA5404
         };
     }

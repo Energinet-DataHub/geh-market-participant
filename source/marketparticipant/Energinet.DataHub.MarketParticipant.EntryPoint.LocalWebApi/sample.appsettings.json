@@ -1,6 +1,5 @@
 {
   "SQL_MP_DB_CONNECTION_STRING": "Connection string to local database.",
-  "ALLOW_ALL_TOKENS": true,
   "TOKEN_KEY_NAME": "token-sign",
   "TOKEN_KEY_VAULT": "https://kvault-token-sign.vault.azure.net/",
 
