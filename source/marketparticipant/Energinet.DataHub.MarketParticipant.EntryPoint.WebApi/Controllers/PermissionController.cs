@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
@@ -65,6 +66,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [AuthorizeUser(PermissionId.UserRolesManage)]
         public async Task<ActionResult> UpdateAsync(UpdatePermissionDto updatePermissionDto)
         {
+            ArgumentNullException.ThrowIfNull(updatePermissionDto);
+
             if (!_userContext.CurrentUser.IsFas)
                 return Unauthorized();
 

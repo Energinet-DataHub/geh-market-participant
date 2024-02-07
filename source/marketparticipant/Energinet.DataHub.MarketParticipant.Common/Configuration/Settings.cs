@@ -43,9 +43,6 @@ public static class Settings
     public static Setting<string> BackendBffAppId { get; }
         = new("BACKEND_BFF_APP_ID");
 
-    public static Setting<bool> AllowAllTokens { get; }
-        = new("ALLOW_ALL_TOKENS", false);
-
     public static Setting<Uri> TokenKeyVault { get; }
         = new("TOKEN_KEY_VAULT");
     public static Setting<string> TokenKeyName { get; }

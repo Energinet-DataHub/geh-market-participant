@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi
                 .ConfigureWebHostDefaults(builder =>
                 {
                     builder
-                        .UseStartup<Startup>()
+                        .UseStartup<NoAuthStartup>()
                         .ConfigureServices(s =>
                         {
                             Startup.EnableIntegrationTestKeys = true;

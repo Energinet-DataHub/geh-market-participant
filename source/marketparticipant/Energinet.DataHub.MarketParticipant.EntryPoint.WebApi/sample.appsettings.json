@@ -5,8 +5,6 @@
   "EXTERNAL_OPEN_ID_URL": "The OpenId configuration endpoint for external Azure token, formatted as https://<tentant-id>.b2clogin.com/<tentant-id>.onmicrosoft.com/<sign-in-user-flow>/v2.0/.well-known/openid-configuration",
   "BACKEND_BFF_APP_ID": "The client id of the 'backend-bff-app' application registration.",
 
-  "ALLOW_ALL_TOKENS": false,
-
   "AZURE_B2C_BACKEND_ID": "The client id of the 'backend-b2b-app' application registration.",
   "AZURE_B2C_BACKEND_OBJECT_ID": "The object id of the 'backend-b2b-app' application registration.",
   "AZURE_B2C_BACKEND_SPN_OBJECT_ID": "The object id of the 'backend-b2b-app' service principal (the enterprise application for the application registration).",
