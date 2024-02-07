@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
-        public async Task InsertsEmailEvent()
+        public async Task Insert_UserInviteEmailTemplate_IsReturned()
         {
             // arrange
             await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -57,7 +57,30 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // assert
             var emailEventRepository2 = new EmailEventRepository(context2);
             var savedEvents = await emailEventRepository2.GetAllPendingEmailEventsAsync();
-            Assert.Single(savedEvents, e => e.Email.Equals(emailRandom));
+            Assert.Single(savedEvents, e => e.Email.Equals(emailRandom) && e.EmailTemplate is UserInviteEmailTemplate);
+        }
+
+        [Fact]
+        public async Task Insert_UserAssignedToActorEmailTemplate_IsReturned()
+        {
+            // arrange
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+
+            var emailEventRepository = new EmailEventRepository(context);
+
+            var emailRandom = new MockedEmailAddress();
+            var newEmailEvent = new EmailEvent(emailRandom, new UserAssignedToActorEmailTemplate(new Dictionary<string, string>()));
+
+            // act
+            await emailEventRepository.InsertAsync(newEmailEvent);
+
+            // assert
+            var emailEventRepository2 = new EmailEventRepository(context2);
+            var savedEvents = await emailEventRepository2.GetAllPendingEmailEventsAsync();
+            Assert.Single(savedEvents, e => e.Email.Equals(emailRandom) && e.EmailTemplate is UserAssignedToActorEmailTemplate);
         }
 
         [Fact]
