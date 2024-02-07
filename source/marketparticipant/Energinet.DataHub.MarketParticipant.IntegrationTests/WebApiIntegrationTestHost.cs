@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
@@ -31,11 +32,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests;
 
 public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 {
-    private readonly Startup _startup;
+    private readonly EntryPoint.WebApi.Startup _startup;
 
     private WebApiIntegrationTestHost(IConfiguration configuration)
     {
-        _startup = new Startup(configuration);
+        _startup = new NoAuthStartup(configuration);
     }
 
     public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
