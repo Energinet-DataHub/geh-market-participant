@@ -25,4 +25,10 @@ limitations under the License.
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.WebApi\Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="sample.appsettings.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
