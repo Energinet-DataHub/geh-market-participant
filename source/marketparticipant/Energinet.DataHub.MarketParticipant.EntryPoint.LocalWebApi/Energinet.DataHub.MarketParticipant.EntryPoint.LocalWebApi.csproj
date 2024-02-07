@@ -27,9 +27,6 @@ limitations under the License.
 
   <ItemGroup>
     <Content Remove="sample.appsettings.json" />
-    <None Include="sample.appsettings.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
