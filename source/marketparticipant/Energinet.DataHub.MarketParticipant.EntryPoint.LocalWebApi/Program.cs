@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi
                         .UseStartup<NoAuthStartup>()
                         .ConfigureServices(s =>
                         {
-                            Startup.EnableIntegrationTestKeys = true;
+                            WebApi.Startup.EnableIntegrationTestKeys = true;
                             s.RemoveAll<IUserIdentityRepository>();
                             s.AddScoped<IUserIdentityRepository, InMemoryUserIdentityRepository>();
                         });

@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests;
 
 public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 {
-    private readonly Startup _startup;
+    private readonly EntryPoint.WebApi.Startup _startup;
 
     private WebApiIntegrationTestHost(IConfiguration configuration)
     {
