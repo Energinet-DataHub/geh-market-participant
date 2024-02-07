@@ -12,17 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
 public class GetUserProfileHandler : IRequestHandler<GetUserProfileCommand, GetUserProfileResponse>
 {
-    public Task<GetUserProfileResponse> Handle(GetUserProfileCommand request, CancellationToken cancellationToken)
+    private readonly IUserRepository _userRepository;
+    private readonly IUserIdentityRepository _userIdentityRepository;
+
+    public GetUserProfileHandler(
+        IUserRepository userRepository,
+        IUserIdentityRepository userIdentityRepository)
     {
-        throw new System.NotImplementedException();
+        _userRepository = userRepository;
+        _userIdentityRepository = userIdentityRepository;
+    }
+
+    public async Task<GetUserProfileResponse> Handle(GetUserProfileCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        var user = await _userRepository.GetAsync(new UserId(request.UserId)).ConfigureAwait(false);
+        NotFoundValidationException.ThrowIfNull(user, request.UserId, $"The specified user {request.UserId} was not found.");
+
+        var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
+        NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value, $"The specified user identity {user.ExternalId} was not found.");
+
+        return new GetUserProfileResponse(userIdentity.FirstName, userIdentity.LastName, userIdentity.PhoneNumber?.Number ?? string.Empty);
     }
 }
