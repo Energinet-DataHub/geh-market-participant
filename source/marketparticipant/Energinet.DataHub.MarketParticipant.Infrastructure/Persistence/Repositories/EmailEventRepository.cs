@@ -91,7 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     mailTemplate = new UserInviteEmailTemplate(templateParameters);
                     break;
                 case EmailTemplateId.UserAssignedToActor:
-                    mailTemplate = new UserInviteEmailTemplate(templateParameters);
+                    mailTemplate = new UserAssignedToActorEmailTemplate(templateParameters);
                     break;
                 default:
                     throw new InvalidOperationException($"Template id for event {emailEventEntity.Id} is invalid.");
