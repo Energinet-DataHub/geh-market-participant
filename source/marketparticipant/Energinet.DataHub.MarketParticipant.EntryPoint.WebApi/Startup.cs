@@ -40,7 +40,7 @@ using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 {
-    public sealed class Startup : Common.StartupBase
+    public class Startup : Common.StartupBase
     {
         private readonly IConfiguration _configuration;
 
@@ -139,17 +139,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 return new CertificateService(certificateClient, certificateValidation, logger);
             });
 
-            if (_configuration.GetSetting(Settings.AllowAllTokens))
-            {
-                services.AddDummyJwtBearerAuthentication();
-            }
-            else
-            {
-                var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
-                var internalOpenIdUrl = configuration.GetSetting(Settings.InternalOpenIdUrl);
-                var backendAppId = configuration.GetSetting(Settings.BackendBffAppId);
-                services.AddJwtBearerAuthentication(externalOpenIdUrl, internalOpenIdUrl, backendAppId);
-            }
+            SetupAuthentication(configuration, services);
 
             services.AddPermissionAuthorization();
             services.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
@@ -194,6 +184,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
                 c.AddSecurityRequirement(securityRequirement);
             });
+        }
+
+        protected virtual void SetupAuthentication(IConfiguration configuration, IServiceCollection services)
+        {
+            var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
+            var internalOpenIdUrl = configuration.GetSetting(Settings.InternalOpenIdUrl);
+            var backendAppId = configuration.GetSetting(Settings.BackendBffAppId);
+            services.AddJwtBearerAuthentication(externalOpenIdUrl, internalOpenIdUrl, backendAppId);
         }
     }
 }

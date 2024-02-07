@@ -31,10 +31,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi
                 .ConfigureWebHostDefaults(builder =>
                 {
                     builder
-                        .UseStartup<Startup>()
+                        .UseStartup<NoAuthStartup>()
                         .ConfigureServices(s =>
                         {
-                            Startup.EnableIntegrationTestKeys = true;
+                            WebApi.Startup.EnableIntegrationTestKeys = true;
                             s.RemoveAll<IUserIdentityRepository>();
                             s.AddScoped<IUserIdentityRepository, InMemoryUserIdentityRepository>();
                         });

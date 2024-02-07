@@ -53,6 +53,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [AuthorizeUser(PermissionId.GridAreasManage)]
         public async Task<ActionResult> UpdateGridAreaAsync(ChangeGridAreaDto gridAreaDto)
         {
+            ArgumentNullException.ThrowIfNull(gridAreaDto);
+
             var updateGridAreaCommand = new UpdateGridAreaCommand(gridAreaDto.Id, gridAreaDto);
 
             await _mediator
