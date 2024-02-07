@@ -26,9 +26,10 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="sample.appsettings.json">
+    <Content Remove="sample.appsettings.json" />
+    <None Include="sample.appsettings.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 
 </Project>
