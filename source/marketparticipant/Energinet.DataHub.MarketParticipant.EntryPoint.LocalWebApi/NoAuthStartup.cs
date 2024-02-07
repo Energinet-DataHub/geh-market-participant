@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.IdentityModel.Tokens.Jwt;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
