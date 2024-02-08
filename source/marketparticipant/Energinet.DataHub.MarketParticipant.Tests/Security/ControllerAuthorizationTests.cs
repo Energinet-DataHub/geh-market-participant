@@ -43,6 +43,8 @@ public sealed class ControllerAuthorizationTests
             $"{nameof(PermissionController)}.{nameof(PermissionController.ListAllAsync)}",
             $"{nameof(PermissionController)}.{nameof(PermissionController.GetPermissionAsync)}",
             $"{nameof(UserController)}.{nameof(UserController.InitiateMitIdSignupAsync)}",
+            $"{nameof(UserController)}.{nameof(UserController.GetUserProfileAsync)}",
+            $"{nameof(UserController)}.{nameof(UserController.UpdateUserProfileAsync)}",
             $"{nameof(AuditIdentityController)}.{nameof(AuditIdentityController.GetAsync)}",
         };
 
