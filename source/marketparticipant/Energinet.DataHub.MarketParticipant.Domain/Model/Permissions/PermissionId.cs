@@ -28,4 +28,5 @@ public enum PermissionId
     ESettExchangeManage = 11,
     RequestAggregatedMeasureData = 12,
     ActorCredentialsManage = 13,
+    ActorMasterDataManage = 14,
 }
