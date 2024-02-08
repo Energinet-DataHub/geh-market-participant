@@ -148,7 +148,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("userprofile")]
-    [AuthorizeUser]
+    [Authorize]
     public async Task<ActionResult<GetUserProfileResponse>> GetUserProfileAsync()
     {
         var command = new GetUserProfileCommand(_userContext.CurrentUser.UserId);
@@ -161,7 +161,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPut("userprofile")]
-    [AuthorizeUser]
+    [Authorize]
     public async Task<ActionResult> UpdateUserProfileAsync(UserProfileUpdateDto userProfileUpdateDto)
     {
         ArgumentNullException.ThrowIfNull(userProfileUpdateDto);
