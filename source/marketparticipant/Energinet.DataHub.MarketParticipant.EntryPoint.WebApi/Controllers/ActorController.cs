@@ -97,6 +97,22 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return Ok();
         }
 
+        [HttpPut("{actorId:guid}/name")]
+        [AuthorizeUser(PermissionId.ActorMasterDataManage)]
+        public async Task<ActionResult> UpdateActorNameAsync(Guid actorId, ActorNameDto actorNameDto)
+        {
+            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                return Unauthorized();
+
+            var updateActorNameCommand = new UpdateActorNameCommand(actorId, actorNameDto);
+
+            await _mediator
+                .Send(updateActorNameCommand)
+                .ConfigureAwait(false);
+
+            return Ok();
+        }
+
         [HttpGet("{actorId:guid}/credentials")]
         [AuthorizeUser(PermissionId.ActorCredentialsManage)]
         public async Task<ActionResult<ActorCredentialsDto>> GetActorCredentialsAsync(Guid actorId)
