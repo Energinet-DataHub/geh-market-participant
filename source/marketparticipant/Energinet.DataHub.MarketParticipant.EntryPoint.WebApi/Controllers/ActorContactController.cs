@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{actorId:guid}/contact")]
-        [AuthorizeUser(PermissionId.ActorsManage)]
+        [AuthorizeUser(PermissionId.ActorMasterDataManage)]
         public async Task<ActionResult<IEnumerable<ActorContactDto>>> ListAllAsync(Guid actorId)
         {
             var getOrganizationsCommand = new GetActorContactsCommand(actorId);
@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost("{actorId:guid}/contact")]
-        [AuthorizeUser(PermissionId.ActorsManage)]
+        [AuthorizeUser(PermissionId.ActorMasterDataManage)]
         public async Task<ActionResult<Guid>> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpDelete("{actorId:guid}/contact/{contactId:guid}")]
-        [AuthorizeUser(PermissionId.ActorsManage)]
+        [AuthorizeUser(PermissionId.ActorMasterDataManage)]
         public async Task<ActionResult> DeleteContactAsync(Guid actorId, Guid contactId)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
