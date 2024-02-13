@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     validator
                         .RuleFor(organization => organization.BusinessRegisterIdentifier)
                         .NotEmpty()
-                        .Length(1, 8);
+                        .Length(1, 64);
 
                     validator
                         .RuleFor(organization => organization.Address)
