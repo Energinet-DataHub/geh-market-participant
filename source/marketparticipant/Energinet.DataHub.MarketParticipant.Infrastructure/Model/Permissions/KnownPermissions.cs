@@ -59,6 +59,7 @@ public static class KnownPermissions
         {
             EicFunction.BalanceResponsibleParty,
             EicFunction.BillingAgent,
+            EicFunction.EnergySupplier,
             EicFunction.GridAccessProvider,
             EicFunction.ImbalanceSettlementResponsible,
             EicFunction.MeteredDataAdministrator,
@@ -132,7 +133,8 @@ public static class KnownPermissions
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader,
-            EicFunction.MeterOperator
+            EicFunction.MeterOperator,
+            EicFunction.EnergySupplier
         })
     };
 }
