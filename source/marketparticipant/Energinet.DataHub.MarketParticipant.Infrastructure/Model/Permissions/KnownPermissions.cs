@@ -132,7 +132,8 @@ public static class KnownPermissions
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader,
-            EicFunction.MeterOperator
+            EicFunction.MeterOperator,
+            EicFunction.EnergySupplier
         })
     };
 }
