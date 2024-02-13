@@ -59,6 +59,7 @@ public static class KnownPermissions
         {
             EicFunction.BalanceResponsibleParty,
             EicFunction.BillingAgent,
+            EicFunction.EnergySupplier,
             EicFunction.GridAccessProvider,
             EicFunction.ImbalanceSettlementResponsible,
             EicFunction.MeteredDataAdministrator,
