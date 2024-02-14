@@ -17,5 +17,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.CvrRegiste
 public interface ICvrRegisterTerm
 {
     // ReSharper disable once UnusedMember.Global
+    // ReSharper disable once UnusedMemberInSuper.Global
     public string Value { get; }
 }
