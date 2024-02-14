@@ -93,7 +93,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData(null, false)]
         [InlineData("  ", false)]
         [InlineData("12345678", true)]
-        [InlineData("123456789", false)]
+        [InlineData("1234567890123456789012345678901234567890123456789012345678901234", true)]
+        [InlineData("12345678901234567890123456789012345678901234567890123456789012345", false)]
         public async Task Validate_OrganizationBusinessRegisterIdentifier_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
