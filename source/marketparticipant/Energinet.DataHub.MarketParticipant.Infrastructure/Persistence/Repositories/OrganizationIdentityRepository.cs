@@ -36,7 +36,7 @@ public sealed class OrganizationIdentityRepository : IOrganizationIdentityReposi
     {
         ArgumentNullException.ThrowIfNull(businessRegisterIdentifier);
 
-        var client = _httpClientFactory.CreateClient("CvrRegister");
+        using var client = _httpClientFactory.CreateClient("CvrRegister");
 
         var query = CvrRegisterRequestBuilder.Build(
             new CvrRegisterTermBusinessRegisterIdentifier(businessRegisterIdentifier.Identifier),
