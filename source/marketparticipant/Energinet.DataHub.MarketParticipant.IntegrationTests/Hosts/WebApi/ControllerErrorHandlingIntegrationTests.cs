@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -36,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationTestsBase
+public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationTestsBase<NoAuthStartup>
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
@@ -44,7 +45,6 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
         : base(fixture)
     {
         _fixture = fixture;
-        AllowAllTokens = true;
     }
 
     [Fact]

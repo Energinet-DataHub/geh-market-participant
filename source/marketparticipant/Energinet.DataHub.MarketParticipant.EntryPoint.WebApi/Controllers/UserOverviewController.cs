@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
@@ -48,6 +49,8 @@ public sealed class UserOverviewController : ControllerBase
         SortDirection sortDirection,
         [FromBody] UserOverviewFilterDto filter)
     {
+        ArgumentNullException.ThrowIfNull(filter);
+
         if (!_userContext.CurrentUser.IsFas)
         {
             if (filter.ActorId.HasValue && !_userContext.CurrentUser.IsAssignedToActor(filter.ActorId.Value))

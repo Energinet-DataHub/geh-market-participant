@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using FluentValidation;
 
-public enum PermissionId
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    OrganizationsManage = 2,
-    GridAreasManage = 3,
-    ActorsManage = 4,
-    UsersManage = 5,
-    UsersView = 6,
-    UserRolesManage = 7,
-    ImbalancePricesManage = 8,
-    CalculationsManage = 9,
-    SettlementReportsManage = 10,
-    ESettExchangeManage = 11,
-    RequestAggregatedMeasureData = 12,
-    ActorCredentialsManage = 13,
-    ActorMasterDataManage = 14,
+    public sealed class GetUserProfileCommandRuleSet : AbstractValidator<GetUserProfileCommand>
+    {
+        public GetUserProfileCommandRuleSet()
+        {
+            RuleFor(command => command.UserId)
+                .NotEmpty();
+        }
+    }
 }
