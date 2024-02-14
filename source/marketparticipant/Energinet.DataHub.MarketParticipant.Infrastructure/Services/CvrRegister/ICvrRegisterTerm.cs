@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Newtonsoft.Json;
-
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.CvrRegister;
 
+#pragma warning disable CA1040
 public interface ICvrRegisterTerm
+#pragma warning restore CA1040
 {
-    [JsonProperty]
-    public string Value { get; init; }
 }

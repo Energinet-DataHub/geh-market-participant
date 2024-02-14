@@ -14,24 +14,25 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.CvrRegister;
 
 public static class CrvRegisterResponseParser
 {
-    public static IEnumerable<T> GetValues<T>(string response, CvrRegisterProperty cvrRegisterProperty)
+    public static IEnumerable<T> GetValues<T>(string responseJson, CvrRegisterProperty cvrRegisterProperty)
     {
-        ArgumentNullException.ThrowIfNull(response);
+        ArgumentNullException.ThrowIfNull(responseJson);
         ArgumentNullException.ThrowIfNull(cvrRegisterProperty);
 
         var path = cvrRegisterProperty.Value.Split(".", StringSplitOptions.RemoveEmptyEntries);
-        var json = JsonNode.Parse(response);
-        var hits = json?["hits"]?["total"]?.GetValue<int>() ?? 0;
+        var response = JsonSerializer.Deserialize<CvrResponse>(responseJson);
 
-        for (var i = 0; i < hits; ++i)
+        for (var i = 0; i < response!.Hits.Total; ++i)
         {
-            var source = json?["hits"]?["hits"]?[i]?["_source"];
+            var source = response.Hits.Hits[i].Source;
 
             foreach (var part in path)
             {
@@ -49,4 +50,32 @@ public static class CrvRegisterResponseParser
             }
         }
     }
+
+    // ReSharper disable ClassNeverInstantiated.Local
+    // ReSharper disable UnusedAutoPropertyAccessor.Local
+    // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
+    private sealed record CvrResponseHit
+    {
+        [JsonPropertyName("_source")]
+        public JsonNode? Source { get; set; }
+    }
+
+    private sealed record CvrResponseHits
+    {
+        [JsonPropertyName("hits")]
+        public CvrResponseHit[] Hits { get; set; } = Array.Empty<CvrResponseHit>();
+
+        [JsonPropertyName("total")]
+        public int Total { get; set; }
+    }
+
+    private sealed record CvrResponse
+    {
+        [JsonPropertyName("hits")]
+        public CvrResponseHits Hits { get; set; } = null!;
+    }
+
+    // ReSharper restore AutoPropertyCanBeMadeGetOnly.Local
+    // ReSharper restore UnusedAutoPropertyAccessor.Local
+    // ReSharper restore ClassNeverInstantiated.Local
 }

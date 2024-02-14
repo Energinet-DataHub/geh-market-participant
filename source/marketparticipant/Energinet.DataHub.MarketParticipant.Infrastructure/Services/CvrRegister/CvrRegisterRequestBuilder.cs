@@ -13,13 +13,14 @@
 // limitations under the License.
 
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.CvrRegister;
 
 public static class CvrRegisterRequestBuilder
 {
-    public static string Build(ICvrRegisterTerm cvrRegisterTerm, params CvrRegisterProperty[] properties)
+    public static string Build<T>(T term, params CvrRegisterProperty[] properties)
+        where T : ICvrRegisterTerm
     {
         var request = new
         {
@@ -32,12 +33,12 @@ public static class CvrRegisterRequestBuilder
                     {
                         new
                         {
-                            term = cvrRegisterTerm,
+                            term,
                         },
                     },
                 },
             },
         };
-        return JsonConvert.SerializeObject(request);
+        return JsonSerializer.Serialize(request);
     }
 }
