@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class TokenControllerIntegrationTests :
-    WebApiIntegrationTestsBase,
+    WebApiIntegrationTestsBase<Startup>,
     IClassFixture<KeyClientFixture>,
     IAsyncLifetime
 {

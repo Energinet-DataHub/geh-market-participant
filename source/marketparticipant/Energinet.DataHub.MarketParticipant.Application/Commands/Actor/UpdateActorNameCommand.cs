@@ -12,21 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using System;
+using MediatR;
 
-public enum PermissionId
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    OrganizationsManage = 2,
-    GridAreasManage = 3,
-    ActorsManage = 4,
-    UsersManage = 5,
-    UsersView = 6,
-    UserRolesManage = 7,
-    ImbalancePricesManage = 8,
-    CalculationsManage = 9,
-    SettlementReportsManage = 10,
-    ESettExchangeManage = 11,
-    RequestAggregatedMeasureData = 12,
-    ActorCredentialsManage = 13,
-    ActorMasterDataManage = 14,
+    public sealed record UpdateActorNameCommand(Guid ActorId, ActorNameDto ActorName) : IRequest;
 }
