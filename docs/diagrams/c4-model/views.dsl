@@ -47,6 +47,24 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             include ->markpartDomain->
             include actorB2BSystem ediApi bffApi frontendSinglePageApplication dh3User
         }
+        
+        component markpartApi "MarketParticipantAPIs" {
+            title "[Component] DataHub 3.0 - Market Participant User Web API"
+            include markpartUserIdentityRepositoryInMarkpartApi->
+            include ->markpartUserController->
+            include ->markpartPermissionController->
+            include ->markpartUserRoleController->
+            include ->markpartUserRoleAssignmentController->
+            include ->markpartUserOverviewController->
+            include ->markpartInvitationController->
+        }
+
+        component markpartOrganizationManager "MarkpartOrganizationManager" {
+            title "[Component] DataHub 3.0 - Market Participant Organization Manager"
+            include markpartUserIdentityRepositoryInOrganizationManager->
+            include ->markpartMailDispatcher->
+            include ->markpartUserInvitationExpiredTimerTrigger->
+        }
     }
 }
 
