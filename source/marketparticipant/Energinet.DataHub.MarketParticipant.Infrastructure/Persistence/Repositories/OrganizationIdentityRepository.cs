@@ -15,7 +15,6 @@
 using System;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -27,25 +26,17 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 public sealed class OrganizationIdentityRepository : IOrganizationIdentityRepository
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly CvrRegisterConfig _cvrRegisterConfig;
 
-    public OrganizationIdentityRepository(IHttpClientFactory httpClientFactory, CvrRegisterConfig cvrRegisterConfig)
+    public OrganizationIdentityRepository(IHttpClientFactory httpClientFactory)
     {
         _httpClientFactory = httpClientFactory;
-        _cvrRegisterConfig = cvrRegisterConfig;
     }
 
     public async Task<OrganizationIdentity?> GetAsync(BusinessRegisterIdentifier businessRegisterIdentifier)
     {
         ArgumentNullException.ThrowIfNull(businessRegisterIdentifier);
 
-        var client = _httpClientFactory.CreateClient(nameof(OrganizationIdentityRepository));
-
-        client.BaseAddress = new Uri(_cvrRegisterConfig.BaseAddress);
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue(
-                "Basic",
-                Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_cvrRegisterConfig.Username}:{_cvrRegisterConfig.Password}")));
+        var client = _httpClientFactory.CreateClient("CvrRegister");
 
         var query = CvrRegisterRequestBuilder.Build(
             new CvrRegisterTermBusinessRegisterIdentifier(businessRegisterIdentifier.Identifier),
@@ -53,7 +44,7 @@ public sealed class OrganizationIdentityRepository : IOrganizationIdentityReposi
 
         using var content = new StringContent(query, Encoding.UTF8, "application/json");
 
-        var response = await client.PostAsync(
+        using var response = await client.PostAsync(
             new Uri("cvr-permanent/virksomhed/_search", UriKind.Relative),
             content).ConfigureAwait(false);
 

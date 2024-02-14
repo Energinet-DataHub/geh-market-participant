@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Net.Http.Headers;
+using System.Text;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
-using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,14 +26,15 @@ internal static class CvrRegisterRegistration
 {
     public static void AddCvrRegisterConfiguration(this IServiceCollection services)
     {
-        services.AddSingleton(provider =>
+        services.AddHttpClient("CvrRegister", (provider, client) =>
         {
             var configuration = provider.GetRequiredService<IConfiguration>();
 
-            return new CvrRegisterConfig(
-                configuration.GetSetting(Settings.CvrBaseAddress),
-                configuration.GetSetting(Settings.CvrUsername),
-                configuration.GetSetting(Settings.CvrPassword));
+            client.BaseAddress = new Uri(configuration.GetSetting(Settings.CvrBaseAddress));
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue(
+                    "Basic",
+                    Convert.ToBase64String(Encoding.ASCII.GetBytes($"{configuration.GetSetting(Settings.CvrUsername)}:{configuration.GetSetting(Settings.CvrPassword)}")));
         });
     }
 }
