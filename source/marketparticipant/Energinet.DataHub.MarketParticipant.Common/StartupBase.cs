@@ -45,6 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddActiveDirectoryRoles();
             services.AddSendGridEmailSenderClient();
             services.AddInviteConfigRegistration();
+            services.AddCvrRegisterConfiguration();
         }
 
         protected abstract void Configure(IConfiguration configuration, IServiceCollection services);

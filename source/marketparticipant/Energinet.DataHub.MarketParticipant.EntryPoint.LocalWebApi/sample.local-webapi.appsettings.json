@@ -14,5 +14,9 @@
   "AZURE_B2C_SPN_SECRET": "00000000-0000-0000-0000-000000000000",
   "AZURE_B2C_TENANT": "localhost",
 
-  "CERTIFICATES_KEY_VAULT": "https://localhost"
+  "CERTIFICATES_KEY_VAULT": "https://localhost",
+  
+  "CVR_BASE_ADDRESS": "https://localhost",
+  "CVR_USERNAME": "cvr-username",
+  "CVR_PASSWORD": "cvr-password"
 }
