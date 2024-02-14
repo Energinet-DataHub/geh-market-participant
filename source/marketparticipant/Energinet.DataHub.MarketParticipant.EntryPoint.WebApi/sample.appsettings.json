@@ -18,5 +18,9 @@
 
   "CERTIFICATES_KEY_VAULT": "The address of the key vault containing the actor certificates",
 
-  "ENFORCE_2FA": true
+  "ENFORCE_2FA": true,
+
+  "CVR_BASE_ADDRESS": "https://localhost",
+  "CVR_USERNAME": "cvr-username",
+  "CVR_PASSWORD": "cvr-password"
 }
