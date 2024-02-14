@@ -14,8 +14,8 @@
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.CvrRegister;
 
-#pragma warning disable CA1040
 public interface ICvrRegisterTerm
-#pragma warning restore CA1040
 {
+    // ReSharper disable once UnusedMember.Global
+    public string Value { get; }
 }
