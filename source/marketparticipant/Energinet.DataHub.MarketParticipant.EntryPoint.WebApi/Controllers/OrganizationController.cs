@@ -124,5 +124,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
             return Ok(response.AuditLogs);
         }
+
+        [HttpGet("{businessRegisterIdentifier}/identity")]
+        [AuthorizeUser(PermissionId.OrganizationsManage)]
+        public async Task<ActionResult<GetOrganizationIdentityResponse>> GetOrganizationIdentityAsync(string businessRegisterIdentifier)
+        {
+            var command = new GetOrganizationIdentityCommand(businessRegisterIdentifier);
+
+            var response = await _mediator
+                .Send(command)
+                .ConfigureAwait(false);
+
+            return Ok(response);
+        }
     }
 }
