@@ -51,14 +51,18 @@ public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOr
 
         foreach (var organization in allOrganizations)
         {
-            var identityResponse = await _organizationIdentityRepository.GetAsync(organization.BusinessRegisterIdentifier).ConfigureAwait(false);
+            var identityResponse = await _organizationIdentityRepository
+                .GetAsync(organization.BusinessRegisterIdentifier)
+                .ConfigureAwait(false);
 
             if (identityResponse == null) continue;
             if (string.IsNullOrWhiteSpace(identityResponse.Name) || organization.Name == identityResponse.Name) continue;
 
             var currentOrgName = organization.Name;
             organization.Name = identityResponse.Name;
-            await _organizationRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            await _organizationRepository
+                .AddOrUpdateAsync(organization)
+                .ConfigureAwait(false);
 
             _logger.LogInformation($"Organization identity updated for organization with id {organization.Id} from {currentOrgName} to {identityResponse.Name}");
             await SendNotificationEmailsAsync(organization, currentOrgName).ConfigureAwait(false);

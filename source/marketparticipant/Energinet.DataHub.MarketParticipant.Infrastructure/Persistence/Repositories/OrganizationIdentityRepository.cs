@@ -48,6 +48,8 @@ public sealed class OrganizationIdentityRepository : IOrganizationIdentityReposi
             new Uri("cvr-permanent/virksomhed/_search", UriKind.Relative),
             content).ConfigureAwait(false);
 
+        response.EnsureSuccessStatusCode();
+
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         var name = CrvRegisterResponseParser.GetValues<string>(json, CvrRegisterProperty.OrganizationName).SingleOrDefault();
