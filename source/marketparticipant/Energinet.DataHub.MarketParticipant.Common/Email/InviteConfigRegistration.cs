@@ -33,7 +33,7 @@ internal static class InviteConfigRegistration
             var userFlow = configuration.GetSetting(Settings.UserInviteFlow);
             var environmentDescription = configuration.GetOptionalSetting(Settings.EnvironmentDescription);
 
-            return new EmailRecipientConfig(sender, bcc, userFlow, environmentDescription);
+            return new EmailInviteRecipientConfig(sender, bcc, userFlow, environmentDescription);
         });
     }
 }

@@ -26,13 +26,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
     public sealed class SendGridEmailSender : IEmailSender
     {
-        private readonly EmailRecipientConfig _config;
+        private readonly EmailInviteRecipientConfig _config;
         private readonly ILogger<SendGridEmailSender> _logger;
         private readonly ISendGridClient _client;
         private readonly IEmailContentGenerator _emailContentGenerator;
 
         public SendGridEmailSender(
-            EmailRecipientConfig config,
+            EmailInviteRecipientConfig config,
             ISendGridClient sendGridClient,
             IEmailContentGenerator emailContentGenerator,
             ILogger<SendGridEmailSender> logger)

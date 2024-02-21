@@ -28,7 +28,7 @@ internal static class EmailSenderRegistration
         services.AddScoped<IEmailContentGenerator, EmailContentGenerator>();
         services.AddScoped<IEmailSender>(provider =>
         {
-            var configuration = provider.GetRequiredService<EmailRecipientConfig>();
+            var configuration = provider.GetRequiredService<EmailInviteRecipientConfig>();
             var senGridClient = provider.GetRequiredService<ISendGridClient>();
             var logger = provider.GetRequiredService<ILogger<SendGridEmailSender>>();
             var emailContentGenerator = provider.GetRequiredService<IEmailContentGenerator>();
