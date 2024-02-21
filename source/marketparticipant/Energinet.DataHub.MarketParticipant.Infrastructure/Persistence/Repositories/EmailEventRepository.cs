@@ -83,19 +83,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             if (templateParameters == null)
                 throw new InvalidOperationException($"Template parameters for event {emailEventEntity.Id} are invalid.");
 
-            EmailTemplate mailTemplate;
-
-            switch ((EmailTemplateId)emailEventEntity.TemplateId)
+            EmailTemplate mailTemplate = (EmailTemplateId)emailEventEntity.TemplateId switch
             {
-                case EmailTemplateId.UserInvite:
-                    mailTemplate = new UserInviteEmailTemplate(templateParameters);
-                    break;
-                case EmailTemplateId.UserAssignedToActor:
-                    mailTemplate = new UserAssignedToActorEmailTemplate(templateParameters);
-                    break;
-                default:
-                    throw new InvalidOperationException($"Template id for event {emailEventEntity.Id} is invalid.");
-            }
+                EmailTemplateId.UserInvite => new UserInviteEmailTemplate(templateParameters),
+                EmailTemplateId.UserAssignedToActor => new UserAssignedToActorEmailTemplate(templateParameters),
+                EmailTemplateId.OrganizationIdentityChanged => new OrganizationIdentityChangedEmailTemplate(templateParameters),
+                _ => throw new InvalidOperationException($"Template id for event {emailEventEntity.Id} is invalid.")
+            };
 
             return new EmailEvent(
                 emailEventEntity.Id,

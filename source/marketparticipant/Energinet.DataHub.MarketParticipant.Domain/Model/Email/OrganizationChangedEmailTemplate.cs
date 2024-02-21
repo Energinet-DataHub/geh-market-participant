@@ -24,6 +24,11 @@ public sealed class OrganizationIdentityChangedEmailTemplate : EmailTemplate
     {
     }
 
+    public OrganizationIdentityChangedEmailTemplate(IReadOnlyDictionary<string, string> parameters)
+        : base(EmailTemplateId.OrganizationIdentityChanged, parameters)
+    {
+    }
+
     private static Dictionary<string, string> PrepareParameters(Organization organization, string oldOrganizationName)
     {
         ArgumentNullException.ThrowIfNull(organization);

@@ -31,17 +31,20 @@ public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOr
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IOrganizationIdentityRepository _organizationIdentityRepository;
     private readonly IEmailEventRepository _emailEventRepository;
+    private readonly EmailRecipientConfig _emailRecipientConfig;
     private readonly ILogger<UpdateOrganizationIdentityTriggerHandler> _logger;
 
     public UpdateOrganizationIdentityTriggerHandler(
         IOrganizationRepository organizationRepository,
         IOrganizationIdentityRepository organizationIdentityRepository,
         IEmailEventRepository emailEventRepository,
+        EmailRecipientConfig emailRecipientConfig,
         ILogger<UpdateOrganizationIdentityTriggerHandler> logger)
     {
         _organizationRepository = organizationRepository;
         _organizationIdentityRepository = organizationIdentityRepository;
         _emailEventRepository = emailEventRepository;
+        _emailRecipientConfig = emailRecipientConfig;
         _logger = logger;
     }
 
@@ -74,6 +77,6 @@ public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOr
     private async Task SendNotificationEmailsAsync(Domain.Model.Organization updatedOrganization, string oldOrganizationName)
     {
         var emailTemplate = new OrganizationIdentityChangedEmailTemplate(updatedOrganization, oldOrganizationName);
-        await _emailEventRepository.InsertAsync(new EmailEvent(new EmailAddress("123"), emailTemplate)).ConfigureAwait(false);
+        await _emailEventRepository.InsertAsync(new EmailEvent(new EmailAddress(_emailRecipientConfig.OrgUpdateNotificationToEmail), emailTemplate)).ConfigureAwait(false);
     }
 }

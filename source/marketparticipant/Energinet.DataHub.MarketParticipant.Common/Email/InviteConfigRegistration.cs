@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Common.Email;
 
 internal static class InviteConfigRegistration
 {
-    public static void AddInviteConfigRegistration(this IServiceCollection services)
+    public static void AddEmailConfigRegistration(this IServiceCollection services)
     {
         services.AddSingleton(provider =>
         {
@@ -30,10 +30,11 @@ internal static class InviteConfigRegistration
 
             var sender = configuration.GetSetting(Settings.SenderEmail);
             var bcc = configuration.GetSetting(Settings.BccEmail);
+            var cvrUpdateNotificationTo = configuration.GetSetting(Settings.CvrNotificationToEmail);
             var userFlow = configuration.GetSetting(Settings.UserInviteFlow);
             var environmentDescription = configuration.GetOptionalSetting(Settings.EnvironmentDescription);
 
-            return new EmailInviteRecipientConfig(sender, bcc, userFlow, environmentDescription);
+            return new EmailRecipientConfig(sender, bcc, cvrUpdateNotificationTo, userFlow, environmentDescription);
         });
     }
 }

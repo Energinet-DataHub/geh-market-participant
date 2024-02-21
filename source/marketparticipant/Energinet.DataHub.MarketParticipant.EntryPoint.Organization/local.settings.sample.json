@@ -8,8 +8,12 @@
     "SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING": "Health connection string to the storage account for the integration events.",
     "SBT_MARKET_PARTICIPANT_CHANGED_NAME": "The name of the topic where the integration events are published.",
     "SEND_GRID_APIKEY": "send grid api key",
-    "USER_INVITE_FROM_EMAIL": "from email for user invites",
-    "USER_INVITE_BCC_EMAIL": "bcc email for user invites",
-    "ENVIRONMENT_DESC": "The environment description"
+    "SENDER_EMAIL": "from email for user invites",
+    "BCC_EMAIL": "bcc email for user invites",
+    "ENVIRONMENT_DESC": "The environment description",
+    "CVR_BASE_ADDRESS": "CVR lookup base address",
+    "CVR_USERNAME": "CVR lookup username",
+    "CVR_PASSWORD": "CVR lookup password",
+    "CVR_UPDATE_NOTIFICATION_TO_EMAIL": "CVR update notification to email"
   }
 }
