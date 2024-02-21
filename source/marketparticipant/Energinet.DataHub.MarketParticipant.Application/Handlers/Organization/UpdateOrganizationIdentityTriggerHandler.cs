@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
@@ -23,9 +25,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 
-/// <summary>
-/// Handler with no input an d output, running every night to update the organization identity
-/// </summary>
 public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOrganisationIdentityTriggerCommand, Unit>
 {
     private readonly IOrganizationRepository _organizationRepository;
@@ -50,9 +49,17 @@ public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOr
 
     public async Task<Unit> Handle(UpdateOrganisationIdentityTriggerCommand request, CancellationToken cancellationToken)
     {
-        var allOrganizations = await _organizationRepository.GetAsync().ConfigureAwait(false);
+        var allOrganizations = await _organizationRepository
+            .GetAsync()
+            .ConfigureAwait(false);
 
-        foreach (var organization in allOrganizations)
+        var organizationsToCheck = allOrganizations
+            .Where(e =>
+                !string.IsNullOrWhiteSpace(e.BusinessRegisterIdentifier.Identifier) &&
+                !e.BusinessRegisterIdentifier.Identifier
+                    .StartsWith("ENDK", StringComparison.InvariantCultureIgnoreCase));
+
+        foreach (var organization in organizationsToCheck)
         {
             var identityResponse = await _organizationIdentityRepository
                 .GetAsync(organization.BusinessRegisterIdentifier)
@@ -68,13 +75,13 @@ public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOr
                 .ConfigureAwait(false);
 
             _logger.LogInformation($"Organization identity updated for organization with id {organization.Id} from {currentOrgName} to {identityResponse.Name}");
-            await SendNotificationEmailsAsync(organization, currentOrgName).ConfigureAwait(false);
+            await SendNotificationEmailAsync(organization, currentOrgName).ConfigureAwait(false);
         }
 
         return Unit.Value;
     }
 
-    private async Task SendNotificationEmailsAsync(Domain.Model.Organization updatedOrganization, string oldOrganizationName)
+    private async Task SendNotificationEmailAsync(Domain.Model.Organization updatedOrganization, string oldOrganizationName)
     {
         var emailTemplate = new OrganizationIdentityChangedEmailTemplate(updatedOrganization, oldOrganizationName);
         await _emailEventRepository.InsertAsync(new EmailEvent(new EmailAddress(_emailRecipientConfig.OrgUpdateNotificationToEmail), emailTemplate)).ConfigureAwait(false);
