@@ -79,6 +79,6 @@ public static class Settings
         = new("CVR_USERNAME");
     public static Setting<string> CvrPassword { get; }
         = new("CVR_PASSWORD");
-    public static Setting<string> CvrNotificationToEmail { get; }
-        = new("CVR_UPDATE_NOTIFICATION_TO_EMAIL");
+    public static Setting<string> OrganizationIdentityUpdateNotificationToEmail { get; }
+        = new("CVR_ORG_UPDATED_NOTIFICATION_TO_EMAIL");
 }

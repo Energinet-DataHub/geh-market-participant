@@ -30,7 +30,7 @@ internal static class InviteConfigRegistration
 
             var sender = configuration.GetSetting(Settings.SenderEmail);
             var bcc = configuration.GetSetting(Settings.BccEmail);
-            var cvrUpdateNotificationTo = configuration.GetSetting(Settings.CvrNotificationToEmail);
+            var cvrUpdateNotificationTo = configuration.GetSetting(Settings.OrganizationIdentityUpdateNotificationToEmail);
             var userFlow = configuration.GetSetting(Settings.UserInviteFlow);
             var environmentDescription = configuration.GetOptionalSetting(Settings.EnvironmentDescription);
 

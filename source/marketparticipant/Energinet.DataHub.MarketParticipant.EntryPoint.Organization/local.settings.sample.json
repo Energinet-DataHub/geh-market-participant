@@ -14,6 +14,6 @@
     "CVR_BASE_ADDRESS": "CVR lookup base address",
     "CVR_USERNAME": "CVR lookup username",
     "CVR_PASSWORD": "CVR lookup password",
-    "CVR_UPDATE_NOTIFICATION_TO_EMAIL": "CVR update notification to email"
+    "CVR_ORG_UPDATED_NOTIFICATION_TO_EMAIL": "CVR update notification to email"
   }
 }
