@@ -146,7 +146,6 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
         var request = await _graphClient.Users.GetAsync(x =>
         {
-            x.Headers.Add("ConsistencyLevel", "eventual");
             x.QueryParameters.Select = _selectors;
             x.QueryParameters.Count = true;
             if (filters.Any())
