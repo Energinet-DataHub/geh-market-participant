@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 
 public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOrganisationIdentityTriggerCommand, Unit>
 {
+    private static readonly CultureInfo _danishCulture = new("da-DK");
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IOrganizationIdentityRepository _organizationIdentityRepository;
     private readonly IEmailEventRepository _emailEventRepository;
@@ -54,10 +56,7 @@ public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOr
             .ConfigureAwait(false);
 
         var organizationsToCheck = allOrganizations
-            .Where(e =>
-                !string.IsNullOrWhiteSpace(e.BusinessRegisterIdentifier.Identifier) &&
-                !e.BusinessRegisterIdentifier.Identifier
-                    .StartsWith("ENDK", StringComparison.InvariantCultureIgnoreCase));
+            .Where(e => !e.BusinessRegisterIdentifier.Identifier.StartsWith("ENDK", StringComparison.InvariantCultureIgnoreCase));
 
         foreach (var organization in organizationsToCheck)
         {
@@ -66,7 +65,7 @@ public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOr
                 .ConfigureAwait(false);
 
             if (identityResponse == null) continue;
-            if (string.IsNullOrWhiteSpace(identityResponse.Name) || organization.Name == identityResponse.Name) continue;
+            if (_danishCulture.CompareInfo.Compare(organization.Name, identityResponse.Name) == 0) continue;
 
             var currentOrgName = organization.Name;
             organization.Name = identityResponse.Name;
