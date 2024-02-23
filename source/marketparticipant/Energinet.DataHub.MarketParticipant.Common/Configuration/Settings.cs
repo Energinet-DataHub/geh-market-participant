@@ -55,9 +55,9 @@ public static class Settings
         = new("SEND_GRID_APIKEY");
 
     public static Setting<string> SenderEmail { get; }
-        = new("USER_INVITE_FROM_EMAIL");
+        = new("SENDER_EMAIL");
     public static Setting<string> BccEmail { get; }
-        = new("USER_INVITE_BCC_EMAIL");
+        = new("BCC_EMAIL");
     public static Setting<string> UserInviteFlow { get; }
         = new("USER_INVITE_FLOW");
     public static Setting<string> EnvironmentDescription { get; }
@@ -79,4 +79,6 @@ public static class Settings
         = new("CVR_USERNAME");
     public static Setting<string> CvrPassword { get; }
         = new("CVR_PASSWORD");
+    public static Setting<string> OrganizationIdentityUpdateNotificationToEmail { get; }
+        = new("CVR_ORG_UPDATED_NOTIFICATION_TO_EMAIL");
 }

@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using FluentValidation;
 
-public sealed record EmailRecipientConfig(
-    string SenderEmail,
-    string BccEmail,
-    string OrgUpdateNotificationToEmail,
-    string UserInviteFlow,
-    string? EnvironmentDescription);
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
+{
+    public sealed class UpdateOrganisationIdentityTriggerCommandRuleSet : AbstractValidator<UpdateOrganisationIdentityTriggerCommand>
+    {
+    }
+}
