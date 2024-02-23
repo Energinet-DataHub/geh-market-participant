@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.36.4
+
+- No functional change.
+
 ## Version 2.36.3
 
 - No functional change.
