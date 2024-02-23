@@ -16,21 +16,39 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 
 public class OrganizationIdentityUpdateTrigger
 {
     private readonly IMediator _mediator;
+    private readonly ILogger<OrganizationIdentityUpdateTrigger> _logger;
+    private readonly IFeatureManager _featureManager;
 
-    public OrganizationIdentityUpdateTrigger(IMediator mediator)
+    public OrganizationIdentityUpdateTrigger(
+        IMediator mediator,
+        ILogger<OrganizationIdentityUpdateTrigger> logger,
+        IFeatureManager featureManager)
     {
         _mediator = mediator;
+        _logger = logger;
+        _featureManager = featureManager;
     }
 
     [Function(nameof(OrganizationIdentityUpdateTrigger))]
-    public Task RunAsync([TimerTrigger("0 2 * * *")] FunctionContext context)
+    public async Task RunAsync([TimerTrigger("0 2 * * *")] FunctionContext context)
     {
-        return _mediator.Send(new UpdateOrganisationIdentityTriggerCommand());
+        var isEnabled = await _featureManager.IsEnabledAsync("EnabledOrganizationIdentityUpdateTrigger").ConfigureAwait(false);
+
+        if (isEnabled)
+        {
+            await _mediator.Send(new UpdateOrganisationIdentityTriggerCommand()).ConfigureAwait(false);
+        }
+        else
+        {
+            _logger.LogInformation($"{nameof(OrganizationIdentityUpdateTrigger)} is disabled by feature flag.");
+        }
     }
 }
