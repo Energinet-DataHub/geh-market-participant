@@ -31,6 +31,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FeatureManagement;
 using SendGrid.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
@@ -40,11 +41,13 @@ internal sealed class Startup : StartupBase
     protected override void Configure(IConfiguration configuration, IServiceCollection services)
     {
         services.AddScoped<IAuditIdentityProvider>(_ => KnownAuditIdentityProvider.OrganizationBackgroundService);
+        services.AddFeatureManagement();
 
         services.AddScoped<SynchronizeActorsTimerTrigger>();
         services.AddScoped<EmailEventTimerTrigger>();
         services.AddScoped<UserInvitationExpiredTimerTrigger>();
         services.AddScoped<DispatchIntegrationEventsTrigger>();
+        services.AddScoped<OrganizationIdentityUpdateTrigger>();
 
         services.AddPublisher<IntegrationEventProvider>();
         services.Configure<PublisherOptions>(options =>
