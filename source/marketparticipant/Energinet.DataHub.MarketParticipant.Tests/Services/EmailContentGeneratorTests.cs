@@ -31,23 +31,43 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 public sealed class EmailContentGeneratorTests
 {
     [Fact]
-    public async Task GenerateAsync_WithTemplate_GeneratesEmailContent()
+    public async Task GenerateAsync_FindAllTemplates_And_GeneratesEmailContent()
     {
         // Arrange
         var emailContentGenerator = new EmailContentGenerator();
-
         var emptyParams = new Dictionary<string, string>();
-        var template = new UserInviteEmailTemplate(emptyParams);
+        var emailTemplateIds = Enum.GetValues<EmailTemplateId>();
 
-        var expected = await GetTestTemplateAsync(EmailTemplateId.UserInvite);
-
-        // Act
-        var actual = await emailContentGenerator.GenerateAsync(template, emptyParams);
-
-        // Assert
-        Assert.NotNull(actual);
-        Assert.NotNull(actual.Subject);
-        Assert.Equal(expected, actual.HtmlContent);
+        //Act + Assert
+        foreach (var templateId in emailTemplateIds)
+        {
+            switch (templateId)
+            {
+                case EmailTemplateId.UserInvite:
+                    var t1Actual = await emailContentGenerator.GenerateAsync(new UserInviteEmailTemplate(emptyParams), emptyParams);
+                    var t1Expected = await GetTestTemplateAsync(EmailTemplateId.UserInvite);
+                    Assert.NotNull(t1Actual);
+                    Assert.NotNull(t1Actual.Subject);
+                    Assert.Equal(t1Expected, t1Actual.HtmlContent);
+                    break;
+                case EmailTemplateId.UserAssignedToActor:
+                    var t2Actual = await emailContentGenerator.GenerateAsync(new UserAssignedToActorEmailTemplate(emptyParams), emptyParams);
+                    var t2Expected = await GetTestTemplateAsync(EmailTemplateId.UserAssignedToActor);
+                    Assert.NotNull(t2Actual);
+                    Assert.NotNull(t2Actual.Subject);
+                    Assert.Equal(t2Expected, t2Actual.HtmlContent);
+                    break;
+                case EmailTemplateId.OrganizationIdentityChanged:
+                    var t3Actual = await emailContentGenerator.GenerateAsync(new OrganizationIdentityChangedEmailTemplate(emptyParams), emptyParams);
+                    var t3Expected = await GetTestTemplateAsync(EmailTemplateId.OrganizationIdentityChanged);
+                    Assert.NotNull(t3Actual);
+                    Assert.NotNull(t3Actual.Subject);
+                    Assert.Equal(t3Expected, t3Actual.HtmlContent);
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
     }
 
     [Fact]
