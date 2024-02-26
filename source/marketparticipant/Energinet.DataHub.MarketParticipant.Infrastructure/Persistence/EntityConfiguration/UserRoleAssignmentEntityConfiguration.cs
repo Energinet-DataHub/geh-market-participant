@@ -27,7 +27,6 @@ public sealed class UserRoleAssignmentEntityConfiguration : AuditedEntityTypeCon
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
 
         builder.ToTable("UserRoleAssignment");
-        builder.Property(x => x.Id).HasDefaultValueSql("newid()");
         builder.HasKey(x => new { x.ActorId, x.UserId, x.UserRoleId });
     }
 }

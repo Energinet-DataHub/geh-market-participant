@@ -237,6 +237,7 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
                 Assert.Equal(auditedUser.Id, userAuditLog.AuditIdentityId);
                 Assert.True(userAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(userAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
+
                 auditLogsProcessed++;
             }
         }
