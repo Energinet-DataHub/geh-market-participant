@@ -41,7 +41,7 @@ public sealed class UserRoleAssignmentAuditLogRepository : IUserRoleAssignmentAu
         var auditLogs = await new AuditLogBuilder<UserAuditedChange, UserRoleAssignmentEntity>(dataSource)
             .Add(UserAuditedChange.UserRoleAssigned, AuditedChangeCompareAt.Creation, MakeAuditValue)
             .Add(UserAuditedChange.UserRoleRemoved, AuditedChangeCompareAt.Deletion, MakeAuditValue)
-            .WithGrouping(entity => new { entity.ActorId, entity.UserRoleId })
+            .WithGrouping(_ => Guid.NewGuid()) // Each changed should be looked at separately.
             .BuildAsync()
             .ConfigureAwait(false);
 

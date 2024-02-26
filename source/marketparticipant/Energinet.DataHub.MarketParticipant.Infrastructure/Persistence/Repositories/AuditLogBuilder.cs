@@ -79,7 +79,28 @@ public sealed class AuditLogBuilder<TAuditedChange, TAuditedEntity>
 
             for (var i = 0; i < entityList.Count; i++)
             {
-                auditLogs.AddRange(i == 0 ? BuildCreationAuditLogs(entityList) : BuildAuditLogs(entityList, i));
+                var isFirst = i == 0;
+                var isLast = i == entityList.Count - 1;
+
+                if (isLast)
+                {
+                    if (entityList[i].Entity is IDeletableAuditedEntity { DeletedByIdentityId: not null } deleted)
+                    {
+                        auditLogs.AddRange(BuildDeletionAuditLogs(entityList[i], deleted.DeletedByIdentityId.Value));
+                    }
+                    else
+                    {
+                        auditLogs.AddRange(isFirst ? BuildCreationAuditLogs(entityList) : BuildAuditLogs(entityList, i));
+                    }
+                }
+                else if (isFirst)
+                {
+                    auditLogs.AddRange(BuildCreationAuditLogs(entityList));
+                }
+                else
+                {
+                    auditLogs.AddRange(BuildAuditLogs(entityList, i));
+                }
             }
         }
 
@@ -105,9 +126,6 @@ public sealed class AuditLogBuilder<TAuditedChange, TAuditedEntity>
     {
         var (previous, _) = entities[i - 1];
         var (current, timestamp) = entities[i];
-
-        if (i == entities.Count - 1 && current is IDeletableAuditedEntity { DeletedByIdentityId: not null } deleted)
-            return BuildDeletionAuditLogs((current, timestamp), deleted.DeletedByIdentityId.Value);
 
         return from auditChange in _auditedChanges
                where auditChange.HasChanges(previous, current)

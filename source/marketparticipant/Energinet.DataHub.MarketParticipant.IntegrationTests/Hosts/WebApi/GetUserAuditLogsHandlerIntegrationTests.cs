@@ -104,6 +104,39 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
     }
 
     [Fact]
+    public async Task GetAuditLogs_AddRemoveAddAssignments_IsAudited()
+    {
+        var assignedActor = await _databaseFixture.PrepareActorAsync();
+        var assignedUserRole = await _databaseFixture.PrepareUserRoleAsync();
+
+        var expected = new UserRoleAssignment(
+            new ActorId(assignedActor.Id),
+            new UserRoleId(assignedUserRole.Id));
+
+        await TestAuditOfUserRoleAssignmentChangeAsync(
+            response =>
+            {
+                var expectedLog = response
+                    .AuditLogs
+                    .Single(log => log.Change == UserAuditedChange.UserRoleRemoved);
+
+                Assert.Equal($"({assignedActor.Id};{assignedUserRole.Id})", expectedLog.PreviousValue);
+            },
+            user =>
+            {
+                user.RoleAssignments.Add(expected);
+            },
+            user =>
+            {
+                user.RoleAssignments.Clear();
+            },
+            user =>
+            {
+                user.RoleAssignments.Add(expected);
+            });
+    }
+
+    [Fact]
     public Task GetAuditLogs_ChangeUserIdentityFirstName_IsAudited()
     {
         var expectedFirstName = Guid.NewGuid().ToString();
