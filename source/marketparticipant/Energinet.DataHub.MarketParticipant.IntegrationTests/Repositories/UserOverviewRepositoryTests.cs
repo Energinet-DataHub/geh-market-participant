@@ -551,7 +551,7 @@ public sealed class UserOverviewRepositoryTests
         var userRoleTemplate = new UserRoleEntity
         {
             Name = "Template name",
-            Permissions = { new UserRolePermissionEntity { Permission = PermissionId.OrganizationsManage, ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value } },
+            Permissions = { new UserRolePermissionEntity { Permission = PermissionId.ActorsManage, ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value } },
             EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } },
             ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value
         };

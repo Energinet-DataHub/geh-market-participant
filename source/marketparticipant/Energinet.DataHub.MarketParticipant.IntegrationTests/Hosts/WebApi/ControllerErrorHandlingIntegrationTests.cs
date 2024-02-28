@@ -110,7 +110,7 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
 
         using var client = CreateClient();
 
-        var token = await CreateTokenAsync(PermissionId.OrganizationsManage);
+        var token = await CreateTokenAsync(PermissionId.ActorsManage);
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
         var request = new CreateOrganizationDto(
@@ -151,7 +151,7 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
 
         using var client = CreateClient();
 
-        var token = await CreateTokenAsync(PermissionId.OrganizationsManage);
+        var token = await CreateTokenAsync(PermissionId.ActorsManage);
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
         var request = new CreateOrganizationDto(
@@ -187,7 +187,7 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
 
         using var client = CreateClient();
 
-        var token = await CreateTokenAsync(PermissionId.OrganizationsManage);
+        var token = await CreateTokenAsync(PermissionId.ActorsManage);
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
         var request = new CreateOrganizationDto(

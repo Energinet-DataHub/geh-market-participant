@@ -77,7 +77,7 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         var frontendFirstUser = await _fixture.PrepareUserAsync();
         host.ServiceCollection.MockFrontendUser(frontendFirstUser.Id);
 
-        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
+        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
         var targetPermission = (int)userRoleWithPermission.Permissions[0].Permission;
 
         await using var scopeFirstUser = host.BeginScope();

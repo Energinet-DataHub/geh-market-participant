@@ -125,7 +125,7 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         var actor2 = await _fixture.PrepareActorAsync();
 
         var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
-        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
         var userRoleNew = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
 
         var user = await _fixture.PrepareUserAsync();
