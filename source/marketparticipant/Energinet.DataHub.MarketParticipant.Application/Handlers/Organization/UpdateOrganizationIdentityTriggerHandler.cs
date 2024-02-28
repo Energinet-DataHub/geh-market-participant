@@ -26,9 +26,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 
-public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOrganisationIdentityTriggerCommand, Unit>
+public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOrganisationIdentityTriggerCommand>
 {
     private static readonly CultureInfo _danishCulture = new("da-DK");
+
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IOrganizationIdentityRepository _organizationIdentityRepository;
     private readonly IEmailEventRepository _emailEventRepository;
@@ -49,7 +50,7 @@ public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOr
         _logger = logger;
     }
 
-    public async Task<Unit> Handle(UpdateOrganisationIdentityTriggerCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateOrganisationIdentityTriggerCommand request, CancellationToken cancellationToken)
     {
         var allOrganizations = await _organizationRepository
             .GetAsync()
@@ -60,29 +61,38 @@ public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOr
 
         foreach (var organization in organizationsToCheck)
         {
-            var identityResponse = await _organizationIdentityRepository
+            var response = await _organizationIdentityRepository
                 .GetAsync(organization.BusinessRegisterIdentifier)
                 .ConfigureAwait(false);
 
-            if (identityResponse == null) continue;
-            if (_danishCulture.CompareInfo.Compare(organization.Name, identityResponse.Name) == 0) continue;
+            if (response == null)
+            {
+                continue;
+            }
 
-            var currentOrgName = organization.Name;
-            organization.Name = identityResponse.Name;
-            await _organizationRepository
-                .AddOrUpdateAsync(organization)
-                .ConfigureAwait(false);
+            var current = organization.Name.Trim();
+            var newName = response.Name.Trim();
 
-            _logger.LogInformation($"Organization identity updated for organization with id {organization.Id} from {currentOrgName} to {identityResponse.Name}");
-            await SendNotificationEmailAsync(organization, currentOrgName).ConfigureAwait(false);
+            if (_danishCulture.CompareInfo.Compare(current, newName) == 0)
+            {
+                continue;
+            }
+
+            organization.Name = newName;
+
+            await _organizationRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+
+            _logger.LogInformation($"Organization identity updated for organization with id {organization.Id} from {current} to {newName}");
+
+            await SendNotificationEmailAsync(organization, current).ConfigureAwait(false);
         }
-
-        return Unit.Value;
     }
 
-    private async Task SendNotificationEmailAsync(Domain.Model.Organization updatedOrganization, string oldOrganizationName)
+    private Task SendNotificationEmailAsync(Domain.Model.Organization updatedOrganization, string oldOrganizationName)
     {
-        var emailTemplate = new OrganizationIdentityChangedEmailTemplate(updatedOrganization, oldOrganizationName);
-        await _emailEventRepository.InsertAsync(new EmailEvent(new EmailAddress(_emailRecipientConfig.OrgUpdateNotificationToEmail), emailTemplate)).ConfigureAwait(false);
+        return _emailEventRepository.InsertAsync(
+            new EmailEvent(
+                new EmailAddress(_emailRecipientConfig.OrgUpdateNotificationToEmail),
+                new OrganizationIdentityChangedEmailTemplate(updatedOrganization, oldOrganizationName)));
     }
 }
