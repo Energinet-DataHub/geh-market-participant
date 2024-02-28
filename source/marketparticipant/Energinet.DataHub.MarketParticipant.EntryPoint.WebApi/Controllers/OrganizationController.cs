@@ -66,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost]
-        [AuthorizeUser(PermissionId.OrganizationsManage)]
+        [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<ActionResult<Guid>> CreateOrganizationAsync(CreateOrganizationDto organization)
         {
             if (!_userContext.CurrentUser.IsFas)
@@ -82,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut("{organizationId:guid}")]
-        [AuthorizeUser(PermissionId.OrganizationsManage)]
+        [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<ActionResult> UpdateOrganizationAsync(
             Guid organizationId,
             ChangeOrganizationDto organization)
@@ -113,7 +113,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}/audit")]
-        [AuthorizeUser(PermissionId.OrganizationsManage)]
+        [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<ActionResult<IEnumerable<AuditLogDto<OrganizationAuditedChange>>>> GetAuditAsync(Guid organizationId)
         {
             var command = new GetOrganizationAuditLogsCommand(organizationId);
@@ -126,7 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{businessRegisterIdentifier}/identity")]
-        [AuthorizeUser(PermissionId.OrganizationsManage)]
+        [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<ActionResult<GetOrganizationIdentityResponse>> GetOrganizationIdentityAsync(string businessRegisterIdentifier)
         {
             var command = new GetOrganizationIdentityCommand(businessRegisterIdentifier);
