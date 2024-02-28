@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         {
             // Arrange
             var target = new GetUserRolesToPermissionCommandRuleSet();
-            var command = new GetUserRolesToPermissionCommand((int)PermissionId.OrganizationsManage);
+            var command = new GetUserRolesToPermissionCommand((int)PermissionId.ActorsManage);
 
             // Act
             var result = await target.ValidateAsync(command);

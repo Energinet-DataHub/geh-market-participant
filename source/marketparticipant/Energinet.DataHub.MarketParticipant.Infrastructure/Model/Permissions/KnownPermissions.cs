@@ -26,10 +26,6 @@ public static class KnownPermissions
 {
     public static IReadOnlyCollection<KnownPermission> All { get; } = new KnownPermission[]
     {
-        new(PermissionId.OrganizationsManage, "organizations:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
-        {
-            EicFunction.DataHubAdministrator
-        }),
         new(PermissionId.GridAreasManage, "grid-areas:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
