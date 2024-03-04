@@ -113,7 +113,8 @@ public static class KnownPermissions
             EicFunction.DanishEnergyAgency,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader,
-            EicFunction.MeterOperator
+            EicFunction.MeterOperator,
+            EicFunction.Delegated
         }),
         new(PermissionId.ActorMasterDataManage, "actor-master-data:manage", InstantPattern.ExtendedIso.Parse("2024-02-08T00:00:00Z").Value, new[]
         {
