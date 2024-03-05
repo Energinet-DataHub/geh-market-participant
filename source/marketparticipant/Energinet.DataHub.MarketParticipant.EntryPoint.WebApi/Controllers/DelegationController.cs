@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Security;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
@@ -26,6 +25,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
+[Route("delegation")]
 public sealed class DelegationController : ControllerBase
 {
     private readonly IUserContext<FrontendUser> _userContext;
@@ -39,7 +39,7 @@ public sealed class DelegationController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet]
+    [HttpGet("{actorId:guid}")]
     [AuthorizeUser(PermissionId.DelegationView)]
     public async Task<ActionResult<GetDelegationsForActorResponse>> GetDelegationsForActorAsync(Guid actorId)
     {
