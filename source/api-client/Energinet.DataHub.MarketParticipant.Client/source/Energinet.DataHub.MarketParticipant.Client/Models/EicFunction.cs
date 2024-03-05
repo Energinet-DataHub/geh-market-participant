@@ -29,6 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         DanishEnergyAgency = 48,
         DataHubAdministrator = 50,
         IndependentAggregator = 51,
-        SerialEnergyTrader = 52
+        SerialEnergyTrader = 52,
+        Delegated = 53,
     }
 }

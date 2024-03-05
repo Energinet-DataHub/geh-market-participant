@@ -50,6 +50,7 @@ public sealed class ActorCertificateCredentialsAssignedIntegrationEventFactory :
                     EicFunction.IndependentAggregator => Model.Contracts.EicFunction.IndependentAggregator,
                     EicFunction.SerialEnergyTrader => Model.Contracts.EicFunction.SerialEnergyTrader,
                     EicFunction.MeterOperator => Model.Contracts.EicFunction.MeterOperator,
+                    EicFunction.Delegated => Model.Contracts.EicFunction.Delegated,
                     _ => throw new NotSupportedException($"Actor role {domainEvent.ActorRole} is not supported in integration event.")
                 },
                 CertificateThumbprint = domainEvent.CertificateThumbprint,
