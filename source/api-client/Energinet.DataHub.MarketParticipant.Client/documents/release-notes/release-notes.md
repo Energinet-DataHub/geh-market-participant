@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.36.5
+
+- Added new Marketrole, Delegated
+
 ## Version 2.36.4
 
 - No functional change.
