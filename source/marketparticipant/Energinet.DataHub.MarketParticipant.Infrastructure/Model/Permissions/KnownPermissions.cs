@@ -132,6 +132,27 @@ public static class KnownPermissions
             EicFunction.SerialEnergyTrader,
             EicFunction.MeterOperator,
             EicFunction.EnergySupplier
-        })
+        }),
+        new(PermissionId.DelegationManage, "delegation:manage", InstantPattern.ExtendedIso.Parse("2024-03-05T00:00:00Z").Value, new[]
+        {
+            EicFunction.DataHubAdministrator,
+        }),
+        new(PermissionId.DelegationView, "delegation:view", InstantPattern.ExtendedIso.Parse("2024-03-05T00:00:00Z").Value, new[]
+        {
+            EicFunction.BalanceResponsibleParty,
+            EicFunction.BillingAgent,
+            EicFunction.GridAccessProvider,
+            EicFunction.ImbalanceSettlementResponsible,
+            EicFunction.MeteredDataAdministrator,
+            EicFunction.MeteredDataResponsible,
+            EicFunction.MeteringPointAdministrator,
+            EicFunction.SystemOperator,
+            EicFunction.DanishEnergyAgency,
+            EicFunction.DataHubAdministrator,
+            EicFunction.IndependentAggregator,
+            EicFunction.SerialEnergyTrader,
+            EicFunction.MeterOperator,
+            EicFunction.EnergySupplier,
+        }),
     };
 }

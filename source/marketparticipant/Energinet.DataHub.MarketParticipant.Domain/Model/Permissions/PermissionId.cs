@@ -28,4 +28,6 @@ public enum PermissionId
     RequestAggregatedMeasureData = 12,
     ActorCredentialsManage = 13,
     ActorMasterDataManage = 14,
+    DelegationView = 15,
+    DelegationManage = 16,
 }
