@@ -13,15 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
-
-public record ActorDelegation(
-    ActorDelegationId Id,
-    ActorId DelegatedBy,
-    ActorId DelegatedTo,
-    IReadOnlyCollection<GridAreaCode> GridAreas,
-    DelegationMessageType MessageType,
-    DateTimeOffset CreatedAt,
-    DateTimeOffset? ExpiresAt = null);
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
+{
+    public sealed record CreateActorDelegationCommand(Guid DelegatedBy, CreateActorDelegationDto CreateDelegation) : IRequest<CreateActorDelegationResponse>;
+}

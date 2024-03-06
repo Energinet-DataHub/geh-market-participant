@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
@@ -44,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 
             NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
-            return new GetDelegationsForActorResponse(new Collection<ActorDelegation>());
+            return new GetDelegationsForActorResponse(new Collection<ActorDelegationDto>());
         }
     }
 }

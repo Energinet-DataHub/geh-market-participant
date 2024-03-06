@@ -12,9 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+
+public sealed record ActorDelegationId
 {
-    public sealed record CreateDelegationResponse(ActorDelegation Delegation);
+    public ActorDelegationId(string value)
+    {
+        Value = Guid.Parse(value);
+    }
+
+    public ActorDelegationId(Guid value)
+    {
+        Value = value;
+    }
+
+    public Guid Value { get; }
+
+    public override string ToString()
+    {
+        return Value.ToString();
+    }
 }

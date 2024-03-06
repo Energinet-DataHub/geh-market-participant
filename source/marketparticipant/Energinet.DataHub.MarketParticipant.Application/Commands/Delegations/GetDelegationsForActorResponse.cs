@@ -13,9 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
-    public sealed record GetDelegationsForActorResponse(IReadOnlyCollection<ActorDelegation> Delegations);
+    public sealed record GetDelegationsForActorResponse(IReadOnlyCollection<ActorDelegationDto> Delegations);
 }
