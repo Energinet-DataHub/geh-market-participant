@@ -215,7 +215,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("{actorId:guid}/delegation")]
+        [HttpPost("delegation")]
         [AuthorizeUser(PermissionId.DelegationManage)]
         public async Task<ActionResult<CreateActorDelegationResponse>> CreateDelegationAsync([FromBody]CreateActorDelegationDto delegationDto)
         {
