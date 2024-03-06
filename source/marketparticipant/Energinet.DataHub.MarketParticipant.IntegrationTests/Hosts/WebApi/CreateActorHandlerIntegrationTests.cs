@@ -14,14 +14,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -67,6 +65,7 @@ public sealed class CreateActorHandlerIntegrationTests
         // Assert
         Assert.Equal(createResponse.ActorId, actualActor.Actor.ActorId);
         Assert.Equal(createDto.Name.Value, actualActor.Actor.Name.Value);
+        actualActor.Actor.MarketRoles.Should().ContainSingle(x => x.EicFunction == EicFunction.Delegated);
     }
 
     [Fact]
@@ -100,6 +99,7 @@ public sealed class CreateActorHandlerIntegrationTests
         // Assert
         Assert.Equal(createResponseDelegatedActor.ActorId, actualDelegatedActor.Actor.ActorId);
         Assert.Equal(actualInitActor.Actor.ActorNumber, actualDelegatedActor.Actor.ActorNumber);
+        actualDelegatedActor.Actor.MarketRoles.Should().ContainSingle(x => x.EicFunction == EicFunction.Delegated);
     }
 
     private static IEnumerable<ActorMarketRoleDto> ActorMarketRoleDto(EicFunction eicFunction)
