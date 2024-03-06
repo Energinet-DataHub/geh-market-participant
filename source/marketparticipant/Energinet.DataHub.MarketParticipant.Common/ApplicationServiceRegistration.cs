@@ -15,6 +15,7 @@
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
@@ -98,6 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IValidator<UpdateActorNameCommand>, UpdateActorNameCommandRuleSet>();
             services.AddScoped<IValidator<GetOrganizationIdentityCommand>, GetOrganizationIdentityCommandRuleSet>();
             services.AddScoped<IValidator<UpdateOrganisationIdentityTriggerCommand>, UpdateOrganisationIdentityTriggerCommandRuleSet>();
+            services.AddScoped<IValidator<GetDelegationsForActorCommand>, GetDelegationsForActorCommandRuleSet>();
 
             services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
             services.AddScoped<IActorClientSecretService, ActorClientSecretService>();
