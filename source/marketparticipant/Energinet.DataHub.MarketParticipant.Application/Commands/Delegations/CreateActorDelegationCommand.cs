@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
-    public sealed record CreateActorDelegationCommand(Guid DelegatedBy, CreateActorDelegationDto CreateDelegation) : IRequest<CreateActorDelegationResponse>;
+    public sealed record CreateActorDelegationCommand(CreateActorDelegationDto CreateDelegation) : IRequest<CreateActorDelegationResponse>;
 }

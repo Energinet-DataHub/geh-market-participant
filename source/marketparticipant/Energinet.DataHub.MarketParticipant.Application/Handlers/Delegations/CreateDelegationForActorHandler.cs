@@ -39,20 +39,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             var actor = await _actorRepository
-                .GetAsync(new ActorId(request.DelegatedBy))
+                .GetAsync(new ActorId(request.CreateDelegation.DelegatedFrom))
                 .ConfigureAwait(false);
 
             var actorDelegatedTo = await _actorRepository
                 .GetAsync(new ActorId(request.CreateDelegation.DelegatedTo))
                 .ConfigureAwait(false);
 
-            NotFoundValidationException.ThrowIfNull(actor, request.DelegatedBy);
+            NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
             NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo);
 
             // TODO: Implement logic for creating delegation and then update values here.
             return new CreateActorDelegationResponse(new ActorDelegationDto(
                 new ActorDelegationId(Guid.NewGuid()),
-                new ActorId(request.DelegatedBy),
+                new ActorId(request.CreateDelegation.DelegatedFrom),
                 new ActorId(request.CreateDelegation.DelegatedTo),
                 new List<GridAreaCode>(),
                 DelegationMessageType.RSM012Inbound,
