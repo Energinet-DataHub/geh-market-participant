@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -196,6 +197,38 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .ConfigureAwait(false);
 
             return Ok(response.AuditLogs);
+        }
+
+        [HttpGet("{actorId:guid}/delegation")]
+        [AuthorizeUser(PermissionId.DelegationView)]
+        public async Task<ActionResult<GetDelegationsForActorResponse>> GetDelegationsForActorAsync(Guid actorId)
+        {
+            ArgumentNullException.ThrowIfNull(actorId);
+
+            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                return Unauthorized();
+
+            var result = await _mediator
+                .Send(new GetDelegationsForActorCommand(actorId))
+                .ConfigureAwait(false);
+
+            return Ok(result);
+        }
+
+        [HttpPost("{actorId:guid}/delegation")]
+        [AuthorizeUser(PermissionId.DelegationManage)]
+        public async Task<ActionResult<CreateActorDelegationResponse>> CreateDelegationAsync([FromBody]CreateActorDelegationDto delegationDto)
+        {
+            if (!_userContext.CurrentUser.IsFas)
+                return Unauthorized();
+
+            var createDelegationCommand = new CreateActorDelegationCommand(delegationDto);
+
+            var response = await _mediator
+                .Send(createDelegationCommand)
+                .ConfigureAwait(false);
+
+            return Ok(response);
         }
     }
 }
