@@ -230,5 +230,21 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
             return Ok(response);
         }
+
+        [HttpPut("delegation")]
+        [AuthorizeUser(PermissionId.DelegationManage)]
+        public async Task<ActionResult<UpdateActorDelegationResponse>> UpdateDelegationAsync([FromBody]UpdateActorDelegationDto delegationDto)
+        {
+            if (!_userContext.CurrentUser.IsFas)
+                return Unauthorized();
+
+            var updateActorDelegation = new UpdateActorDelegationCommand(delegationDto);
+
+            var response = await _mediator
+                .Send(updateActorDelegation)
+                .ConfigureAwait(false);
+
+            return Ok(response);
+        }
     }
 }
