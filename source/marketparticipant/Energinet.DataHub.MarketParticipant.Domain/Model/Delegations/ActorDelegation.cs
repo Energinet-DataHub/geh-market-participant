@@ -17,11 +17,36 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-public record ActorDelegation(
-    ActorDelegationId Id,
-    ActorId DelegatedBy,
-    ActorId DelegatedTo,
-    IReadOnlyCollection<GridAreaCode> GridAreas,
-    DelegationMessageType MessageType,
-    DateTimeOffset CreatedAt,
-    DateTimeOffset? ExpiresAt = null);
+public class ActorDelegation
+{
+    public ActorDelegation(
+        ActorDelegationId id,
+        ActorId delegatedBy,
+        ActorId delegatedTo,
+        IReadOnlyCollection<GridAreaCode> gridAreas,
+        DelegationMessageType messageType,
+        DateTimeOffset createdAt,
+        DateTimeOffset? expiresAt = null)
+    {
+        Id = id;
+        DelegatedBy = delegatedBy;
+        DelegatedTo = delegatedTo;
+        GridAreas = gridAreas;
+        MessageType = messageType;
+        CreatedAt = createdAt;
+        ExpiresAt = expiresAt;
+    }
+
+    public ActorDelegationId Id { get; }
+    public ActorId DelegatedBy { get; }
+    public ActorId DelegatedTo { get; }
+    public IReadOnlyCollection<GridAreaCode> GridAreas { get; }
+    public DelegationMessageType MessageType { get; }
+    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset? ExpiresAt { get; internal set; }
+
+    public void SetExpiresAt(DateTimeOffset expiresAt)
+    {
+        ExpiresAt = expiresAt;
+    }
+}
