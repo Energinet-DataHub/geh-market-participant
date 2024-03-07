@@ -25,7 +25,7 @@ public class ActorDelegation
         ActorId delegatedTo,
         IReadOnlyCollection<GridAreaCode> gridAreas,
         DelegationMessageType messageType,
-        DateTimeOffset createdAt,
+        DateTimeOffset startsAt,
         DateTimeOffset? expiresAt = null)
     {
         Id = id;
@@ -33,7 +33,7 @@ public class ActorDelegation
         DelegatedTo = delegatedTo;
         GridAreas = gridAreas;
         MessageType = messageType;
-        CreatedAt = createdAt;
+        StartsAt = startsAt;
         ExpiresAt = expiresAt;
     }
 
@@ -42,7 +42,7 @@ public class ActorDelegation
     public ActorId DelegatedTo { get; }
     public IReadOnlyCollection<GridAreaCode> GridAreas { get; }
     public DelegationMessageType MessageType { get; }
-    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset StartsAt { get; }
     public DateTimeOffset? ExpiresAt { get; internal set; }
 
     public void SetExpiresAt(DateTimeOffset expiresAt)
