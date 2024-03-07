@@ -39,6 +39,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [IntegrationTest]
 public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationTestsBase<NoAuthStartup>
 {
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
+
     private readonly MarketParticipantDatabaseFixture _fixture;
 
     public ControllerErrorHandlingIntegrationTests(MarketParticipantDatabaseFixture fixture)
@@ -222,11 +227,11 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
     {
         var responseContent = await response.Content.ReadAsStringAsync();
 
-        var returnValue = new { errors = Array.Empty<ErrorDescriptor>() };
-        var errorResponse = JsonSerializer.Deserialize(responseContent, returnValue.GetType(), new JsonSerializerOptions
+        var returnValue = new
         {
-            PropertyNameCaseInsensitive = true
-        });
+            errors = Array.Empty<ErrorDescriptor>(),
+        };
+        var errorResponse = JsonSerializer.Deserialize(responseContent, returnValue.GetType(), _jsonSerializerOptions);
 
         Assert.NotNull(errorResponse);
         returnValue = (dynamic)errorResponse;

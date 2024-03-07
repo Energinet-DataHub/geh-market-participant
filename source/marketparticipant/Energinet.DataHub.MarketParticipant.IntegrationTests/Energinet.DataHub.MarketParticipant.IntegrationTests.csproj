@@ -16,41 +16,35 @@ limitations under the License.
 
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="4.4.2" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.15" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-      <PackageReference Include="xunit" Version="2.6.5" />
-      <PackageReference Include="xunit.categories" Version="2.0.8" />
-      <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="coverlet.collector" Version="6.0.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="4.6.1"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.2"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0"/>
+    <PackageReference Include="xunit" Version="2.7.0"/>
+    <PackageReference Include="xunit.categories" Version="2.0.8"/>
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7"/>
+    <PackageReference Include="coverlet.collector" Version="6.0.1"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.csproj" />
-      <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi\Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi.csproj" />
-      <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.Organization\Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.csproj"/>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi\Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi.csproj"/>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.Organization\Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <None Update="integrationtest.local.settings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
+  <ItemGroup>
+    <None Update="integrationtest.local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
-    <ItemGroup>
-      <EmbeddedResource Include="Common\Certificates\integration-actor-test-certificate-public.cer" />
-    </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Common\Certificates\integration-actor-test-certificate-public.cer"/>
+  </ItemGroup>
 
 </Project>
