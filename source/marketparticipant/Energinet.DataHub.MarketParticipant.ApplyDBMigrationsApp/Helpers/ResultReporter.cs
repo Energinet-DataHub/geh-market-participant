@@ -24,19 +24,9 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 
         public static int ReportResult(DatabaseUpgradeResult result)
         {
-            if (result == null)
-            {
-                throw new ArgumentNullException(nameof(result));
-            }
+            ArgumentNullException.ThrowIfNull(result);
 
-            if (!result.Successful)
-            {
-                return ReportFailure(result);
-            }
-            else
-            {
-                return ReportSuccess();
-            }
+            return !result.Successful ? ReportFailure(result) : ReportSuccess();
         }
 
         private static int ReportFailure(DatabaseUpgradeResult result)

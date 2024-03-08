@@ -16,7 +16,7 @@ limitations under the License.
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AzureFunctionsVersion>V4</AzureFunctionsVersion>
     <OutputType>Exe</OutputType>
     <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
@@ -26,13 +26,14 @@ limitations under the License.
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.10.4" />
-    <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.5.0" />
-    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="8.2.0" />
+    <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.6.0" />
+    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="8.3.2" />
     <PackageReference Include="Energinet.DataHub.Core.Logging.LoggingScopeMiddleware" Version="2.3.1" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.20.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.21.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.1.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.16.4" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.2" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
