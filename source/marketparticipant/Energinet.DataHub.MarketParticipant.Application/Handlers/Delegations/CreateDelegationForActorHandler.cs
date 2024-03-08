@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                 new ActorDelegationId(Guid.NewGuid()),
                 new ActorId(request.CreateDelegation.DelegatedFrom),
                 new ActorId(request.CreateDelegation.DelegatedTo),
-                new List<GridAreaCode>(),
+                new GridAreaId(Guid.NewGuid()),
                 DelegationMessageType.RSM012Inbound,
                 DateTimeOffset.UtcNow,
                 DateTimeOffset.UtcNow));

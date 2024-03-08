@@ -14,24 +14,42 @@
 
 using System;
 using System.Collections.Generic;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 public class ActorDelegation
 {
     public ActorDelegation(
+        ActorId delegatedBy,
+        ActorId delegatedTo,
+        GridAreaId gridAreaId,
+        DelegationMessageType messageType,
+        Instant startsAt,
+        Instant? expiresAt = null)
+    {
+        Id = new ActorDelegationId(Guid.Empty);
+        DelegatedBy = delegatedBy;
+        DelegatedTo = delegatedTo;
+        GridAreaId = gridAreaId;
+        MessageType = messageType;
+        StartsAt = startsAt;
+        ExpiresAt = expiresAt;
+    }
+
+    public ActorDelegation(
         ActorDelegationId id,
         ActorId delegatedBy,
         ActorId delegatedTo,
-        IReadOnlyCollection<GridAreaCode> gridAreas,
+        GridAreaId gridAreaId,
         DelegationMessageType messageType,
-        DateTimeOffset startsAt,
-        DateTimeOffset? expiresAt = null)
+        Instant startsAt,
+        Instant? expiresAt = null)
     {
         Id = id;
         DelegatedBy = delegatedBy;
         DelegatedTo = delegatedTo;
-        GridAreas = gridAreas;
+        GridAreaId = gridAreaId;
         MessageType = messageType;
         StartsAt = startsAt;
         ExpiresAt = expiresAt;
@@ -40,12 +58,12 @@ public class ActorDelegation
     public ActorDelegationId Id { get; }
     public ActorId DelegatedBy { get; }
     public ActorId DelegatedTo { get; }
-    public IReadOnlyCollection<GridAreaCode> GridAreas { get; }
+    public GridAreaId GridAreaId { get; }
     public DelegationMessageType MessageType { get; }
-    public DateTimeOffset StartsAt { get; }
-    public DateTimeOffset? ExpiresAt { get; internal set; }
+    public Instant StartsAt { get; }
+    public Instant? ExpiresAt { get; internal set; }
 
-    public void SetExpiresAt(DateTimeOffset expiresAt)
+    public void SetExpiresAt(Instant expiresAt)
     {
         ExpiresAt = expiresAt;
     }

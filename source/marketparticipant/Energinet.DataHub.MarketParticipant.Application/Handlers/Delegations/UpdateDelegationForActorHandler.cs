@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 {
@@ -39,9 +40,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                 .GetAsync(request.UpdateActorDelegation.Id)
                 .ConfigureAwait(false);
 
-            actorDelegation.SetExpiresAt(request.UpdateActorDelegation.ExpiresAt);
+            if (actorDelegation is null) return new UpdateActorDelegationResponse("NotFound");
+            actorDelegation.SetExpiresAt(request.UpdateActorDelegation.ExpiresAt.ToInstant());
 
-            await _actorDelegationRepository.UpdateAsync(actorDelegation).ConfigureAwait(false);
+            await _actorDelegationRepository.AddOrUpdateAsync(actorDelegation).ConfigureAwait(false);
 
             var responseMessage = request.UpdateActorDelegation.ExpiresAt > DateTimeOffset.UtcNow ? "Updated" : "Stopped";
             return new UpdateActorDelegationResponse(responseMessage);

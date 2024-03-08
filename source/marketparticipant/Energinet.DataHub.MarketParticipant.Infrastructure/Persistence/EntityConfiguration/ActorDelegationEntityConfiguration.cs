@@ -27,10 +27,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.ToTable("ActorDelegation");
             builder.HasKey(d => d.Id);
             builder.Property(d => d.Id).ValueGeneratedOnAdd();
-            builder
-                .HasMany(d => d.GridAreas)
-                .WithOne()
-                .HasForeignKey(g => g.ActorDelegationId);
         }
     }
 }

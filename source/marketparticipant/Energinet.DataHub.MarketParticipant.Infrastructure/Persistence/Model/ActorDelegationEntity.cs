@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -21,9 +21,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 public sealed class ActorDelegationEntity : IAuditedEntity
 {
     public Guid Id { get; set; }
-    public Guid? DelegatedByActorId { get; set; }
+    public Guid DelegatedByActorId { get; set; }
     public Guid DelegatedToActorId { get; set; }
-    public Collection<ActorDelegationGridAreaEntity> GridAreas { get; } = new();
+    public Guid GridAreaId { get; set; }
+    public DelegationMessageType MessageType { get; set; }
     public DateTimeOffset StartsAt { get; set; }
     public DateTimeOffset? ExpiresAt { get; set; } = null!;
     public int Version { get; set; }

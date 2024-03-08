@@ -23,7 +23,7 @@ public record ActorDelegationDto(
     ActorDelegationId Id,
     ActorId DelegatedBy,
     ActorId DelegatedTo,
-    IReadOnlyCollection<GridAreaCode> GridAreas,
+    GridAreaId GridAreaId,
     DelegationMessageType MessageType,
     DateTimeOffset StartsAt,
     DateTimeOffset? ExpiresAt = null);
