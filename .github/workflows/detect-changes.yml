@@ -55,9 +55,6 @@ jobs:
               - '.github/workflows/ci-dotnet.yml'
               - '.github/actions/dotnet-*/**'
               - 'source/marketparticipant/**'
-            client_package:
-              - '.github/workflows/publish-marketparticipant-client.yml'
-              - 'source/api-client/**'
             render_c4model_views:
               - 'docs/diagrams/c4-model/views.dsl'
               - 'docs/diagrams/c4-model/views.json'
