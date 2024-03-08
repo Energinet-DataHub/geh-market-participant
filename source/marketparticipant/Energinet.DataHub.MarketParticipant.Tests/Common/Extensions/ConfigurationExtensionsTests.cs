@@ -32,7 +32,6 @@ public sealed class ConfigurationExtensionsTests
         const string expectedValue = "fake_value";
 
         var configurationMock = new Mock<IConfiguration>();
-
         var target = configurationMock.Object;
 
         var setting = new Setting<string>("test_setting");
