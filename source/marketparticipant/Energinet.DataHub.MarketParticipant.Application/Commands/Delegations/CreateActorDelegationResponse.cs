@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
-    public sealed record CreateActorDelegationResponse(ActorDelegationDto Delegation);
+    public sealed record CreateActorDelegationResponse(IEnumerable<ActorDelegationDto> Delegation);
 }
