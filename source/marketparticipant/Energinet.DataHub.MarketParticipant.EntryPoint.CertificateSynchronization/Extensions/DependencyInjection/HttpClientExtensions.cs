@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronizat
 
 internal static class HttpClientExtensions
 {
-    public static IServiceCollection RegisterHttpClient(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddHttpClient(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpClient<HttpClient>((_, httpClient)
             => httpClient.BaseAddress = new Uri($"https://management.azure.com{configuration.GetValue<string>("APIM_SERVICE_NAME")}/certificates/"));

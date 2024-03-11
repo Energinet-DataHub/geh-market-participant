@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronizat
 
 internal static class ApimCertificateStoreExtensions
 {
-    public static IServiceCollection RegisterCertificateStore(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddCertificateStore(this IServiceCollection services, IConfiguration configuration)
     {
         // register certificate store
         services.AddScoped<IKeyVaultCertificates, KeyVaultCertificates>();

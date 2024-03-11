@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
@@ -22,33 +21,25 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization;
-
-public static class Program
-{
-    public static async Task Main()
+var host = new HostBuilder()
+    .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
+    .ConfigureServices((context, services) =>
     {
-        var host = new HostBuilder()
-            .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
-            .ConfigureServices((context, services) =>
-            {
-                services.AddApplicationInsights();
+        services.AddApplicationInsights();
 
-                services
-                    .AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>()
-                    .AddScoped<HealthCheckEndpoint>()
-                    .AddHealthChecks()
-                    .AddLiveCheck();
+        services
+            .AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>()
+            .AddScoped<HealthCheckEndpoint>()
+            .AddHealthChecks()
+            .AddLiveCheck();
 
-                services
-                    .AddLogging()
-                    .AddFunctionLoggingScope("mark-part");
+        services
+            .AddLogging()
+            .AddFunctionLoggingScope("mark-part");
 
-                services
-                    .RegisterHttpClient(context.Configuration)
-                    .RegisterCertificateStore(context.Configuration);
-            }).Build();
+        services
+            .AddHttpClient(context.Configuration)
+            .AddCertificateStore(context.Configuration);
+    }).Build();
 
-        await host.RunAsync().ConfigureAwait(false);
-    }
-}
+host.Run();
