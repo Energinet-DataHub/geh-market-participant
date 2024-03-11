@@ -61,7 +61,7 @@ public class ActorDelegation
     public GridAreaId GridAreaId { get; }
     public DelegationMessageType MessageType { get; }
     public Instant StartsAt { get; }
-    public Instant? ExpiresAt { get; internal set; }
+    public Instant? ExpiresAt { get; private set; }
 
     public void SetExpiresAt(Instant expiresAt)
     {

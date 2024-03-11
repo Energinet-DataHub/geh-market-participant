@@ -10,8 +10,8 @@ CREATE TABLE [dbo].[ActorDelegation]
     CONSTRAINT [PK_ActorDelegation] PRIMARY KEY CLUSTERED
     (
         [Id] ASC
-    ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
+    CONSTRAINT [FK_ActorDelegationGridAreaId_GridArea] FOREIGN KEY([GridAreaId]) REFERENCES [dbo].[GridArea] ([Id]),
+    CONSTRAINT [FK_ActorDelegationDelegatedByActorId_Actor] FOREIGN KEY([DelegatedByActorId]) REFERENCES [dbo].[Actor] ([Id]),
+    CONSTRAINT [FK_ActorDelegationDelegatedToActorIdActor] FOREIGN KEY([DelegatedToActorId]) REFERENCES [dbo].[Actor] ([Id])
 ) ON [PRIMARY]
-GO
-ALTER TABLE [dbo].[ActorDelegation] WITH CHECK ADD CONSTRAINT [FK_ActorDelegationGridAreaId_GridArea] FOREIGN KEY([GridAreaId])
-    REFERENCES [dbo].[GridArea] ([Id])

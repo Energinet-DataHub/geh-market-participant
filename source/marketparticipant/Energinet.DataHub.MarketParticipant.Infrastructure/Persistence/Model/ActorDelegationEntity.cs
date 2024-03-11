@@ -26,7 +26,7 @@ public sealed class ActorDelegationEntity : IAuditedEntity
     public Guid GridAreaId { get; set; }
     public DelegationMessageType MessageType { get; set; }
     public DateTimeOffset StartsAt { get; set; }
-    public DateTimeOffset? ExpiresAt { get; set; } = null!;
+    public DateTimeOffset? ExpiresAt { get; set; }
     public int Version { get; set; }
     public Guid ChangedByIdentityId { get; set; }
 }

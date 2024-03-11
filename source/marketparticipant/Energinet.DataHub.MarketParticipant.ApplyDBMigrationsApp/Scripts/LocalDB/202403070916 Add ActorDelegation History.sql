@@ -8,8 +8,6 @@ ALTER TABLE [dbo].[ActorDelegation] ADD
     
     Version             int              NOT NULL DEFAULT 0,
     ChangedByIdentityId uniqueidentifier NOT NULL
-    CONSTRAINT DF_ChangedByIdentityId DEFAULT('00000000-FFFF-FFFF-FFFF-000000000000'),
-    DeletedByIdentityId uniqueidentifier     NULL;
 GO
 
 ALTER TABLE [dbo].[ActorDelegation]
@@ -21,6 +19,5 @@ DROP CONSTRAINT DF_ChangedByIdentityId
 GO
 
 ALTER TABLE [dbo].[ActorDelegation]
-    ADD CONSTRAINT CHK_ActorDelegation_ChangedByIdentityId_NotEmpty CHECK (ChangedByIdentityId <> '00000000-0000-0000-0000-000000000000'),
-        CONSTRAINT CHK_ActorDelegation_DeletedByIdentityId_NotEmpty CHECK (DeletedByIdentityId <> '00000000-0000-0000-0000-000000000000');
+    ADD CONSTRAINT CHK_ActorDelegation_ChangedByIdentityId_NotEmpty CHECK (ChangedByIdentityId <> '00000000-0000-0000-0000-000000000000')
 GO

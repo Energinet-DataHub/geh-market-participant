@@ -38,9 +38,7 @@ public sealed class ActorDelegationRepository : IActorDelegationRepository
     {
         ArgumentNullException.ThrowIfNull(actorDelegationId, nameof(actorDelegationId));
 
-        var actorDelegation = await _marketParticipantDbContext.ActorDelegations
-            .FindAsync(actorDelegationId.Value)
-            .ConfigureAwait(false);
+        var actorDelegation = await FindAsync(actorDelegationId).ConfigureAwait(false);
 
         return actorDelegation is null ? null : ActorDelegationMapper.MapFromEntity(actorDelegation);
     }
@@ -81,10 +79,10 @@ public sealed class ActorDelegationRepository : IActorDelegationRepository
         }
         else
         {
-            destination = await _marketParticipantDbContext
-                .ActorDelegations
-                .FindAsync(actorDelegation.Id.Value)
-                .ConfigureAwait(false) ?? throw new InvalidOperationException($"ActorDelegation with id {actorDelegation.Id.Value} is missing, even though it cannot be deleted.");
+            destination = actorDelegation.Id.Value == default
+                ? new ActorDelegationEntity()
+                : await FindAsync(actorDelegation.Id).ConfigureAwait(false)
+                  ?? throw new InvalidOperationException($"ActorDelegation with id {actorDelegation.Id.Value} is missing, even though it cannot be deleted.");
         }
 
         ActorDelegationMapper.MapToEntity(actorDelegation, destination);
@@ -93,5 +91,11 @@ public sealed class ActorDelegationRepository : IActorDelegationRepository
         await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
 
         return new ActorDelegationId(destination.Id);
+    }
+
+    private ValueTask<ActorDelegationEntity?> FindAsync(ActorDelegationId actorDelegationId)
+    {
+        return _marketParticipantDbContext.ActorDelegations
+            .FindAsync(actorDelegationId.Value);
     }
 }
