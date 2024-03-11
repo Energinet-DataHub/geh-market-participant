@@ -217,18 +217,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost("delegation")]
         [AuthorizeUser(PermissionId.DelegationManage)]
-        public async Task<ActionResult<CreateActorDelegationResponse>> CreateDelegationAsync([FromBody]CreateActorDelegationDto delegationDto)
+        public async Task<ActionResult> CreateDelegationAsync([FromBody]CreateActorDelegationDto delegationDto)
         {
             if (!_userContext.CurrentUser.IsFas)
                 return Unauthorized();
 
             var createDelegationCommand = new CreateActorDelegationCommand(delegationDto);
 
-            var response = await _mediator
+            await _mediator
                 .Send(createDelegationCommand)
                 .ConfigureAwait(false);
 
-            return Ok(response);
+            return Ok();
         }
 
         [HttpPut("delegation")]

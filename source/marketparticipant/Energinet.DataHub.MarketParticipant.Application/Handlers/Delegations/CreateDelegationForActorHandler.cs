@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
@@ -29,10 +30,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 {
     public sealed class CreateDelegationForActorHandler(
         IActorRepository actorRepository,
-        IActorDelegationRepository actorDelegationRepository)
-        : IRequestHandler<CreateActorDelegationCommand, CreateActorDelegationResponse>
+        IActorDelegationRepository actorDelegationRepository,
+        IUnitOfWorkProvider unitOfWorkProvider)
+        : IRequestHandler<CreateActorDelegationCommand>
     {
-        public async Task<CreateActorDelegationResponse> Handle(CreateActorDelegationCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateActorDelegationCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
@@ -47,33 +49,40 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
             NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
             NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo);
 
-            var result = new List<ActorDelegationDto>();
-            foreach (var gridArea in request.CreateDelegation.GridAreas)
+            var uow = await unitOfWorkProvider
+                .NewUnitOfWorkAsync()
+                .ConfigureAwait(false);
+
+            await using (uow.ConfigureAwait(false))
             {
-                foreach (var messageType in request.CreateDelegation.MessageTypes)
+                var result = new List<ActorDelegationDto>();
+                foreach (var gridArea in request.CreateDelegation.GridAreas)
                 {
-                    var delegation = new ActorDelegation(
-                        new ActorId(request.CreateDelegation.DelegatedFrom),
-                        new ActorId(request.CreateDelegation.DelegatedTo),
-                        new GridAreaId(gridArea),
-                        messageType,
-                        DateTimeOffset.UtcNow.ToInstant(),
-                        DateTimeOffset.UtcNow.ToInstant());
+                    foreach (var messageType in request.CreateDelegation.MessageTypes)
+                    {
+                        var delegation = new ActorDelegation(
+                            new ActorId(request.CreateDelegation.DelegatedFrom),
+                            new ActorId(request.CreateDelegation.DelegatedTo),
+                            new GridAreaId(gridArea),
+                            messageType,
+                            DateTimeOffset.UtcNow.ToInstant(),
+                            DateTimeOffset.UtcNow.ToInstant());
 
-                    var delegationId = await actorDelegationRepository.AddOrUpdateAsync(delegation).ConfigureAwait(false);
+                        var delegationId = await actorDelegationRepository.AddOrUpdateAsync(delegation).ConfigureAwait(false);
 
-                    result.Add(new ActorDelegationDto(
-                        delegationId,
-                        delegation.DelegatedBy,
-                        delegation.DelegatedTo,
-                        delegation.GridAreaId,
-                        delegation.MessageType,
-                        delegation.StartsAt.ToDateTimeOffset(),
-                        delegation.ExpiresAt?.ToDateTimeOffset()));
+                        result.Add(new ActorDelegationDto(
+                            delegationId,
+                            delegation.DelegatedBy,
+                            delegation.DelegatedTo,
+                            delegation.GridAreaId,
+                            delegation.MessageType,
+                            delegation.StartsAt.ToDateTimeOffset(),
+                            delegation.ExpiresAt?.ToDateTimeOffset()));
+                    }
                 }
-            }
 
-            return new CreateActorDelegationResponse(result);
+                await uow.CommitAsync().ConfigureAwait(false);
+            }
         }
     }
 }
