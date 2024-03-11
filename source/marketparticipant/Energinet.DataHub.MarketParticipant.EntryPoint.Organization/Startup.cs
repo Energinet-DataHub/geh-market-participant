@@ -65,7 +65,7 @@ internal sealed class Startup : StartupBase
 
     private static void AddHealthChecks(IConfiguration configuration, IServiceCollection services)
     {
-        static async Task<bool> CheckExpiredEvents(MarketParticipantDbContext context, CancellationToken cancellationToken)
+        static async Task<bool> CheckExpiredEventsAsync(MarketParticipantDbContext context, CancellationToken cancellationToken)
         {
             var healthCutoff = DateTimeOffset.UtcNow.AddDays(-1);
 
@@ -76,7 +76,7 @@ internal sealed class Startup : StartupBase
             return !expiredDomainEvents;
         }
 
-        static async Task<bool> CheckExpiredEmails(MarketParticipantDbContext context, CancellationToken cancellationToken)
+        static async Task<bool> CheckExpiredEmailsAsync(MarketParticipantDbContext context, CancellationToken cancellationToken)
         {
             var healthCutoff = DateTimeOffset.UtcNow.AddDays(-1);
 
@@ -96,8 +96,8 @@ internal sealed class Startup : StartupBase
             .AddHealthChecks()
             .AddLiveCheck()
             .AddDbContextCheck<MarketParticipantDbContext>()
-            .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEvents, name: "expired_events")
-            .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEmails, name: "expired_emails")
+            .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEventsAsync, name: "expired_events")
+            .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEmailsAsync, name: "expired_emails")
             .AddAzureServiceBusTopic(
                 _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
                 _ => configuration.GetSetting(Settings.ServiceBusTopicName))

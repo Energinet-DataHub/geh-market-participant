@@ -13,11 +13,11 @@ if (-not $ConnectionString) {
 $ScriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 # Construct the path to DatabaseMigration.exe
-$MigrationToolPath = Join-Path -Path $ScriptDirectory -ChildPath "\bin\Debug\net7.0\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.exe"
+$MigrationToolPath = Join-Path -Path $ScriptDirectory -ChildPath "\bin\Debug\net8.0\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.exe"
 
 # Check if DatabaseMigration.exe exists
 if (-not (Test-Path $MigrationToolPath)) {
-    Write-Host "Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.exe not found in the expected location (\bin\Debug\net7.0\)."
+    Write-Host "Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.exe not found in the expected location (\bin\Debug\net8.0\)."
     exit
 }
 

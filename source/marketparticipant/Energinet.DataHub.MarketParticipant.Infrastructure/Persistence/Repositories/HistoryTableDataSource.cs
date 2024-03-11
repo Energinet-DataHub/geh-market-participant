@@ -55,7 +55,9 @@ public sealed class HistoryTableDataSource<TAuditedEntity> : IAuditedEntityDataS
             .ConfigureAwait(false);
 
         var allHistory = await _dataSource
+#pragma warning disable EF1002
             .FromSqlRaw($"SELECT * FROM dbo.{historyTableName}")
+#pragma warning restore EF1002
             .AsNoTracking()
             .Where(_wherePredicate)
             .Select(entity => new

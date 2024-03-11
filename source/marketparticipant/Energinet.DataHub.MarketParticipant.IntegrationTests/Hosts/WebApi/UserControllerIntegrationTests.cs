@@ -35,6 +35,11 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase<
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
+
     public UserControllerIntegrationTests(MarketParticipantDatabaseFixture fixture)
         : base(fixture)
     {
@@ -84,7 +89,7 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase<
         // Assert
         var response = JsonSerializer.Deserialize<GetActorsAssociatedWithExternalUserIdResponse>(
             responseJson,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            _jsonSerializerOptions);
 
         Assert.NotNull(response);
         Assert.Empty(response.ActorIds);
@@ -117,7 +122,7 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase<
         // Assert
         var response = JsonSerializer.Deserialize<GetActorsAssociatedWithExternalUserIdResponse>(
             responseJson,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            _jsonSerializerOptions);
 
         Assert.NotNull(response);
         Assert.Equal(actor.Id, response.ActorIds.Single());
