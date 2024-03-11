@@ -72,6 +72,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<ActorCertificateCredentialsEntity> ActorCertificateCredentials { get; private set; } = null!;
     public DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; private set; } = null!;
     public DbSet<UsedActorCertificatesEntity> UsedActorCertificates { get; private set; } = null!;
+    public DbSet<ActorDelegationEntity> ActorDelegations { get; private set; } = null!;
 
     public async Task<int> SaveChangesAsync()
     {
@@ -124,6 +125,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new EmailEventEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorCertificateCredentialsEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorClientSecretCredentialsEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ActorDelegationEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 

@@ -14,10 +14,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -30,23 +34,68 @@ public sealed class ActorDelegationRepository : IActorDelegationRepository
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public Task<ActorDelegation> GetAsync(ActorDelegationId actorDelegationId)
+    public async Task<ActorDelegation?> GetAsync(ActorDelegationId actorDelegationId)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(actorDelegationId, nameof(actorDelegationId));
+
+        var actorDelegation = await FindAsync(actorDelegationId).ConfigureAwait(false);
+
+        return actorDelegation is null ? null : ActorDelegationMapper.MapFromEntity(actorDelegation);
     }
 
-    public Task<IEnumerable<ActorDelegation>> GetAsync(ActorId actorId)
+    public async Task<IEnumerable<ActorDelegation>> GetDelegatedByAsync(ActorId actorId)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(actorId, nameof(actorId));
+
+        var actorDelegations = await _marketParticipantDbContext.ActorDelegations
+            .Where(x => x.DelegatedByActorId == actorId.Value)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return actorDelegations.Select(ActorDelegationMapper.MapFromEntity);
     }
 
-    public Task<ActorDelegationId> AddAsync(ActorDelegation contact)
+    public async Task<IEnumerable<ActorDelegation>> GetDelegatedToAsync(ActorId actorId)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(actorId, nameof(actorId));
+
+        var actorDelegations = await _marketParticipantDbContext.ActorDelegations
+            .Where(x => x.DelegatedToActorId == actorId.Value)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return actorDelegations.Select(ActorDelegationMapper.MapFromEntity);
     }
 
-    public Task UpdateAsync(ActorDelegation contact)
+    public async Task<ActorDelegationId> AddOrUpdateAsync(ActorDelegation actorDelegation)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(actorDelegation);
+
+        ActorDelegationEntity destination;
+
+        if (actorDelegation.Id.Value == default)
+        {
+            destination = new ActorDelegationEntity();
+        }
+        else
+        {
+            destination = actorDelegation.Id.Value == default
+                ? new ActorDelegationEntity()
+                : await FindAsync(actorDelegation.Id).ConfigureAwait(false)
+                  ?? throw new InvalidOperationException($"ActorDelegation with id {actorDelegation.Id.Value} is missing, even though it cannot be deleted.");
+        }
+
+        ActorDelegationMapper.MapToEntity(actorDelegation, destination);
+        _marketParticipantDbContext.ActorDelegations.Update(destination);
+
+        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+
+        return new ActorDelegationId(destination.Id);
+    }
+
+    private ValueTask<ActorDelegationEntity?> FindAsync(ActorDelegationId actorDelegationId)
+    {
+        return _marketParticipantDbContext.ActorDelegations
+            .FindAsync(actorDelegationId.Value);
     }
 }

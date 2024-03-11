@@ -21,8 +21,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 public interface IActorDelegationRepository
 {
-    Task<ActorDelegation> GetAsync(ActorDelegationId actorDelegationId);
-    Task<IEnumerable<ActorDelegation>> GetAsync(ActorId actorId);
-    Task<ActorDelegationId> AddAsync(ActorDelegation contact);
-    Task UpdateAsync(ActorDelegation contact);
+    Task<ActorDelegation?> GetAsync(ActorDelegationId actorDelegationId);
+    Task<IEnumerable<ActorDelegation>> GetDelegatedByAsync(ActorId actorId);
+    Task<IEnumerable<ActorDelegation>> GetDelegatedToAsync(ActorId actorId);
+    Task<ActorDelegationId> AddOrUpdateAsync(ActorDelegation actorDelegation);
 }

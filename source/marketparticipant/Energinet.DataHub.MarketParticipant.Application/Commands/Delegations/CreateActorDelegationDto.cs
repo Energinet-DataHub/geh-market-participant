@@ -21,8 +21,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
     public sealed record CreateActorDelegationDto(
         Guid DelegatedFrom,
         Guid DelegatedTo,
-        IReadOnlyCollection<string> GridAreas,
-        DelegationMessageType MessageType,
+        IReadOnlyCollection<Guid> GridAreas,
+        IReadOnlyCollection<DelegationMessageType> MessageTypes,
         DateTimeOffset CreatedAt,
         DateTimeOffset? ExpiresAt = null);
 }
