@@ -130,6 +130,11 @@ public interface IMarketParticipantDbContext
     DbSet<UsedActorCertificatesEntity> UsedActorCertificates { get; }
 
     /// <summary>
+    ///     Represent access to the ActorDelegations database table
+    /// </summary>
+    DbSet<ActorDelegationEntity> ActorDelegations { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();

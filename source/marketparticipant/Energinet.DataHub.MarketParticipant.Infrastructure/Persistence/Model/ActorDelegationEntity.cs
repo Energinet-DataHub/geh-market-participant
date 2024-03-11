@@ -13,17 +13,20 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public record ActorDelegationDto(
-    ActorDelegationId Id,
-    ActorId DelegatedBy,
-    ActorId DelegatedTo,
-    IReadOnlyCollection<GridAreaCode> GridAreas,
-    DelegationMessageType MessageType,
-    DateTimeOffset CreatedAt,
-    DateTimeOffset? ExpiresAt = null);
+public sealed class ActorDelegationEntity : IAuditedEntity
+{
+    public Guid Id { get; set; }
+    public Guid DelegatedByActorId { get; set; }
+    public Guid DelegatedToActorId { get; set; }
+    public Guid GridAreaId { get; set; }
+    public DelegationMessageType MessageType { get; set; }
+    public DateTimeOffset StartsAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
+    public int Version { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
+}
