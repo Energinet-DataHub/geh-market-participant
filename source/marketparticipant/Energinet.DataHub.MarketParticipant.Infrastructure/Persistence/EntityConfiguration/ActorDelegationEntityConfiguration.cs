@@ -13,15 +13,16 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public sealed class ActorDelegationEntityConfiguration : IEntityTypeConfiguration<ActorDelegationEntity>
+    public sealed class ActorDelegationEntityConfiguration : AuditedEntityTypeConfiguration<ActorDelegationEntity>
     {
-        public void Configure(EntityTypeBuilder<ActorDelegationEntity> builder)
+        protected override void ConfigureEntity(EntityTypeBuilder<ActorDelegationEntity> builder)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("ActorDelegation");
