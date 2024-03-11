@@ -55,7 +55,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 
             await using (uow.ConfigureAwait(false))
             {
-                var result = new List<ActorDelegationDto>();
                 foreach (var gridArea in request.CreateDelegation.GridAreas)
                 {
                     foreach (var messageType in request.CreateDelegation.MessageTypes)
@@ -68,16 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                             DateTimeOffset.UtcNow.ToInstant(),
                             DateTimeOffset.UtcNow.ToInstant());
 
-                        var delegationId = await actorDelegationRepository.AddOrUpdateAsync(delegation).ConfigureAwait(false);
-
-                        result.Add(new ActorDelegationDto(
-                            delegationId,
-                            delegation.DelegatedBy,
-                            delegation.DelegatedTo,
-                            delegation.GridAreaId,
-                            delegation.MessageType,
-                            delegation.StartsAt.ToDateTimeOffset(),
-                            delegation.ExpiresAt?.ToDateTimeOffset()));
+                        await actorDelegationRepository.AddOrUpdateAsync(delegation).ConfigureAwait(false);
                     }
                 }
 
