@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -31,6 +32,17 @@ public sealed class MessageDelegationRepository : IMessageDelegationRepository
     public MessageDelegationRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
+    }
+
+    public async Task<IEnumerable<MessageDelegation>> GetForActorAsync(ActorId delegatedBy)
+    {
+        var messageDelegations = await _marketParticipantDbContext
+            .MessageDelegations
+            .Where(messageDelegation => messageDelegation.DelegatedByActorId == delegatedBy.Value)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return messageDelegations.Select(Map);
     }
 
     public async Task<MessageDelegation?> GetForActorAsync(ActorId delegatedBy, DelegationMessageType messageType)

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
@@ -20,6 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 public interface IMessageDelegationRepository
 {
+    Task<IEnumerable<MessageDelegation>> GetForActorAsync(ActorId delegatedBy);
     Task<MessageDelegation?> GetForActorAsync(ActorId delegatedBy, DelegationMessageType messageType);
     Task<MessageDelegationId> AddOrUpdateAsync(MessageDelegation messageDelegation);
 }
