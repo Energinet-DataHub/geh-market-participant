@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 actorFromId,
                 actorToId,
                 gridAreaId,
-                DelegationMessageType.RSM012Inbound,
+                DelegationMessageType.Rsm012Inbound,
                 startsAt,
                 null);
 
@@ -87,7 +87,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(actorFromId, newDelegation.DelegatedBy);
             Assert.Equal(actorToId, newDelegation.DelegatedTo);
             Assert.Equal(gridAreaId, newDelegation.GridAreaId);
-            Assert.Equal(DelegationMessageType.RSM012Inbound, newDelegation.MessageType);
+            Assert.Equal(DelegationMessageType.Rsm012Inbound, newDelegation.MessageType);
             Assert.Equal(startsAt, newDelegation.StartsAt);
             Assert.Null(newDelegation.ExpiresAt);
         }
@@ -113,7 +113,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 actorFromId,
                 actorToId,
                 gridAreaId,
-                DelegationMessageType.RSM012Inbound,
+                DelegationMessageType.Rsm012Inbound,
                 startsAt,
                 expiresAt);
 
@@ -127,7 +127,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(actorFromId, newDelegation.DelegatedBy);
             Assert.Equal(actorToId, newDelegation.DelegatedTo);
             Assert.Equal(gridAreaId, newDelegation.GridAreaId);
-            Assert.Equal(DelegationMessageType.RSM012Inbound, newDelegation.MessageType);
+            Assert.Equal(DelegationMessageType.Rsm012Inbound, newDelegation.MessageType);
             Assert.Equal(startsAt, newDelegation.StartsAt);
             Assert.Equal(expiresAt, newDelegation.ExpiresAt);
         }
@@ -155,7 +155,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 actorFromId,
                 actorToId,
                 gridAreaId,
-                DelegationMessageType.RSM012Inbound,
+                DelegationMessageType.Rsm012Inbound,
                 startsAt,
                 expiresAt);
 
@@ -169,7 +169,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(actorFromId, newDelegation.DelegatedBy);
             Assert.Equal(actorToId, newDelegation.DelegatedTo);
             Assert.Equal(gridAreaId, newDelegation.GridAreaId);
-            Assert.Equal(DelegationMessageType.RSM012Inbound, newDelegation.MessageType);
+            Assert.Equal(DelegationMessageType.Rsm012Inbound, newDelegation.MessageType);
             Assert.Equal(startsAt, newDelegation.StartsAt);
             Assert.Equal(expiresAt, newDelegation.ExpiresAt);
         }

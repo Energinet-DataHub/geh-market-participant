@@ -12,17 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using NodaTime;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-public enum DelegationMessageType
+public sealed record DelegationTarget(ActorId DelegatedTo, GridAreaId GridAreaId, Instant StartsAt)
 {
-    Rsm012Inbound,
-    Rsm012Outbound,
-    Rsm014Inbound,
-    Rsm016Inbound,
-    Rsm016Outbound,
-    Rsm017Inbound,
-    Rsm017Outbound,
-    Rsm018Inbound,
-    Rsm019Inbound
+    public DelegationTarget(
+        DelegationTargetId id,
+        ActorId delegatedTo,
+        GridAreaId gridAreaId,
+        Instant startsAt,
+        Instant? stopsAt)
+            : this(delegatedTo, gridAreaId, startsAt)
+    {
+        Id = id;
+        StopsAt = stopsAt;
+    }
+
+    public DelegationTargetId Id { get; } = new(Guid.Empty);
+    public Instant? StopsAt { get; set; }
 }
