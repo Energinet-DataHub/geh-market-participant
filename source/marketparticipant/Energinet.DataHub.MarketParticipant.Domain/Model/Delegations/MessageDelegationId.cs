@@ -12,15 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-public enum DelegationMessageType
-{
-    Rsm012Inbound,
-    Rsm014Inbound,
-    Rsm016Inbound,
-    Rsm016Outbound,
-    Rsm017Inbound,
-    Rsm017Outbound,
-    Rsm019Inbound
-}
+public sealed record MessageDelegationId(Guid Value);
