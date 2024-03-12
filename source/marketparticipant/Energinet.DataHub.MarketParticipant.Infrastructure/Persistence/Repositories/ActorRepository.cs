@@ -147,4 +147,9 @@ public sealed class ActorRepository : IActorRepository
 
         return actors.Select(ActorMapper.MapFromEntity);
     }
+
+    public Task CreateLockAsync()
+    {
+        return _marketParticipantDbContext.CreateLockAsync(LockableEntity.Actor);
+    }
 }
