@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
@@ -149,8 +148,8 @@ public sealed class ActorRepository : IActorRepository
         return actors.Select(ActorMapper.MapFromEntity);
     }
 
-    public Task<ILockScope> CreateLockScopeAsync()
+    public Task CreateLockAsync()
     {
-        return _marketParticipantDbContext.CreateLockScopeAsync(LockableEntity.Actor);
+        return _marketParticipantDbContext.CreateLockAsync(LockableEntity.Actor);
     }
 }

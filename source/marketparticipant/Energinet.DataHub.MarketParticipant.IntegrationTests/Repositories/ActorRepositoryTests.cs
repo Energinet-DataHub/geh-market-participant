@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -339,60 +340,15 @@ public sealed class ActorRepositoryTests
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
+            var uowProvider = new UnitOfWorkProvider(context);
+
+            await using var uow = await uowProvider.NewUnitOfWorkAsync();
+
             var repository = new ActorRepository(context);
 
-            await using var lockScope = await repository.CreateLockScopeAsync();
+            await repository.CreateLockAsync();
 
             await Task.Delay(millis);
-        }
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task CreateLockScopeWhenWriting_IfCommited_WritesChanges(bool commit)
-    {
-        // arrange
-        var organization = await _fixture.PrepareOrganizationAsync();
-
-        Result<ActorId, ActorError> result = default!;
-
-        await NewRepositoryExecutionAsync(async repository =>
-        {
-            await using var lockScope = await repository.CreateLockScopeAsync();
-
-            result = await repository.AddOrUpdateAsync(new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Actors name")));
-
-            // act
-            if (commit)
-            {
-                await lockScope.CommitAsync();
-            }
-        });
-
-        await NewRepositoryExecutionAsync(async repository =>
-        {
-            var actual = await repository.GetAsync(new ActorId(result.Value.Value));
-
-            // assert
-            switch (commit)
-            {
-                case true:
-                    Assert.NotNull(actual);
-                    break;
-                case false:
-                    Assert.Null(actual);
-                    break;
-            }
-        });
-
-        async Task NewRepositoryExecutionAsync(Func<ActorRepository, Task> action)
-        {
-            await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var repository = new ActorRepository(context);
-            await action(repository);
         }
     }
 }

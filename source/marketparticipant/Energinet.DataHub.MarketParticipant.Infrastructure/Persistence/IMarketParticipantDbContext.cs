@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -146,5 +145,5 @@ public interface IMarketParticipantDbContext
     EntityEntry<TEntity> Entry<TEntity>(TEntity entity)
         where TEntity : class;
 
-    Task<ILockScope> CreateLockScopeAsync(LockableEntity lockableEntity);
+    Task CreateLockAsync(LockableEntity lockableEntity);
 }

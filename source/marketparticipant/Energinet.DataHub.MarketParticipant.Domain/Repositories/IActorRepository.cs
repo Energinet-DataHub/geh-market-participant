@@ -57,5 +57,5 @@ public interface IActorRepository
     /// <returns>A list of actors.</returns>
     Task<IEnumerable<Actor>> GetActorsAsync(OrganizationId organizationId);
 
-    Task<ILockScope> CreateLockScopeAsync();
+    Task CreateLockAsync();
 }
