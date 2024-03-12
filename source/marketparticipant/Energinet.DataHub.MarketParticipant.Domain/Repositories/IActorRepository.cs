@@ -56,4 +56,6 @@ public interface IActorRepository
     /// <param name="organizationId">The organization to get the actors for.</param>
     /// <returns>A list of actors.</returns>
     Task<IEnumerable<Actor>> GetActorsAsync(OrganizationId organizationId);
+
+    Task CreateLockAsync();
 }

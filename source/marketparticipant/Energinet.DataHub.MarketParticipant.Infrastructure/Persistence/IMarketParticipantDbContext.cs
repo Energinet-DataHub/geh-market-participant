@@ -154,4 +154,6 @@ public interface IMarketParticipantDbContext
     /// </summary>
     EntityEntry<TEntity> Entry<TEntity>(TEntity entity)
         where TEntity : class;
+
+    Task CreateLockAsync(LockableEntity lockableEntity);
 }

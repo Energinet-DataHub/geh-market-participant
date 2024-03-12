@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -318,5 +320,35 @@ public sealed class ActorRepositoryTests
         // Assert
         Assert.NotNull(actual);
         Assert.Single(actual);
+    }
+
+    [Fact]
+    public async Task CreateLockScope_IfLockAlreadyTaken_Waits()
+    {
+        // arrange
+        var sw = Stopwatch.StartNew();
+
+        // act
+        await Task.WhenAll(LockTimoutAsync(1_000), LockTimoutAsync(1_000));
+
+        // assert
+        Assert.True(sw.ElapsedMilliseconds >= 2_000);
+
+        async Task LockTimoutAsync(int millis)
+        {
+            await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+            var uowProvider = new UnitOfWorkProvider(context);
+
+            await using var uow = await uowProvider.NewUnitOfWorkAsync();
+
+            var repository = new ActorRepository(context);
+
+            await repository.CreateLockAsync();
+
+            await Task.Delay(millis);
+        }
     }
 }
