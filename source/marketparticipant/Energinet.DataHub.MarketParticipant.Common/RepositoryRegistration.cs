@@ -49,6 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IActorContactAuditLogRepository, ActorContactAuditLogRepository>();
             services.AddScoped<IOrganizationIdentityRepository, OrganizationIdentityRepository>();
             services.AddScoped<IActorDelegationRepository, ActorDelegationRepository>();
+            services.AddScoped<IMessageDelegationRepository, MessageDelegationRepository>();
         }
     }
 }

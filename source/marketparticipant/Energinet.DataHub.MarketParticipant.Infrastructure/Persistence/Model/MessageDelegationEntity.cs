@@ -13,24 +13,17 @@
 // limitations under the License.
 
 using System;
-using NodaTime;
+using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed record DelegationTarget(ActorId DelegatedTo, GridAreaId GridAreaId, Instant StartsAt)
+public sealed class MessageDelegationEntity
 {
-    public DelegationTarget(
-        DelegationTargetId id,
-        ActorId delegatedTo,
-        GridAreaId gridAreaId,
-        Instant startsAt,
-        Instant? stopsAt)
-            : this(delegatedTo, gridAreaId, startsAt)
-    {
-        Id = id;
-        StopsAt = stopsAt;
-    }
+    public Guid Id { get; set; }
+    public Guid DelegatedByActorId { get; set; }
+    public Guid ConcurrencyToken { get; set; }
+    public DelegationMessageType MessageType { get; set; }
 
-    public DelegationTargetId Id { get; } = new(Guid.Empty);
-    public Instant? StopsAt { get; set; }
+    public Collection<DelegationPeriodEntity> Delegations { get; } = new();
 }
