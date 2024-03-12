@@ -14,6 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
@@ -65,8 +68,14 @@ public sealed class MessageDelegation
     {
         var delegationPeriod = new DelegationPeriod(delegatedTo, gridAreaId, startsAt, stopsAt);
 
-        // TODO: Rule (A/Fra, MessageType) skal være unik i perioden i netområde.
-        // TODO: Rule Denne regel gælder ikke, hvis ExpiresAt <= StartsAt.
+        // Rule There can't be any overlap between delegation period on a given grid area
+        // but don't include periods where ExpiresAt <= StartsAt, because that means that it was cancelled.
+        if (IsThereDelegationPeriodOverlap(startsAt, gridAreaId, stopsAt))
+        {
+            throw new ValidationException("Delegation already exists for the given grid area and time period")
+                .WithErrorCode("message_delegation.overlap");
+        }
+
         // TODO: Rule Denne regel gælder ikke, hvis Actor A/B er deaktiveret.
         _delegations.Add(delegationPeriod);
     }
@@ -77,12 +86,30 @@ public sealed class MessageDelegation
 
         if (!_delegations.Remove(existingPeriod))
         {
-            throw new InvalidOperationException("Provided existing delegation period was not in collection.");
+            throw new ValidationException("Delegation already exists for the given grid area and time period")
+                .WithErrorCode("message_delegation.overlap");
         }
 
-        // TODO: Rule (A/Fra, MessageType) skal være unik i perioden i netområde.
-        // TODO: Rule Denne regel gælder ikke, hvis ExpiresAt <= StartsAt.
+        // Rule There can't be any overlap between delegation period on a given grid area
+        // but don't include periods where ExpiresAt <= StartsAt, because that means that it was cancelled.
+        if (IsThereDelegationPeriodOverlap(existingPeriod.StartsAt, existingPeriod.GridAreaId, stopsAt))
+        {
+            throw new InvalidOperationException("Delegation already exists for the given grid area and time period");
+        }
+
         // TODO: Rule Denne regel gælder ikke, hvis Actor A/B er deaktiveret.
         _delegations.Add(existingPeriod with { StopsAt = stopsAt });
+    }
+
+    private bool IsThereDelegationPeriodOverlap(Instant startsAt, GridAreaId gridAreaId, Instant? stopsAt = null)
+    {
+        return _delegations
+            .Where(x => x.GridAreaId == gridAreaId && !(x.StopsAt <= x.StartsAt))
+            .Any(x =>
+            {
+                var interval = new Interval(x.StartsAt, x.StopsAt);
+                return interval.Contains(startsAt) ||
+                       (stopsAt.HasValue && interval.Contains(stopsAt.GetValueOrDefault()));
+            });
     }
 }
