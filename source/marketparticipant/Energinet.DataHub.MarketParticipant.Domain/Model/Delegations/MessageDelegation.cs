@@ -14,14 +14,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 public sealed class MessageDelegation
 {
-    private readonly List<DelegationTarget> _targets = [];
+    private readonly List<DelegationPeriod> _delegations = [];
 
     public MessageDelegation(Actor messageOwner, DelegationMessageType messageType)
     {
@@ -37,39 +36,45 @@ public sealed class MessageDelegation
         MessageDelegationId id,
         ActorId delegatedBy,
         DelegationMessageType messageType,
-        IEnumerable<DelegationTarget> destinations)
+        Guid concurrencyToken,
+        IEnumerable<DelegationPeriod> delegations)
     {
         Id = id;
         DelegatedBy = delegatedBy;
         MessageType = messageType;
-        _targets.AddRange(destinations);
+        ConcurrencyToken = concurrencyToken;
+        _delegations.AddRange(delegations);
     }
 
     public MessageDelegationId Id { get; } = new(Guid.Empty);
     public ActorId DelegatedBy { get; }
     public DelegationMessageType MessageType { get; }
-    public IReadOnlyCollection<DelegationTarget> Targets => _targets;
+    public Guid ConcurrencyToken { get; }
 
-    public void DelegateTo(Actor target, GridAreaId gridAreaId, Instant from)
+    public IReadOnlyCollection<DelegationPeriod> Delegations => _delegations;
+
+    public void DelegateTo(ActorId delegatedTo, GridAreaId gridAreaId, Instant startsAt, Instant? stopsAt = null)
     {
-        ArgumentNullException.ThrowIfNull(target);
-        ArgumentNullException.ThrowIfNull(gridAreaId);
-
-        var delegationPeriod = new DelegationTarget(target.Id, gridAreaId, from);
+        var delegationPeriod = new DelegationPeriod(delegatedTo, gridAreaId, startsAt, stopsAt);
 
         // TODO: Rule (A/Fra, MessageType) skal være unik i perioden i netområde.
         // TODO: Rule Denne regel gælder ikke, hvis ExpiresAt <= StartsAt.
         // TODO: Rule Denne regel gælder ikke, hvis Actor A/B er deaktiveret.
-        _targets.Add(delegationPeriod);
+        _delegations.Add(delegationPeriod);
     }
 
-    public void StopDelegation(DelegationTargetId delegationTargetId, Instant stopsAt)
+    public void StopDelegation(DelegationPeriod existingPeriod, Instant stopsAt)
     {
-        var delegationPeriod = _targets.Single(p => p.Id == delegationTargetId);
+        ArgumentNullException.ThrowIfNull(existingPeriod);
+
+        if (!_delegations.Remove(existingPeriod))
+        {
+            throw new InvalidOperationException("Provided existing delegation period was not in collection.");
+        }
 
         // TODO: Rule (A/Fra, MessageType) skal være unik i perioden i netområde.
         // TODO: Rule Denne regel gælder ikke, hvis ExpiresAt <= StartsAt.
         // TODO: Rule Denne regel gælder ikke, hvis Actor A/B er deaktiveret.
-        delegationPeriod.StopsAt = stopsAt;
+        _delegations.Add(existingPeriod with { StopsAt = stopsAt });
     }
 }
