@@ -63,7 +63,7 @@ public sealed class MessageDelegation
         _targets.Add(delegationPeriod);
     }
 
-    public void StopDelegating(DelegationTargetId delegationTargetId, Instant stopsAt)
+    public void StopDelegation(DelegationTargetId delegationTargetId, Instant stopsAt)
     {
         var delegationPeriod = _targets.Single(p => p.Id == delegationTargetId);
 
