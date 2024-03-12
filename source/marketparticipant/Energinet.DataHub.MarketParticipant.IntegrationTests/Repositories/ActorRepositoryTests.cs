@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -318,5 +319,80 @@ public sealed class ActorRepositoryTests
         // Assert
         Assert.NotNull(actual);
         Assert.Single(actual);
+    }
+
+    [Fact]
+    public async Task CreateLockScope_IfLockAlreadyTaken_Waits()
+    {
+        // arrange
+        var sw = Stopwatch.StartNew();
+
+        // act
+        await Task.WhenAll(LockTimoutAsync(1_000), LockTimoutAsync(1_000));
+
+        // assert
+        Assert.True(sw.ElapsedMilliseconds >= 2_000);
+
+        async Task LockTimoutAsync(int millis)
+        {
+            await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+            var repository = new ActorRepository(context);
+
+            await using var lockScope = await repository.CreateLockScopeAsync();
+
+            await Task.Delay(millis);
+        }
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task CreateLockScopeWhenWriting_IfCommited_WritesChanges(bool commit)
+    {
+        // arrange
+        var organization = await _fixture.PrepareOrganizationAsync();
+
+        Result<ActorId, ActorError> result = default!;
+
+        await NewRepositoryExecutionAsync(async repository =>
+        {
+            await using var lockScope = await repository.CreateLockScopeAsync();
+
+            result = await repository.AddOrUpdateAsync(new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Actors name")));
+
+            // act
+            if (commit)
+            {
+                await lockScope.CommitAsync();
+            }
+        });
+
+        await NewRepositoryExecutionAsync(async repository =>
+        {
+            var actual = await repository.GetAsync(new ActorId(result.Value.Value));
+
+            // assert
+            switch (commit)
+            {
+                case true:
+                    Assert.NotNull(actual);
+                    break;
+                case false:
+                    Assert.Null(actual);
+                    break;
+            }
+        });
+
+        async Task NewRepositoryExecutionAsync(Func<ActorRepository, Task> action)
+        {
+            await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var repository = new ActorRepository(context);
+            await action(repository);
+        }
     }
 }

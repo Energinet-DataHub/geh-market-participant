@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -99,6 +100,26 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         }
 
         return affected;
+    }
+
+    public async Task<ILockScope> CreateLockScopeAsync(LockableEntity lockableEntity)
+    {
+        ArgumentNullException.ThrowIfNull(lockableEntity);
+
+        var transactionScope = await Database.BeginTransactionAsync().ConfigureAwait(false);
+        try
+        {
+#pragma warning disable EF1002
+            await Database.ExecuteSqlRawAsync($"SELECT TOP 0 NULL FROM {lockableEntity.TableName} WITH (TABLOCKX)").ConfigureAwait(false);
+#pragma warning restore EF1002
+
+            return new LockScope(transactionScope);
+        }
+        catch (Exception)
+        {
+            await transactionScope.DisposeAsync().ConfigureAwait(false);
+            throw;
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
