@@ -135,6 +135,16 @@ public interface IMarketParticipantDbContext
     DbSet<ActorDelegationEntity> ActorDelegations { get; }
 
     /// <summary>
+    ///     Represent access to the MessageDelegation database table
+    /// </summary>
+    DbSet<MessageDelegationEntity> MessageDelegations { get; }
+
+    /// <summary>
+    ///     Represent access to the DelegationPeriod database table
+    /// </summary>
+    DbSet<DelegationPeriodEntity> DelegationPeriods { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();
@@ -144,4 +154,6 @@ public interface IMarketParticipantDbContext
     /// </summary>
     EntityEntry<TEntity> Entry<TEntity>(TEntity entity)
         where TEntity : class;
+
+    Task CreateLockAsync(LockableEntity lockableEntity);
 }

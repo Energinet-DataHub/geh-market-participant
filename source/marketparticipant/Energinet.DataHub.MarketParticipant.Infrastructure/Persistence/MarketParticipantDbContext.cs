@@ -73,6 +73,8 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; private set; } = null!;
     public DbSet<UsedActorCertificatesEntity> UsedActorCertificates { get; private set; } = null!;
     public DbSet<ActorDelegationEntity> ActorDelegations { get; private set; } = null!;
+    public DbSet<MessageDelegationEntity> MessageDelegations { get; private set; } = null!;
+    public DbSet<DelegationPeriodEntity> DelegationPeriods { get; private set; } = null!;
 
     public async Task<int> SaveChangesAsync()
     {
@@ -101,6 +103,18 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         return affected;
     }
 
+    public async Task CreateLockAsync(LockableEntity lockableEntity)
+    {
+        ArgumentNullException.ThrowIfNull(lockableEntity);
+
+        if (Database.CurrentTransaction == null)
+            throw new InvalidOperationException("A transaction is required");
+
+#pragma warning disable EF1002
+        await Database.ExecuteSqlRawAsync($"SELECT TOP 0 NULL FROM {lockableEntity.TableName} WITH (TABLOCKX)").ConfigureAwait(false);
+#pragma warning restore EF1002
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
@@ -126,6 +140,8 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new ActorCertificateCredentialsEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorClientSecretCredentialsEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorDelegationEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new MessageDelegationEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new DelegationPeriodEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 
