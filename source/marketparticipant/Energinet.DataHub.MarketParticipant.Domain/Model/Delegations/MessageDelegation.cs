@@ -27,8 +27,16 @@ public sealed class MessageDelegation
     {
         ArgumentNullException.ThrowIfNull(messageOwner);
 
-        // TODO: Rule Actor A, som skal være enten Ellev, Netvirk, Balanceansvarlig eller Afregningsansvarlig.
-        // TODO: Rule Actor A, som skal være aktiv.
+        if (messageOwner.Status != ActorStatus.Active)
+            throw new InvalidOperationException("Actor must be active to delegate messages.");
+
+        if (messageOwner.MarketRoles.All(role =>
+                role.Function != EicFunction.GridAccessProvider
+                && role.Function != EicFunction.BalanceResponsibleParty
+                && role.Function != EicFunction.EnergySupplier
+                && role.Function != EicFunction.BillingAgent))
+            throw new InvalidOperationException("Actor must have a valid market role to delegate messages.");
+
         DelegatedBy = messageOwner.Id;
         MessageType = messageType;
     }
