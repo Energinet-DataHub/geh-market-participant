@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
@@ -65,10 +66,13 @@ public sealed class IntegrationEventProviderIntegrationTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
+        var internalDomainEventTypes = new List<string> { nameof(BalanceResponsiblePartiesChanged) };
+
         var allIntegrationEvents = typeof(DomainEvent)
             .Assembly
             .GetTypes()
             .Where(domainEventType => domainEventType.IsSubclassOf(typeof(DomainEvent)))
+            .Where(d => !internalDomainEventTypes.Contains(d.Name))
             .ToDictionary(x => x.Name);
 
         foreach (var (eventName, eventType) in allIntegrationEvents)
