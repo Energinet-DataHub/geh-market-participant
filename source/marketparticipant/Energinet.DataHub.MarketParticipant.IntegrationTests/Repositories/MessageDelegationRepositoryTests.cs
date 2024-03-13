@@ -63,9 +63,9 @@ public sealed class MessageDelegationRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var actorEntityA = await _fixture.PrepareActorAsync();
-        var actorEntityB = await _fixture.PrepareActorAsync();
-        var actorEntityC = await _fixture.PrepareActorAsync();
+        var actorEntityA = await _fixture.PrepareActiveActorAsync();
+        var actorEntityB = await _fixture.PrepareActiveActorAsync();
+        var actorEntityC = await _fixture.PrepareActiveActorAsync();
         var gridAreaId = await _fixture.PrepareGridAreaAsync();
         var actorRepository = new ActorRepository(context);
         var actorA = await actorRepository.GetAsync(new ActorId(actorEntityA.Id));
@@ -110,9 +110,9 @@ public sealed class MessageDelegationRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var actorEntityA = await _fixture.PrepareActorAsync();
-        var actorEntityB = await _fixture.PrepareActorAsync();
-        var actorEntityC = await _fixture.PrepareActorAsync();
+        var actorEntityA = await _fixture.PrepareActiveActorAsync();
+        var actorEntityB = await _fixture.PrepareActiveActorAsync();
+        var actorEntityC = await _fixture.PrepareActiveActorAsync();
         var gridAreaId = await _fixture.PrepareGridAreaAsync();
         var actorRepository = new ActorRepository(context);
         var actorA = await actorRepository.GetAsync(new ActorId(actorEntityA.Id));
@@ -148,8 +148,8 @@ public sealed class MessageDelegationRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var actorEntityA = await _fixture.PrepareActorAsync();
-        var actorEntityB = await _fixture.PrepareActorAsync();
+        var actorEntityA = await _fixture.PrepareActiveActorAsync();
+        var actorEntityB = await _fixture.PrepareActiveActorAsync();
         var gridAreaId = await _fixture.PrepareGridAreaAsync();
         var actorRepository = new ActorRepository(context);
         var actorA = await actorRepository.GetAsync(new ActorId(actorEntityA.Id));
@@ -198,8 +198,8 @@ public sealed class MessageDelegationRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var actorEntityA = await _fixture.PrepareActorAsync();
-        var actorEntityB = await _fixture.PrepareActorAsync();
+        var actorEntityA = await _fixture.PrepareActiveActorAsync();
+        var actorEntityB = await _fixture.PrepareActiveActorAsync();
         var gridAreaId = await _fixture.PrepareGridAreaAsync();
         var actorRepository = new ActorRepository(context);
         var actorA = await actorRepository.GetAsync(new ActorId(actorEntityA.Id));

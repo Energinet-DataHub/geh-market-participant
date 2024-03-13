@@ -46,6 +46,16 @@ internal static class TestPreparationEntities
         Status = ActorStatus.New
     };
 
+    public static ActorEntity ValidActiveActor => new()
+    {
+        Id = Guid.NewGuid(),
+        ActorNumber = new MockedGln(),
+        ActorId = null,
+        IsFas = false,
+        Name = "Test Actor Name",
+        Status = ActorStatus.Active
+    };
+
     public static MarketRoleEntity ValidMarketRole => new()
     {
         Function = EicFunction.GridAccessProvider,
