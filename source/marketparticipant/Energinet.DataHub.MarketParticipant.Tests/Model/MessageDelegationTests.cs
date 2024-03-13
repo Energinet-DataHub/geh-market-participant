@@ -32,7 +32,7 @@ public sealed class MessageDelegationTests
     // ReSharper disable once InconsistentNaming
 #pragma warning disable SA1401
 #pragma warning disable CA2211
-    public static TheoryData<IReadOnlyList<(Instant StartsAt, Instant? StopsAt)>, bool> OverlapCases =
+    public static TheoryData<IReadOnlyList<(Instant StartsAt, Instant? StopsAt)>, bool, int> OverlapCases =
 #pragma warning restore CA2211
 #pragma warning restore SA1401
         new()
@@ -44,7 +44,8 @@ public sealed class MessageDelegationTests
                     (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(1))),
                     (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(2)), null)
                 },
-                false
+                false,
+                2
             },
 
             // Two delegations after each other, new start right as old stops, should not throw
@@ -54,7 +55,8 @@ public sealed class MessageDelegationTests
                     (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(1))),
                     (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(1)), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(2)))
                 },
-                false
+                false,
+                2
             },
 
             // Two delegations, one is cancelled, no overlap, should not throw
@@ -64,7 +66,90 @@ public sealed class MessageDelegationTests
                     (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(-2))),
                     (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(2)))
                 },
-                false
+                false,
+                2
+            },
+
+            // Two delegations, overlap (first never ends), should throw
+            {
+                new List<(Instant StartsAt, Instant? StopsAt)>
+                {
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), null),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(3)), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(6)))
+                },
+                true,
+                1
+            },
+
+            // Two delegations, overlap (second never ends, and contains first), should throw
+            {
+                new List<(Instant StartsAt, Instant? StopsAt)>
+                {
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(6))),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(-3)), null)
+                },
+                true,
+                1
+            },
+
+            // Three delegations, one is cancelled, no overlap, should not throw
+            {
+                new List<(Instant StartsAt, Instant? StopsAt)>
+                {
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(-2))),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(2))),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(2)), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(4)))
+                },
+                false,
+                3
+            },
+
+            // Three delegations, no overlap, should not throw
+            {
+                new List<(Instant StartsAt, Instant? StopsAt)>
+                {
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(1))),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(2)), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(4))),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(5)), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(6)))
+                },
+                false,
+                3
+            },
+
+            // Three delegations, overlap 1+2, should throw
+            {
+                new List<(Instant StartsAt, Instant? StopsAt)>
+                {
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(2))),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(1)), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(4))),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(4)), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(6)))
+                },
+                true,
+                2
+            },
+
+            // Three delegations, overlap 2+3, should throw
+            {
+                new List<(Instant StartsAt, Instant? StopsAt)>
+                {
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(1))),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(2)), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(4))),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(3)), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(6)))
+                },
+                true,
+                2
+            },
+
+            // Three delegations, overlap 1+2 (new delegation completely contains existing), should throw
+            {
+                new List<(Instant StartsAt, Instant? StopsAt)>
+                {
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(1))),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(-2)), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(1))),
+                    (Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(3)), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddMonths(6)))
+                },
+                true,
+                2
             },
         };
 
@@ -85,7 +170,7 @@ public sealed class MessageDelegationTests
 
     [Theory]
     [MemberData(nameof(OverlapCases))]
-    public void Validate_PeriodOverlap_HandlesCorrectly(IReadOnlyList<(Instant StartsAt, Instant? StopsAt)> delegationPeriods, bool shouldThrow)
+    public void Validate_PeriodOverlap_HandlesCorrectly(IReadOnlyList<(Instant StartsAt, Instant? StopsAt)> delegationPeriods, bool shouldThrow, int expectedDelegationCount)
     {
         // arrange
         var testData = CreateTestBasicTestData();
@@ -115,8 +200,9 @@ public sealed class MessageDelegationTests
         else
         {
             Assert.Empty(exceptions);
-            Assert.Equal(delegationPeriods.Count, messageDelegation.Delegations.Count);
         }
+
+        Assert.Equal(expectedDelegationCount, messageDelegation.Delegations.Count);
     }
 
     private static (Actor ActorFrom, Actor ActorTo, GridArea GridArea) CreateTestBasicTestData()

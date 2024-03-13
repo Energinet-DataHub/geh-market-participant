@@ -103,13 +103,16 @@ public sealed class MessageDelegation
 
     private bool IsThereDelegationPeriodOverlap(Instant startsAt, GridAreaId gridAreaId, Instant? stopsAt = null)
     {
-        return _delegations
+       return _delegations
             .Where(x => x.GridAreaId == gridAreaId && !(x.StopsAt <= x.StartsAt))
             .Any(x =>
             {
                 var interval = new Interval(x.StartsAt, x.StopsAt);
+                var intervalNew = new Interval(startsAt, stopsAt);
                 return interval.Contains(startsAt) ||
-                       (stopsAt.HasValue && interval.Contains(stopsAt.GetValueOrDefault()));
+                       (stopsAt.HasValue && interval.Contains(stopsAt.GetValueOrDefault())) ||
+                       intervalNew.Contains(x.StartsAt) ||
+                       (x.StopsAt.HasValue && intervalNew.Contains(x.StopsAt.GetValueOrDefault()));
             });
     }
 }
