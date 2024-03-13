@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.Common;
@@ -43,5 +45,7 @@ internal static class DomainServiceRegistration
         services.AddScoped<IPasswordChecker, PasswordChecker>();
         services.AddScoped<IPasswordGenerator, PasswordGenerator>();
         services.AddScoped<IUserPasswordGenerator, UserPasswordGenerator>();
+
+        services.AddScoped<IEntityLock, EntityLock>();
     }
 }

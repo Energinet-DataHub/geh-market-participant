@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -111,7 +112,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
             throw new InvalidOperationException("A transaction is required");
 
 #pragma warning disable EF1002
-        await Database.ExecuteSqlRawAsync($"SELECT TOP 0 NULL FROM {lockableEntity.TableName} WITH (TABLOCKX)").ConfigureAwait(false);
+        await Database.ExecuteSqlRawAsync($"SELECT TOP 0 NULL FROM {lockableEntity.Name} WITH (TABLOCKX)").ConfigureAwait(false);
 #pragma warning restore EF1002
     }
 
