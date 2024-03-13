@@ -74,8 +74,6 @@ public sealed class MessageDelegation
     {
         var delegationPeriod = new DelegationPeriod(delegatedTo, gridAreaId, startsAt, stopsAt);
 
-        // Rule There can't be any overlap between delegation period on a given grid area
-        // but don't include periods where ExpiresAt <= StartsAt, because that means that it was cancelled.
         if (IsThereDelegationPeriodOverlap(startsAt, gridAreaId, stopsAt))
         {
             throw new ValidationException("Delegation already exists for the given grid area and time period")
@@ -94,8 +92,6 @@ public sealed class MessageDelegation
             throw new InvalidOperationException("Provided existing delegation period was not in collection.");
         }
 
-        // Rule There can't be any overlap between delegation period on a given grid area
-        // but don't include periods where ExpiresAt <= StartsAt, because that means that it was cancelled.
         if (IsThereDelegationPeriodOverlap(existingPeriod.StartsAt, existingPeriod.GridAreaId, stopsAt))
         {
             throw new ValidationException("Delegation already exists for the given grid area and time period")
