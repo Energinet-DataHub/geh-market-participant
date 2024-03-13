@@ -45,6 +45,17 @@ public sealed class MessageDelegationRepository : IMessageDelegationRepository
         return messageDelegations.Select(Map);
     }
 
+    public async Task<IEnumerable<MessageDelegation>> GetDelegatedToActorAsync(ActorId delegatedTo)
+    {
+        var messageDelegations = await _marketParticipantDbContext
+            .MessageDelegations
+            .Where(messageDelegation => messageDelegation.Delegations.Any(d => d.DelegatedToActorId == delegatedTo.Value))
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return messageDelegations.Select(Map);
+    }
+
     public async Task<MessageDelegation?> GetForActorAsync(ActorId delegatedBy, DelegationMessageType messageType)
     {
         var messageDelegation = await _marketParticipantDbContext
