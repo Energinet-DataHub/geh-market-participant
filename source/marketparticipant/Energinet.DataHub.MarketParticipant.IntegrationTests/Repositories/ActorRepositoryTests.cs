@@ -329,10 +329,15 @@ public sealed class ActorRepositoryTests
         var sw = Stopwatch.StartNew();
 
         // act
-        await Task.WhenAll(LockTimoutAsync(1_000), LockTimoutAsync(1_000));
+        await Task.WhenAll(Task.Run(() => LockTimoutAsync(1_000)), Task.Run(() => LockTimoutAsync(1_000)));
+
+        sw.Stop();
+
+        var elapsed = sw.ElapsedMilliseconds;
+        var elapsedTicks = sw.ElapsedTicks;
 
         // assert
-        Assert.True(sw.ElapsedMilliseconds >= 2_000);
+        Assert.True(elapsed >= 2_000, $"Actual elapsed: {elapsed} | ticks: {elapsedTicks} | isHighRes: {Stopwatch.IsHighResolution} | freq: {Stopwatch.Frequency}");
 
         async Task LockTimoutAsync(int millis)
         {
