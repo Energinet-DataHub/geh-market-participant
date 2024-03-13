@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -117,6 +119,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.NotNull(exception);
+            Assert.IsType<ValidationException>(exception);
+            Assert.Contains(
+                $"Actors to delegate from/to must be both be active to delegate messages",
+                exception.Message,
+                StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
@@ -158,6 +165,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.NotNull(exception);
+            Assert.IsType<ValidationException>(exception);
+            Assert.Contains(
+                $"Actors to delegate from/to must be both be active to delegate messages",
+                exception.Message,
+                StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
@@ -196,6 +208,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.NotNull(exception);
+            Assert.IsType<NotFoundValidationException>(exception);
+            Assert.Contains(
+                $"Entity '{actorFrom.Id.Value}' does not exist.",
+                exception.Message,
+                StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
@@ -234,6 +251,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.NotNull(exception);
+            Assert.IsType<NotFoundValidationException>(exception);
+            Assert.Contains(
+                $"Entity '{actorTo.Id.Value}' does not exist.",
+                exception.Message,
+                StringComparison.OrdinalIgnoreCase);
         }
     }
 }
