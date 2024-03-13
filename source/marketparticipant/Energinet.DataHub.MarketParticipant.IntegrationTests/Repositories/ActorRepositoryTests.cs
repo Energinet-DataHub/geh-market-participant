@@ -329,7 +329,7 @@ public sealed class ActorRepositoryTests
         var sw = Stopwatch.StartNew();
 
         // act
-        await Task.WhenAll(Task.Run(() => LockTimoutAsync(1_000)), Task.Run(() => LockTimoutAsync(1_000)));
+        await Task.WhenAll(LockTimoutAsync(1_000), LockTimoutAsync(1_000));
 
         sw.Stop();
 
