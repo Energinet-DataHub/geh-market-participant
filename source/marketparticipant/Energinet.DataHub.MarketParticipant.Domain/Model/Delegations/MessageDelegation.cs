@@ -105,6 +105,6 @@ public sealed class MessageDelegation
     {
        return _delegations
             .Where(x => x.GridAreaId == gridAreaId && !(x.StopsAt <= x.StartsAt))
-            .Any(x => x.StartsAt <= (stopsAt ?? Instant.MaxValue) && (x.StopsAt ?? Instant.MaxValue) >= startsAt);
+            .Any(x => x.StartsAt < (stopsAt ?? Instant.MaxValue) && (x.StopsAt ?? Instant.MaxValue) > startsAt);
     }
 }

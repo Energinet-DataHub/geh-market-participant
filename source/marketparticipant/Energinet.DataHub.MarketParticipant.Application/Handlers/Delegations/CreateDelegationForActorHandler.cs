@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
@@ -26,53 +24,55 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 using NodaTime.Extensions;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
-{
-    public sealed class CreateDelegationForActorHandler(
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations;
+
+public sealed class CreateDelegationForActorHandler(
         IActorRepository actorRepository,
         IActorDelegationRepository actorDelegationRepository,
-        IUnitOfWorkProvider unitOfWorkProvider)
-        : IRequestHandler<CreateActorDelegationCommand>
+        IUnitOfWorkProvider unitOfWorkProvider,
+        IEntityLock entityLock)
+    : IRequestHandler<CreateActorDelegationCommand>
+{
+    public async Task Handle(CreateActorDelegationCommand request, CancellationToken cancellationToken)
     {
-        public async Task Handle(CreateActorDelegationCommand request, CancellationToken cancellationToken)
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
+
+        var actor = await actorRepository
+            .GetAsync(new ActorId(request.CreateDelegation.DelegatedFrom))
+            .ConfigureAwait(false);
+
+        var actorDelegatedTo = await actorRepository
+            .GetAsync(new ActorId(request.CreateDelegation.DelegatedTo))
+            .ConfigureAwait(false);
+
+        NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
+        NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo);
+
+        var uow = await unitOfWorkProvider
+            .NewUnitOfWorkAsync()
+            .ConfigureAwait(false);
+
+        await using (uow.ConfigureAwait(false))
         {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+            await entityLock.LockAsync(LockableEntity.Actor).ConfigureAwait(false);
 
-            var actor = await actorRepository
-                .GetAsync(new ActorId(request.CreateDelegation.DelegatedFrom))
-                .ConfigureAwait(false);
-
-            var actorDelegatedTo = await actorRepository
-                .GetAsync(new ActorId(request.CreateDelegation.DelegatedTo))
-                .ConfigureAwait(false);
-
-            NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
-            NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo);
-
-            var uow = await unitOfWorkProvider
-                .NewUnitOfWorkAsync()
-                .ConfigureAwait(false);
-
-            await using (uow.ConfigureAwait(false))
+            foreach (var gridArea in request.CreateDelegation.GridAreas)
             {
-                foreach (var gridArea in request.CreateDelegation.GridAreas)
+                foreach (var messageType in request.CreateDelegation.MessageTypes)
                 {
-                    foreach (var messageType in request.CreateDelegation.MessageTypes)
-                    {
-                        var delegation = new ActorDelegation(
-                            new ActorId(request.CreateDelegation.DelegatedFrom),
-                            new ActorId(request.CreateDelegation.DelegatedTo),
-                            new GridAreaId(gridArea),
-                            messageType,
-                            DateTimeOffset.UtcNow.ToInstant(),
-                            DateTimeOffset.UtcNow.ToInstant());
+                    var delegation = new ActorDelegation(
+                        new ActorId(request.CreateDelegation.DelegatedFrom),
+                        new ActorId(request.CreateDelegation.DelegatedTo),
+                        new GridAreaId(gridArea),
+                        messageType,
+                        DateTimeOffset.UtcNow.ToInstant(),
+                        DateTimeOffset.UtcNow.ToInstant());
 
-                        await actorDelegationRepository.AddOrUpdateAsync(delegation).ConfigureAwait(false);
-                    }
+                    await actorDelegationRepository.AddOrUpdateAsync(delegation).ConfigureAwait(false);
                 }
-
-                await uow.CommitAsync().ConfigureAwait(false);
             }
+
+            await uow.CommitAsync().ConfigureAwait(false);
         }
     }
 }

@@ -20,33 +20,25 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 using NodaTime.Extensions;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations;
+
+public sealed class UpdateDelegationForActorHandler(IActorDelegationRepository actorDelegationRepository)
+    : IRequestHandler<UpdateActorDelegationCommand, UpdateActorDelegationResponse>
 {
-    public sealed class UpdateDelegationForActorHandler : IRequestHandler<UpdateActorDelegationCommand, UpdateActorDelegationResponse>
+    public async Task<UpdateActorDelegationResponse> Handle(UpdateActorDelegationCommand request, CancellationToken cancellationToken)
     {
-        private readonly IActorDelegationRepository _actorDelegationRepository;
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        public UpdateDelegationForActorHandler(
-            IActorDelegationRepository actorDelegationRepository)
-        {
-            _actorDelegationRepository = actorDelegationRepository;
-        }
+        var actorDelegation = await actorDelegationRepository
+            .GetAsync(request.UpdateActorDelegation.Id)
+            .ConfigureAwait(false);
 
-        public async Task<UpdateActorDelegationResponse> Handle(UpdateActorDelegationCommand request, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+        if (actorDelegation is null) return new UpdateActorDelegationResponse("NotFound");
+        actorDelegation.SetExpiresAt(request.UpdateActorDelegation.ExpiresAt.ToInstant());
 
-            var actorDelegation = await _actorDelegationRepository
-                .GetAsync(request.UpdateActorDelegation.Id)
-                .ConfigureAwait(false);
+        await actorDelegationRepository.AddOrUpdateAsync(actorDelegation).ConfigureAwait(false);
 
-            if (actorDelegation is null) return new UpdateActorDelegationResponse("NotFound");
-            actorDelegation.SetExpiresAt(request.UpdateActorDelegation.ExpiresAt.ToInstant());
-
-            await _actorDelegationRepository.AddOrUpdateAsync(actorDelegation).ConfigureAwait(false);
-
-            var responseMessage = request.UpdateActorDelegation.ExpiresAt > DateTimeOffset.UtcNow ? "Updated" : "Stopped";
-            return new UpdateActorDelegationResponse(responseMessage);
-        }
+        var responseMessage = request.UpdateActorDelegation.ExpiresAt > DateTimeOffset.UtcNow ? "Updated" : "Stopped";
+        return new UpdateActorDelegationResponse(responseMessage);
     }
 }
