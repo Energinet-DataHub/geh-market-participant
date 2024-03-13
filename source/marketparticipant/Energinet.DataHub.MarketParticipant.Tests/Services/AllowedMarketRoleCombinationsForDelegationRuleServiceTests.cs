@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 
-public interface IMessageDelegationRepository
+public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceTests
 {
-    Task<IEnumerable<MessageDelegation>> GetForActorAsync(ActorId delegatedBy);
-    Task<IEnumerable<MessageDelegation>> GetDelegatedToActorAsync(ActorId delegatedTo);
-
-    Task<MessageDelegation?> GetForActorAsync(ActorId delegatedBy, DelegationMessageType messageType);
-    Task<MessageDelegationId> AddOrUpdateAsync(MessageDelegation messageDelegation);
+    [Fact]
+    public Task ValidateAsync_MessageDelegation_A()
+    {
+        return Task.CompletedTask;
+    }
 }

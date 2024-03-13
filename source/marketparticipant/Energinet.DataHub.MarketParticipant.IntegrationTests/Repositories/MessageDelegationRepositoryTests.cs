@@ -141,6 +141,45 @@ public sealed class MessageDelegationRepositoryTests
     }
 
     [Fact]
+    public async Task GetDelegatedToActorAsync_HasTwoDelegations_BothReturned()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var actorEntityA = await _fixture.PrepareActiveActorAsync();
+        var actorEntityB = await _fixture.PrepareActiveActorAsync();
+        var actorEntityC = await _fixture.PrepareActiveActorAsync();
+        var gridAreaId = await _fixture.PrepareGridAreaAsync();
+        var actorRepository = new ActorRepository(context);
+        var actorA = await actorRepository.GetAsync(new ActorId(actorEntityA.Id));
+        var actorB = await actorRepository.GetAsync(new ActorId(actorEntityB.Id));
+        var actorC = await actorRepository.GetAsync(new ActorId(actorEntityC.Id));
+
+        var expectedA = new MessageDelegation(actorA!, DelegationMessageType.Rsm017Inbound);
+        var expectedB = new MessageDelegation(actorB!, DelegationMessageType.Rsm016Outbound);
+
+        var baseDateTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
+        expectedA.DelegateTo(actorC!.Id, new GridAreaId(gridAreaId.Id), baseDateTime);
+        expectedB.DelegateTo(actorC.Id, new GridAreaId(gridAreaId.Id), baseDateTime);
+
+        var messageDelegationRepository = new MessageDelegationRepository(context);
+        await messageDelegationRepository.AddOrUpdateAsync(expectedA);
+        await messageDelegationRepository.AddOrUpdateAsync(expectedB);
+
+        // Act
+        var actual = (await messageDelegationRepository
+            .GetDelegatedToActorAsync(actorC.Id))
+            .ToList();
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.Contains(actual, md => md.DelegatedBy == actorA!.Id && md.MessageType == DelegationMessageType.Rsm017Inbound);
+        Assert.Contains(actual, md => md.DelegatedBy == actorB!.Id && md.MessageType == DelegationMessageType.Rsm016Outbound);
+    }
+
+    [Fact]
     public async Task AddOrUpdateAsync_ValidDelegation_CanBeReadBack()
     {
         // Arrange
