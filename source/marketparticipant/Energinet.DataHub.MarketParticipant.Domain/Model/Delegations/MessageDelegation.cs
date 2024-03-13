@@ -82,7 +82,6 @@ public sealed class MessageDelegation
                 .WithErrorCode("message_delegation.overlap");
         }
 
-        // TODO: Rule Denne regel gælder ikke, hvis Actor A/B er deaktiveret.
         _delegations.Add(delegationPeriod);
     }
 
@@ -92,8 +91,7 @@ public sealed class MessageDelegation
 
         if (!_delegations.Remove(existingPeriod))
         {
-            throw new ValidationException("Provided existing delegation period was not in collection.")
-                .WithErrorCode("message_delegation.does_not_exist");
+            throw new InvalidOperationException("Provided existing delegation period was not in collection.");
         }
 
         // Rule There can't be any overlap between delegation period on a given grid area
@@ -104,7 +102,6 @@ public sealed class MessageDelegation
                 .WithErrorCode("message_delegation.overlap");
         }
 
-        // TODO: Rule Denne regel gælder ikke, hvis Actor A/B er deaktiveret.
         _delegations.Add(existingPeriod with { StopsAt = stopsAt });
     }
 
