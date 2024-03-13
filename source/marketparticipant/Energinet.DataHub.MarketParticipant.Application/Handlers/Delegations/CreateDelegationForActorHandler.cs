@@ -66,8 +66,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                         messageDelegation.DelegateTo(
                             actorDelegatedTo.Id,
                             new GridAreaId(gridAreaId),
-                            Instant.FromDateTimeOffset(request.CreateDelegation.CreatedAt),
-                            request.CreateDelegation.ExpiresAt.HasValue ? Instant.FromDateTimeOffset(request.CreateDelegation.ExpiresAt.GetValueOrDefault()) : null);
+                            Instant.FromDateTimeOffset(request.CreateDelegation.StartsAt),
+                            request.CreateDelegation.StopsAt.HasValue ? Instant.FromDateTimeOffset(request.CreateDelegation.StopsAt.GetValueOrDefault()) : null);
                     }
                 }
 
