@@ -42,10 +42,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var actorRepo = new Mock<IActorRepository>();
-            var messageRepoMock = new Mock<IMessageDelegationRepository>();
             var target = new CreateMessageDelegationHandler(
                 actorRepo.Object,
-                messageRepoMock.Object,
+                new Mock<IMessageDelegationRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IEntityLock>().Object);
 
@@ -64,10 +63,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             actorRepo
                 .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
                 .ReturnsAsync(actorTo);
-
-            messageRepoMock
-                .Setup(x => x.AddOrUpdateAsync(It.IsAny<MessageDelegation>()))
-                .ReturnsAsync(messageDelegation.Id);
 
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
                 actorFrom.Id.Value,
@@ -88,10 +83,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var actorRepo = new Mock<IActorRepository>();
-            var messageRepoMock = new Mock<IMessageDelegationRepository>();
             var target = new CreateMessageDelegationHandler(
                 actorRepo.Object,
-                messageRepoMock.Object,
+                new Mock<IMessageDelegationRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IEntityLock>().Object);
 
@@ -110,10 +104,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             actorRepo
                 .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
                 .ReturnsAsync(actorTo);
-
-            messageRepoMock
-                .Setup(x => x.AddOrUpdateAsync(It.IsAny<MessageDelegation>()))
-                .ReturnsAsync(messageDelegation.Id);
 
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
                 actorFrom.Id.Value,
@@ -134,10 +124,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var actorRepo = new Mock<IActorRepository>();
-            var messageRepoMock = new Mock<IMessageDelegationRepository>();
             var target = new CreateMessageDelegationHandler(
                 actorRepo.Object,
-                messageRepoMock.Object,
+                new Mock<IMessageDelegationRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IEntityLock>().Object);
 
@@ -156,10 +145,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             actorRepo
                 .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
                 .ReturnsAsync(actorTo);
-
-            messageRepoMock
-                .Setup(x => x.AddOrUpdateAsync(It.IsAny<MessageDelegation>()))
-                .ReturnsAsync(messageDelegation.Id);
 
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
                 actorFrom.Id.Value,
@@ -180,10 +165,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var actorRepo = new Mock<IActorRepository>();
-            var messageRepoMock = new Mock<IMessageDelegationRepository>();
             var target = new CreateMessageDelegationHandler(
                 actorRepo.Object,
-                messageRepoMock.Object,
+                new Mock<IMessageDelegationRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IEntityLock>().Object);
 
@@ -199,10 +183,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             actorRepo
                 .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
                 .ReturnsAsync(actorTo);
-
-            messageRepoMock
-                .Setup(x => x.AddOrUpdateAsync(It.IsAny<MessageDelegation>()))
-                .ReturnsAsync(messageDelegation.Id);
 
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
                 actorFrom.Id.Value,
@@ -223,10 +203,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var actorRepo = new Mock<IActorRepository>();
-            var messageRepoMock = new Mock<IMessageDelegationRepository>();
             var target = new CreateMessageDelegationHandler(
                 actorRepo.Object,
-                messageRepoMock.Object,
+                new Mock<IMessageDelegationRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IEntityLock>().Object);
 
@@ -242,10 +221,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             actorRepo
                 .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
                 .ReturnsAsync(actorFrom);
-
-            messageRepoMock
-                .Setup(x => x.AddOrUpdateAsync(It.IsAny<MessageDelegation>()))
-                .ReturnsAsync(messageDelegation.Id);
 
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
                 actorFrom.Id.Value,

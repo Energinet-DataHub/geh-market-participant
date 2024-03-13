@@ -37,8 +37,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 
             NotFoundValidationException.ThrowIfNull(actorDelegation, request.StopMessageDelegation.Id.Value);
 
-            var periodToStop =
-                actorDelegation.Delegations.SingleOrDefault(d => d.Id == request.StopMessageDelegation.PeriodId);
+            var periodToStop = actorDelegation
+                .Delegations
+                .SingleOrDefault(d => d.Id == request.StopMessageDelegation.PeriodId);
+
             NotFoundValidationException.ThrowIfNull(periodToStop, request.StopMessageDelegation.PeriodId.Value);
 
             Instant? stopsAt = request.StopMessageDelegation.StopsAt.HasValue
