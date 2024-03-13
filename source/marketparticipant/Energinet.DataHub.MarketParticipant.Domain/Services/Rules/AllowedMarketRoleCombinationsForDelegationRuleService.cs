@@ -87,24 +87,24 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
     {
         ArgumentNullException.ThrowIfNull(messageDelegation);
 
+        var delegatedBy = await _actorRepository
+            .GetAsync(messageDelegation.DelegatedBy)
+            .ConfigureAwait(false);
+
         var delegatedTo = messageDelegation
             .Delegations
             .Select(d => d.DelegatedTo)
             .ToHashSet();
 
-        var delegatedBy = await _actorRepository
-            .GetAsync(messageDelegation.DelegatedBy)
-            .ConfigureAwait(false);
-
         var affectedActors = await _actorRepository
             .GetActorsAsync(delegatedTo)
             .ConfigureAwait(false);
 
-        var organizations = affectedActors
+        var affectedActorOrganizations = affectedActors
             .Select(actor => actor.OrganizationId)
             .ToHashSet();
 
-        foreach (var organizationId in organizations)
+        foreach (var organizationId in affectedActorOrganizations)
         {
             var actorsInOrganization = await _actorRepository
                 .GetActorsAsync(organizationId)
