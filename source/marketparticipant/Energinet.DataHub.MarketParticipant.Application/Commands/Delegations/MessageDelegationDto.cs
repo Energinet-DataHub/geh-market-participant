@@ -13,16 +13,13 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 
-public interface IActorDelegationRepository
-{
-    Task<ActorDelegation?> GetAsync(ActorDelegationId actorDelegationId);
-    Task<IEnumerable<ActorDelegation>> GetDelegatedByAsync(ActorId actorId);
-    Task<IEnumerable<ActorDelegation>> GetDelegatedToAsync(ActorId actorId);
-    Task<ActorDelegationId> AddOrUpdateAsync(ActorDelegation actorDelegation);
-}
+public sealed record MessageDelegationDto(
+    MessageDelegationId Id,
+    ActorId DelegatedBy,
+    DelegationMessageType MessageType,
+    IEnumerable<MessageDelegationPeriodDto> Periods);

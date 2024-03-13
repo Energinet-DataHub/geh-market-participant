@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,9 +34,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
         IActorRepository actorRepository,
         IMessageDelegationRepository messageDelegationRepository,
         IUnitOfWorkProvider unitOfWorkProvider)
-        : IRequestHandler<CreateActorDelegationCommand>
+        : IRequestHandler<CreateMessageDelegationCommand>
     {
-        public async Task Handle(CreateActorDelegationCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateMessageDelegationCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
@@ -49,6 +50,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 
             NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
             NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo);
+
+            if (actor.Status != ActorStatus.Active && actorDelegatedTo.Status != ActorStatus.Active)
+            {
+                throw new ValidationException("Actors to delegate from/to must be active to delegate messages.")
+                    .WithErrorCode("message_delegation.actors_from_and_to_inactive");
+            }
 
             var uow = await unitOfWorkProvider
                 .NewUnitOfWorkAsync()

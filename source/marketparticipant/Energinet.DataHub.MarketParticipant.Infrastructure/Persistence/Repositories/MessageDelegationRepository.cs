@@ -25,18 +25,22 @@ using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class MessageDelegationRepository : IMessageDelegationRepository
+public sealed class MessageDelegationRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    : IMessageDelegationRepository
 {
-    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
-
-    public MessageDelegationRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public async Task<MessageDelegation?> GetAsync(MessageDelegationId id)
     {
-        _marketParticipantDbContext = marketParticipantDbContext;
+        var messageDelegation = await marketParticipantDbContext
+            .MessageDelegations
+            .SingleOrDefaultAsync(messageDelegation => messageDelegation.Id == id.Value)
+            .ConfigureAwait(false);
+
+        return messageDelegation == null ? null : Map(messageDelegation);
     }
 
     public async Task<IEnumerable<MessageDelegation>> GetForActorAsync(ActorId delegatedBy)
     {
-        var messageDelegations = await _marketParticipantDbContext
+        var messageDelegations = await marketParticipantDbContext
             .MessageDelegations
             .Where(messageDelegation => messageDelegation.DelegatedByActorId == delegatedBy.Value)
             .ToListAsync()
@@ -47,7 +51,7 @@ public sealed class MessageDelegationRepository : IMessageDelegationRepository
 
     public async Task<MessageDelegation?> GetForActorAsync(ActorId delegatedBy, DelegationMessageType messageType)
     {
-        var messageDelegation = await _marketParticipantDbContext
+        var messageDelegation = await marketParticipantDbContext
             .MessageDelegations
             .SingleOrDefaultAsync(messageDelegation =>
                 messageDelegation.DelegatedByActorId == delegatedBy.Value &&
@@ -76,7 +80,7 @@ public sealed class MessageDelegationRepository : IMessageDelegationRepository
         }
         else
         {
-            destination = await _marketParticipantDbContext
+            destination = await marketParticipantDbContext
                 .MessageDelegations
                 .FindAsync(messageDelegation.Id.Value)
                 .ConfigureAwait(false) ?? throw new InvalidOperationException($"Delegation '{messageDelegation.Id.Value}' is missing, even though it cannot be deleted.");
@@ -112,9 +116,9 @@ public sealed class MessageDelegationRepository : IMessageDelegationRepository
         }
 
         destination.ConcurrencyToken = Guid.NewGuid();
-        _marketParticipantDbContext.MessageDelegations.Update(destination);
+        marketParticipantDbContext.MessageDelegations.Update(destination);
 
-        await _marketParticipantDbContext
+        await marketParticipantDbContext
             .SaveChangesAsync()
             .ConfigureAwait(false);
 

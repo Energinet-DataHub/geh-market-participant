@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
@@ -24,26 +25,46 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 {
-    public sealed class GetDelegationsForActorHandler : IRequestHandler<GetDelegationsForActorCommand, GetDelegationsForActorResponse>
+    public sealed class GetDelegationsForActorHandler(
+        IActorRepository actorRepository,
+        IMessageDelegationRepository messageDelegationRepository)
+        : IRequestHandler<GetDelegationsForActorCommand, GetDelegationsForActorResponse>
     {
-        private readonly IActorRepository _actorRepository;
-
-        public GetDelegationsForActorHandler(IActorRepository actorRepository)
-        {
-            _actorRepository = actorRepository;
-        }
-
         public async Task<GetDelegationsForActorResponse> Handle(GetDelegationsForActorCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var actor = await _actorRepository
+            var actor = await actorRepository
                 .GetAsync(new ActorId(request.ActorId))
                 .ConfigureAwait(false);
 
             NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
-            return new GetDelegationsForActorResponse(new Collection<ActorDelegationDto>());
+            var delegations = await messageDelegationRepository
+                .GetForActorAsync(new ActorId(request.ActorId))
+                .ConfigureAwait(false);
+
+            var result = new List<MessageDelegationDto>();
+            foreach (var messageDelegation in delegations)
+            {
+                var delegationPeriods = messageDelegation.Delegations.Select(x =>
+                    new MessageDelegationPeriodDto(
+                        x.Id,
+                        x.DelegatedTo,
+                        x.GridAreaId,
+                        x.StartsAt.ToDateTimeOffset(),
+                        x.StopsAt?.ToDateTimeOffset()));
+
+                var messageDelegationDto = new MessageDelegationDto(
+                    messageDelegation.Id,
+                    messageDelegation.DelegatedBy,
+                    messageDelegation.MessageType,
+                    delegationPeriods);
+
+                result.Add(messageDelegationDto);
+            }
+
+            return new GetDelegationsForActorResponse(result);
         }
     }
 }

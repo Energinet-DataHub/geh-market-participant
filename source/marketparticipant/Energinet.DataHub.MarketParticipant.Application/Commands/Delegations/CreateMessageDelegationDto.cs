@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
-    public sealed record CreateActorDelegationDto(
+    public sealed record CreateMessageDelegationDto(
         Guid DelegatedFrom,
         Guid DelegatedTo,
         IReadOnlyCollection<Guid> GridAreas,
