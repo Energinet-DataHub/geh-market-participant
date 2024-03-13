@@ -25,15 +25,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class ActorRepository : IActorRepository
+public sealed class ActorRepository(IMarketParticipantDbContext marketParticipantDbContext) : IActorRepository
 {
-    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
-
-    public ActorRepository(IMarketParticipantDbContext marketParticipantDbContext)
-    {
-        _marketParticipantDbContext = marketParticipantDbContext;
-    }
-
     public async Task<Result<ActorId, ActorError>> AddOrUpdateAsync(Actor actor)
     {
         ArgumentNullException.ThrowIfNull(actor);
@@ -46,7 +39,7 @@ public sealed class ActorRepository : IActorRepository
         }
         else
         {
-            destination = await _marketParticipantDbContext
+            destination = await marketParticipantDbContext
                 .Actors
                 .FindAsync(actor.Id.Value)
                 .ConfigureAwait(false) ?? throw new InvalidOperationException($"Actor with id {actor.Id.Value} is missing, even though it cannot be deleted.");
@@ -55,7 +48,7 @@ public sealed class ActorRepository : IActorRepository
         if (actor.Credentials is ActorCertificateCredentials certificateCredentials &&
             destination.CertificateCredential?.CertificateThumbprint != certificateCredentials.CertificateThumbprint)
         {
-            var certificateReUsedByCurrentActor = await _marketParticipantDbContext.UsedActorCertificates.SingleOrDefaultAsync(e =>
+            var certificateReUsedByCurrentActor = await marketParticipantDbContext.UsedActorCertificates.SingleOrDefaultAsync(e =>
                 e.Thumbprint == certificateCredentials.CertificateThumbprint && e.ActorId == destination.Id).ConfigureAwait(false);
 
             if (certificateReUsedByCurrentActor is null)
@@ -68,11 +61,11 @@ public sealed class ActorRepository : IActorRepository
         }
 
         ActorMapper.MapToEntity(actor, destination);
-        _marketParticipantDbContext.Actors.Update(destination);
+        marketParticipantDbContext.Actors.Update(destination);
 
         try
         {
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (DbUpdateException ex) when (
             ex.InnerException is SqlException inner &&
@@ -87,7 +80,7 @@ public sealed class ActorRepository : IActorRepository
 
     public async Task<Actor?> GetAsync(ActorId actorId)
     {
-        var foundActor = await _marketParticipantDbContext
+        var foundActor = await marketParticipantDbContext
             .Actors
             .Include(a => a.MarketRoles)
             .ThenInclude(m => m.GridAreas)
@@ -101,7 +94,7 @@ public sealed class ActorRepository : IActorRepository
 
     public async Task<IEnumerable<Actor>> GetActorsAsync()
     {
-        var actors = await _marketParticipantDbContext
+        var actors = await marketParticipantDbContext
             .Actors
             .Include(a => a.MarketRoles)
             .ThenInclude(m => m.GridAreas)
@@ -119,7 +112,7 @@ public sealed class ActorRepository : IActorRepository
             .ToList();
 
         var query =
-            from actor in _marketParticipantDbContext.Actors
+            from actor in marketParticipantDbContext.Actors
             where ids.Contains(actor.Id)
             select actor;
 
@@ -135,7 +128,7 @@ public sealed class ActorRepository : IActorRepository
     public async Task<IEnumerable<Actor>> GetActorsAsync(OrganizationId organizationId)
     {
         var query =
-            from actor in _marketParticipantDbContext.Actors
+            from actor in marketParticipantDbContext.Actors
             where actor.OrganizationId == organizationId.Value
             select actor;
 
@@ -146,10 +139,5 @@ public sealed class ActorRepository : IActorRepository
             .ConfigureAwait(false);
 
         return actors.Select(ActorMapper.MapFromEntity);
-    }
-
-    public Task CreateLockAsync()
-    {
-        return _marketParticipantDbContext.CreateLockAsync(LockableEntity.Actor);
     }
 }

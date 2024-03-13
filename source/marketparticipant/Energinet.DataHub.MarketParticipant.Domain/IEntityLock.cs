@@ -12,16 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+using System.Threading.Tasks;
 
-public sealed class LockableEntity
+namespace Energinet.DataHub.MarketParticipant.Domain;
+
+public interface IEntityLock
 {
-    private LockableEntity(string tableName)
-    {
-        TableName = tableName;
-    }
-
-    public static LockableEntity Actor => new("Actor");
-
-    public string TableName { get; }
+    Task LockAsync(LockableEntity lockableEntity);
 }
