@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
@@ -26,14 +24,14 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 using NodaTime;
-using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 {
-    public sealed class CreateDelegationForActorHandler(
+    public sealed class CreateMessageDelegationHandler(
         IActorRepository actorRepository,
         IMessageDelegationRepository messageDelegationRepository,
-        IUnitOfWorkProvider unitOfWorkProvider)
+        IUnitOfWorkProvider unitOfWorkProvider,
+        IEntityLock entityLock)
         : IRequestHandler<CreateMessageDelegationCommand>
     {
         public async Task Handle(CreateMessageDelegationCommand request, CancellationToken cancellationToken)
@@ -51,9 +49,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
             NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
             NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo);
 
-            if (actor.Status != ActorStatus.Active && actorDelegatedTo.Status != ActorStatus.Active)
+            if (actor.Status != ActorStatus.Active || actorDelegatedTo.Status != ActorStatus.Active)
             {
-                throw new ValidationException("Actors to delegate from/to must be active to delegate messages.")
+                throw new ValidationException("Actors to delegate from/to must be both be active to delegate messages.")
                     .WithErrorCode("message_delegation.actors_from_and_to_inactive");
             }
 
@@ -63,6 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 
             await using (uow.ConfigureAwait(false))
             {
+                await entityLock.LockAsync(LockableEntity.Actor).ConfigureAwait(false);
                 foreach (var messageType in request.CreateDelegation.MessageTypes)
                 {
                     var messageDelegation = await messageDelegationRepository
