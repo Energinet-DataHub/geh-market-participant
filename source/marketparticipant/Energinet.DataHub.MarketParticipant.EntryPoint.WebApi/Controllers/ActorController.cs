@@ -233,15 +233,15 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPut("delegation")]
         [AuthorizeUser(PermissionId.DelegationManage)]
-        public async Task<ActionResult> UpdateDelegationAsync([FromBody] StopMessageDelegationDto delegationDto)
+        public async Task<ActionResult> StopMessageDelegationAsync([FromBody] StopMessageDelegationDto delegationDto)
         {
             if (!_userContext.CurrentUser.IsFas)
                 return Unauthorized();
 
-            var updateActorDelegation = new StopMessageDelegationCommand(delegationDto);
+            var stopMessageDelegationCommand = new StopMessageDelegationCommand(delegationDto);
 
             await _mediator
-                .Send(updateActorDelegation)
+                .Send(stopMessageDelegationCommand)
                 .ConfigureAwait(false);
 
             return Ok();
