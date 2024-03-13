@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using NodaTime.Extensions;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
@@ -33,10 +34,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 public sealed class ActorRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
+    private readonly ITestOutputHelper _testOutputHelper;
 
-    public ActorRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    public ActorRepositoryTests(MarketParticipantDatabaseFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
+        _testOutputHelper = testOutputHelper;
     }
 
     [Fact]
@@ -329,26 +332,36 @@ public sealed class ActorRepositoryTests
         var sw = Stopwatch.StartNew();
 
         // act
-        await Task.WhenAll(LockTimoutAsync(1_000), LockTimoutAsync(1_000));
+        var lockTimout1Async = Task.Run(() => LockTimoutAsync(1_500));
+        var lockTimout2Async = Task.Run(() => LockTimoutAsync(1_500));
+
+        await Task.WhenAll(lockTimout1Async, lockTimout2Async);
+
+        sw.Stop();
+
+        var elapsed = sw.ElapsedMilliseconds;
+        var elapsedTicks = sw.ElapsedTicks;
 
         // assert
-        Assert.True(sw.ElapsedMilliseconds >= 2_000);
+        var output = $"actual elapsed: {elapsed} | ticks: {elapsedTicks} | isHighRes: {Stopwatch.IsHighResolution} | freq: {Stopwatch.Frequency}";
+        Assert.True(elapsed >= 3_000, output);
+        _testOutputHelper.WriteLine(output);
+    }
 
-        async Task LockTimoutAsync(int millis)
-        {
-            await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
+    private async Task LockTimoutAsync(int millis)
+    {
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var uowProvider = new UnitOfWorkProvider(context);
+        var uowProvider = new UnitOfWorkProvider(context);
 
-            await using var uow = await uowProvider.NewUnitOfWorkAsync();
+        await using var uow = await uowProvider.NewUnitOfWorkAsync();
 
-            var repository = new ActorRepository(context);
+        var repository = new ActorRepository(context);
 
-            await repository.CreateLockAsync();
+        await repository.CreateLockAsync();
 
-            await Task.Delay(millis);
-        }
+        await Task.Delay(millis);
     }
 }
