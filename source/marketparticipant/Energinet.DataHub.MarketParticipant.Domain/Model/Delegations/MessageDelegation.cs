@@ -94,8 +94,8 @@ public sealed class MessageDelegation
 
         if (!_delegations.Remove(existingPeriod))
         {
-            throw new ValidationException("Delegation already exists for the given grid area and time period")
-                .WithErrorCode("message_delegation.overlap");
+            throw new ValidationException("Provided existing delegation period was not in collection.")
+                .WithErrorCode("message_delegation.does_not_exist");
         }
 
         // Rule There can't be any overlap between delegation period on a given grid area
