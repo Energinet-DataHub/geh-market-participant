@@ -110,6 +110,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();
             services.AddScoped<ICertificateValidation, NoCertificateValidation>();
             services.AddScoped<IPermissionRelationService, PermissionRelationService>();
+            services.AddScoped<IIntegrationEventParser, IntegrationEventParser>();
         }
     }
 }

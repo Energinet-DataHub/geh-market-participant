@@ -20,12 +20,14 @@ using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -43,10 +45,14 @@ internal sealed class Startup : StartupBase
         services.AddScoped<IAuditIdentityProvider>(_ => KnownAuditIdentityProvider.OrganizationBackgroundService);
         services.AddFeatureManagement();
 
+        services.AddOptions();
+        services.Configure<ConsumeServiceBusSettings>(configuration.GetSection(nameof(ConsumeServiceBusSettings)));
+
         services.AddScoped<SynchronizeActorsTimerTrigger>();
         services.AddScoped<EmailEventTimerTrigger>();
         services.AddScoped<UserInvitationExpiredTimerTrigger>();
         services.AddScoped<DispatchIntegrationEventsTrigger>();
+        services.AddScoped<ReceiveIntegrationEventsTrigger>();
         services.AddScoped<OrganizationIdentityUpdateTrigger>();
 
         services.AddPublisher<IntegrationEventProvider>();
@@ -54,6 +60,11 @@ internal sealed class Startup : StartupBase
         {
             options.ServiceBusConnectionString = configuration.GetSetting(Settings.ServiceBusTopicConnectionString);
             options.TopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
+        });
+
+        services.AddSubscriber<IntegrationEventSubscriptionHandler>(new[]
+        {
+            BalanceResponsiblePartiesChanged.Descriptor,
         });
 
         var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
