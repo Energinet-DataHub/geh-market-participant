@@ -21,31 +21,15 @@ using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
-public sealed class ActorFactoryService : IActorFactoryService
-{
-    private readonly IActorRepository _actorRepository;
-    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-    private readonly IOverlappingEicFunctionsRuleService _overlappingEicFunctionsRuleService;
-    private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
-    private readonly IUniqueMarketRoleGridAreaRuleService _uniqueMarketRoleGridAreaRuleService;
-    private readonly IDomainEventRepository _domainEventRepository;
-
-    public ActorFactoryService(
-        IActorRepository actorRepository,
+public sealed class ActorFactoryService(IActorRepository actorRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
         IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
         IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService,
-        IDomainEventRepository domainEventRepository)
-    {
-        _actorRepository = actorRepository;
-        _unitOfWorkProvider = unitOfWorkProvider;
-        _overlappingEicFunctionsRuleService = overlappingEicFunctionsRuleService;
-        _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
-        _uniqueMarketRoleGridAreaRuleService = uniqueMarketRoleGridAreaRuleService;
-        _domainEventRepository = domainEventRepository;
-    }
-
+        IDomainEventRepository domainEventRepository,
+        IEntityLock entityLock)
+    : IActorFactoryService
+{
     public async Task<Actor> CreateAsync(
         Organization organization,
         ActorNumber actorNumber,
@@ -62,33 +46,35 @@ public sealed class ActorFactoryService : IActorFactoryService
         foreach (var marketRole in marketRoles)
             newActor.AddMarketRole(marketRole);
 
-        await _uniqueGlobalLocationNumberRuleService
+        await uniqueGlobalLocationNumberRuleService
             .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
             .ConfigureAwait(false);
 
-        await _overlappingEicFunctionsRuleService
+        await overlappingEicFunctionsRuleService
             .ValidateEicFunctionsAcrossActorsAsync(newActor)
             .ConfigureAwait(false);
 
-        var uow = await _unitOfWorkProvider
+        var uow = await unitOfWorkProvider
             .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
 
         await using (uow.ConfigureAwait(false))
         {
+            await entityLock.LockAsync(LockableEntity.Actor).ConfigureAwait(false);
+
             var actorId = await SaveActorAsync(newActor).ConfigureAwait(false);
 
-            var committedActor = (await _actorRepository
+            var committedActor = (await actorRepository
                 .GetAsync(actorId)
                 .ConfigureAwait(false))!;
 
-            await _uniqueMarketRoleGridAreaRuleService
+            await uniqueMarketRoleGridAreaRuleService
                 .ValidateAndReserveAsync(committedActor)
                 .ConfigureAwait(false);
 
             committedActor.Activate();
 
-            await _domainEventRepository
+            await domainEventRepository
                 .EnqueueAsync(committedActor)
                 .ConfigureAwait(false);
 
@@ -102,7 +88,7 @@ public sealed class ActorFactoryService : IActorFactoryService
 
     private async Task<ActorId> SaveActorAsync(Actor newActor)
     {
-        var result = await _actorRepository
+        var result = await actorRepository
             .AddOrUpdateAsync(newActor)
             .ConfigureAwait(false);
 

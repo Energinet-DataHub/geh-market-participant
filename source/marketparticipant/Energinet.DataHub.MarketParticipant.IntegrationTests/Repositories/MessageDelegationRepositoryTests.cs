@@ -99,7 +99,7 @@ public sealed class MessageDelegationRepositoryTests
         Assert.Equal(actorC.Id, actualDelegation.DelegatedTo);
         Assert.Equal(new GridAreaId(gridAreaId.Id), actualDelegation.GridAreaId);
         Assert.Equal(baseDateTime, actualDelegation.StartsAt);
-        Assert.Equal(null, actualDelegation.StopsAt);
+        Assert.Null(actualDelegation.StopsAt);
     }
 
     [Fact]
@@ -226,7 +226,7 @@ public sealed class MessageDelegationRepositoryTests
         Assert.Equal(actorB.Id, actualDelegationB.DelegatedTo);
         Assert.Equal(new GridAreaId(gridAreaId.Id), actualDelegationB.GridAreaId);
         Assert.Equal(baseDateTime.Plus(Duration.FromDays(5)), actualDelegationB.StartsAt);
-        Assert.Equal(null, actualDelegationB.StopsAt);
+        Assert.Null(actualDelegationB.StopsAt);
     }
 
     [Fact]
