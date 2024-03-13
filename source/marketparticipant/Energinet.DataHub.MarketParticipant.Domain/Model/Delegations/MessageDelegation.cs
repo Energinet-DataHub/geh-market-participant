@@ -14,6 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
@@ -26,8 +29,22 @@ public sealed class MessageDelegation
     {
         ArgumentNullException.ThrowIfNull(messageOwner);
 
-        // TODO: Rule Actor A, som skal være enten Ellev, Netvirk, Balanceansvarlig eller Afregningsansvarlig.
-        // TODO: Rule Actor A, som skal være aktiv.
+        if (messageOwner.Status != ActorStatus.Active)
+        {
+            throw new ValidationException("Actor must be active to delegate messages.")
+                .WithErrorCode("message_delegation.actor_inactive");
+        }
+
+        if (messageOwner.MarketRoles.All(role =>
+                role.Function != EicFunction.GridAccessProvider
+                && role.Function != EicFunction.BalanceResponsibleParty
+                && role.Function != EicFunction.EnergySupplier
+                && role.Function != EicFunction.BillingAgent))
+        {
+            throw new ValidationException("Actor must have a valid market role to delegate messages.")
+                .WithErrorCode("message_delegation.actor_invalid_market_role");
+        }
+
         DelegatedBy = messageOwner.Id;
         MessageType = messageType;
     }
@@ -57,9 +74,12 @@ public sealed class MessageDelegation
     {
         var delegationPeriod = new DelegationPeriod(delegatedTo, gridAreaId, startsAt, stopsAt);
 
-        // TODO: Rule (A/Fra, MessageType) skal være unik i perioden i netområde.
-        // TODO: Rule Denne regel gælder ikke, hvis ExpiresAt <= StartsAt.
-        // TODO: Rule Denne regel gælder ikke, hvis Actor A/B er deaktiveret.
+        if (IsThereDelegationPeriodOverlap(startsAt, gridAreaId, stopsAt))
+        {
+            throw new ValidationException("Delegation already exists for the given grid area and time period")
+                .WithErrorCode("message_delegation.overlap");
+        }
+
         _delegations.Add(delegationPeriod);
     }
 
@@ -72,9 +92,19 @@ public sealed class MessageDelegation
             throw new InvalidOperationException("Provided existing delegation period was not in collection.");
         }
 
-        // TODO: Rule (A/Fra, MessageType) skal være unik i perioden i netområde.
-        // TODO: Rule Denne regel gælder ikke, hvis ExpiresAt <= StartsAt.
-        // TODO: Rule Denne regel gælder ikke, hvis Actor A/B er deaktiveret.
+        if (IsThereDelegationPeriodOverlap(existingPeriod.StartsAt, existingPeriod.GridAreaId, stopsAt))
+        {
+            throw new ValidationException("Delegation already exists for the given grid area and time period")
+                .WithErrorCode("message_delegation.overlap");
+        }
+
         _delegations.Add(existingPeriod with { StopsAt = stopsAt });
+    }
+
+    private bool IsThereDelegationPeriodOverlap(Instant startsAt, GridAreaId gridAreaId, Instant? stopsAt = null)
+    {
+       return _delegations
+            .Where(x => x.GridAreaId == gridAreaId && !(x.StopsAt <= x.StartsAt))
+            .Any(x => x.StartsAt <= (stopsAt ?? Instant.MaxValue) && (x.StopsAt ?? Instant.MaxValue) >= startsAt);
     }
 }
