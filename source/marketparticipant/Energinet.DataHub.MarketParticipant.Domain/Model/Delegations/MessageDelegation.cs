@@ -30,14 +30,22 @@ public sealed class MessageDelegation
         ArgumentNullException.ThrowIfNull(messageOwner);
 
         if (messageOwner.Status != ActorStatus.Active)
-            throw new InvalidOperationException("Actor must be active to delegate messages.");
+        {
+            throw new ValidationException("Actor must be active to delegate messages.")
+                .WithErrorCode("message_delegation.actor_inactive");
+        }
+
 
         if (messageOwner.MarketRoles.All(role =>
                 role.Function != EicFunction.GridAccessProvider
                 && role.Function != EicFunction.BalanceResponsibleParty
                 && role.Function != EicFunction.EnergySupplier
                 && role.Function != EicFunction.BillingAgent))
-            throw new InvalidOperationException("Actor must have a valid market role to delegate messages.");
+        {
+            throw new ValidationException("Actor must have a valid market role to delegate messages.")
+                .WithErrorCode("message_delegation.actor_invalid_market_role");
+        }
+
 
         DelegatedBy = messageOwner.Id;
         MessageType = messageType;
@@ -94,7 +102,8 @@ public sealed class MessageDelegation
         // but don't include periods where ExpiresAt <= StartsAt, because that means that it was cancelled.
         if (IsThereDelegationPeriodOverlap(existingPeriod.StartsAt, existingPeriod.GridAreaId, stopsAt))
         {
-            throw new InvalidOperationException("Delegation already exists for the given grid area and time period");
+            throw new ValidationException("Delegation already exists for the given grid area and time period")
+                .WithErrorCode("message_delegation.overlap");
         }
 
         // TODO: Rule Denne regel gælder ikke, hvis Actor A/B er deaktiveret.
