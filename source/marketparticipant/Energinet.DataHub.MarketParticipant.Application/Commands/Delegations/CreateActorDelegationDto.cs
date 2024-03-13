@@ -24,5 +24,5 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
         IReadOnlyCollection<Guid> GridAreas,
         IReadOnlyCollection<DelegationMessageType> MessageTypes,
         DateTimeOffset StartsAt,
-        DateTimeOffset? ExpiresAt = null);
+        DateTimeOffset? StopsAt = null);
 }
