@@ -35,7 +35,6 @@ public sealed class MessageDelegation
                 .WithErrorCode("message_delegation.actor_inactive");
         }
 
-
         if (messageOwner.MarketRoles.All(role =>
                 role.Function != EicFunction.GridAccessProvider
                 && role.Function != EicFunction.BalanceResponsibleParty
@@ -45,7 +44,6 @@ public sealed class MessageDelegation
             throw new ValidationException("Actor must have a valid market role to delegate messages.")
                 .WithErrorCode("message_delegation.actor_invalid_market_role");
         }
-
 
         DelegatedBy = messageOwner.Id;
         MessageType = messageType;
@@ -114,14 +112,6 @@ public sealed class MessageDelegation
     {
        return _delegations
             .Where(x => x.GridAreaId == gridAreaId && !(x.StopsAt <= x.StartsAt))
-            .Any(x =>
-            {
-                var interval = new Interval(x.StartsAt, x.StopsAt);
-                var intervalNew = new Interval(startsAt, stopsAt);
-                return interval.Contains(startsAt) ||
-                       (stopsAt.HasValue && interval.Contains(stopsAt.GetValueOrDefault())) ||
-                       intervalNew.Contains(x.StartsAt) ||
-                       (x.StopsAt.HasValue && intervalNew.Contains(x.StopsAt.GetValueOrDefault()));
-            });
+            .Any(x => x.StartsAt <= (stopsAt ?? Instant.MaxValue) && (x.StopsAt ?? Instant.MaxValue) >= startsAt);
     }
 }
