@@ -24,13 +24,14 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
+using NodaTime;
 using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 {
     public sealed class CreateDelegationForActorHandler(
         IActorRepository actorRepository,
-        IActorDelegationRepository actorDelegationRepository,
+        IMessageDelegationRepository messageDelegationRepository,
         IUnitOfWorkProvider unitOfWorkProvider)
         : IRequestHandler<CreateActorDelegationCommand>
     {
@@ -55,19 +56,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 
             await using (uow.ConfigureAwait(false))
             {
-                foreach (var gridArea in request.CreateDelegation.GridAreas)
+                foreach (var messageType in request.CreateDelegation.MessageTypes)
                 {
-                    foreach (var messageType in request.CreateDelegation.MessageTypes)
-                    {
-                        var delegation = new ActorDelegation(
-                            new ActorId(request.CreateDelegation.DelegatedFrom),
-                            new ActorId(request.CreateDelegation.DelegatedTo),
-                            new GridAreaId(gridArea),
-                            messageType,
-                            DateTimeOffset.UtcNow.ToInstant(),
-                            DateTimeOffset.UtcNow.ToInstant());
+                    var messageDelegation = await messageDelegationRepository
+                        .GetForActorAsync(actor.Id, messageType).ConfigureAwait(false) ?? new MessageDelegation(actor, messageType);
 
-                        await actorDelegationRepository.AddOrUpdateAsync(delegation).ConfigureAwait(false);
+                    foreach (var gridAreaId in request.CreateDelegation.GridAreas)
+                    {
+                        messageDelegation.DelegateTo(
+                            actorDelegatedTo.Id,
+                            new GridAreaId(gridAreaId),
+                            Instant.FromDateTimeOffset(request.CreateDelegation.CreatedAt),
+                            request.CreateDelegation.ExpiresAt.HasValue ? Instant.FromDateTimeOffset(request.CreateDelegation.ExpiresAt.GetValueOrDefault()) : null);
                     }
                 }
 

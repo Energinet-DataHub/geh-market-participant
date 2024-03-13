@@ -72,7 +72,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<ActorCertificateCredentialsEntity> ActorCertificateCredentials { get; private set; } = null!;
     public DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; private set; } = null!;
     public DbSet<UsedActorCertificatesEntity> UsedActorCertificates { get; private set; } = null!;
-    public DbSet<ActorDelegationEntity> ActorDelegations { get; private set; } = null!;
     public DbSet<MessageDelegationEntity> MessageDelegations { get; private set; } = null!;
     public DbSet<DelegationPeriodEntity> DelegationPeriods { get; private set; } = null!;
 
@@ -139,7 +138,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new EmailEventEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorCertificateCredentialsEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorClientSecretCredentialsEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new ActorDelegationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new MessageDelegationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new DelegationPeriodEntityConfiguration());
         base.OnModelCreating(modelBuilder);
