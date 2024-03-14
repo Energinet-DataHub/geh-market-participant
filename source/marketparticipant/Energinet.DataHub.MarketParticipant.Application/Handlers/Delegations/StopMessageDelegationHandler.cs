@@ -32,16 +32,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             var actorDelegation = await delegationRepository
-                .GetAsync(request.StopMessageDelegation.Id)
+                .GetAsync(new(request.StopMessageDelegation.Id))
                 .ConfigureAwait(false);
 
-            NotFoundValidationException.ThrowIfNull(actorDelegation, request.StopMessageDelegation.Id.Value);
+            NotFoundValidationException.ThrowIfNull(actorDelegation, request.StopMessageDelegation.Id);
 
             var periodToStop = actorDelegation
                 .Delegations
-                .SingleOrDefault(d => d.Id == request.StopMessageDelegation.PeriodId);
+                .SingleOrDefault(d => d.Id.Value == request.StopMessageDelegation.PeriodId);
 
-            NotFoundValidationException.ThrowIfNull(periodToStop, request.StopMessageDelegation.PeriodId.Value);
+            NotFoundValidationException.ThrowIfNull(periodToStop, request.StopMessageDelegation.PeriodId);
 
             Instant? stopsAt = request.StopMessageDelegation.StopsAt.HasValue
                 ? Instant.FromDateTimeOffset(request.StopMessageDelegation.StopsAt.GetValueOrDefault())

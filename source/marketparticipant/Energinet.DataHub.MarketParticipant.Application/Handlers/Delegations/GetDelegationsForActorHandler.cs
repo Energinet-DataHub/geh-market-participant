@@ -45,13 +45,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                 .ConfigureAwait(false);
 
             return new GetDelegationsForActorResponse(delegations.Select(x => new MessageDelegationDto(
-                x.Id,
-                x.DelegatedBy,
+                x.Id.Value,
+                x.DelegatedBy.Value,
                 x.MessageType,
                 x.Delegations.Select(y => new MessageDelegationPeriodDto(
-                    y.Id,
-                    y.DelegatedTo,
-                    y.GridAreaId,
+                    y.Id.Value,
+                    y.DelegatedTo.Value,
+                    y.GridAreaId.Value,
                     y.StartsAt.ToDateTimeOffset(),
                     y.StopsAt?.ToDateTimeOffset())))));
         }

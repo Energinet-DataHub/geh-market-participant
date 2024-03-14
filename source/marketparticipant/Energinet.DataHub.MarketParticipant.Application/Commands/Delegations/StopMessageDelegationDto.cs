@@ -13,12 +13,11 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
     public sealed record StopMessageDelegationDto(
-        MessageDelegationId Id,
-        DelegationPeriodId PeriodId,
+        Guid Id,
+        Guid PeriodId,
         DateTimeOffset? StopsAt);
 }
