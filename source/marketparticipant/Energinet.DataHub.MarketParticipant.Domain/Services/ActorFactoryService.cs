@@ -47,14 +47,6 @@ public sealed class ActorFactoryService(IActorRepository actorRepository,
         foreach (var marketRole in marketRoles)
             newActor.AddMarketRole(marketRole);
 
-        await uniqueGlobalLocationNumberRuleService
-            .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
-            .ConfigureAwait(false);
-
-        await overlappingEicFunctionsRuleService
-            .ValidateEicFunctionsAcrossActorsAsync(newActor)
-            .ConfigureAwait(false);
-
         var uow = await unitOfWorkProvider
             .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
@@ -62,6 +54,14 @@ public sealed class ActorFactoryService(IActorRepository actorRepository,
         await using (uow.ConfigureAwait(false))
         {
             await entityLock.LockAsync(LockableEntity.Actor).ConfigureAwait(false);
+
+            await uniqueGlobalLocationNumberRuleService
+                .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
+                .ConfigureAwait(false);
+
+            await overlappingEicFunctionsRuleService
+                .ValidateEicFunctionsAcrossActorsAsync(newActor)
+                .ConfigureAwait(false);
 
             foreach (var marketRole in newActor.MarketRoles)
             {
