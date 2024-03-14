@@ -21,6 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 public interface IMessageDelegationRepository
 {
+    Task<MessageDelegation?> GetAsync(MessageDelegationId id);
     Task<IEnumerable<MessageDelegation>> GetForActorAsync(ActorId delegatedBy);
     Task<IEnumerable<MessageDelegation>> GetDelegatedToActorAsync(ActorId delegatedTo);
 

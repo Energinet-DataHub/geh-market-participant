@@ -12,9 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed record UpdateActorDelegationCommand(UpdateActorDelegationDto UpdateActorDelegation) : IRequest<UpdateActorDelegationResponse>;
+    public sealed class StopMessageDelegationCommandRuleSet : AbstractValidator<StopMessageDelegationCommand>
+    {
+        public StopMessageDelegationCommandRuleSet()
+        {
+            RuleFor(command => command.StopMessageDelegation.Id)
+                .NotEmpty();
+            RuleFor(command => command.StopMessageDelegation.PeriodId)
+                .NotEmpty();
+        }
+    }
 }

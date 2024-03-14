@@ -83,7 +83,7 @@ public sealed class MessageDelegation
         _delegations.Add(delegationPeriod);
     }
 
-    public void StopDelegation(DelegationPeriod existingPeriod, Instant stopsAt)
+    public void StopDelegation(DelegationPeriod existingPeriod, Instant? stopsAt)
     {
         ArgumentNullException.ThrowIfNull(existingPeriod);
 
