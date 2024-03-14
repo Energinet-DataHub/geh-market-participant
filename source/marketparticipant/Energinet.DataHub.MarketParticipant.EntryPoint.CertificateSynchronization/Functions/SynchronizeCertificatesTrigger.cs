@@ -35,7 +35,7 @@ public sealed class SynchronizeCertificatesTrigger
     }
 
     [Function(nameof(SynchronizeCertificatesTrigger))]
-    public async Task RunAsync([TimerTrigger("* */1 * * *", RunOnStartup = true)] FunctionContext context)
+    public async Task RunAsync([TimerTrigger("* */1 * * *")] FunctionContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
