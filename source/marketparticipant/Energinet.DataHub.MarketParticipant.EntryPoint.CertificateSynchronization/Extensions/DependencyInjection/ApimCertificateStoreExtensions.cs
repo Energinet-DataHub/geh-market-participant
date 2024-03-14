@@ -16,32 +16,21 @@ using System;
 using System.Net.Http;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Monitor;
 using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Extensions.DependencyInjection;
 
-internal sealed class Startup
+internal static class ApimCertificateStoreExtensions
 {
-#pragma warning disable CA1822 // Mark members as static
-    public void Initialize(IConfiguration configuration, IServiceCollection services)
-#pragma warning restore CA1822 // Mark members as static
+    public static IServiceCollection AddCertificateStore(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddLogging();
-        services.AddFunctionLoggingScope("mark-part");
+        // register certificate store
         services.AddScoped<IKeyVaultCertificates, KeyVaultCertificates>();
-
-        services.AddHttpClient<HttpClient>((_, httpClient) =>
-        {
-            var apimServiceName = configuration.GetValue<string>("APIM_SERVICE_NAME");
-            httpClient.BaseAddress = new Uri($"https://management.azure.com{apimServiceName}/certificates/");
-        });
-
         services.AddSingleton<IApimCertificateStore>(serviceProvider =>
         {
             var apimTenantId = configuration.GetValue<string>("APIM_TENANT_ID");
@@ -61,6 +50,7 @@ internal sealed class Startup
                 serviceProvider.GetRequiredService<IHttpClientFactory>());
         });
 
+        // register secret client
         services.AddSingleton(_ =>
         {
             var certificatesKeyVault = configuration.GetValue<Uri>("CERTIFICATES_KEY_VAULT");
@@ -68,18 +58,15 @@ internal sealed class Startup
             return new SecretClient(certificatesKeyVault, defaultCredentials);
         });
 
-        AddHealthChecks(services);
-    }
-
-    private static void AddHealthChecks(IServiceCollection services)
-    {
-        services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
-        services.AddScoped<HealthCheckEndpoint>();
+        // specific health checks
+        services.TryAddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
+        services.TryAddScoped<HealthCheckEndpoint>();
 
         services
             .AddHealthChecks()
-            .AddLiveCheck()
             .AddCheck<ApimCertificateStoreHealthCheck>("APIM Certificate Access")
             .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access");
+
+        return services;
     }
 }
