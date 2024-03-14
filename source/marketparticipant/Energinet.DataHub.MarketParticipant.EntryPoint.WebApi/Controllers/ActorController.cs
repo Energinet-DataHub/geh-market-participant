@@ -217,12 +217,12 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost("delegation")]
         [AuthorizeUser(PermissionId.DelegationManage)]
-        public async Task<ActionResult> CreateDelegationAsync([FromBody]CreateActorDelegationDto delegationDto)
+        public async Task<ActionResult> CreateDelegationAsync([FromBody]CreateMessageDelegationDto delegationDto)
         {
             if (!_userContext.CurrentUser.IsFas)
                 return Unauthorized();
 
-            var createDelegationCommand = new CreateActorDelegationCommand(delegationDto);
+            var createDelegationCommand = new CreateMessageDelegationCommand(delegationDto);
 
             await _mediator
                 .Send(createDelegationCommand)
@@ -233,18 +233,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPut("delegation")]
         [AuthorizeUser(PermissionId.DelegationManage)]
-        public async Task<ActionResult<UpdateActorDelegationResponse>> UpdateDelegationAsync([FromBody]UpdateActorDelegationDto delegationDto)
+        public async Task<ActionResult> StopMessageDelegationAsync([FromBody] StopMessageDelegationDto delegationDto)
         {
             if (!_userContext.CurrentUser.IsFas)
                 return Unauthorized();
 
-            var updateActorDelegation = new UpdateActorDelegationCommand(delegationDto);
+            var stopMessageDelegationCommand = new StopMessageDelegationCommand(delegationDto);
 
-            var response = await _mediator
-                .Send(updateActorDelegation)
+            await _mediator
+                .Send(stopMessageDelegationCommand)
                 .ConfigureAwait(false);
 
-            return Ok(response);
+            return Ok();
         }
     }
 }

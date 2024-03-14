@@ -14,19 +14,11 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-
-public sealed class ActorDelegationEntity : IAuditedEntity
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
-    public Guid Id { get; set; }
-    public Guid DelegatedByActorId { get; set; }
-    public Guid DelegatedToActorId { get; set; }
-    public Guid GridAreaId { get; set; }
-    public DelegationMessageType MessageType { get; set; }
-    public DateTimeOffset StartsAt { get; set; }
-    public DateTimeOffset? ExpiresAt { get; set; }
-    public int Version { get; set; }
-    public Guid ChangedByIdentityId { get; set; }
+    public sealed record StopMessageDelegationDto(
+        MessageDelegationId Id,
+        DelegationPeriodId PeriodId,
+        DateTimeOffset? StopsAt);
 }

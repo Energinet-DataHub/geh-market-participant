@@ -13,11 +13,16 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
-    public sealed record UpdateActorDelegationDto(
-        ActorDelegationId Id,
-        DateTimeOffset ExpiresAt);
+    public sealed record CreateMessageDelegationDto(
+        ActorId DelegatedFrom,
+        ActorId DelegatedTo,
+        IReadOnlyCollection<GridAreaId> GridAreas,
+        IReadOnlyCollection<DelegationMessageType> MessageTypes,
+        DateTimeOffset StartsAt);
 }

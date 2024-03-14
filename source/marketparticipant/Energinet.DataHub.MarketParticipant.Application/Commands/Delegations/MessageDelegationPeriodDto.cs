@@ -13,16 +13,14 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
-{
-    public sealed record CreateActorDelegationDto(
-        Guid DelegatedFrom,
-        Guid DelegatedTo,
-        IReadOnlyCollection<Guid> GridAreas,
-        IReadOnlyCollection<DelegationMessageType> MessageTypes,
-        DateTimeOffset StartsAt,
-        DateTimeOffset? StopsAt = null);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+
+public sealed record MessageDelegationPeriodDto(
+    DelegationPeriodId Id,
+    ActorId DelegatedTo,
+    GridAreaId GridAreaId,
+    DateTimeOffset StartsAt,
+    DateTimeOffset? ExpiresAt = null);
