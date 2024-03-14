@@ -12,17 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using System;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public interface IActorDelegationRepository
+public sealed class DelegationPeriodEntity : IAuditedEntity
 {
-    Task<ActorDelegation> GetAsync(ActorDelegationId actorDelegationId);
-    Task<IEnumerable<ActorDelegation>> GetAsync(ActorId actorId);
-    Task<ActorDelegationId> AddAsync(ActorDelegation contact);
-    Task UpdateAsync(ActorDelegation contact);
+    public Guid Id { get; set; }
+    public Guid MessageDelegationId { get; set; }
+    public Guid DelegatedToActorId { get; set; }
+    public Guid GridAreaId { get; set; }
+    public DateTimeOffset StartsAt { get; set; }
+    public DateTimeOffset? StopsAt { get; set; }
+
+    public int Version { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
 }

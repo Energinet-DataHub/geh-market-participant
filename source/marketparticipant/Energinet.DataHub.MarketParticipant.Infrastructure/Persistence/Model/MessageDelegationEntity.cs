@@ -12,9 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System;
+using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class MessageDelegationEntity
 {
-    public sealed record CreateActorDelegationCommand(CreateActorDelegationDto CreateDelegation) : IRequest<CreateActorDelegationResponse>;
+    public Guid Id { get; set; }
+    public Guid DelegatedByActorId { get; set; }
+    public Guid ConcurrencyToken { get; set; }
+    public DelegationMessageType MessageType { get; set; }
+
+    public Collection<DelegationPeriodEntity> Delegations { get; } = new();
 }

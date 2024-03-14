@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
-    public sealed record GetDelegationsForActorResponse(IEnumerable<MessageDelegationDto> Delegations);
+    public sealed record StopMessageDelegationCommand(StopMessageDelegationDto StopMessageDelegation) : IRequest;
 }

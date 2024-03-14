@@ -13,11 +13,22 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+
+public sealed record DelegationPeriod(ActorId DelegatedTo, GridAreaId GridAreaId, Instant StartsAt, Instant? StopsAt)
 {
-    public sealed record UpdateActorDelegationDto(
-        ActorDelegationId Id,
-        DateTimeOffset ExpiresAt);
+    public DelegationPeriod(
+        DelegationPeriodId id,
+        ActorId delegatedTo,
+        GridAreaId gridAreaId,
+        Instant startsAt,
+        Instant? stopsAt)
+            : this(delegatedTo, gridAreaId, startsAt, stopsAt)
+    {
+        Id = id;
+    }
+
+    public DelegationPeriodId Id { get; } = new(Guid.Empty);
 }

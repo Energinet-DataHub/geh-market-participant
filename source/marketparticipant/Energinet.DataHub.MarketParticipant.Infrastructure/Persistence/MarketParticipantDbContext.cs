@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -72,6 +73,8 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<ActorCertificateCredentialsEntity> ActorCertificateCredentials { get; private set; } = null!;
     public DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; private set; } = null!;
     public DbSet<UsedActorCertificatesEntity> UsedActorCertificates { get; private set; } = null!;
+    public DbSet<MessageDelegationEntity> MessageDelegations { get; private set; } = null!;
+    public DbSet<DelegationPeriodEntity> DelegationPeriods { get; private set; } = null!;
 
     public async Task<int> SaveChangesAsync()
     {
@@ -100,6 +103,18 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         return affected;
     }
 
+    public async Task CreateLockAsync(LockableEntity lockableEntity)
+    {
+        ArgumentNullException.ThrowIfNull(lockableEntity);
+
+        if (Database.CurrentTransaction == null)
+            throw new InvalidOperationException("A transaction is required");
+
+#pragma warning disable EF1002
+        await Database.ExecuteSqlRawAsync($"SELECT TOP 0 NULL FROM {lockableEntity.Name} WITH (TABLOCKX)").ConfigureAwait(false);
+#pragma warning restore EF1002
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
@@ -124,6 +139,8 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new EmailEventEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorCertificateCredentialsEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorClientSecretCredentialsEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new MessageDelegationEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new DelegationPeriodEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 

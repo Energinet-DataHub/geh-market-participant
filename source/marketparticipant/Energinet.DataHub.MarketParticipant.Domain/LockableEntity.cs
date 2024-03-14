@@ -12,20 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
-using FluentValidation;
+namespace Energinet.DataHub.MarketParticipant.Domain;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+public sealed class LockableEntity
 {
-    public sealed class UpdateActorDelegationCommandRuleSet : AbstractValidator<UpdateActorDelegationCommand>
+    private LockableEntity(string name)
     {
-        public UpdateActorDelegationCommandRuleSet()
-        {
-            RuleFor(command => command.UpdateActorDelegation.Id)
-                .NotEmpty();
-            RuleFor(command => command.UpdateActorDelegation.ExpiresAt)
-                .GreaterThanOrEqualTo(DateTimeOffset.UtcNow.Date);
-        }
+        Name = name;
     }
+
+    public static LockableEntity Actor => new("Actor");
+
+    public string Name { get; }
 }

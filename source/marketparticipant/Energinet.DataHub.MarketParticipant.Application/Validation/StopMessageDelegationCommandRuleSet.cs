@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
-
-public record ActorDelegationDto(
-    ActorDelegationId Id,
-    ActorId DelegatedBy,
-    ActorId DelegatedTo,
-    IReadOnlyCollection<GridAreaCode> GridAreas,
-    DelegationMessageType MessageType,
-    DateTimeOffset CreatedAt,
-    DateTimeOffset? ExpiresAt = null);
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
+{
+    public sealed class StopMessageDelegationCommandRuleSet : AbstractValidator<StopMessageDelegationCommand>
+    {
+        public StopMessageDelegationCommandRuleSet()
+        {
+            RuleFor(command => command.StopMessageDelegation.Id)
+                .NotEmpty();
+            RuleFor(command => command.StopMessageDelegation.PeriodId)
+                .NotEmpty();
+        }
+    }
+}

@@ -28,27 +28,20 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class ActorRepositoryTests
+public sealed class ActorRepositoryTests(MarketParticipantDatabaseFixture fixture)
 {
-    private readonly MarketParticipantDatabaseFixture _fixture;
-
-    public ActorRepositoryTests(MarketParticipantDatabaseFixture fixture)
-    {
-        _fixture = fixture;
-    }
-
     [Fact]
     public async Task AddOrUpdateAsync_OneActor_CanReadBack()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        await using var context = fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = fixture.DatabaseManager.CreateDbContext();
         var actorRepository = new ActorRepository(context);
         var actorRepository2 = new ActorRepository(context2);
 
-        var organization = await _fixture.PrepareOrganizationAsync();
+        var organization = await fixture.PrepareOrganizationAsync();
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
 
         // Act
@@ -65,10 +58,10 @@ public sealed class ActorRepositoryTests
     public async Task AddOrUpdateAsync_ActorWithMarkedRolesAndGridAreas_CanReadBack()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        await using var context = fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = fixture.DatabaseManager.CreateDbContext();
         var actorRepository = new ActorRepository(context);
         var actorRepository2 = new ActorRepository(context2);
         var gridAreaRepository = new GridAreaRepository(context2);
@@ -80,7 +73,7 @@ public sealed class ActorRepositoryTests
             DateTimeOffset.MinValue,
             DateTimeOffset.MaxValue));
 
-        var organization = await _fixture.PrepareOrganizationAsync();
+        var organization = await fixture.PrepareOrganizationAsync();
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
 
         actor.AddMarketRole(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new[]
@@ -103,14 +96,14 @@ public sealed class ActorRepositoryTests
     public async Task AddOrUpdateAsync_OneActor_WithCertificateCredentials_CanReadBack()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        await using var context = fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = fixture.DatabaseManager.CreateDbContext();
         var actorRepository = new ActorRepository(context);
         var actorRepository2 = new ActorRepository(context2);
 
-        var organization = await _fixture.PrepareOrganizationAsync();
+        var organization = await fixture.PrepareOrganizationAsync();
         var actorCredentials = new ActorCertificateCredentials(
             "12345678",
             "secret",
@@ -139,19 +132,19 @@ public sealed class ActorRepositoryTests
     public async Task AddOrUpdateAsync_OneActor_WithCertificateCredentials_ReuseCertificate_CanReadBack()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
         await using var scope = host.BeginScope();
-        await using var context1 = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        await using var context3 = _fixture.DatabaseManager.CreateDbContext();
-        await using var context4 = _fixture.DatabaseManager.CreateDbContext();
+        await using var context1 = fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = fixture.DatabaseManager.CreateDbContext();
+        await using var context3 = fixture.DatabaseManager.CreateDbContext();
+        await using var context4 = fixture.DatabaseManager.CreateDbContext();
 
         var actorRepository1 = new ActorRepository(context1);
         var actorRepository2 = new ActorRepository(context2);
         var actorRepository3 = new ActorRepository(context3);
         var actorRepository4 = new ActorRepository(context4);
 
-        var organization = await _fixture.PrepareOrganizationAsync();
+        var organization = await fixture.PrepareOrganizationAsync();
         var actorCredentials = new ActorCertificateCredentials(
             "1234567899",
             "secret",
@@ -189,14 +182,14 @@ public sealed class ActorRepositoryTests
     public async Task AddOrUpdateAsync_OneActor_WithClientSecretCredentials_CanReadBack()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        await using var context = fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = fixture.DatabaseManager.CreateDbContext();
         var actorRepository = new ActorRepository(context);
         var actorRepository2 = new ActorRepository(context2);
 
-        var organization = await _fixture.PrepareOrganizationAsync();
+        var organization = await fixture.PrepareOrganizationAsync();
         var endDate = DateTime.UtcNow.AddYears(1).ToInstant();
         var actorClientSecretCredentials = new ActorClientSecretCredentials(
             Guid.NewGuid(),
@@ -228,14 +221,14 @@ public sealed class ActorRepositoryTests
     public async Task AddOrUpdateAsync_OneActor_IdenticalThumbprintCredentials_HasError()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        await using var context = fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = fixture.DatabaseManager.CreateDbContext();
         var actorRepository = new ActorRepository(context);
         var actorRepository2 = new ActorRepository(context2);
 
-        var organization = await _fixture.PrepareOrganizationAsync();
+        var organization = await fixture.PrepareOrganizationAsync();
         var actorCertificateCredentials = new ActorCertificateCredentials("123456784", "secret", DateTime.UtcNow.AddYears(1).ToInstant());
         var actorCertificateCredentials2 = new ActorCertificateCredentials("123456784", "secret2", DateTime.UtcNow.AddYears(1).ToInstant());
 
@@ -263,13 +256,13 @@ public sealed class ActorRepositoryTests
     public async Task GetActorsAsync_All_CanReadBack()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context = fixture.DatabaseManager.CreateDbContext();
         var actorRepository = new ActorRepository(context);
 
-        var actor1 = await _fixture.PrepareActorAsync();
-        var actor2 = await _fixture.PrepareActorAsync();
+        var actor1 = await fixture.PrepareActorAsync();
+        var actor2 = await fixture.PrepareActorAsync();
 
         // Act
         var actual = (await actorRepository.GetActorsAsync()).ToList();
@@ -284,13 +277,13 @@ public sealed class ActorRepositoryTests
     public async Task GetActorsAsync_ById_CanReadBack()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context = fixture.DatabaseManager.CreateDbContext();
         var actorRepository = new ActorRepository(context);
 
-        var actor1 = await _fixture.PrepareActorAsync();
-        var actor2 = await _fixture.PrepareActorAsync();
+        var actor1 = await fixture.PrepareActorAsync();
+        var actor2 = await fixture.PrepareActorAsync();
 
         // Act
         var actual = await actorRepository.GetActorsAsync(new[] { new ActorId(actor1.Id), new ActorId(actor2.Id) });
@@ -304,13 +297,13 @@ public sealed class ActorRepositoryTests
     public async Task GetActorsAsync_ForOrganization_CanReadBack()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context = fixture.DatabaseManager.CreateDbContext();
         var actorRepository = new ActorRepository(context);
 
-        var actor1 = await _fixture.PrepareActorAsync();
-        await _fixture.PrepareActorAsync();
+        var actor1 = await fixture.PrepareActorAsync();
+        await fixture.PrepareActorAsync();
 
         // Act
         var actual = await actorRepository.GetActorsAsync(new OrganizationId(actor1.OrganizationId));

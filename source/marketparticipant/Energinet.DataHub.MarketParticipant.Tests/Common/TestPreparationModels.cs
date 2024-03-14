@@ -47,6 +47,16 @@ internal static class TestPreparationModels
         new ActorName("Racoon Power"),
         null);
 
+    public static Actor MockedActiveActor(Guid actorId, Guid organizationId) => new(
+        new ActorId(actorId),
+        new OrganizationId(organizationId),
+        new ExternalActorId(Guid.NewGuid()),
+        new MockedGln(),
+        ActorStatus.Active,
+        new[] { new ActorMarketRole(EicFunction.GridAccessProvider) },
+        new ActorName("Racoon Power"),
+        null);
+
     public static UserRole MockedUserRole(Guid userRoleId) => new(
         new UserRoleId(userRoleId),
         "Test Name",

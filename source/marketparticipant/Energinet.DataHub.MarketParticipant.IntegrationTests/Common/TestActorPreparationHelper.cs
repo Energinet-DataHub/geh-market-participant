@@ -30,6 +30,15 @@ internal static class TestActorPreparationHelper
             TestPreparationEntities.ValidMarketRole);
     }
 
+    public static Task<ActorEntity> PrepareActiveActorAsync(
+        this MarketParticipantDatabaseFixture fixture)
+    {
+        return fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActiveActor,
+            TestPreparationEntities.ValidMarketRole);
+    }
+
     public static async Task<ActorEntity> PrepareActorAsync(
         this MarketParticipantDatabaseFixture fixture,
         OrganizationEntity inputOrganization,

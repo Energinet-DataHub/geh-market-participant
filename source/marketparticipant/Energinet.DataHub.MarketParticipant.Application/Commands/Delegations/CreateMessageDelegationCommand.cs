@@ -16,5 +16,5 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
-    public sealed record UpdateActorDelegationCommand(UpdateActorDelegationDto UpdateActorDelegation) : IRequest<UpdateActorDelegationResponse>;
+    public sealed record CreateMessageDelegationCommand(CreateMessageDelegationDto CreateDelegation) : IRequest;
 }

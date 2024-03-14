@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -53,7 +54,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
-                new Mock<IDomainEventRepository>().Object);
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IEntityLock>().Object,
+                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
@@ -101,7 +104,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
-                new Mock<IDomainEventRepository>().Object);
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IEntityLock>().Object,
+                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
             var validMeteringPointTypes = new List<MeteringPointType> { MeteringPointType.D05NetProduction };
             var validGridAreas = new List<ActorGridArea>
@@ -157,7 +162,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 globalLocationNumberUniquenessService.Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
-                new Mock<IDomainEventRepository>().Object);
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IEntityLock>().Object,
+                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
@@ -205,7 +212,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 overlappingBusinessRolesService.Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
-                new Mock<IDomainEventRepository>().Object);
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IEntityLock>().Object,
+                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
@@ -255,7 +264,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 uniqueMarketRoleGridAreaRuleService.Object,
-                new Mock<IDomainEventRepository>().Object);
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IEntityLock>().Object,
+                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
@@ -305,7 +316,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
-                domainEventRepositoryMock.Object);
+                domainEventRepositoryMock.Object,
+                new Mock<IEntityLock>().Object,
+                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };

@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
-    public sealed record GetDelegationsForActorResponse(IEnumerable<MessageDelegationDto> Delegations);
+    public sealed record CreateMessageDelegationDto(
+        ActorId DelegatedFrom,
+        ActorId DelegatedTo,
+        IReadOnlyCollection<GridAreaId> GridAreas,
+        IReadOnlyCollection<DelegationMessageType> MessageTypes,
+        DateTimeOffset StartsAt);
 }

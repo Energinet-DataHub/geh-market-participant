@@ -16,11 +16,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 public enum DelegationMessageType
 {
-    RSM012Inbound,
-    RSM014Inbound,
-    RSM016Inbound,
-    RSM016Outbound,
-    RSM017Inbound,
-    RSM017Outbound,
-    RSM019Inbound
+    Rsm012Inbound = 1,
+    Rsm012Outbound,
+    Rsm014Inbound,
+    Rsm016Inbound,
+    Rsm016Outbound,
+    Rsm017Inbound,
+    Rsm017Outbound,
+    Rsm018Inbound,
+    Rsm019Inbound
 }
