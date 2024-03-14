@@ -17,13 +17,18 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 
 public class IntegrationEventSubscriptionHandler(
     IIntegrationEventParser integrationEventParser,
+    IEmailEventRepository emailEventRepository,
+    EmailRecipientConfig emailRecipientConfig,
     ILogger<IntegrationEventSubscriptionHandler> logger)
     : IIntegrationEventHandler
 {
@@ -39,7 +44,7 @@ public class IntegrationEventSubscriptionHandler(
             return Task.CompletedTask;
         }
 
-        logger.LogInformation("Integration event received. Event name: {EventName}", integrationEvent.EventName);
+        logger.LogInformation("Integration event received. Event name: {EventName} EventId: {EventId}", integrationEvent.EventName, integrationEvent.EventIdentification);
 
         switch (domainEvent)
         {
@@ -50,8 +55,11 @@ public class IntegrationEventSubscriptionHandler(
         }
     }
 
-    private static Task BuildAndSendEmailAsync(BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
+    private Task BuildAndSendEmailAsync(BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
     {
-        return Task.CompletedTask;
+        return emailEventRepository.InsertAsync(
+            new EmailEvent(
+                new EmailAddress(emailRecipientConfig.BalanceResponsibleChangedNotificationToEmail),
+                new BalanceResponsiblePartiesChangedEmailTemplate(balanceResponsiblePartiesChanged)));
     }
 }

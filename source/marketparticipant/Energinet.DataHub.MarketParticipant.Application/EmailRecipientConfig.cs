@@ -18,5 +18,6 @@ public sealed record EmailRecipientConfig(
     string SenderEmail,
     string BccEmail,
     string OrgUpdateNotificationToEmail,
+    string BalanceResponsibleChangedNotificationToEmail,
     string UserInviteFlow,
     string? EnvironmentDescription);

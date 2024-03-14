@@ -15,6 +15,7 @@
     "CVR_USERNAME": "CVR lookup username",
     "CVR_PASSWORD": "CVR lookup password",
     "CVR_ORG_UPDATED_NOTIFICATION_TO_EMAIL": "CVR update notification to email",
+    "BALANCE_RESPONSIBLE_CHANGED_NOTIFICATION_TO_EMAIL": "Balance responsible changed notification to email",
 
     "ConsumeServiceBusSettings:ConnectionString": "",
     "ConsumeServiceBusSettings:SharedIntegrationEventTopic": "",

@@ -24,6 +24,7 @@ limitations under the License.
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Services\Email\Templates\BalanceResponsiblePartiesChanged.html" />
     <EmbeddedResource Include="Services\Email\Templates\UserAssignedToActor.html" />
     <EmbeddedResource Include="Services\Email\Templates\UserInvite.html" />
     <EmbeddedResource Include="Services\Email\Templates\OrganizationIdentityChanged.html" />
