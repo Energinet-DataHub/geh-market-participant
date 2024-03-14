@@ -58,14 +58,14 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
             TestPreparationEntities.ValidMarketRole.Patch(marketRole => marketRole.Function = EicFunction.EnergySupplier));
 
         var delegatedBy = await actorRepository.GetAsync(new ActorId(delegatedByActorEntity.Id));
-        var delegateTo = await CreateDelegationOrganizationAsync(EicFunction.BalanceResponsibleParty);
+        var delegatedTo = await CreateDelegationOrganizationAsync(EicFunction.BalanceResponsibleParty);
 
-        await CreateTestDelegationAsync(messageDelegationRepository, delegatedBy!, delegateTo);
+        await CreateTestDelegationAsync(messageDelegationRepository, delegatedBy!, delegatedTo);
 
         var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, messageDelegationRepository);
 
         // Act + Assert
-        await ruleService.ValidateAsync(new OrganizationId(delegateTo.OrganizationId), EicFunction.EnergySupplier);
+        await ruleService.ValidateAsync(new OrganizationId(delegatedTo.OrganizationId), EicFunction.EnergySupplier);
     }
 
     [Fact]
@@ -85,14 +85,14 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
             TestPreparationEntities.ValidMarketRole.Patch(marketRole => marketRole.Function = EicFunction.GridAccessProvider));
 
         var delegatedBy = await actorRepository.GetAsync(new ActorId(delegatedByActorEntity.Id));
-        var delegateTo = await CreateDelegationOrganizationAsync(EicFunction.BalanceResponsibleParty);
+        var delegatedTo = await CreateDelegationOrganizationAsync(EicFunction.BalanceResponsibleParty);
 
-        await CreateTestDelegationAsync(messageDelegationRepository, delegatedBy!, delegateTo);
+        await CreateTestDelegationAsync(messageDelegationRepository, delegatedBy!, delegatedTo);
 
         var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, messageDelegationRepository);
 
         // Act + Assert
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => ruleService.ValidateAsync(new OrganizationId(delegateTo.OrganizationId), EicFunction.EnergySupplier));
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => ruleService.ValidateAsync(new OrganizationId(delegatedTo.OrganizationId), EicFunction.EnergySupplier));
         Assert.Equal("message_delegation.market_role_forbidden", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
     }
 
@@ -115,10 +115,10 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
             TestPreparationEntities.ValidMarketRole.Patch(marketRole => marketRole.Function = EicFunction.EnergySupplier));
 
         var delegatedBy = await actorRepository.GetAsync(new ActorId(delegatedByActorEntity.Id));
-        var delegateTo = await CreateDelegationOrganizationAsync(EicFunction.EnergySupplier);
+        var delegatedTo = await CreateDelegationOrganizationAsync(EicFunction.EnergySupplier);
 
         var delegation = new MessageDelegation(delegatedBy!, DelegationMessageType.Rsm017Inbound);
-        delegation.DelegateTo(new ActorId(delegateTo.Id), new GridAreaId(gridAreaEntity.Id), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow));
+        delegation.DelegateTo(new ActorId(delegatedTo.Id), new GridAreaId(gridAreaEntity.Id), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow));
 
         var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, messageDelegationRepository);
 
@@ -145,10 +145,10 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
             TestPreparationEntities.ValidMarketRole.Patch(marketRole => marketRole.Function = EicFunction.EnergySupplier));
 
         var delegatedBy = await actorRepository.GetAsync(new ActorId(delegatedByActorEntity.Id));
-        var delegateTo = await CreateDelegationOrganizationAsync(EicFunction.GridAccessProvider);
+        var delegatedTo = await CreateDelegationOrganizationAsync(EicFunction.GridAccessProvider);
 
         var delegation = new MessageDelegation(delegatedBy!, DelegationMessageType.Rsm017Inbound);
-        delegation.DelegateTo(new ActorId(delegateTo.Id), new GridAreaId(gridAreaEntity.Id), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow));
+        delegation.DelegateTo(new ActorId(delegatedTo.Id), new GridAreaId(gridAreaEntity.Id), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow));
 
         var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, messageDelegationRepository);
 
