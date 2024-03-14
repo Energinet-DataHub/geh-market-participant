@@ -13,14 +13,12 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 
 public sealed record MessageDelegationPeriodDto(
-    DelegationPeriodId Id,
-    ActorId DelegatedTo,
-    GridAreaId GridAreaId,
+    Guid Id,
+    Guid DelegatedTo,
+    Guid GridAreaId,
     DateTimeOffset StartsAt,
     DateTimeOffset? ExpiresAt = null);
