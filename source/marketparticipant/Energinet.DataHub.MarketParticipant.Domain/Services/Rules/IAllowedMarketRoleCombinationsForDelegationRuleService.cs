@@ -12,18 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 
-public interface IMessageDelegationRepository
+public interface IAllowedMarketRoleCombinationsForDelegationRuleService
 {
-    Task<IEnumerable<MessageDelegation>> GetForActorAsync(ActorId delegatedBy);
-    Task<IEnumerable<MessageDelegation>> GetDelegatedToActorAsync(ActorId delegatedTo);
-
-    Task<MessageDelegation?> GetForActorAsync(ActorId delegatedBy, DelegationMessageType messageType);
-    Task<MessageDelegationId> AddOrUpdateAsync(MessageDelegation messageDelegation);
+    Task ValidateAsync(OrganizationId organizationId, EicFunction newMarketRole);
+    Task ValidateAsync(MessageDelegation messageDelegation);
 }
