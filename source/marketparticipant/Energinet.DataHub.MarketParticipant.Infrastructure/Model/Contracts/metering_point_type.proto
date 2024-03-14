@@ -22,7 +22,8 @@ enum MeteringPointType {
      * Unspecified is unused but according to best practice.
      * Read more at https://protobuf.dev/programming-guides/style/#enums.
      */
-    METERING_POINT_TYPE_MGAEXCHANGE = 0;
-    METERING_POINT_TYPE_PRODUCTION = 1;
-    METERING_POINT_TYPE_CONSUMPTION = 2;
+    METERING_POINT_TYPE_UNSPECIFIED = 0;
+    METERING_POINT_TYPE_MGAEXCHANGE = 1;
+    METERING_POINT_TYPE_PRODUCTION = 2;
+    METERING_POINT_TYPE_CONSUMPTION = 3;
 }
