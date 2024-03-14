@@ -67,9 +67,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ReturnsAsync(actorTo);
 
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
-                actorFrom.Id.Value,
-                actorTo.Id.Value,
-                new List<Guid> { Guid.NewGuid() },
+                actorFrom.Id,
+                actorTo.Id,
+                new List<GridAreaId> { new GridAreaId(Guid.NewGuid()) },
                 new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
                 DateTimeOffset.UtcNow));
 
@@ -108,9 +108,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ReturnsAsync(actorTo);
 
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
-                actorFrom.Id.Value,
-                actorTo.Id.Value,
-                new List<Guid> { Guid.NewGuid() },
+                actorFrom.Id,
+                actorTo.Id,
+                new List<GridAreaId> { new GridAreaId(Guid.NewGuid()) },
                 new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
                 DateTimeOffset.UtcNow));
 
@@ -154,9 +154,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ReturnsAsync(actorTo);
 
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
-                actorFrom.Id.Value,
-                actorTo.Id.Value,
-                new List<Guid> { Guid.NewGuid() },
+                actorFrom.Id,
+                actorTo.Id,
+                new List<GridAreaId> { new GridAreaId(Guid.NewGuid()) },
                 new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
                 DateTimeOffset.UtcNow));
 
@@ -197,9 +197,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ReturnsAsync(actorTo);
 
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
-                actorFrom.Id.Value,
-                actorTo.Id.Value,
-                new List<Guid> { Guid.NewGuid() },
+                actorFrom.Id,
+                actorTo.Id,
+                new List<GridAreaId> { new GridAreaId(Guid.NewGuid()) },
                 new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
                 DateTimeOffset.UtcNow));
 
@@ -240,9 +240,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ReturnsAsync(actorFrom);
 
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
-                actorFrom.Id.Value,
-                actorTo.Id.Value,
-                new List<Guid> { Guid.NewGuid() },
+                actorFrom.Id,
+                actorTo.Id,
+                new List<GridAreaId> { new GridAreaId(Guid.NewGuid()) },
                 new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
                 DateTimeOffset.UtcNow));
 

@@ -14,15 +14,15 @@
 
 using System;
 using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
     public sealed record CreateMessageDelegationDto(
-        Guid DelegatedFrom,
-        Guid DelegatedTo,
-        IReadOnlyCollection<Guid> GridAreas,
+        ActorId DelegatedFrom,
+        ActorId DelegatedTo,
+        IReadOnlyCollection<GridAreaId> GridAreas,
         IReadOnlyCollection<DelegationMessageType> MessageTypes,
-        DateTimeOffset StartsAt,
-        DateTimeOffset? StopsAt = null);
+        DateTimeOffset StartsAt);
 }

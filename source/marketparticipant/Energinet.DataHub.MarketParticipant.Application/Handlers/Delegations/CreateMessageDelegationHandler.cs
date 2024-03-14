@@ -39,20 +39,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             var actor = await actorRepository
-                .GetAsync(new ActorId(request.CreateDelegation.DelegatedFrom))
+                .GetAsync(request.CreateDelegation.DelegatedFrom)
                 .ConfigureAwait(false);
 
             var actorDelegatedTo = await actorRepository
-                .GetAsync(new ActorId(request.CreateDelegation.DelegatedTo))
+                .GetAsync(request.CreateDelegation.DelegatedTo)
                 .ConfigureAwait(false);
 
-            NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
-            NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo);
+            NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom.Value);
+            NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo.Value);
 
             if (actor.Status != ActorStatus.Active || actorDelegatedTo.Status != ActorStatus.Active)
             {
-                throw new ValidationException("Actors to delegate from/to must be both be active to delegate messages.")
-                    .WithErrorCode("message_delegation.actors_from_and_to_inactive");
+                throw new ValidationException("Actors to delegate from/to must both be active to delegate messages.")
+                    .WithErrorCode("message_delegation.actors_from_or_to_inactive");
             }
 
             var uow = await unitOfWorkProvider
@@ -71,9 +71,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                     {
                         messageDelegation.DelegateTo(
                             actorDelegatedTo.Id,
-                            new GridAreaId(gridAreaId),
-                            Instant.FromDateTimeOffset(request.CreateDelegation.StartsAt),
-                            request.CreateDelegation.StopsAt.HasValue ? Instant.FromDateTimeOffset(request.CreateDelegation.StopsAt.GetValueOrDefault()) : null);
+                            gridAreaId,
+                            Instant.FromDateTimeOffset(request.CreateDelegation.StartsAt));
                     }
                 }
 
