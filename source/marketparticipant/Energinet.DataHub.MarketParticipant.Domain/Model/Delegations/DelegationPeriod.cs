@@ -17,7 +17,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-public sealed record DelegationPeriod(ActorId DelegatedTo, GridAreaId GridAreaId, Instant StartsAt, Instant? StopsAt)
+public sealed record DelegationPeriod(ActorId DelegatedTo, GridAreaId GridAreaId, Instant StartsAt)
 {
     public DelegationPeriod(
         DelegationPeriodId id,
@@ -25,10 +25,12 @@ public sealed record DelegationPeriod(ActorId DelegatedTo, GridAreaId GridAreaId
         GridAreaId gridAreaId,
         Instant startsAt,
         Instant? stopsAt)
-            : this(delegatedTo, gridAreaId, startsAt, stopsAt)
+            : this(delegatedTo, gridAreaId, startsAt)
     {
         Id = id;
+        StopsAt = stopsAt;
     }
 
     public DelegationPeriodId Id { get; } = new(Guid.Empty);
+    public Instant? StopsAt { get; init; }
 }

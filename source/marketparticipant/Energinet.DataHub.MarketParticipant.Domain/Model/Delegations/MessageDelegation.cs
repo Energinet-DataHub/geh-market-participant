@@ -70,11 +70,11 @@ public sealed class MessageDelegation
 
     public IReadOnlyCollection<DelegationPeriod> Delegations => _delegations;
 
-    public void DelegateTo(ActorId delegatedTo, GridAreaId gridAreaId, Instant startsAt, Instant? stopsAt = null)
+    public void DelegateTo(ActorId delegatedTo, GridAreaId gridAreaId, Instant startsAt)
     {
-        var delegationPeriod = new DelegationPeriod(delegatedTo, gridAreaId, startsAt, stopsAt);
+        var delegationPeriod = new DelegationPeriod(delegatedTo, gridAreaId, startsAt);
 
-        if (IsThereDelegationPeriodOverlap(startsAt, gridAreaId, stopsAt))
+        if (IsThereDelegationPeriodOverlap(startsAt, gridAreaId))
         {
             throw new ValidationException("Delegation already exists for the given grid area and time period")
                 .WithErrorCode("message_delegation.overlap");
