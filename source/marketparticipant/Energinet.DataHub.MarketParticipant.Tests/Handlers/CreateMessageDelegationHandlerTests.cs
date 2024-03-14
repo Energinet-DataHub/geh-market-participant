@@ -167,7 +167,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             Assert.NotNull(exception);
             Assert.IsType<ValidationException>(exception);
             Assert.Contains(
-                $"Actors to delegate from/to must be both be active to delegate messages",
+                $"Actors to delegate from/to must both be active to delegate messages.",
                 exception.Message,
                 StringComparison.OrdinalIgnoreCase);
         }
