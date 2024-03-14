@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_DelegatedFrom_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            const string propertyName = $"{nameof(CreateMessageDelegationCommand.CreateDelegation)}.{nameof(CreateMessageDelegationDto.DelegatedFrom)}";
+            const string propertyName = $"{nameof(CreateMessageDelegationCommand.CreateDelegation)}.{nameof(CreateMessageDelegationDto.DelegatedFrom)}.{nameof(CreateMessageDelegationDto.DelegatedFrom.Value)}";
             var gridAreaList = new List<GridAreaId>() { new GridAreaId(Guid.NewGuid()) };
             var messageTypeList = new List<DelegationMessageType>() { DelegationMessageType.Rsm012Inbound };
             var delegationDto = new CreateMessageDelegationDto(
@@ -86,7 +86,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_DelegatedTo_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            const string propertyName = $"{nameof(CreateMessageDelegationCommand.CreateDelegation)}.{nameof(CreateMessageDelegationDto.DelegatedTo)}";
+            const string propertyName = $"{nameof(CreateMessageDelegationCommand.CreateDelegation)}.{nameof(CreateMessageDelegationDto.DelegatedTo)}.{nameof(CreateMessageDelegationDto.DelegatedTo.Value)}";
             var gridAreaList = new List<GridAreaId>() { new GridAreaId(Guid.NewGuid()) };
             var messageTypeList = new List<DelegationMessageType>() { DelegationMessageType.Rsm012Inbound };
             var delegationDto = new CreateMessageDelegationDto(

@@ -31,7 +31,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .NotEmpty();
 
                     validator
+                        .RuleFor(delegation => delegation.DelegatedFrom.Value)
+                        .NotEmpty();
+
+                    validator
                         .RuleFor(delegation => delegation.DelegatedTo)
+                        .NotEmpty();
+
+                    validator
+                        .RuleFor(delegation => delegation.DelegatedTo.Value)
                         .NotEmpty();
 
                     validator
@@ -40,7 +48,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     validator
                         .RuleForEach(delegation => delegation.GridAreas)
-                        .NotEmpty();
+                        .NotEmpty()
+                        .ChildRules(gridArea => gridArea.RuleFor(g => g.Value).NotEmpty());
 
                     validator
                         .RuleFor(delegation => delegation.MessageTypes)
