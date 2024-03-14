@@ -78,6 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                     }
 
                     await allowedMarketRoleCombinationsForDelegationRuleService.ValidateAsync(messageDelegation).ConfigureAwait(false);
+                    await messageDelegationRepository.AddOrUpdateAsync(messageDelegation).ConfigureAwait(false);
                 }
 
                 await uow.CommitAsync().ConfigureAwait(false);
