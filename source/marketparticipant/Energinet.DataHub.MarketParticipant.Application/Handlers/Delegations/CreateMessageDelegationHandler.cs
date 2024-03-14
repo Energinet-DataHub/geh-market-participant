@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 using NodaTime;
 
@@ -31,7 +32,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
         IActorRepository actorRepository,
         IMessageDelegationRepository messageDelegationRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
-        IEntityLock entityLock)
+        IEntityLock entityLock,
+        IAllowedMarketRoleCombinationsForDelegationRuleService allowedMarketRoleCombinationsForDelegationRuleService)
         : IRequestHandler<CreateMessageDelegationCommand>
     {
         public async Task Handle(CreateMessageDelegationCommand request, CancellationToken cancellationToken)
@@ -74,6 +76,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                             gridAreaId,
                             Instant.FromDateTimeOffset(request.CreateDelegation.StartsAt));
                     }
+
+                    await allowedMarketRoleCombinationsForDelegationRuleService.ValidateAsync(messageDelegation).ConfigureAwait(false);
                 }
 
                 await uow.CommitAsync().ConfigureAwait(false);
