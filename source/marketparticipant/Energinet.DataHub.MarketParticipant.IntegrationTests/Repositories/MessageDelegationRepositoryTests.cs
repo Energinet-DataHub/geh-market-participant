@@ -197,7 +197,8 @@ public sealed class MessageDelegationRepositoryTests
         var baseDateTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
 
         var expected = new MessageDelegation(actorA!, DelegationMessageType.Rsm017Inbound);
-        expected.DelegateTo(actorB!.Id, new GridAreaId(gridAreaId.Id), baseDateTime, baseDateTime.Plus(Duration.FromDays(2)));
+        expected.DelegateTo(actorB!.Id, new GridAreaId(gridAreaId.Id), baseDateTime);
+        expected.StopDelegation(expected.Delegations.Last(), baseDateTime.Plus(Duration.FromDays(2)));
         expected.DelegateTo(actorB.Id, new GridAreaId(gridAreaId.Id), baseDateTime.Plus(Duration.FromDays(5)));
 
         var messageDelegationRepository = new MessageDelegationRepository(context);

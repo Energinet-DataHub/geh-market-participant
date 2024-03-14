@@ -161,8 +161,9 @@ public sealed class MessageDelegationTests
         var messageDelegation = new MessageDelegation(testData.ActorFrom, DelegationMessageType.Rsm012Inbound);
 
         // act
-        messageDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, Instant.FromDateTimeOffset(DateTimeOffset.Now), Instant.FromDateTimeOffset(DateTimeOffset.Now.AddMonths(1)));
-        messageDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, Instant.FromDateTimeOffset(DateTimeOffset.Now.AddMonths(2)), null);
+        messageDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, Instant.FromDateTimeOffset(DateTimeOffset.Now));
+        messageDelegation.StopDelegation(messageDelegation.Delegations.Single(), Instant.FromDateTimeOffset(DateTimeOffset.Now.AddMonths(1)));
+        messageDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, Instant.FromDateTimeOffset(DateTimeOffset.Now.AddMonths(2)));
 
         // assert
         Assert.Equal(2, messageDelegation.Delegations.Count);
@@ -181,11 +182,14 @@ public sealed class MessageDelegationTests
         foreach (var delegationPeriod in delegationPeriods)
         {
             var exception = Record.Exception(() =>
+            {
                 messageDelegation.DelegateTo(
                     testData.ActorTo.Id,
                     testData.GridArea.Id,
-                    delegationPeriod.StartsAt,
-                    delegationPeriod.StopsAt));
+                    delegationPeriod.StartsAt);
+
+                messageDelegation.StopDelegation(messageDelegation.Delegations.Last(), delegationPeriod.StopsAt);
+            });
 
             if (exception != null)
                 exceptions.Add(exception);
@@ -195,7 +199,7 @@ public sealed class MessageDelegationTests
         if (shouldThrow)
         {
             Assert.NotEmpty(exceptions);
-            Assert.Contains(typeof(ValidationException), exceptions.Select(e => e?.GetType()));
+            Assert.Contains(typeof(ValidationException), exceptions.Select(e => e.GetType()));
         }
         else
         {
