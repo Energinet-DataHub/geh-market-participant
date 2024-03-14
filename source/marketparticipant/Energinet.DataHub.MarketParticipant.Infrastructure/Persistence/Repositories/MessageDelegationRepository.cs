@@ -51,7 +51,7 @@ public sealed class MessageDelegationRepository(IMarketParticipantDbContext mark
 
     public async Task<IEnumerable<MessageDelegation>> GetDelegatedToActorAsync(ActorId delegatedTo)
     {
-        var messageDelegations = await _marketParticipantDbContext
+        var messageDelegations = await marketParticipantDbContext
             .MessageDelegations
             .Where(messageDelegation => messageDelegation.Delegations.Any(d => d.DelegatedToActorId == delegatedTo.Value))
             .ToListAsync()
