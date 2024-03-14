@@ -44,27 +44,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                 .GetForActorAsync(new ActorId(request.ActorId))
                 .ConfigureAwait(false);
 
-            var result = new List<MessageDelegationDto>();
-            foreach (var messageDelegation in delegations)
-            {
-                var delegationPeriods = messageDelegation.Delegations.Select(x =>
-                    new MessageDelegationPeriodDto(
-                        x.Id,
-                        x.DelegatedTo,
-                        x.GridAreaId,
-                        x.StartsAt.ToDateTimeOffset(),
-                        x.StopsAt?.ToDateTimeOffset()));
-
-                var messageDelegationDto = new MessageDelegationDto(
-                    messageDelegation.Id,
-                    messageDelegation.DelegatedBy,
-                    messageDelegation.MessageType,
-                    delegationPeriods);
-
-                result.Add(messageDelegationDto);
-            }
-
-            return new GetDelegationsForActorResponse(result);
+            return new GetDelegationsForActorResponse(delegations.Select(x => new MessageDelegationDto(
+                x.Id,
+                x.DelegatedBy,
+                x.MessageType,
+                x.Delegations.Select(y => new MessageDelegationPeriodDto(
+                    y.Id,
+                    y.DelegatedTo,
+                    y.GridAreaId,
+                    y.StartsAt.ToDateTimeOffset(),
+                    y.StopsAt?.ToDateTimeOffset())))));
         }
     }
 }
