@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Core.Messaging.Communication;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 
-public interface IIntegrationEventParser
+#pragma warning disable CA1711
+public interface IBalanceResponsiblePartiesChangedEventHandler
+#pragma warning restore CA1711
 {
-    DomainEvent? Parse(IntegrationEvent integrationEvent);
+    Task HandleAsync(BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged);
 }

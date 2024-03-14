@@ -12,47 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 
-public class IntegrationEventSubscriptionHandler(
-    IIntegrationEventParser integrationEventParser,
+#pragma warning disable CA1711
+public sealed class BalanceResponsiblePartiesChangedEventHandler(
+#pragma warning restore CA1711
     IEmailEventRepository emailEventRepository,
-    EmailRecipientConfig emailRecipientConfig,
-    ILogger<IntegrationEventSubscriptionHandler> logger)
-    : IIntegrationEventHandler
+    EmailRecipientConfig emailRecipientConfig)
+    : IBalanceResponsiblePartiesChangedEventHandler
 {
-    public Task HandleAsync(IntegrationEvent integrationEvent)
+    public Task HandleAsync(BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
     {
-        ArgumentNullException.ThrowIfNull(integrationEvent);
-
-        var domainEvent = integrationEventParser.Parse(integrationEvent);
-
-        if (domainEvent is null)
-        {
-            logger.LogInformation("Integration event not supported. Event name: {EventName}", integrationEvent.EventName);
-            return Task.CompletedTask;
-        }
-
-        logger.LogInformation("Integration event received. Event name: {EventName} EventId: {EventId}", integrationEvent.EventName, integrationEvent.EventIdentification);
-
-        switch (domainEvent)
-        {
-            case BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged:
-                return BuildAndSendEmailAsync(balanceResponsiblePartiesChanged);
-            default:
-                return Task.CompletedTask;
-        }
+        return BuildAndSendEmailAsync(balanceResponsiblePartiesChanged);
     }
 
     private Task BuildAndSendEmailAsync(BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)

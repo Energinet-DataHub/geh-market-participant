@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -110,7 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();
             services.AddScoped<ICertificateValidation, NoCertificateValidation>();
             services.AddScoped<IPermissionRelationService, PermissionRelationService>();
-            services.AddScoped<IIntegrationEventParser, IntegrationEventParser>();
+            services.AddScoped<IBalanceResponsiblePartiesChangedEventHandler, BalanceResponsiblePartiesChangedEventHandler>();
         }
     }
 }
