@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
     public sealed record CreateMessageDelegationDto(
         ActorId DelegatedFrom,
         ActorId DelegatedTo,
-        IReadOnlyCollection<GridAreaId> GridAreas,
-        IReadOnlyCollection<DelegationMessageType> MessageTypes,
+        IEnumerable<GridAreaId> GridAreas,
+        IEnumerable<DelegationMessageType> MessageTypes,
         DateTimeOffset StartsAt);
 }
