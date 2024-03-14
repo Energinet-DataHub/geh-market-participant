@@ -12,17 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed class CreateActorDelegationCommandRuleSet : AbstractValidator<CreateActorDelegationCommand>
+    public sealed class CreateMessageDelegationCommandRuleSet : AbstractValidator<CreateMessageDelegationCommand>
     {
-        public CreateActorDelegationCommandRuleSet()
+        public CreateMessageDelegationCommandRuleSet()
         {
             RuleFor(command => command.CreateDelegation)
-                .NotEmpty();
+                .NotNull()
+                .ChildRules(validator =>
+                {
+                    validator
+                        .RuleFor(delegation => delegation.DelegatedFrom)
+                        .NotEmpty();
+
+                    validator
+                        .RuleFor(delegation => delegation.DelegatedFrom.Value)
+                        .NotEmpty();
+
+                    validator
+                        .RuleFor(delegation => delegation.DelegatedTo)
+                        .NotEmpty();
+
+                    validator
+                        .RuleFor(delegation => delegation.DelegatedTo.Value)
+                        .NotEmpty();
+
+                    validator
+                        .RuleFor(delegation => delegation.GridAreas)
+                        .NotEmpty();
+
+                    validator
+                        .RuleForEach(delegation => delegation.GridAreas)
+                        .NotEmpty()
+                        .ChildRules(gridArea => gridArea.RuleFor(g => g.Value).NotEmpty());
+
+                    validator
+                        .RuleFor(delegation => delegation.MessageTypes)
+                        .NotEmpty();
+
+                    validator
+                        .RuleForEach(delegation => delegation.MessageTypes)
+                        .NotEmpty()
+                        .Must(Enum.IsDefined);
+                });
         }
     }
 }

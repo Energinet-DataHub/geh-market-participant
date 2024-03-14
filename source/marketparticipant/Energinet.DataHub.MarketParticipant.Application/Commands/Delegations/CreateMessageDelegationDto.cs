@@ -13,19 +13,16 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
-using FluentValidation;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
 {
-    public sealed class UpdateActorDelegationCommandRuleSet : AbstractValidator<UpdateActorDelegationCommand>
-    {
-        public UpdateActorDelegationCommandRuleSet()
-        {
-            RuleFor(command => command.UpdateActorDelegation.Id)
-                .NotEmpty();
-            RuleFor(command => command.UpdateActorDelegation.ExpiresAt)
-                .GreaterThanOrEqualTo(DateTimeOffset.UtcNow.Date);
-        }
-    }
+    public sealed record CreateMessageDelegationDto(
+        ActorId DelegatedFrom,
+        ActorId DelegatedTo,
+        IReadOnlyCollection<GridAreaId> GridAreas,
+        IReadOnlyCollection<DelegationMessageType> MessageTypes,
+        DateTimeOffset StartsAt);
 }
