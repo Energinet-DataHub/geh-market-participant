@@ -15,20 +15,16 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
@@ -48,16 +44,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actorRepo.Object,
                 new Mock<IMessageDelegationRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IEntityLock>().Object);
+                new Mock<IEntityLock>().Object,
+                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
             var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
             var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
-            var messageDelegation = new MessageDelegation(
-                new MessageDelegationId(Guid.NewGuid()),
-                actorFrom.Id,
-                DelegationMessageType.Rsm012Inbound,
-                Guid.NewGuid(),
-                new List<DelegationPeriod>());
 
             actorRepo
                 .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
@@ -69,7 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
                 actorFrom.Id,
                 actorTo.Id,
-                new List<GridAreaId> { new GridAreaId(Guid.NewGuid()) },
+                new List<GridAreaId> { new(Guid.NewGuid()) },
                 new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
                 DateTimeOffset.UtcNow));
 
@@ -89,16 +80,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actorRepo.Object,
                 new Mock<IMessageDelegationRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IEntityLock>().Object);
+                new Mock<IEntityLock>().Object,
+                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
             var actorFrom = TestPreparationModels.MockedActor(Guid.NewGuid(), Guid.NewGuid());
             var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
-            var messageDelegation = new MessageDelegation(
-                new MessageDelegationId(Guid.NewGuid()),
-                actorFrom.Id,
-                DelegationMessageType.Rsm012Inbound,
-                Guid.NewGuid(),
-                new List<DelegationPeriod>());
 
             actorRepo
                 .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
@@ -110,7 +96,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
                 actorFrom.Id,
                 actorTo.Id,
-                new List<GridAreaId> { new GridAreaId(Guid.NewGuid()) },
+                new List<GridAreaId> { new(Guid.NewGuid()) },
                 new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
                 DateTimeOffset.UtcNow));
 
@@ -135,16 +121,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actorRepo.Object,
                 new Mock<IMessageDelegationRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IEntityLock>().Object);
+                new Mock<IEntityLock>().Object,
+                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
             var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
             var actorTo = TestPreparationModels.MockedActor(Guid.NewGuid(), Guid.NewGuid());
-            var messageDelegation = new MessageDelegation(
-                new MessageDelegationId(Guid.NewGuid()),
-                actorFrom.Id,
-                DelegationMessageType.Rsm012Inbound,
-                Guid.NewGuid(),
-                new List<DelegationPeriod>());
 
             actorRepo
                 .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
@@ -156,7 +137,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
                 actorFrom.Id,
                 actorTo.Id,
-                new List<GridAreaId> { new GridAreaId(Guid.NewGuid()) },
+                new List<GridAreaId> { new(Guid.NewGuid()) },
                 new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
                 DateTimeOffset.UtcNow));
 
@@ -181,16 +162,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actorRepo.Object,
                 new Mock<IMessageDelegationRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IEntityLock>().Object);
+                new Mock<IEntityLock>().Object,
+                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
             var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
             var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
-            var messageDelegation = new MessageDelegation(
-                new MessageDelegationId(Guid.NewGuid()),
-                actorFrom.Id,
-                DelegationMessageType.Rsm012Inbound,
-                Guid.NewGuid(),
-                new List<DelegationPeriod>());
 
             actorRepo
                 .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
@@ -199,7 +175,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
                 actorFrom.Id,
                 actorTo.Id,
-                new List<GridAreaId> { new GridAreaId(Guid.NewGuid()) },
+                new List<GridAreaId> { new(Guid.NewGuid()) },
                 new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
                 DateTimeOffset.UtcNow));
 
@@ -224,16 +200,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actorRepo.Object,
                 new Mock<IMessageDelegationRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IEntityLock>().Object);
+                new Mock<IEntityLock>().Object,
+                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
             var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
             var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
-            var messageDelegation = new MessageDelegation(
-                new MessageDelegationId(Guid.NewGuid()),
-                actorFrom.Id,
-                DelegationMessageType.Rsm012Inbound,
-                Guid.NewGuid(),
-                new List<DelegationPeriod>());
 
             actorRepo
                 .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
@@ -242,7 +213,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
                 actorFrom.Id,
                 actorTo.Id,
-                new List<GridAreaId> { new GridAreaId(Guid.NewGuid()) },
+                new List<GridAreaId> { new(Guid.NewGuid()) },
                 new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
                 DateTimeOffset.UtcNow));
 
