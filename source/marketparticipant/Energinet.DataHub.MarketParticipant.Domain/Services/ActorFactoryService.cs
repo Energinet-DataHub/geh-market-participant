@@ -27,7 +27,8 @@ public sealed class ActorFactoryService(IActorRepository actorRepository,
         IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
         IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService,
         IDomainEventRepository domainEventRepository,
-        IEntityLock entityLock)
+        IEntityLock entityLock,
+        IAllowedMarketRoleCombinationsForDelegationRuleService allowedMarketRoleCombinationsForDelegationRuleService)
     : IActorFactoryService
 {
     public async Task<Actor> CreateAsync(
@@ -61,6 +62,11 @@ public sealed class ActorFactoryService(IActorRepository actorRepository,
         await using (uow.ConfigureAwait(false))
         {
             await entityLock.LockAsync(LockableEntity.Actor).ConfigureAwait(false);
+
+            foreach (var marketRole in newActor.MarketRoles)
+            {
+                await allowedMarketRoleCombinationsForDelegationRuleService.ValidateAsync(organization.Id, marketRole.Function).ConfigureAwait(false);
+            }
 
             var actorId = await SaveActorAsync(newActor).ConfigureAwait(false);
 
