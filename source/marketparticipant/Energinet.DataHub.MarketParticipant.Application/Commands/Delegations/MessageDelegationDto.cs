@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 
 public sealed record MessageDelegationDto(
-    MessageDelegationId Id,
-    ActorId DelegatedBy,
+    Guid Id,
+    Guid DelegatedBy,
     DelegationMessageType MessageType,
     IEnumerable<MessageDelegationPeriodDto> Periods);
