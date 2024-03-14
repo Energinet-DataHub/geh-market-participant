@@ -69,8 +69,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                     var messageDelegation = await messageDelegationRepository
                         .GetForActorAsync(actor.Id, messageType).ConfigureAwait(false) ?? new MessageDelegation(actor, messageType);
 
-                    await allowedMarketRoleCombinationsForDelegationRuleService.ValidateAsync(messageDelegation).ConfigureAwait(false);
-
                     foreach (var gridAreaId in request.CreateDelegation.GridAreas)
                     {
                         messageDelegation.DelegateTo(
@@ -78,6 +76,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                             gridAreaId,
                             Instant.FromDateTimeOffset(request.CreateDelegation.StartsAt));
                     }
+
+                    await allowedMarketRoleCombinationsForDelegationRuleService.ValidateAsync(messageDelegation).ConfigureAwait(false);
                 }
 
                 await uow.CommitAsync().ConfigureAwait(false);
