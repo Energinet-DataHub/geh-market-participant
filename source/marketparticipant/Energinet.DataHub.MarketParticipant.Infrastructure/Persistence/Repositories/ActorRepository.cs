@@ -74,6 +74,10 @@ public sealed class ActorRepository(IMarketParticipantDbContext marketParticipan
         {
             return new(ActorError.ThumbprintCredentialsConflict);
         }
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException inner && inner.Message.Contains("FK_LockId", StringComparison.InvariantCultureIgnoreCase))
+        {
+            throw new InvalidOperationException("Lock not acquired");
+        }
 
         return new(new ActorId(destination.Id));
     }

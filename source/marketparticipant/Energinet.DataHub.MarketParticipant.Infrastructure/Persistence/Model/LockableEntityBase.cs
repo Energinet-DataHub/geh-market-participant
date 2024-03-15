@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public interface IEntityLock
+public abstract class LockableEntityBase
 {
-    Task LockAsync(LockableBase lockableEntity);
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
+    public Guid? LockId { get; set; }
 }

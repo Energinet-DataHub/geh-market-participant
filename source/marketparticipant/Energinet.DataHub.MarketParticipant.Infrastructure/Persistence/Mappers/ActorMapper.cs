@@ -30,6 +30,7 @@ internal static class ActorMapper
         to.ActorNumber = from.ActorNumber.Value;
         to.Status = from.Status;
         to.Name = from.Name.Value;
+        to.LockId = from.LockId;
 
         // Market roles are currently treated as value types, so they are deleted and recreated with each update.
         to.MarketRoles.Clear();

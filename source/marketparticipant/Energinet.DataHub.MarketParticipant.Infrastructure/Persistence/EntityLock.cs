@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 
 public sealed class EntityLock(IMarketParticipantDbContext context) : IEntityLock
 {
-    public Task LockAsync(LockableEntity lockableEntity)
+    public Task LockAsync(LockableBase lockableEntity)
     {
         return context.CreateLockAsync(lockableEntity);
     }

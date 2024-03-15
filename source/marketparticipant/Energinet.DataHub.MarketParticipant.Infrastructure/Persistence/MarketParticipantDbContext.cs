@@ -103,15 +103,16 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         return affected;
     }
 
-    public async Task CreateLockAsync(LockableEntity lockableEntity)
+    public async Task CreateLockAsync(LockableBase lockable)
     {
-        ArgumentNullException.ThrowIfNull(lockableEntity);
+        ArgumentNullException.ThrowIfNull(lockable);
 
         if (Database.CurrentTransaction == null)
             throw new InvalidOperationException("A transaction is required");
 
 #pragma warning disable EF1002
-        await Database.ExecuteSqlRawAsync($"SELECT TOP 0 NULL FROM {lockableEntity.Name} WITH (TABLOCKX)").ConfigureAwait(false);
+        await Database.ExecuteSqlRawAsync($"SELECT TOP 0 NULL FROM {lockable.GetType().Name} WITH (TABLOCKX)").ConfigureAwait(false);
+        await Database.ExecuteSqlRawAsync($"INSERT INTO [Lock] VALUES('{lockable.LockId}')").ConfigureAwait(false);
 #pragma warning restore EF1002
     }
 

@@ -21,10 +21,10 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public sealed class Actor : IPublishDomainEvents
+public sealed class Actor : LockableBase, IPublishDomainEvents
 {
-    private readonly List<DomainEvent> _domainEvents = new();
-    private readonly List<ActorMarketRole> _marketRoles = new();
+    private readonly List<DomainEvent> _domainEvents = [];
+    private readonly List<ActorMarketRole> _marketRoles = [];
     private readonly ActorStatusTransitioner _actorStatusTransitioner;
     private ExternalActorId? _externalActorId;
     private ActorCredentials? _credentials;
@@ -59,6 +59,7 @@ public sealed class Actor : IPublishDomainEvents
         _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
         _marketRoles.AddRange(marketRoles);
         _credentials = credentials;
+        LockId = null;
     }
 
     /// <summary>

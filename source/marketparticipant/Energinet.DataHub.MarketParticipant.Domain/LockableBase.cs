@@ -12,16 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Domain;
 
-public sealed class LockableEntity
+public abstract class LockableBase
 {
-    private LockableEntity(string name)
-    {
-        Name = name;
-    }
-
-    public static LockableEntity Actor => new("Actor");
-
-    public string Name { get; }
+    public Guid? LockId { get; protected init; } = Guid.NewGuid();
 }
