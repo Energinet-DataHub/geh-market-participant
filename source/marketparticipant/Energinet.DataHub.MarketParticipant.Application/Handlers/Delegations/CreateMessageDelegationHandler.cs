@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 
             await using (uow.ConfigureAwait(false))
             {
-                await entityLock.LockAsync(LockableEntity.Actor).ConfigureAwait(false);
+                await entityLock.LockAsync(actor).ConfigureAwait(false);
                 foreach (var messageType in request.CreateDelegation.MessageTypes)
                 {
                     var messageDelegation = await messageDelegationRepository

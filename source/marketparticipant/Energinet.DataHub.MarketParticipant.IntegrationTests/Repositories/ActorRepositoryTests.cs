@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -30,6 +31,29 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 [IntegrationTest]
 public sealed class ActorRepositoryTests(MarketParticipantDatabaseFixture fixture)
 {
+    [Fact]
+    public async Task AddOrUpdateAsync_WhenAddingNew_MustLock()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
+        await using var scope = host.BeginScope();
+        await using var context = fixture.DatabaseManager.CreateDbContext();
+        var actorRepository = new ActorRepository(context);
+
+        var organization = await fixture.PrepareOrganizationAsync();
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
+        var uowProvider = new UnitOfWorkProvider(context);
+
+        await using var uow = await uowProvider.NewUnitOfWorkAsync();
+
+        // Act
+        var actual = await Assert.ThrowsAsync<InvalidOperationException>(() => actorRepository.AddOrUpdateAsync(actor));
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.Equal("Lock not acquired", actual.Message);
+    }
+
     [Fact]
     public async Task AddOrUpdateAsync_OneActor_CanReadBack()
     {

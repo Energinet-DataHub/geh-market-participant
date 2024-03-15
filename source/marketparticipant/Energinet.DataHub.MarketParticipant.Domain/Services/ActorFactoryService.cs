@@ -53,7 +53,7 @@ public sealed class ActorFactoryService(IActorRepository actorRepository,
 
         await using (uow.ConfigureAwait(false))
         {
-            await entityLock.LockAsync(LockableEntity.Actor).ConfigureAwait(false);
+            await entityLock.LockAsync(newActor).ConfigureAwait(false);
 
             await uniqueGlobalLocationNumberRuleService
                 .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)

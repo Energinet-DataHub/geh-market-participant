@@ -14,8 +14,9 @@
 
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
@@ -62,7 +63,9 @@ public sealed class EntityTests(MarketParticipantDatabaseFixture fixture, ITestO
 
         var entityLock = new EntityLock(context);
 
-        await entityLock.LockAsync(LockableEntity.Actor);
+        var org = await fixture.PrepareOrganizationAsync();
+        var actor = new Actor(new OrganizationId(org.Id), new MockedGln(), new ActorName("test"));
+        await entityLock.LockAsync(actor);
 
         await Task.Delay(millis);
     }
