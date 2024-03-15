@@ -73,6 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 new(Settings.SenderEmail.Key, "fake_value"),
                 new(Settings.BccEmail.Key, "fake_value"),
                 new(Settings.OrganizationIdentityUpdateNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
+                new(Settings.BalanceResponsiblePartiesChangedNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
                 new(Settings.UserInviteFlow.Key, "fake_value"),
                 new(Settings.EnvironmentDescription.Key, "fake_value"),
                 new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
