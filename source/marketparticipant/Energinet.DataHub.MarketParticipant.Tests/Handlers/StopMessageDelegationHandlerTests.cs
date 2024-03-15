@@ -59,8 +59,8 @@ public sealed class StopMessageDelegationHandlerTests
             .ReturnsAsync(messageDelegation);
 
         var command = new StopMessageDelegationCommand(new StopMessageDelegationDto(
-            messageDelegation.Id,
-            delegationPeriod.Id,
+            messageDelegation.Id.Value,
+            delegationPeriod.Id.Value,
             DateTimeOffset.UtcNow));
 
         // Act
@@ -97,8 +97,8 @@ public sealed class StopMessageDelegationHandlerTests
 
         var testDelegationId = new MessageDelegationId(Guid.NewGuid());
         var command = new StopMessageDelegationCommand(new StopMessageDelegationDto(
-            testDelegationId,
-            delegationPeriod.Id,
+            testDelegationId.Value,
+            delegationPeriod.Id.Value,
             DateTimeOffset.UtcNow));
 
         // Act
@@ -140,8 +140,8 @@ public sealed class StopMessageDelegationHandlerTests
 
         var testPeriodId = new DelegationPeriodId(Guid.NewGuid());
         var command = new StopMessageDelegationCommand(new StopMessageDelegationDto(
-            messageDelegation.Id,
-            testPeriodId,
+            messageDelegation.Id.Value,
+            testPeriodId.Value,
             DateTimeOffset.UtcNow));
 
         // Act
