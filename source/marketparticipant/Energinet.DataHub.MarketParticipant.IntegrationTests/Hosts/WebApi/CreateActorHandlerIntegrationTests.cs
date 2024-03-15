@@ -14,14 +14,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Nito.AsyncEx;
 using Xunit;
 using Xunit.Categories;
 
@@ -100,6 +103,40 @@ public sealed class CreateActorHandlerIntegrationTests
         Assert.Equal(createResponseDelegatedActor.ActorId, actualDelegatedActor.Actor.ActorId);
         Assert.Equal(actualInitActor.Actor.ActorNumber, actualDelegatedActor.Actor.ActorNumber);
         actualDelegatedActor.Actor.MarketRoles.Should().ContainSingle(x => x.EicFunction == EicFunction.Delegated);
+    }
+
+    [Fact]
+    public async Task CreateActor_NonUniqueGlnAndRole_ThrowsException()
+    {
+        // Arrange
+        var actorName = new ActorNameDto("Actor Delegated");
+        var actorNumber = new ActorNumberDto(new MockedGln());
+        var marketRoles = ActorMarketRoleDto(EicFunction.Delegated);
+
+        var tasks = new List<Task>();
+
+        for (var i = 0; i < 10; i++)
+        {
+            var cvr = MockedBusinessRegisterIdentifier.New().Identifier;
+
+            tasks.Add(Task.Run(async () =>
+            {
+                await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+                await using var scope = host.BeginScope();
+                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+                var newOrganization = await _fixture.PrepareOrganizationAsync(TestPreparationEntities.ValidOrganization.Patch(o => o.BusinessRegisterIdentifier = cvr));
+
+                var createDto = new CreateActorDto(newOrganization.Id, actorName, actorNumber, marketRoles);
+                var createActorCommand = new CreateActorCommand(createDto);
+
+                return await mediator.Send(createActorCommand);
+            }));
+        }
+
+        // Act + Assert
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => tasks.WhenAll());
+        Assert.Equal("actor.number.reserved", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
     }
 
     private static IEnumerable<ActorMarketRoleDto> ActorMarketRoleDto(EicFunction eicFunction)

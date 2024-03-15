@@ -41,15 +41,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             var actor = await actorRepository
-                .GetAsync(request.CreateDelegation.DelegatedFrom)
+                .GetAsync(new(request.CreateDelegation.DelegatedFrom))
                 .ConfigureAwait(false);
 
             var actorDelegatedTo = await actorRepository
-                .GetAsync(request.CreateDelegation.DelegatedTo)
+                .GetAsync(new(request.CreateDelegation.DelegatedTo))
                 .ConfigureAwait(false);
 
-            NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom.Value);
-            NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo.Value);
+            NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
+            NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo);
 
             if (actor.Status != ActorStatus.Active || actorDelegatedTo.Status != ActorStatus.Active)
             {
@@ -73,11 +73,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                     {
                         messageDelegation.DelegateTo(
                             actorDelegatedTo.Id,
-                            gridAreaId,
+                            new(gridAreaId),
                             Instant.FromDateTimeOffset(request.CreateDelegation.StartsAt));
                     }
 
                     await allowedMarketRoleCombinationsForDelegationRuleService.ValidateAsync(messageDelegation).ConfigureAwait(false);
+                    await messageDelegationRepository.AddOrUpdateAsync(messageDelegation).ConfigureAwait(false);
                 }
 
                 await uow.CommitAsync().ConfigureAwait(false);
