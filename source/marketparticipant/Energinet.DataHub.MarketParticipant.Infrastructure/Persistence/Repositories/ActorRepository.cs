@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
@@ -25,7 +26,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class ActorRepository(IMarketParticipantDbContext marketParticipantDbContext) : IActorRepository
+public sealed class ActorRepository(IMarketParticipantDbContext marketParticipantDbContext, IEntityLock entityLock) : IActorRepository
 {
     public async Task<Result<ActorId, ActorError>> AddOrUpdateAsync(Actor actor)
     {
@@ -35,6 +36,11 @@ public sealed class ActorRepository(IMarketParticipantDbContext marketParticipan
 
         if (actor.Id.Value == default)
         {
+            if (!entityLock.IsLocked(LockableEntity.Actor))
+            {
+                throw new InvalidOperationException("Actor lock is required during creation of new actor.");
+            }
+
             destination = new ActorEntity();
         }
         else

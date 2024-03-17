@@ -15,11 +15,13 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Moq;
 using NodaTime;
 using Xunit;
 using Xunit.Categories;
@@ -31,10 +33,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 public sealed class MessageDelegationRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
+    private readonly IEntityLock _lock;
 
     public MessageDelegationRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
+        var entityLock = new Mock<IEntityLock>();
+        entityLock.Setup(x => x.IsLocked(LockableEntity.Actor)).Returns(true);
+        _lock = entityLock.Object;
     }
 
     [Fact]
@@ -67,7 +73,7 @@ public sealed class MessageDelegationRepositoryTests
         var actorEntityB = await _fixture.PrepareActiveActorAsync();
         var actorEntityC = await _fixture.PrepareActiveActorAsync();
         var gridAreaId = await _fixture.PrepareGridAreaAsync();
-        var actorRepository = new ActorRepository(context);
+        var actorRepository = new ActorRepository(context, _lock);
         var actorA = await actorRepository.GetAsync(new ActorId(actorEntityA.Id));
         var actorB = await actorRepository.GetAsync(new ActorId(actorEntityB.Id));
         var actorC = await actorRepository.GetAsync(new ActorId(actorEntityC.Id));
@@ -114,7 +120,7 @@ public sealed class MessageDelegationRepositoryTests
         var actorEntityB = await _fixture.PrepareActiveActorAsync();
         var actorEntityC = await _fixture.PrepareActiveActorAsync();
         var gridAreaId = await _fixture.PrepareGridAreaAsync();
-        var actorRepository = new ActorRepository(context);
+        var actorRepository = new ActorRepository(context, _lock);
         var actorA = await actorRepository.GetAsync(new ActorId(actorEntityA.Id));
         var actorB = await actorRepository.GetAsync(new ActorId(actorEntityB.Id));
         var actorC = await actorRepository.GetAsync(new ActorId(actorEntityC.Id));
@@ -152,7 +158,7 @@ public sealed class MessageDelegationRepositoryTests
         var actorEntityB = await _fixture.PrepareActiveActorAsync();
         var actorEntityC = await _fixture.PrepareActiveActorAsync();
         var gridAreaId = await _fixture.PrepareGridAreaAsync();
-        var actorRepository = new ActorRepository(context);
+        var actorRepository = new ActorRepository(context, _lock);
         var actorA = await actorRepository.GetAsync(new ActorId(actorEntityA.Id));
         var actorB = await actorRepository.GetAsync(new ActorId(actorEntityB.Id));
         var actorC = await actorRepository.GetAsync(new ActorId(actorEntityC.Id));
@@ -190,7 +196,7 @@ public sealed class MessageDelegationRepositoryTests
         var actorEntityA = await _fixture.PrepareActiveActorAsync();
         var actorEntityB = await _fixture.PrepareActiveActorAsync();
         var gridAreaId = await _fixture.PrepareGridAreaAsync();
-        var actorRepository = new ActorRepository(context);
+        var actorRepository = new ActorRepository(context, _lock);
         var actorA = await actorRepository.GetAsync(new ActorId(actorEntityA.Id));
         var actorB = await actorRepository.GetAsync(new ActorId(actorEntityB.Id));
 
@@ -241,7 +247,7 @@ public sealed class MessageDelegationRepositoryTests
         var actorEntityA = await _fixture.PrepareActiveActorAsync();
         var actorEntityB = await _fixture.PrepareActiveActorAsync();
         var gridAreaId = await _fixture.PrepareGridAreaAsync();
-        var actorRepository = new ActorRepository(context);
+        var actorRepository = new ActorRepository(context, _lock);
         var actorA = await actorRepository.GetAsync(new ActorId(actorEntityA.Id));
         var actorB = await actorRepository.GetAsync(new ActorId(actorEntityB.Id));
 

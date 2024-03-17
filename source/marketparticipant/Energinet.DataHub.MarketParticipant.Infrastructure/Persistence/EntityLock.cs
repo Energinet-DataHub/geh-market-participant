@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain;
 
@@ -19,8 +20,16 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 
 public sealed class EntityLock(IMarketParticipantDbContext context) : IEntityLock
 {
-    public Task LockAsync(LockableEntity lockableEntity)
+    private readonly HashSet<LockableEntity> _lockedEntities = [];
+
+    public async Task LockAsync(LockableEntity lockableEntity)
     {
-        return context.CreateLockAsync(lockableEntity);
+        await context.CreateLockAsync(lockableEntity).ConfigureAwait(false);
+        _lockedEntities.Add(lockableEntity);
+    }
+
+    public bool IsLocked(LockableEntity lockableEntity)
+    {
+        return _lockedEntities.Contains(lockableEntity);
     }
 }

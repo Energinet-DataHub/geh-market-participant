@@ -14,11 +14,13 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -106,7 +108,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         private static async Task<Actor> CreateActorUnderNewOrganizationAsync(MarketParticipantDatabaseFixture fixture, MarketParticipantDbContext context)
         {
             var actor = await fixture.PrepareActorAsync();
-            var repository = new ActorRepository(context);
+            var entityLock = new Mock<IEntityLock>();
+            entityLock.Setup(x => x.IsLocked(LockableEntity.Actor)).Returns(true);
+
+            var repository = new ActorRepository(context, entityLock.Object);
             return (await repository.GetAsync(new ActorId(actor.Id)))!;
         }
 
