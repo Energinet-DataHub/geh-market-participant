@@ -19,7 +19,6 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
@@ -62,8 +61,6 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
         {
             host.ServiceCollection.Replace(ServiceDescriptor.Scoped<ICertificateService>(_ => certificateFixture.CertificateService));
         }
-
-        host.ServiceCollection.Replace(ServiceDescriptor.Scoped<IEntityLock>(_ => new Mock<IEntityLock>().Object));
 
         return Task.FromResult(host);
     }
