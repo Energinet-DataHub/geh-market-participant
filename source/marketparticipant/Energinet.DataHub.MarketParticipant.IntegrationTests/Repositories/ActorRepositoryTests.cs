@@ -56,7 +56,7 @@ public sealed class ActorRepositoryTests
 
         // act, assert
         var actual = await Assert.ThrowsAsync<InvalidOperationException>(() => actorRepository.AddOrUpdateAsync(actor));
-        Assert.Equal("Actor lock is required during creation of new actor.", actual.Message);
+        Assert.Equal("Actor lock is required.", actual.Message);
     }
 
     [Fact]
