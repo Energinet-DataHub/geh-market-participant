@@ -38,8 +38,8 @@ public sealed class BalanceResponsiblePartiesChangedEmailTemplate : EmailTemplat
             { "actor_balance_responsible", balanceResponsiblePartiesChanged.BalanceResponsibleParty.Value },
             { "actor_supplier", balanceResponsiblePartiesChanged.ElectricalSupplier.Value },
             { "grid_area_code", balanceResponsiblePartiesChanged.GridAreaCode.Value },
-            { "valid_from", balanceResponsiblePartiesChanged.ValidFrom.ToDateTimeUtc().ToLongDateString() },
-            { "valid_to", balanceResponsiblePartiesChanged.ValidTo?.ToDateTimeUtc().ToLongDateString() ?? string.Empty },
+            { "valid_from", balanceResponsiblePartiesChanged.ValidFrom.ToDateTimeOffset().ToString("u") },
+            { "valid_to", balanceResponsiblePartiesChanged.ValidTo?.ToDateTimeOffset().ToString("u") ?? string.Empty },
         };
     }
 }
