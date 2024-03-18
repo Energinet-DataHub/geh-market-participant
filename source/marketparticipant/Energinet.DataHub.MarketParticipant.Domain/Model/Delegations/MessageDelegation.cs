@@ -43,7 +43,6 @@ public sealed class MessageDelegation : IPublishDomainEvents
 
         DelegatedBy = messageOwner.Id;
         MessageType = messageType;
-
         _domainEvents = new DomainEventList();
     }
 
@@ -82,12 +81,7 @@ public sealed class MessageDelegation : IPublishDomainEvents
         }
 
         _delegations.Add(delegationPeriod);
-        _domainEvents.Add(new MessageDelegationConfigured(
-            DelegatedBy,
-            delegatedTo,
-            MessageType,
-            gridAreaId,
-            startsAt));
+        _domainEvents.Add(new MessageDelegationConfigured(this, delegationPeriod));
     }
 
     public void StopDelegation(DelegationPeriod existingPeriod, Instant? stopsAt)
@@ -105,27 +99,9 @@ public sealed class MessageDelegation : IPublishDomainEvents
                 .WithErrorCode("message_delegation.overlap");
         }
 
-        _delegations.Add(existingPeriod with { StopsAt = stopsAt });
-
-        if (stopsAt.HasValue)
-        {
-            _domainEvents.Add(new MessageDelegationConfigured(
-                DelegatedBy,
-                existingPeriod.DelegatedTo,
-                MessageType,
-                existingPeriod.GridAreaId,
-                existingPeriod.StartsAt,
-                stopsAt.Value));
-        }
-        else
-        {
-            _domainEvents.Add(new MessageDelegationConfigured(
-                DelegatedBy,
-                existingPeriod.DelegatedTo,
-                MessageType,
-                existingPeriod.GridAreaId,
-                existingPeriod.StartsAt));
-        }
+        var delegationPeriod = existingPeriod with { StopsAt = stopsAt };
+        _delegations.Add(delegationPeriod);
+        _domainEvents.Add(new MessageDelegationConfigured(this, delegationPeriod));
     }
 
     private bool IsThereDelegationPeriodOverlap(Instant startsAt, GridAreaId gridAreaId, Instant? stopsAt = null)

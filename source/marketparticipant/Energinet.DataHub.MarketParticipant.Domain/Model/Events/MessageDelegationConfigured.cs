@@ -42,37 +42,18 @@ public sealed class MessageDelegationConfigured : DomainEvent
         StopsAt = stopsAt;
     }
 
-    public MessageDelegationConfigured(
-        ActorId delegatedBy,
-        ActorId delegatedTo,
-        DelegationMessageType messageType,
-        GridAreaId gridAreaId,
-        Instant startsAt)
+    public MessageDelegationConfigured(MessageDelegation messageDelegation, DelegationPeriod delegationPeriod)
     {
-        EventId = Guid.NewGuid();
-        DelegatedBy = delegatedBy;
-        DelegatedTo = delegatedTo;
-        MessageType = messageType;
-        GridAreaId = gridAreaId;
-        StartsAt = startsAt;
-        StopsAt = Instant.MaxValue;
-    }
+        ArgumentNullException.ThrowIfNull(messageDelegation);
+        ArgumentNullException.ThrowIfNull(delegationPeriod);
 
-    public MessageDelegationConfigured(
-        ActorId delegatedBy,
-        ActorId delegatedTo,
-        DelegationMessageType messageType,
-        GridAreaId gridAreaId,
-        Instant startsAt,
-        Instant stopsAt)
-    {
         EventId = Guid.NewGuid();
-        DelegatedBy = delegatedBy;
-        DelegatedTo = delegatedTo;
-        MessageType = messageType;
-        GridAreaId = gridAreaId;
-        StartsAt = startsAt;
-        StopsAt = stopsAt;
+        DelegatedBy = messageDelegation.DelegatedBy;
+        DelegatedTo = delegationPeriod.DelegatedTo;
+        MessageType = messageDelegation.MessageType;
+        GridAreaId = delegationPeriod.GridAreaId;
+        StartsAt = delegationPeriod.StartsAt;
+        StopsAt = delegationPeriod.StopsAt ?? Instant.MaxValue;
     }
 
     public ActorId DelegatedBy { get; }
