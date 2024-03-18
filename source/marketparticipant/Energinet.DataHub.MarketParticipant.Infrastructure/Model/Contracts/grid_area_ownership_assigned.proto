@@ -48,7 +48,7 @@ message GridAreaOwnershipAssigned {
   google.protobuf.Timestamp valid_from = 4;
 
   /*
-   * The sequence number of the event. The number is always increasing, but may no be continuous.
+   * The sequence number of the event. The number is always increasing, but may not be continuous.
    * Used to distinguish between events with identical valid_from timestamps.
    */
   int32 sequence_number = 5;
