@@ -52,30 +52,30 @@ message MessageDelegationConfigured {
   /*
    * The type of the delegated messages.
    */
-  DelegatedMessageType message_type = 3;
+  DelegatedMessageType message_type = 5;
 
   /*
    * The code of the grid area for which messages are delegated.
    */
-  string grid_area_code = 3;
+  string grid_area_code = 6;
 
   /*
    * The start timestamp of the configured delegation (inclusive).
    */
-  google.protobuf.Timestamp starts_at = 4;
+  google.protobuf.Timestamp starts_at = 7;
 
   /*
    * The end timestamp of the configured delegation (inclusive).
    * If the delegation does not stop, stops_at is set to December 31, 9999.
    * If stops_at occurs before starts_at, then the delegation is cancelled. 
    */
-  google.protobuf.Timestamp stops_at = 4;
+  google.protobuf.Timestamp stops_at = 8;
 
   /*
    * The sequence number of the event. The number is always increasing, but may not be continuous.
    * Used to determine the latest delegation configuration.
    */
-  int32 sequence_number = 5;
+  int32 sequence_number = 9;
 }
 
 enum DelegatedMessageType {
