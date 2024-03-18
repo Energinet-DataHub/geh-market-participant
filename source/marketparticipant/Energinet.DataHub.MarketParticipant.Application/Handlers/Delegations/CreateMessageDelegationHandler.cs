@@ -28,27 +28,45 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 {
-    public sealed class CreateMessageDelegationHandler(
-        IActorRepository actorRepository,
-        IMessageDelegationRepository messageDelegationRepository,
-        IUnitOfWorkProvider unitOfWorkProvider,
-        IEntityLock entityLock,
-        IAllowedMarketRoleCombinationsForDelegationRuleService allowedMarketRoleCombinationsForDelegationRuleService)
-        : IRequestHandler<CreateMessageDelegationCommand>
+    public sealed class CreateMessageDelegationHandler : IRequestHandler<CreateMessageDelegationCommand>
     {
+        private readonly IActorRepository _actorRepository;
+        private readonly IMessageDelegationRepository _messageDelegationRepository;
+        private readonly IDomainEventRepository _domainEventRepository;
+        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+        private readonly IEntityLock _entityLock;
+        private readonly IAllowedMarketRoleCombinationsForDelegationRuleService _allowedMarketRoleCombinationsForDelegationRuleService;
+
+        public CreateMessageDelegationHandler(
+            IActorRepository actorRepository,
+            IMessageDelegationRepository messageDelegationRepository,
+            IDomainEventRepository domainEventRepository,
+            IUnitOfWorkProvider unitOfWorkProvider,
+            IEntityLock entityLock,
+            IAllowedMarketRoleCombinationsForDelegationRuleService allowedMarketRoleCombinationsForDelegationRuleService)
+        {
+            _actorRepository = actorRepository;
+            _messageDelegationRepository = messageDelegationRepository;
+            _domainEventRepository = domainEventRepository;
+            _unitOfWorkProvider = unitOfWorkProvider;
+            _entityLock = entityLock;
+            _allowedMarketRoleCombinationsForDelegationRuleService = allowedMarketRoleCombinationsForDelegationRuleService;
+        }
+
         public async Task Handle(CreateMessageDelegationCommand request, CancellationToken cancellationToken)
         {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+            ArgumentNullException.ThrowIfNull(request);
 
-            var actor = await actorRepository
+            var actor = await _actorRepository
                 .GetAsync(new(request.CreateDelegation.DelegatedFrom))
                 .ConfigureAwait(false);
 
-            var actorDelegatedTo = await actorRepository
+            NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
+
+            var actorDelegatedTo = await _actorRepository
                 .GetAsync(new(request.CreateDelegation.DelegatedTo))
                 .ConfigureAwait(false);
 
-            NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
             NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo);
 
             if (actor.Status != ActorStatus.Active || actorDelegatedTo.Status != ActorStatus.Active)
@@ -57,17 +75,21 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                     .WithErrorCode("message_delegation.actors_from_or_to_inactive");
             }
 
-            var uow = await unitOfWorkProvider
+            var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
                 .ConfigureAwait(false);
 
             await using (uow.ConfigureAwait(false))
             {
-                await entityLock.LockAsync(LockableEntity.Actor).ConfigureAwait(false);
+                await _entityLock
+                    .LockAsync(LockableEntity.Actor)
+                    .ConfigureAwait(false);
+
                 foreach (var messageType in request.CreateDelegation.MessageTypes)
                 {
-                    var messageDelegation = await messageDelegationRepository
-                        .GetForActorAsync(actor.Id, messageType).ConfigureAwait(false) ?? new MessageDelegation(actor, messageType);
+                    var messageDelegation = await _messageDelegationRepository
+                        .GetForActorAsync(actor.Id, messageType)
+                        .ConfigureAwait(false) ?? new MessageDelegation(actor, messageType);
 
                     foreach (var gridAreaId in request.CreateDelegation.GridAreas)
                     {
@@ -77,8 +99,17 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                             Instant.FromDateTimeOffset(request.CreateDelegation.StartsAt));
                     }
 
-                    await allowedMarketRoleCombinationsForDelegationRuleService.ValidateAsync(messageDelegation).ConfigureAwait(false);
-                    await messageDelegationRepository.AddOrUpdateAsync(messageDelegation).ConfigureAwait(false);
+                    await _allowedMarketRoleCombinationsForDelegationRuleService
+                        .ValidateAsync(messageDelegation)
+                        .ConfigureAwait(false);
+
+                    var messageDelegationId = await _messageDelegationRepository
+                        .AddOrUpdateAsync(messageDelegation)
+                        .ConfigureAwait(false);
+
+                    await _domainEventRepository
+                        .EnqueueAsync(messageDelegation, messageDelegationId.Value)
+                        .ConfigureAwait(false);
                 }
 
                 await uow.CommitAsync().ConfigureAwait(false);

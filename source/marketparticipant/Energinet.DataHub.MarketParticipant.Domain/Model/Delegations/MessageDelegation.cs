@@ -17,12 +17,14 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-public sealed class MessageDelegation
+public sealed class MessageDelegation : IPublishDomainEvents
 {
+    private readonly DomainEventList _domainEvents;
     private readonly List<DelegationPeriod> _delegations = [];
 
     public MessageDelegation(Actor messageOwner, DelegationMessageType messageType)
@@ -41,6 +43,7 @@ public sealed class MessageDelegation
 
         DelegatedBy = messageOwner.Id;
         MessageType = messageType;
+        _domainEvents = new DomainEventList();
     }
 
     public MessageDelegation(
@@ -54,6 +57,7 @@ public sealed class MessageDelegation
         DelegatedBy = delegatedBy;
         MessageType = messageType;
         ConcurrencyToken = concurrencyToken;
+        _domainEvents = new DomainEventList(Id.Value);
         _delegations.AddRange(delegations);
     }
 
@@ -63,6 +67,8 @@ public sealed class MessageDelegation
     public Guid ConcurrencyToken { get; }
 
     public IReadOnlyCollection<DelegationPeriod> Delegations => _delegations;
+
+    IDomainEvents IPublishDomainEvents.DomainEvents => _domainEvents;
 
     public void DelegateTo(ActorId delegatedTo, GridAreaId gridAreaId, Instant startsAt)
     {
@@ -75,6 +81,7 @@ public sealed class MessageDelegation
         }
 
         _delegations.Add(delegationPeriod);
+        _domainEvents.Add(new MessageDelegationConfigured(this, delegationPeriod));
     }
 
     public void StopDelegation(DelegationPeriod existingPeriod, Instant? stopsAt)
@@ -92,13 +99,15 @@ public sealed class MessageDelegation
                 .WithErrorCode("message_delegation.overlap");
         }
 
-        _delegations.Add(existingPeriod with { StopsAt = stopsAt });
+        var delegationPeriod = existingPeriod with { StopsAt = stopsAt };
+        _delegations.Add(delegationPeriod);
+        _domainEvents.Add(new MessageDelegationConfigured(this, delegationPeriod));
     }
 
     private bool IsThereDelegationPeriodOverlap(Instant startsAt, GridAreaId gridAreaId, Instant? stopsAt = null)
     {
-       return _delegations
-            .Where(x => x.GridAreaId == gridAreaId && !(x.StopsAt <= x.StartsAt))
-            .Any(x => x.StartsAt < (stopsAt ?? Instant.MaxValue) && (x.StopsAt ?? Instant.MaxValue) > startsAt);
+        return _delegations
+             .Where(x => x.GridAreaId == gridAreaId && !(x.StopsAt <= x.StartsAt))
+             .Any(x => x.StartsAt < (stopsAt ?? Instant.MaxValue) && (x.StopsAt ?? Instant.MaxValue) > startsAt);
     }
 }
