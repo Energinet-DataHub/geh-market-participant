@@ -16,6 +16,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -72,7 +73,7 @@ public sealed class ActorAuditLogRepositoryTests
 
         // Arrange - Setup Repositories
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var uow = await LockActorAsync(scope.ServiceProvider);
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
         var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogRepository>();
 
@@ -108,7 +109,7 @@ public sealed class ActorAuditLogRepositoryTests
 
         // Arrange - Setup Repositories
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var uow = await LockActorAsync(scope.ServiceProvider);
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
         var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogRepository>();
 
@@ -148,7 +149,7 @@ public sealed class ActorAuditLogRepositoryTests
 
         // Arrange - Setup Repositories
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var uow = await LockActorAsync(scope.ServiceProvider);
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
         var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogRepository>();
 
@@ -187,7 +188,6 @@ public sealed class ActorAuditLogRepositoryTests
 
         // Arrange - Setup Repositories
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
         var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogRepository>();
 
@@ -231,5 +231,16 @@ public sealed class ActorAuditLogRepositoryTests
         Assert.Contains(actorAuditLogs, entry =>
             entry is { Change: ActorAuditedChange.ClientSecretCredentials, PreviousValue: null } &&
             entry.CurrentValue == actorClientSecretCredentials.ExpirationDate.ToString("g", CultureInfo.InvariantCulture));
+    }
+
+    private static async Task<IUnitOfWork> LockActorAsync(IServiceProvider serviceProvider)
+    {
+        var uowProvider = serviceProvider.GetRequiredService<IUnitOfWorkProvider>();
+        var uow = await uowProvider.NewUnitOfWorkAsync();
+
+        var entityLock = serviceProvider.GetRequiredService<IEntityLock>();
+        await entityLock.LockAsync(LockableEntity.Actor);
+
+        return uow;
     }
 }
