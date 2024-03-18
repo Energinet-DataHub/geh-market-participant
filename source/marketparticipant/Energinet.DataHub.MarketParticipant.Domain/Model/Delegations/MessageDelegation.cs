@@ -29,12 +29,6 @@ public sealed class MessageDelegation
     {
         ArgumentNullException.ThrowIfNull(messageOwner);
 
-        if (messageOwner.Status != ActorStatus.Active)
-        {
-            throw new ValidationException("Actor must be active to delegate messages.")
-                .WithErrorCode("message_delegation.actor_inactive");
-        }
-
         if (messageOwner.MarketRoles.All(role =>
                 role.Function != EicFunction.GridAccessProvider
                 && role.Function != EicFunction.BalanceResponsibleParty
