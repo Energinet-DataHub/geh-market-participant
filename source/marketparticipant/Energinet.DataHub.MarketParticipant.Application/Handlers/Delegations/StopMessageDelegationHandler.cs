@@ -17,38 +17,67 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
-{
-    public sealed class StopMessageDelegationHandler(IMessageDelegationRepository delegationRepository)
-        : IRequestHandler<StopMessageDelegationCommand>
-    {
-        public async Task Handle(StopMessageDelegationCommand request, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations;
 
-            var actorDelegation = await delegationRepository
-                .GetAsync(new(request.StopMessageDelegation.Id))
+public sealed class StopMessageDelegationHandler : IRequestHandler<StopMessageDelegationCommand>
+{
+    private readonly IMessageDelegationRepository _delegationRepository;
+    private readonly IDomainEventRepository _domainEventRepository;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+
+    public StopMessageDelegationHandler(
+        IMessageDelegationRepository delegationRepository,
+        IDomainEventRepository domainEventRepository,
+        IUnitOfWorkProvider unitOfWorkProvider)
+    {
+        _delegationRepository = delegationRepository;
+        _domainEventRepository = domainEventRepository;
+        _unitOfWorkProvider = unitOfWorkProvider;
+    }
+
+    public async Task Handle(StopMessageDelegationCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        var messageDelegation = await _delegationRepository
+            .GetAsync(new(request.StopMessageDelegation.Id))
+            .ConfigureAwait(false);
+
+        NotFoundValidationException.ThrowIfNull(messageDelegation, request.StopMessageDelegation.Id);
+
+        var periodToStop = messageDelegation
+            .Delegations
+            .SingleOrDefault(d => d.Id.Value == request.StopMessageDelegation.PeriodId);
+
+        NotFoundValidationException.ThrowIfNull(periodToStop, request.StopMessageDelegation.PeriodId);
+
+        Instant? stopsAt = request.StopMessageDelegation.StopsAt.HasValue
+            ? Instant.FromDateTimeOffset(request.StopMessageDelegation.StopsAt.Value)
+            : null;
+
+        var uow = await _unitOfWorkProvider
+            .NewUnitOfWorkAsync()
+            .ConfigureAwait(false);
+
+        await using (uow.ConfigureAwait(false))
+        {
+            messageDelegation.StopDelegation(periodToStop, stopsAt);
+
+            await _domainEventRepository
+                .EnqueueAsync(messageDelegation)
                 .ConfigureAwait(false);
 
-            NotFoundValidationException.ThrowIfNull(actorDelegation, request.StopMessageDelegation.Id);
+            await _delegationRepository
+                .AddOrUpdateAsync(messageDelegation)
+                .ConfigureAwait(false);
 
-            var periodToStop = actorDelegation
-                .Delegations
-                .SingleOrDefault(d => d.Id.Value == request.StopMessageDelegation.PeriodId);
-
-            NotFoundValidationException.ThrowIfNull(periodToStop, request.StopMessageDelegation.PeriodId);
-
-            Instant? stopsAt = request.StopMessageDelegation.StopsAt.HasValue
-                ? Instant.FromDateTimeOffset(request.StopMessageDelegation.StopsAt.GetValueOrDefault())
-                : null;
-
-            actorDelegation.StopDelegation(periodToStop, stopsAt);
-            await delegationRepository.AddOrUpdateAsync(actorDelegation).ConfigureAwait(false);
+            await uow.CommitAsync().ConfigureAwait(false);
         }
     }
 }

@@ -25,8 +25,14 @@ public interface IPublishDomainEvents
     /// <summary>
     /// Gets the list of unpublished domain events.
     /// </summary>
-    IReadOnlyList<DomainEvent> DomainEvents { get; }
+    IDomainEvents DomainEvents { get; }
+}
 
+/// <summary>
+/// Contains all the unpublished domain events.
+/// </summary>
+public interface IDomainEvents : IEnumerable<DomainEvent>
+{
     /// <summary>
     /// Marks the domain events as published.
     /// The list of domain events will be cleared.

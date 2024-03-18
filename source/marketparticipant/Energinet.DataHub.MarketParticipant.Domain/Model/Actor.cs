@@ -23,7 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed class Actor : IPublishDomainEvents
 {
-    private readonly List<DomainEvent> _domainEvents = new();
+    private readonly DomainEventList _domainEvents;
     private readonly List<ActorMarketRole> _marketRoles = new();
     private readonly ActorStatusTransitioner _actorStatusTransitioner;
     private ExternalActorId? _externalActorId;
@@ -38,6 +38,7 @@ public sealed class Actor : IPublishDomainEvents
         OrganizationId = organizationId;
         ActorNumber = actorNumber;
         Name = actorName;
+        _domainEvents = new DomainEventList();
         _actorStatusTransitioner = new ActorStatusTransitioner();
     }
 
@@ -55,6 +56,7 @@ public sealed class Actor : IPublishDomainEvents
         OrganizationId = organizationId;
         ActorNumber = actorNumber;
         Name = name;
+        _domainEvents = new DomainEventList(Id.Value);
         _externalActorId = externalActorId;
         _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
         _marketRoles.AddRange(marketRoles);
@@ -167,7 +169,7 @@ public sealed class Actor : IPublishDomainEvents
     /// </summary>
     public IReadOnlyList<ActorMarketRole> MarketRoles => _marketRoles;
 
-    IReadOnlyList<DomainEvent> IPublishDomainEvents.DomainEvents => _domainEvents;
+    IDomainEvents IPublishDomainEvents.DomainEvents => _domainEvents;
 
     private bool AreMarketRolesReadOnly => Status != ActorStatus.New;
 
@@ -270,14 +272,4 @@ public sealed class Actor : IPublishDomainEvents
     /// Only Active and New actors can be set to passive.
     /// </summary>
     public void SetAsPassive() => _actorStatusTransitioner.SetAsPassive();
-
-    void IPublishDomainEvents.ClearPublishedDomainEvents()
-    {
-        _domainEvents.Clear();
-    }
-
-    Guid IPublishDomainEvents.GetAggregateIdForDomainEvents()
-    {
-        return Id.Value;
-    }
 }
