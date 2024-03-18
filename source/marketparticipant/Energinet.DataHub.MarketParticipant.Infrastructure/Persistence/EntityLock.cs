@@ -31,9 +31,11 @@ public sealed class EntityLock(IMarketParticipantDbContext context) : IEntityLoc
 
     public void EnsureLocked(LockableEntity lockableEntity)
     {
+        ArgumentNullException.ThrowIfNull(lockableEntity);
+
         if (!_lockedEntities.Contains(lockableEntity))
         {
-            throw new InvalidOperationException("Actor lock is required during creation of new actor.");
+            throw new InvalidOperationException($"{lockableEntity.Name} lock is required during creation of new actor.");
         }
     }
 }
