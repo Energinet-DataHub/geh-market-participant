@@ -25,7 +25,6 @@ using MessageDelegationConfigured = Energinet.DataHub.MarketParticipant.Domain.M
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
-// TODO: Test
 public sealed class MessageDelegationConfiguredIntegrationEventFactory : IIntegrationEventFactory<MessageDelegationConfigured>
 {
     private readonly IActorRepository _actorRepository;
