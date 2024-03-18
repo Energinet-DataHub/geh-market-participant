@@ -151,7 +151,7 @@ markpartDomain = group "Market Participant" {
         }
 
         markpartIntegrationEvents = component "Integration Event Receiver" {
-            description "Receiver for domain event sent to shared servicebus."
+            description "Receiver for domain events sent to shared servicebus."
             technology "ServiceBus"
             tags "Microsoft Azure - Function Apps" "Titans"
 
