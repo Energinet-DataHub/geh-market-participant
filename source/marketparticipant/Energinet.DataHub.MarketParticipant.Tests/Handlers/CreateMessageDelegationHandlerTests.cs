@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
@@ -60,20 +59,9 @@ public sealed class CreateMessageDelegationHandlerTests
             .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
             .ReturnsAsync(actorTo);
 
-        var messageDelegations = new Dictionary<MessageDelegationId, MessageDelegation>();
-
         messageDelegationRepository
             .Setup(x => x.AddOrUpdateAsync(It.IsAny<MessageDelegation>()))
-            .ReturnsAsync(new Func<MessageDelegation, MessageDelegationId>(md =>
-            {
-                var newId = new MessageDelegationId(Guid.NewGuid());
-                messageDelegations.Add(newId, md);
-                return newId;
-            }));
-
-        messageDelegationRepository
-            .Setup(x => x.GetAsync(It.IsAny<MessageDelegationId>()))
-            .ReturnsAsync(new Func<MessageDelegationId, MessageDelegation?>(id => messageDelegations.GetValueOrDefault(id)));
+            .ReturnsAsync(new MessageDelegationId(Guid.NewGuid()));
 
         var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
             actorFrom.Id.Value,
@@ -263,6 +251,7 @@ public sealed class CreateMessageDelegationHandlerTests
             new Mock<IEntityLock>().Object,
             new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
+        var messageDelegationId = new MessageDelegationId(Guid.NewGuid());
         var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
         var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
 
@@ -273,20 +262,9 @@ public sealed class CreateMessageDelegationHandlerTests
             .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
             .ReturnsAsync(actorTo);
 
-        var messageDelegations = new Dictionary<MessageDelegationId, MessageDelegation>();
-
         messageDelegationRepository
             .Setup(x => x.AddOrUpdateAsync(It.IsAny<MessageDelegation>()))
-            .ReturnsAsync(new Func<MessageDelegation, MessageDelegationId>(md =>
-            {
-                var newId = new MessageDelegationId(Guid.NewGuid());
-                messageDelegations.Add(newId, md);
-                return newId;
-            }));
-
-        messageDelegationRepository
-            .Setup(x => x.GetAsync(It.IsAny<MessageDelegationId>()))
-            .ReturnsAsync(new Func<MessageDelegationId, MessageDelegation?>(id => messageDelegations.GetValueOrDefault(id)));
+            .ReturnsAsync(messageDelegationId);
 
         var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
             actorFrom.Id.Value,
@@ -299,6 +277,6 @@ public sealed class CreateMessageDelegationHandlerTests
         await target.Handle(command, CancellationToken.None);
 
         // Assert
-        domainEventRepository.Verify(x => x.EnqueueAsync(messageDelegations.Last().Value));
+        domainEventRepository.Verify(x => x.EnqueueAsync(It.IsAny<MessageDelegation>(), messageDelegationId.Value));
     }
 }

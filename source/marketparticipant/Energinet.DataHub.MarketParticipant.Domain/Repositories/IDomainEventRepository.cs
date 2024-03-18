@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
@@ -27,5 +28,13 @@ public interface IDomainEventRepository
     /// </summary>
     /// <param name="aggregate">The aggregate containing the domain events.</param>
     Task EnqueueAsync<T>(T aggregate)
+        where T : IPublishDomainEvents;
+
+    /// <summary>
+    /// Enqueue domain events for publishing from the provided aggregate.
+    /// </summary>
+    /// <param name="aggregate">The aggregate containing the domain events.</param>
+    /// <param name="aggregateId">The id of the aggregate containing the domain events.</param>
+    Task EnqueueAsync<T>(T aggregate, Guid aggregateId)
         where T : IPublishDomainEvents;
 }

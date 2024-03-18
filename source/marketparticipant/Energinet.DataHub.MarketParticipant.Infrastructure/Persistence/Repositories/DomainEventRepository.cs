@@ -37,15 +37,24 @@ public sealed class DomainEventRepository : IDomainEventRepository
         _jsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
     }
 
-    public async Task EnqueueAsync<T>(T aggregate)
+    public Task EnqueueAsync<T>(T aggregate)
+        where T : IPublishDomainEvents
+    {
+        ArgumentNullException.ThrowIfNull(aggregate);
+
+        var domainEvents = aggregate.DomainEvents;
+        var aggregateId = domainEvents.GetAggregateIdForDomainEvents();
+
+        return EnqueueAsync(aggregate, aggregateId);
+    }
+
+    public async Task EnqueueAsync<T>(T aggregate, Guid aggregateId)
         where T : IPublishDomainEvents
     {
         ArgumentNullException.ThrowIfNull(aggregate);
 
         var hasEvents = false;
         var domainEvents = aggregate.DomainEvents;
-
-        var aggregateId = domainEvents.GetAggregateIdForDomainEvents();
 
         foreach (var domainEvent in domainEvents)
         {

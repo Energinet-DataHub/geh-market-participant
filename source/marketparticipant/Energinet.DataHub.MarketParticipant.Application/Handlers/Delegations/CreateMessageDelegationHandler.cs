@@ -87,7 +87,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 
                 foreach (var messageType in request.CreateDelegation.MessageTypes)
                 {
-                    var messageDelegation = await EnsureMessageDelegationAsync(actor, messageType).ConfigureAwait(false);
+                    var messageDelegation = await _messageDelegationRepository
+                        .GetForActorAsync(actor.Id, messageType)
+                        .ConfigureAwait(false) ?? new MessageDelegation(actor, messageType);
 
                     foreach (var gridAreaId in request.CreateDelegation.GridAreas)
                     {
@@ -101,37 +103,17 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
                         .ValidateAsync(messageDelegation)
                         .ConfigureAwait(false);
 
-                    await _domainEventRepository
-                        .EnqueueAsync(messageDelegation)
+                    var messageDelegationId = await _messageDelegationRepository
+                        .AddOrUpdateAsync(messageDelegation)
                         .ConfigureAwait(false);
 
-                    await _messageDelegationRepository
-                        .AddOrUpdateAsync(messageDelegation)
+                    await _domainEventRepository
+                        .EnqueueAsync(messageDelegation, messageDelegationId.Value)
                         .ConfigureAwait(false);
                 }
 
                 await uow.CommitAsync().ConfigureAwait(false);
             }
-        }
-
-        private async Task<MessageDelegation> EnsureMessageDelegationAsync(Domain.Model.Actor actor, DelegationMessageType messageType)
-        {
-            var messageDelegation = await _messageDelegationRepository
-                .GetForActorAsync(actor.Id, messageType)
-                .ConfigureAwait(false);
-
-            if (messageDelegation == null)
-            {
-                var messageDelegationId = await _messageDelegationRepository
-                    .AddOrUpdateAsync(new MessageDelegation(actor, messageType))
-                    .ConfigureAwait(false);
-
-                messageDelegation = await _messageDelegationRepository
-                    .GetAsync(messageDelegationId)
-                    .ConfigureAwait(false);
-            }
-
-            return messageDelegation!;
         }
     }
 }
