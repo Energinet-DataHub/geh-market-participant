@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+namespace Energinet.DataHub.MarketParticipant.Application.Contracts;
 
 public partial class BalanceResponsiblePartiesChanged
 {

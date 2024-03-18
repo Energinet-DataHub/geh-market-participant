@@ -16,7 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Configuration;
 using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;

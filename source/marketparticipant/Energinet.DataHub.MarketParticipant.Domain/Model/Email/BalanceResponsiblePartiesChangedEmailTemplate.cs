@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 

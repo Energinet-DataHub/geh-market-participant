@@ -16,14 +16,15 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.MarketParticipant.Application.Contracts;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
-using NodaTime.Serialization.Protobuf;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Integration;
 
-public class IntegrationEventSubscriptionHandler(IBalanceResponsiblePartiesChangedEventHandler balanceResponsiblePartiesChangedEventHandler) : IIntegrationEventHandler
+public class IntegrationEventSubscriptionHandler(
+    IBalanceResponsiblePartiesChangedEventHandler balanceResponsiblePartiesChangedEventHandler,
+    ILogger<IntegrationEventSubscriptionHandler> logger) : IIntegrationEventHandler
 {
     public Task HandleAsync(IntegrationEvent integrationEvent)
     {
@@ -32,21 +33,10 @@ public class IntegrationEventSubscriptionHandler(IBalanceResponsiblePartiesChang
         switch (integrationEvent.Message)
         {
             case BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged:
-                return balanceResponsiblePartiesChangedEventHandler.HandleAsync(Map(integrationEvent.EventIdentification, balanceResponsiblePartiesChanged));
+                logger.LogInformation("Received BalanceResponsiblePartiesChanged event with id {EventId}", integrationEvent.EventIdentification);
+                return balanceResponsiblePartiesChangedEventHandler.HandleAsync(balanceResponsiblePartiesChanged);
             default:
                 return Task.CompletedTask;
         }
-    }
-
-    private static Domain.Model.Events.BalanceResponsiblePartiesChanged Map(Guid eventId, BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
-    {
-        return new Domain.Model.Events.BalanceResponsiblePartiesChanged(
-            eventId,
-            ActorNumber.Create(balanceResponsiblePartiesChanged.EnergySupplierId),
-            ActorNumber.Create(balanceResponsiblePartiesChanged.BalanceResponsibleId),
-            new GridAreaCode(balanceResponsiblePartiesChanged.GridAreaCode),
-            balanceResponsiblePartiesChanged.Received.ToInstant(),
-            balanceResponsiblePartiesChanged.ValidFrom.ToInstant(),
-            balanceResponsiblePartiesChanged.ValidTo.ToInstant());
     }
 }

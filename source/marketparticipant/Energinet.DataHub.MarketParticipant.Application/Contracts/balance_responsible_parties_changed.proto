@@ -15,9 +15,9 @@
 
 syntax = "proto3";
 import "google/protobuf/timestamp.proto";
-import "Model/Contracts/metering_point_type.proto";
+import "Contracts/metering_point_type.proto";
 
-option csharp_namespace = "Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts";
+option csharp_namespace = "Energinet.DataHub.MarketParticipant.Application.Contracts";
 
 /*
  * BalanceResponsiblePartiesChange Integration Event.

@@ -15,7 +15,7 @@
 
 syntax = "proto3";
 
-option csharp_namespace = "Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts";
+option csharp_namespace = "Energinet.DataHub.MarketParticipant.Application.Contracts";
 
 enum MeteringPointType {
     /*

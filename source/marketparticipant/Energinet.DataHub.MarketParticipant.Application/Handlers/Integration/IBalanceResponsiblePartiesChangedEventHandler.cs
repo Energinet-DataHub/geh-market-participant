@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
+using Energinet.DataHub.MarketParticipant.Application.Contracts;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 

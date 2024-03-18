@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 
@@ -27,9 +28,21 @@ public sealed class BalanceResponsiblePartiesChangedEventHandler(
     EmailRecipientConfig emailRecipientConfig)
     : IBalanceResponsiblePartiesChangedEventHandler
 {
-    public Task HandleAsync(BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
+    public Task HandleAsync(Contracts.BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
     {
-        return BuildAndSendEmailAsync(balanceResponsiblePartiesChanged);
+        ArgumentNullException.ThrowIfNull(balanceResponsiblePartiesChanged);
+        return BuildAndSendEmailAsync(Map(balanceResponsiblePartiesChanged));
+    }
+
+    private static BalanceResponsiblePartiesChanged Map(Contracts.BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
+    {
+        return new BalanceResponsiblePartiesChanged(
+            ActorNumber.Create(balanceResponsiblePartiesChanged.EnergySupplierId),
+            ActorNumber.Create(balanceResponsiblePartiesChanged.BalanceResponsibleId),
+            new GridAreaCode(balanceResponsiblePartiesChanged.GridAreaCode),
+            balanceResponsiblePartiesChanged.Received.ToInstant(),
+            balanceResponsiblePartiesChanged.ValidFrom.ToInstant(),
+            balanceResponsiblePartiesChanged.ValidTo?.ToInstant());
     }
 
     private Task BuildAndSendEmailAsync(BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
