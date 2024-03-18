@@ -150,6 +150,16 @@ markpartDomain = group "Market Participant" {
             this -> markpartDb "Reads data regarding newly invited users." "EF Core"
         }
 
+        markpartIntegrationEvents = component "Integration Event Receiver" {
+            description "Receiver for domain event sent to shared servicebus."
+            technology "ServiceBus"
+            tags "Microsoft Azure - Function Apps" "Titans"
+
+            # Common relationships
+            dh3.sharedServiceBus -> this "Receives integration events" "integration event/amqp"
+            this -> dh3.sharedExternalSendGrid "Sends change notification" "SendGrid/https"
+        }
+
         markpartUserInvitationExpiredTimerTrigger = component "UserInvitationExpiredTimerTrigger" {
             description "Timer Trigger checking for users with expired invitations. Users with expired invitations are disable in B2C."
 

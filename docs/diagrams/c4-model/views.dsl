@@ -64,6 +64,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             include markpartUserIdentityRepositoryInOrganizationManager->
             include ->markpartMailDispatcher->
             include ->markpartUserInvitationExpiredTimerTrigger->
+            include ->markpartIntegrationEvents->
         }
     }
 }
