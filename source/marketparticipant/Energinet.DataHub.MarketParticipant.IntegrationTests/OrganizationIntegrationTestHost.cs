@@ -77,7 +77,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 new(Settings.UserInviteFlow.Key, "fake_value"),
                 new(Settings.EnvironmentDescription.Key, "fake_value"),
                 new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
-                new(Settings.ServiceBusTopicName.Key, "fake_value")
+                new(Settings.ServiceBusTopicName.Key, "fake_value"),
+                new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.ConnectionString)}", "fake_value"),
+                new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.SharedIntegrationEventTopic)}", "fake_value"),
             };
 
             return new ConfigurationBuilder()
