@@ -99,6 +99,7 @@ internal sealed class Startup : StartupBase
         }
 
         var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
+        var consumeEventsOptions = configuration.GetSection(nameof(ConsumeServiceBusSettings)).Get<ConsumeServiceBusSettings>()!;
 
         services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
         services.AddScoped<HealthCheckEndpoint>();
@@ -112,6 +113,10 @@ internal sealed class Startup : StartupBase
             .AddAzureServiceBusTopic(
                 _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
                 _ => configuration.GetSetting(Settings.ServiceBusTopicName))
+            .AddAzureServiceBusTopic(
+                _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
+                _ => consumeEventsOptions.SharedIntegrationEventTopic,
+                name: "integration event consumer")
             .AddSendGrid(sendGridApiKey)
             .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check");
     }
