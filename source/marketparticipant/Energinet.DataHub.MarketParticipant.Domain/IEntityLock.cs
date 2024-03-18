@@ -19,5 +19,5 @@ namespace Energinet.DataHub.MarketParticipant.Domain;
 public interface IEntityLock
 {
     Task LockAsync(LockableEntity lockableEntity);
-    bool IsLocked(LockableEntity lockableEntity);
+    void EnsureLocked(LockableEntity lockableEntity);
 }

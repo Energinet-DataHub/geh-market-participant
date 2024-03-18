@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain;
@@ -28,8 +29,11 @@ public sealed class EntityLock(IMarketParticipantDbContext context) : IEntityLoc
         _lockedEntities.Add(lockableEntity);
     }
 
-    public bool IsLocked(LockableEntity lockableEntity)
+    public void EnsureLocked(LockableEntity lockableEntity)
     {
-        return _lockedEntities.Contains(lockableEntity);
+        if (!_lockedEntities.Contains(lockableEntity))
+        {
+            throw new InvalidOperationException("Actor lock is required during creation of new actor.");
+        }
     }
 }

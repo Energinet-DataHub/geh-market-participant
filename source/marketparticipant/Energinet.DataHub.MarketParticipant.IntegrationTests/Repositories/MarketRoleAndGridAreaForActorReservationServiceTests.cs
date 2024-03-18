@@ -108,10 +108,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         private static async Task<Actor> CreateActorUnderNewOrganizationAsync(MarketParticipantDatabaseFixture fixture, MarketParticipantDbContext context)
         {
             var actor = await fixture.PrepareActorAsync();
-            var entityLock = new Mock<IEntityLock>();
-            entityLock.Setup(x => x.IsLocked(LockableEntity.Actor)).Returns(true);
-
-            var repository = new ActorRepository(context, entityLock.Object);
+            var repository = new ActorRepository(context, new Mock<IEntityLock>().Object);
             return (await repository.GetAsync(new ActorId(actor.Id)))!;
         }
 

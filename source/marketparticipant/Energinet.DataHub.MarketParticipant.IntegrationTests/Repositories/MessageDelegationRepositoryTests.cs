@@ -38,9 +38,7 @@ public sealed class MessageDelegationRepositoryTests
     public MessageDelegationRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
-        var entityLock = new Mock<IEntityLock>();
-        entityLock.Setup(x => x.IsLocked(LockableEntity.Actor)).Returns(true);
-        _lock = entityLock.Object;
+        _lock = new Mock<IEntityLock>().Object;
     }
 
     [Fact]

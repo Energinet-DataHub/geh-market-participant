@@ -36,11 +36,7 @@ public sealed class ActorRepository(IMarketParticipantDbContext marketParticipan
 
         if (actor.Id.Value == default)
         {
-            if (!entityLock.IsLocked(LockableEntity.Actor))
-            {
-                throw new InvalidOperationException("Actor lock is required during creation of new actor.");
-            }
-
+            entityLock.EnsureLocked(LockableEntity.Actor);
             destination = new ActorEntity();
         }
         else

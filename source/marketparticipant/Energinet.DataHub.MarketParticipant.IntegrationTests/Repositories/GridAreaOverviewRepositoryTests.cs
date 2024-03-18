@@ -186,9 +186,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                     actor.AddMarketRole(new ActorMarketRole(marketRole, new[] { new ActorGridArea(gridAreaId, new[] { MeteringPointType.D01VeProduction }) }));
                 }
 
-                var entityLock = new Mock<IEntityLock>();
-                entityLock.Setup(x => x.IsLocked(LockableEntity.Actor)).Returns(true);
-                var actorRepository = new ActorRepository(context, entityLock.Object);
+                var actorRepository = new ActorRepository(context, new Mock<IEntityLock>().Object);
                 await actorRepository.AddOrUpdateAsync(actor);
             }
 
