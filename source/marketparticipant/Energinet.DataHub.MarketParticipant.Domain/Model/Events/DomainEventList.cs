@@ -41,7 +41,6 @@ public sealed class DomainEventList : IDomainEvents
 
     void IDomainEvents.ClearPublishedDomainEvents()
     {
-        EnsureAggregateId();
         _domainEvents.Clear();
     }
 
