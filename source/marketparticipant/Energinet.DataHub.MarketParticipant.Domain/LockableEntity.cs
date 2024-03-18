@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain;
 
-public sealed class LockableEntity
+public sealed record LockableEntity
 {
     private LockableEntity(string name)
     {

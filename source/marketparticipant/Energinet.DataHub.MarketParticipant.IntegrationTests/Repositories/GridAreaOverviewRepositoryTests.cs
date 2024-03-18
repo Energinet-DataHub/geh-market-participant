@@ -15,10 +15,12 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -184,7 +186,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                     actor.AddMarketRole(new ActorMarketRole(marketRole, new[] { new ActorGridArea(gridAreaId, new[] { MeteringPointType.D01VeProduction }) }));
                 }
 
-                var actorRepository = new ActorRepository(context);
+                var actorRepository = new ActorRepository(context, new Mock<IEntityLock>().Object);
                 await actorRepository.AddOrUpdateAsync(actor);
             }
 
