@@ -26,111 +26,112 @@ using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations;
-
-public sealed class CreateMessageDelegationHandler : IRequestHandler<CreateMessageDelegationCommand>
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
 {
-    private readonly IActorRepository _actorRepository;
-    private readonly IMessageDelegationRepository _messageDelegationRepository;
-    private readonly IDomainEventRepository _domainEventRepository;
-    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-    private readonly IEntityLock _entityLock;
-    private readonly IAllowedMarketRoleCombinationsForDelegationRuleService _allowedMarketRoleCombinationsForDelegationRuleService;
-
-    public CreateMessageDelegationHandler(
-        IActorRepository actorRepository,
-        IMessageDelegationRepository messageDelegationRepository,
-        IDomainEventRepository domainEventRepository,
-        IUnitOfWorkProvider unitOfWorkProvider,
-        IEntityLock entityLock,
-        IAllowedMarketRoleCombinationsForDelegationRuleService allowedMarketRoleCombinationsForDelegationRuleService)
+    public sealed class CreateMessageDelegationHandler : IRequestHandler<CreateMessageDelegationCommand>
     {
-        _actorRepository = actorRepository;
-        _messageDelegationRepository = messageDelegationRepository;
-        _domainEventRepository = domainEventRepository;
-        _unitOfWorkProvider = unitOfWorkProvider;
-        _entityLock = entityLock;
-        _allowedMarketRoleCombinationsForDelegationRuleService = allowedMarketRoleCombinationsForDelegationRuleService;
-    }
+        private readonly IActorRepository _actorRepository;
+        private readonly IMessageDelegationRepository _messageDelegationRepository;
+        private readonly IDomainEventRepository _domainEventRepository;
+        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+        private readonly IEntityLock _entityLock;
+        private readonly IAllowedMarketRoleCombinationsForDelegationRuleService _allowedMarketRoleCombinationsForDelegationRuleService;
 
-    public async Task Handle(CreateMessageDelegationCommand request, CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(request);
-
-        var actor = await _actorRepository
-            .GetAsync(new(request.CreateDelegation.DelegatedFrom))
-            .ConfigureAwait(false);
-
-        NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
-
-        var actorDelegatedTo = await _actorRepository
-            .GetAsync(new(request.CreateDelegation.DelegatedTo))
-            .ConfigureAwait(false);
-
-        NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo);
-
-        if (actor.Status != ActorStatus.Active || actorDelegatedTo.Status != ActorStatus.Active)
+        public CreateMessageDelegationHandler(
+            IActorRepository actorRepository,
+            IMessageDelegationRepository messageDelegationRepository,
+            IDomainEventRepository domainEventRepository,
+            IUnitOfWorkProvider unitOfWorkProvider,
+            IEntityLock entityLock,
+            IAllowedMarketRoleCombinationsForDelegationRuleService allowedMarketRoleCombinationsForDelegationRuleService)
         {
-            throw new ValidationException("Actors to delegate from/to must both be active to delegate messages.")
-                .WithErrorCode("message_delegation.actors_from_or_to_inactive");
+            _actorRepository = actorRepository;
+            _messageDelegationRepository = messageDelegationRepository;
+            _domainEventRepository = domainEventRepository;
+            _unitOfWorkProvider = unitOfWorkProvider;
+            _entityLock = entityLock;
+            _allowedMarketRoleCombinationsForDelegationRuleService = allowedMarketRoleCombinationsForDelegationRuleService;
         }
 
-        var uow = await _unitOfWorkProvider
-            .NewUnitOfWorkAsync()
-            .ConfigureAwait(false);
-
-        await using (uow.ConfigureAwait(false))
+        public async Task Handle(CreateMessageDelegationCommand request, CancellationToken cancellationToken)
         {
-            await _entityLock
-                .LockAsync(LockableEntity.Actor)
+            ArgumentNullException.ThrowIfNull(request);
+
+            var actor = await _actorRepository
+                .GetAsync(new(request.CreateDelegation.DelegatedFrom))
                 .ConfigureAwait(false);
 
-            foreach (var messageType in request.CreateDelegation.MessageTypes)
-            {
-                var messageDelegation = await EnsureMessageDelegationAsync(actor, messageType).ConfigureAwait(false);
+            NotFoundValidationException.ThrowIfNull(actor, request.CreateDelegation.DelegatedFrom);
 
-                foreach (var gridAreaId in request.CreateDelegation.GridAreas)
+            var actorDelegatedTo = await _actorRepository
+                .GetAsync(new(request.CreateDelegation.DelegatedTo))
+                .ConfigureAwait(false);
+
+            NotFoundValidationException.ThrowIfNull(actorDelegatedTo, request.CreateDelegation.DelegatedTo);
+
+            if (actor.Status != ActorStatus.Active || actorDelegatedTo.Status != ActorStatus.Active)
+            {
+                throw new ValidationException("Actors to delegate from/to must both be active to delegate messages.")
+                    .WithErrorCode("message_delegation.actors_from_or_to_inactive");
+            }
+
+            var uow = await _unitOfWorkProvider
+                .NewUnitOfWorkAsync()
+                .ConfigureAwait(false);
+
+            await using (uow.ConfigureAwait(false))
+            {
+                await _entityLock
+                    .LockAsync(LockableEntity.Actor)
+                    .ConfigureAwait(false);
+
+                foreach (var messageType in request.CreateDelegation.MessageTypes)
                 {
-                    messageDelegation.DelegateTo(
-                        actorDelegatedTo.Id,
-                        new(gridAreaId),
-                        Instant.FromDateTimeOffset(request.CreateDelegation.StartsAt));
+                    var messageDelegation = await EnsureMessageDelegationAsync(actor, messageType).ConfigureAwait(false);
+
+                    foreach (var gridAreaId in request.CreateDelegation.GridAreas)
+                    {
+                        messageDelegation.DelegateTo(
+                            actorDelegatedTo.Id,
+                            new(gridAreaId),
+                            Instant.FromDateTimeOffset(request.CreateDelegation.StartsAt));
+                    }
+
+                    await _allowedMarketRoleCombinationsForDelegationRuleService
+                        .ValidateAsync(messageDelegation)
+                        .ConfigureAwait(false);
+
+                    await _domainEventRepository
+                        .EnqueueAsync(messageDelegation)
+                        .ConfigureAwait(false);
+
+                    await _messageDelegationRepository
+                        .AddOrUpdateAsync(messageDelegation)
+                        .ConfigureAwait(false);
                 }
 
-                await _allowedMarketRoleCombinationsForDelegationRuleService
-                    .ValidateAsync(messageDelegation)
+                await uow.CommitAsync().ConfigureAwait(false);
+            }
+        }
+
+        private async Task<MessageDelegation> EnsureMessageDelegationAsync(Domain.Model.Actor actor, DelegationMessageType messageType)
+        {
+            var messageDelegation = await _messageDelegationRepository
+                .GetForActorAsync(actor.Id, messageType)
+                .ConfigureAwait(false);
+
+            if (messageDelegation == null)
+            {
+                var messageDelegationId = await _messageDelegationRepository
+                    .AddOrUpdateAsync(new MessageDelegation(actor, messageType))
                     .ConfigureAwait(false);
 
-                await _domainEventRepository
-                    .EnqueueAsync(messageDelegation)
-                    .ConfigureAwait(false);
-
-                await _messageDelegationRepository
-                    .AddOrUpdateAsync(messageDelegation)
+                messageDelegation = await _messageDelegationRepository
+                    .GetAsync(messageDelegationId)
                     .ConfigureAwait(false);
             }
 
-            await uow.CommitAsync().ConfigureAwait(false);
+            return messageDelegation!;
         }
-    }
-
-    private async Task<MessageDelegation> EnsureMessageDelegationAsync(Domain.Model.Actor actor, DelegationMessageType messageType)
-    {
-        var messageDelegation = await _messageDelegationRepository
-            .GetForActorAsync(actor.Id, messageType)
-            .ConfigureAwait(false);
-
-        if (messageDelegation == null)
-        {
-            var messageDelegationId = await _messageDelegationRepository
-                .AddOrUpdateAsync(new MessageDelegation(actor, messageType))
-                .ConfigureAwait(false);
-
-            messageDelegation = await _messageDelegationRepository
-                .GetAsync(messageDelegationId)
-                .ConfigureAwait(false);
-        }
-
-        return messageDelegation!;
     }
 }
