@@ -85,9 +85,6 @@ public sealed class MessageDelegationRepository(IMarketParticipantDbContext mark
                 DelegatedByActorId = messageDelegation.DelegatedBy.Value,
                 MessageType = messageDelegation.MessageType
             };
-
-            if (!messageDelegation.Delegations.Any())
-                throw new InvalidOperationException("Message delegation requires at least one delegation period.");
         }
         else
         {

@@ -18,6 +18,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using NodaTime;
 using Xunit;
@@ -28,13 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model;
 [UnitTest]
 public sealed class MessageDelegationTests
 {
-    // Test data for the overlap test
-    // ReSharper disable once InconsistentNaming
-#pragma warning disable SA1401
-#pragma warning disable CA2211
-    public static TheoryData<IReadOnlyList<(Instant StartsAt, Instant? StopsAt)>, bool, int> OverlapCases =
-#pragma warning restore CA2211
-#pragma warning restore SA1401
+    public static TheoryData<IReadOnlyList<(Instant StartsAt, Instant? StopsAt)>, bool, int> OverlapCases { get; } =
         new()
         {
             // Two delegations after each other, no overlap, new starts after old stops, should not throw
@@ -207,6 +202,62 @@ public sealed class MessageDelegationTests
         }
 
         Assert.Equal(expectedDelegationCount, messageDelegation.Delegations.Count);
+    }
+
+    [Fact]
+    public void DelegateTo_AddedPeriod_PublishesEvents()
+    {
+        // Arrange
+        var testData = CreateTestBasicTestData();
+        var messageDelegation = new MessageDelegation(testData.ActorFrom, DelegationMessageType.Rsm017Inbound);
+
+        // Act
+        var expectedStartsAt = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
+        messageDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, expectedStartsAt);
+
+        // Assert
+        var actual = (MessageDelegationConfigured)((IPublishDomainEvents)messageDelegation)
+            .DomainEvents
+            .ToList()
+            .Single();
+
+        Assert.Equal(testData.ActorFrom.Id, actual.DelegatedBy);
+        Assert.Equal(testData.ActorTo.Id, actual.DelegatedTo);
+        Assert.Equal(testData.GridArea.Id, actual.GridAreaId);
+        Assert.Equal(DelegationMessageType.Rsm017Inbound, actual.MessageType);
+        Assert.Equal(expectedStartsAt, actual.StartsAt);
+        Assert.Equal(Instant.MaxValue, actual.StopsAt);
+    }
+
+    [Fact]
+    public void StopDelegation_StopPeriod_PublishesEvents()
+    {
+        // Arrange
+        var testData = CreateTestBasicTestData();
+        var messageDelegation = new MessageDelegation(testData.ActorFrom, DelegationMessageType.Rsm019Inbound);
+
+        var expectedStartsAt = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
+        var expectedStopsAt = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow).Plus(Duration.FromDays(-5));
+
+        // Act
+        messageDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, expectedStartsAt);
+        messageDelegation.StopDelegation(messageDelegation.Delegations.Single(), expectedStopsAt);
+
+        // Assert
+        var domainEvents = ((IPublishDomainEvents)messageDelegation)
+            .DomainEvents
+            .ToList();
+
+        Assert.Equal(2, domainEvents.Count);
+
+        var actual = (MessageDelegationConfigured)domainEvents.Last();
+
+        Assert.Equal(testData.ActorFrom.Id, actual.DelegatedBy);
+        Assert.Equal(testData.ActorTo.Id, actual.DelegatedTo);
+        Assert.Equal(testData.GridArea.Id, actual.GridAreaId);
+        Assert.Equal(DelegationMessageType.Rsm019Inbound, actual.MessageType);
+        Assert.Equal(expectedStartsAt, actual.StartsAt);
+        Assert.Equal(expectedStopsAt, actual.StopsAt);
     }
 
     private static (Actor ActorFrom, Actor ActorTo, GridArea GridArea) CreateTestBasicTestData()
