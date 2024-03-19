@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Contracts;
 
-public sealed record EmailRecipientConfig(
-    string SenderEmail,
-    string BccEmail,
-    string OrgUpdateNotificationToEmail,
-    string BalanceResponsibleChangedNotificationToEmail,
-    string UserInviteFlow,
-    string? EnvironmentDescription);
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
+
+#pragma warning disable CA1711
+public interface IBalanceResponsiblePartiesChangedEventHandler
+#pragma warning restore CA1711
+{
+    Task HandleAsync(BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged);
+}

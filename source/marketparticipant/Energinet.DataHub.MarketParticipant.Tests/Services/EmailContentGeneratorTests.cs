@@ -64,6 +64,13 @@ public sealed class EmailContentGeneratorTests
                     Assert.NotNull(t3Actual.Subject);
                     Assert.Equal(t3Expected, t3Actual.HtmlContent);
                     break;
+                case EmailTemplateId.BalanceResponsiblePartiesChanged:
+                    var t4Actual = await emailContentGenerator.GenerateAsync(new BalanceResponsiblePartiesChangedEmailTemplate(emptyParams), emptyParams);
+                    var t4Expected = await GetTestTemplateAsync(EmailTemplateId.BalanceResponsiblePartiesChanged);
+                    Assert.NotNull(t4Actual);
+                    Assert.NotNull(t4Actual.Subject);
+                    Assert.Equal(t4Expected, t4Actual.HtmlContent);
+                    break;
                 default:
                     throw new InvalidOperationException();
             }
