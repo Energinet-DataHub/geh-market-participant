@@ -20,11 +20,14 @@ using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
+using Energinet.DataHub.MarketParticipant.Application.Contracts;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Integration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -43,10 +46,14 @@ internal sealed class Startup : StartupBase
         services.AddScoped<IAuditIdentityProvider>(_ => KnownAuditIdentityProvider.OrganizationBackgroundService);
         services.AddFeatureManagement();
 
+        services.AddOptions();
+        services.Configure<ConsumeServiceBusSettings>(configuration.GetSection(nameof(ConsumeServiceBusSettings)));
+
         services.AddScoped<SynchronizeActorsTimerTrigger>();
         services.AddScoped<EmailEventTimerTrigger>();
         services.AddScoped<UserInvitationExpiredTimerTrigger>();
         services.AddScoped<DispatchIntegrationEventsTrigger>();
+        services.AddScoped<ReceiveIntegrationEventsTrigger>();
         services.AddScoped<OrganizationIdentityUpdateTrigger>();
 
         services.AddPublisher<IntegrationEventProvider>();
@@ -54,6 +61,11 @@ internal sealed class Startup : StartupBase
         {
             options.ServiceBusConnectionString = configuration.GetSetting(Settings.ServiceBusTopicConnectionString);
             options.TopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
+        });
+
+        services.AddSubscriber<IntegrationEventSubscriptionHandler>(new[]
+        {
+            BalanceResponsiblePartiesChanged.Descriptor,
         });
 
         var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
@@ -88,6 +100,7 @@ internal sealed class Startup : StartupBase
         }
 
         var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
+        var consumeEventsOptions = configuration.GetSection(nameof(ConsumeServiceBusSettings)).Get<ConsumeServiceBusSettings>()!;
 
         services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
         services.AddScoped<HealthCheckEndpoint>();
@@ -101,6 +114,10 @@ internal sealed class Startup : StartupBase
             .AddAzureServiceBusTopic(
                 _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
                 _ => configuration.GetSetting(Settings.ServiceBusTopicName))
+            .AddAzureServiceBusTopic(
+                _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
+                _ => consumeEventsOptions.SharedIntegrationEventTopic,
+                name: "integration event consumer")
             .AddSendGrid(sendGridApiKey)
             .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check");
     }

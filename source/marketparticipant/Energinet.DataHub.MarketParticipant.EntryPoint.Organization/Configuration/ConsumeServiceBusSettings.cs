@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Configuration;
 
-public sealed record EmailRecipientConfig(
-    string SenderEmail,
-    string BccEmail,
-    string OrgUpdateNotificationToEmail,
-    string BalanceResponsibleChangedNotificationToEmail,
-    string UserInviteFlow,
-    string? EnvironmentDescription);
+public class ConsumeServiceBusSettings
+{
+    public string ConnectionString { get; set; } = string.Empty;
+    public string SharedIntegrationEventTopic { get; set; } = string.Empty;
+    public string IntegrationEventSubscription { get; set; } = string.Empty;
+}
