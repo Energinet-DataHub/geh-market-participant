@@ -30,203 +30,253 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class CreateMessageDelegationHandlerTests
 {
-    [UnitTest]
-    public sealed class CreateMessageDelegationHandlerTests
+    [Fact]
+    public async Task Handle_NewMessageDelegation_CorrectDoesNotThrow()
     {
-        [Fact]
-        public async Task Handle_NewMessageDelegation_CorrectDoesNotThrow()
-        {
-            // Arrange
-            var actorRepo = new Mock<IActorRepository>();
-            var target = new CreateMessageDelegationHandler(
-                actorRepo.Object,
-                new Mock<IMessageDelegationRepository>().Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IEntityLock>().Object,
-                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+        // Arrange
+        var actorRepo = new Mock<IActorRepository>();
+        var messageDelegationRepository = new Mock<IMessageDelegationRepository>();
+        var target = new CreateMessageDelegationHandler(
+            actorRepo.Object,
+            messageDelegationRepository.Object,
+            new Mock<IDomainEventRepository>().Object,
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IEntityLock>().Object,
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
-            var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
-            var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
+        var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
+        var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
 
-            actorRepo
-                .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
-                .ReturnsAsync(actorFrom);
-            actorRepo
-                .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
-                .ReturnsAsync(actorTo);
+        actorRepo
+            .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
+            .ReturnsAsync(actorFrom);
+        actorRepo
+            .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
+            .ReturnsAsync(actorTo);
 
-            var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
-                actorFrom.Id.Value,
-                actorTo.Id.Value,
-                new List<Guid> { Guid.NewGuid() },
-                new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
-                DateTimeOffset.UtcNow));
+        messageDelegationRepository
+            .Setup(x => x.AddOrUpdateAsync(It.IsAny<MessageDelegation>()))
+            .ReturnsAsync(new MessageDelegationId(Guid.NewGuid()));
 
-            // Act
-            var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
+        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+            actorFrom.Id.Value,
+            actorTo.Id.Value,
+            new List<Guid> { Guid.NewGuid() },
+            new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
+            DateTimeOffset.UtcNow));
 
-            // Assert
-            Assert.Null(exception);
-        }
+        // Act + Assert
+        await target.Handle(command, CancellationToken.None);
+    }
 
-        [Fact]
-        public async Task Handle_NewMessageDelegation_InActiveActorFromThrows()
-        {
-            // Arrange
-            var actorRepo = new Mock<IActorRepository>();
-            var target = new CreateMessageDelegationHandler(
-                actorRepo.Object,
-                new Mock<IMessageDelegationRepository>().Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IEntityLock>().Object,
-                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+    [Fact]
+    public async Task Handle_NewMessageDelegation_InActiveActorFromThrows()
+    {
+        // Arrange
+        var actorRepo = new Mock<IActorRepository>();
+        var target = new CreateMessageDelegationHandler(
+            actorRepo.Object,
+            new Mock<IMessageDelegationRepository>().Object,
+            new Mock<IDomainEventRepository>().Object,
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IEntityLock>().Object,
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
-            var actorFrom = TestPreparationModels.MockedActor(Guid.NewGuid(), Guid.NewGuid());
-            var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
+        var actorFrom = TestPreparationModels.MockedActor(Guid.NewGuid(), Guid.NewGuid());
+        var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
 
-            actorRepo
-                .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
-                .ReturnsAsync(actorFrom);
-            actorRepo
-                .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
-                .ReturnsAsync(actorTo);
+        actorRepo
+            .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
+            .ReturnsAsync(actorFrom);
+        actorRepo
+            .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
+            .ReturnsAsync(actorTo);
 
-            var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
-                actorFrom.Id.Value,
-                actorTo.Id.Value,
-                new List<Guid> { Guid.NewGuid() },
-                new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
-                DateTimeOffset.UtcNow));
+        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+            actorFrom.Id.Value,
+            actorTo.Id.Value,
+            new List<Guid> { Guid.NewGuid() },
+            new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
+            DateTimeOffset.UtcNow));
 
-            // Act
-            var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
+        // Act
+        var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
 
-            // Assert
-            Assert.NotNull(exception);
-            Assert.IsType<ValidationException>(exception);
-            Assert.Contains(
-                $"Actors to delegate from/to must both be active to delegate messages",
-                exception.Message,
-                StringComparison.OrdinalIgnoreCase);
-        }
+        // Assert
+        Assert.NotNull(exception);
+        Assert.IsType<ValidationException>(exception);
+        Assert.Contains(
+            $"Actors to delegate from/to must both be active to delegate messages",
+            exception.Message,
+            StringComparison.OrdinalIgnoreCase);
+    }
 
-        [Fact]
-        public async Task Handle_NewMessageDelegation_InActiveActorToThrows()
-        {
-            // Arrange
-            var actorRepo = new Mock<IActorRepository>();
-            var target = new CreateMessageDelegationHandler(
-                actorRepo.Object,
-                new Mock<IMessageDelegationRepository>().Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IEntityLock>().Object,
-                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+    [Fact]
+    public async Task Handle_NewMessageDelegation_InActiveActorToThrows()
+    {
+        // Arrange
+        var actorRepo = new Mock<IActorRepository>();
+        var target = new CreateMessageDelegationHandler(
+            actorRepo.Object,
+            new Mock<IMessageDelegationRepository>().Object,
+            new Mock<IDomainEventRepository>().Object,
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IEntityLock>().Object,
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
-            var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
-            var actorTo = TestPreparationModels.MockedActor(Guid.NewGuid(), Guid.NewGuid());
+        var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
+        var actorTo = TestPreparationModels.MockedActor(Guid.NewGuid(), Guid.NewGuid());
 
-            actorRepo
-                .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
-                .ReturnsAsync(actorFrom);
-            actorRepo
-                .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
-                .ReturnsAsync(actorTo);
+        actorRepo
+            .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
+            .ReturnsAsync(actorFrom);
+        actorRepo
+            .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
+            .ReturnsAsync(actorTo);
 
-            var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
-                actorFrom.Id.Value,
-                actorTo.Id.Value,
-                new List<Guid> { Guid.NewGuid() },
-                new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
-                DateTimeOffset.UtcNow));
+        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+            actorFrom.Id.Value,
+            actorTo.Id.Value,
+            new List<Guid> { Guid.NewGuid() },
+            new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
+            DateTimeOffset.UtcNow));
 
-            // Act
-            var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
+        // Act
+        var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
 
-            // Assert
-            Assert.NotNull(exception);
-            Assert.IsType<ValidationException>(exception);
-            Assert.Contains(
-                $"Actors to delegate from/to must both be active to delegate messages.",
-                exception.Message,
-                StringComparison.OrdinalIgnoreCase);
-        }
+        // Assert
+        Assert.NotNull(exception);
+        Assert.IsType<ValidationException>(exception);
+        Assert.Contains(
+            $"Actors to delegate from/to must both be active to delegate messages.",
+            exception.Message,
+            StringComparison.OrdinalIgnoreCase);
+    }
 
-        [Fact]
-        public async Task Handle_NewMessageDelegation_UnknownActorFromThrows()
-        {
-            // Arrange
-            var actorRepo = new Mock<IActorRepository>();
-            var target = new CreateMessageDelegationHandler(
-                actorRepo.Object,
-                new Mock<IMessageDelegationRepository>().Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IEntityLock>().Object,
-                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+    [Fact]
+    public async Task Handle_NewMessageDelegation_UnknownActorFromThrows()
+    {
+        // Arrange
+        var actorRepo = new Mock<IActorRepository>();
+        var target = new CreateMessageDelegationHandler(
+            actorRepo.Object,
+            new Mock<IMessageDelegationRepository>().Object,
+            new Mock<IDomainEventRepository>().Object,
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IEntityLock>().Object,
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
-            var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
-            var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
+        var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
+        var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
 
-            actorRepo
-                .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
-                .ReturnsAsync(actorTo);
+        actorRepo
+            .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
+            .ReturnsAsync(actorTo);
 
-            var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
-                actorFrom.Id.Value,
-                actorTo.Id.Value,
-                new List<Guid> { Guid.NewGuid() },
-                new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
-                DateTimeOffset.UtcNow));
+        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+            actorFrom.Id.Value,
+            actorTo.Id.Value,
+            new List<Guid> { Guid.NewGuid() },
+            new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
+            DateTimeOffset.UtcNow));
 
-            // Act
-            var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
+        // Act
+        var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
 
-            // Assert
-            Assert.NotNull(exception);
-            Assert.IsType<NotFoundValidationException>(exception);
-            Assert.Contains(
-                $"Entity '{actorFrom.Id.Value}' does not exist.",
-                exception.Message,
-                StringComparison.OrdinalIgnoreCase);
-        }
+        // Assert
+        Assert.NotNull(exception);
+        Assert.IsType<NotFoundValidationException>(exception);
+        Assert.Contains(
+            $"Entity '{actorFrom.Id.Value}' does not exist.",
+            exception.Message,
+            StringComparison.OrdinalIgnoreCase);
+    }
 
-        [Fact]
-        public async Task Handle_NewMessageDelegation_UnknownActorToThrows()
-        {
-            // Arrange
-            var actorRepo = new Mock<IActorRepository>();
-            var target = new CreateMessageDelegationHandler(
-                actorRepo.Object,
-                new Mock<IMessageDelegationRepository>().Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IEntityLock>().Object,
-                new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+    [Fact]
+    public async Task Handle_NewMessageDelegation_UnknownActorToThrows()
+    {
+        // Arrange
+        var actorRepo = new Mock<IActorRepository>();
+        var target = new CreateMessageDelegationHandler(
+            actorRepo.Object,
+            new Mock<IMessageDelegationRepository>().Object,
+            new Mock<IDomainEventRepository>().Object,
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IEntityLock>().Object,
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
-            var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
-            var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
+        var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
+        var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
 
-            actorRepo
-                .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
-                .ReturnsAsync(actorFrom);
+        actorRepo
+            .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
+            .ReturnsAsync(actorFrom);
 
-            var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
-                actorFrom.Id.Value,
-                actorTo.Id.Value,
-                new List<Guid> { Guid.NewGuid() },
-                new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
-                DateTimeOffset.UtcNow));
+        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+            actorFrom.Id.Value,
+            actorTo.Id.Value,
+            new List<Guid> { Guid.NewGuid() },
+            new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
+            DateTimeOffset.UtcNow));
 
-            // Act
-            var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
+        // Act
+        var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
 
-            // Assert
-            Assert.NotNull(exception);
-            Assert.IsType<NotFoundValidationException>(exception);
-            Assert.Contains(
-                $"Entity '{actorTo.Id.Value}' does not exist.",
-                exception.Message,
-                StringComparison.OrdinalIgnoreCase);
-        }
+        // Assert
+        Assert.NotNull(exception);
+        Assert.IsType<NotFoundValidationException>(exception);
+        Assert.Contains(
+            $"Entity '{actorTo.Id.Value}' does not exist.",
+            exception.Message,
+            StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task Handle_NewMessageDelegation_PublishesEvents()
+    {
+        // Arrange
+        var actorRepository = new Mock<IActorRepository>();
+        var messageDelegationRepository = new Mock<IMessageDelegationRepository>();
+        var domainEventRepository = new Mock<IDomainEventRepository>();
+        var target = new CreateMessageDelegationHandler(
+            actorRepository.Object,
+            messageDelegationRepository.Object,
+            domainEventRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IEntityLock>().Object,
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+
+        var messageDelegationId = new MessageDelegationId(Guid.NewGuid());
+        var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
+        var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
+
+        actorRepository
+            .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
+            .ReturnsAsync(actorFrom);
+        actorRepository
+            .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
+            .ReturnsAsync(actorTo);
+
+        messageDelegationRepository
+            .Setup(x => x.AddOrUpdateAsync(It.IsAny<MessageDelegation>()))
+            .ReturnsAsync(messageDelegationId);
+
+        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+            actorFrom.Id.Value,
+            actorTo.Id.Value,
+            [Guid.NewGuid()],
+            [DelegationMessageType.Rsm012Inbound],
+            DateTimeOffset.UtcNow));
+
+        // Act
+        await target.Handle(command, CancellationToken.None);
+
+        // Assert
+        domainEventRepository.Verify(x => x.EnqueueAsync(It.IsAny<MessageDelegation>(), messageDelegationId.Value));
     }
 }

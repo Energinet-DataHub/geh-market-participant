@@ -37,31 +37,43 @@ public sealed class DomainEventRepository : IDomainEventRepository
         _jsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
     }
 
-    public async Task EnqueueAsync<T>(T aggregate)
+    public Task EnqueueAsync<T>(T aggregate)
         where T : IPublishDomainEvents
     {
         ArgumentNullException.ThrowIfNull(aggregate);
 
-        if (aggregate.DomainEvents.Count == 0)
-            return;
+        var domainEvents = aggregate.DomainEvents;
+        var aggregateId = domainEvents.GetAggregateIdForDomainEvents();
 
-        var aggregateId = aggregate.GetAggregateIdForDomainEvents();
-        if (aggregateId == Guid.Empty)
-            throw new InvalidOperationException("Cannot publish events for unsaved aggregate.");
+        return EnqueueAsync(aggregate, aggregateId);
+    }
 
-        foreach (var domainEvent in aggregate.DomainEvents)
+    public async Task EnqueueAsync<T>(T aggregate, Guid aggregateId)
+        where T : IPublishDomainEvents
+    {
+        ArgumentNullException.ThrowIfNull(aggregate);
+
+        var hasEvents = false;
+        var domainEvents = aggregate.DomainEvents;
+
+        foreach (var domainEvent in domainEvents)
         {
+            hasEvents = true;
+
             await _marketParticipantDbContext
                 .DomainEvents
                 .AddAsync(Map(aggregateId, typeof(T), domainEvent))
                 .ConfigureAwait(false);
         }
 
+        if (!hasEvents)
+            return;
+
         await _marketParticipantDbContext
             .SaveChangesAsync()
             .ConfigureAwait(false);
 
-        aggregate.ClearPublishedDomainEvents();
+        domainEvents.ClearPublishedDomainEvents();
     }
 
     private DomainEventEntity Map(Guid aggregateId, Type aggregateType, DomainEvent domainEvent)

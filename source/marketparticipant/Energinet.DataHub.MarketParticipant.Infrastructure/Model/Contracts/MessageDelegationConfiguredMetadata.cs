@@ -12,21 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
-
-public sealed record ActorId
+public partial class MessageDelegationConfigured
 {
-    public ActorId(Guid value)
-    {
-        Value = value;
-    }
-
-    public Guid Value { get; }
-
-    public override string ToString()
-    {
-        return Value.ToString();
-    }
+    public const string EventName = "MessageDelegationConfigured";
+    public const int CurrentMinorVersion = 1;
 }

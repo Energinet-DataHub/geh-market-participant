@@ -38,7 +38,10 @@ public sealed class StopMessageDelegationHandlerTests
     {
         // Arrange
         var messageRepo = new Mock<IMessageDelegationRepository>();
-        var target = new StopMessageDelegationHandler(messageRepo.Object);
+        var target = new StopMessageDelegationHandler(
+            messageRepo.Object,
+            new Mock<IDomainEventRepository>().Object,
+            UnitOfWorkProviderMock.Create());
 
         var actorFrom = TestPreparationModels.MockedActor(Guid.NewGuid(), Guid.NewGuid());
         var delegationPeriod = new DelegationPeriod(
@@ -63,11 +66,8 @@ public sealed class StopMessageDelegationHandlerTests
             delegationPeriod.Id.Value,
             DateTimeOffset.UtcNow));
 
-        // Act
-        var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
-
-        // Assert
-        Assert.Null(exception);
+        // Act + Assert
+        await target.Handle(command, CancellationToken.None);
     }
 
     [Fact]
@@ -75,7 +75,10 @@ public sealed class StopMessageDelegationHandlerTests
     {
         // Arrange
         var messageRepo = new Mock<IMessageDelegationRepository>();
-        var target = new StopMessageDelegationHandler(messageRepo.Object);
+        var target = new StopMessageDelegationHandler(
+            messageRepo.Object,
+            new Mock<IDomainEventRepository>().Object,
+            UnitOfWorkProviderMock.Create());
 
         var actorFrom = TestPreparationModels.MockedActor(Guid.NewGuid(), Guid.NewGuid());
         var delegationPeriod = new DelegationPeriod(
@@ -118,7 +121,10 @@ public sealed class StopMessageDelegationHandlerTests
     {
         // Arrange
         var messageRepo = new Mock<IMessageDelegationRepository>();
-        var target = new StopMessageDelegationHandler(messageRepo.Object);
+        var target = new StopMessageDelegationHandler(
+            messageRepo.Object,
+            new Mock<IDomainEventRepository>().Object,
+            UnitOfWorkProviderMock.Create());
 
         var actorFrom = TestPreparationModels.MockedActor(Guid.NewGuid(), Guid.NewGuid());
         var delegationPeriod = new DelegationPeriod(
@@ -154,5 +160,46 @@ public sealed class StopMessageDelegationHandlerTests
             $"Entity '{testPeriodId.Value}' does not exist",
             exception.Message,
             StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task Handle_StopMessageDelegation_PublishesEvents()
+    {
+        // Arrange
+        var messageDelegationRepository = new Mock<IMessageDelegationRepository>();
+        var domainEventRepository = new Mock<IDomainEventRepository>();
+        var target = new StopMessageDelegationHandler(
+            messageDelegationRepository.Object,
+            domainEventRepository.Object,
+            UnitOfWorkProviderMock.Create());
+
+        var delegationPeriod = new DelegationPeriod(
+            new DelegationPeriodId(Guid.NewGuid()),
+            new ActorId(Guid.NewGuid()),
+            new GridAreaId(Guid.NewGuid()),
+            Instant.FromDateTimeOffset(DateTimeOffset.UtcNow),
+            null);
+
+        var messageDelegation = new MessageDelegation(
+            new MessageDelegationId(Guid.NewGuid()),
+            new ActorId(Guid.NewGuid()),
+            DelegationMessageType.Rsm012Inbound,
+            Guid.NewGuid(),
+            [delegationPeriod]);
+
+        messageDelegationRepository
+            .Setup(x => x.GetAsync(It.Is<MessageDelegationId>(match => match.Value == messageDelegation.Id.Value)))
+            .ReturnsAsync(messageDelegation);
+
+        var command = new StopMessageDelegationCommand(new StopMessageDelegationDto(
+            messageDelegation.Id.Value,
+            delegationPeriod.Id.Value,
+            DateTimeOffset.UtcNow));
+
+        // Act
+        await target.Handle(command, CancellationToken.None);
+
+        // Assert
+        domainEventRepository.Verify(x => x.EnqueueAsync(messageDelegation));
     }
 }
