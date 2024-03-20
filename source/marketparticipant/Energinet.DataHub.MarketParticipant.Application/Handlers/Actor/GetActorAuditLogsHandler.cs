@@ -28,13 +28,16 @@ public sealed class GetActorAuditLogsHandler : IRequestHandler<GetActorAuditLogs
 {
     private readonly IActorAuditLogRepository _actorAuditLogRepository;
     private readonly IActorContactAuditLogRepository _actorContactAuditLogRepository;
+    private readonly IActorDelegationAuditLogRepository _actorDelegationAuditLogRepository;
 
     public GetActorAuditLogsHandler(
         IActorAuditLogRepository actorAuditLogRepository,
-        IActorContactAuditLogRepository actorContactAuditLogRepository)
+        IActorContactAuditLogRepository actorContactAuditLogRepository,
+        IActorDelegationAuditLogRepository actorDelegationAuditLogRepository)
     {
         _actorAuditLogRepository = actorAuditLogRepository;
         _actorContactAuditLogRepository = actorContactAuditLogRepository;
+        _actorDelegationAuditLogRepository = actorDelegationAuditLogRepository;
     }
 
     public async Task<GetActorAuditLogsResponse> Handle(
@@ -51,8 +54,13 @@ public sealed class GetActorAuditLogsHandler : IRequestHandler<GetActorAuditLogs
             .GetAsync(new ActorId(request.ActorId))
             .ConfigureAwait(false);
 
+        var actorDelegationAuditLogs = await _actorDelegationAuditLogRepository
+            .GetAsync(new ActorId(request.ActorId))
+            .ConfigureAwait(false);
+
         return new GetActorAuditLogsResponse(actorAuditLogs
             .Concat(actorContactAuditLogs)
+            .Concat(actorDelegationAuditLogs)
             .OrderBy(log => log.Timestamp)
             .Select(log => new AuditLogDto<ActorAuditedChange>(log)));
     }

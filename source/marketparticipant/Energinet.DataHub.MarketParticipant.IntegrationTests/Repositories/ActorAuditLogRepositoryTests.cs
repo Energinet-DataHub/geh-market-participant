@@ -18,7 +18,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -233,48 +232,6 @@ public sealed class ActorAuditLogRepositoryTests
         Assert.Contains(actorAuditLogs, entry =>
             entry is { Change: ActorAuditedChange.ClientSecretCredentials, PreviousValue: null } &&
             entry.CurrentValue == actorClientSecretCredentials.ExpirationDate.ToString("g", CultureInfo.InvariantCulture));
-    }
-
-    [Fact]
-    public async Task GetAsync_StartStopDelegation_HasCorrectAuditLogs()
-    {
-        // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-
-        var user = await _fixture.PrepareUserAsync();
-        host.ServiceCollection.MockFrontendUser(user.Id);
-
-        await using var scope = host.BeginScope();
-        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogRepository>();
-
-        var delegator = await actorRepository.GetAsync(new ActorId((await _fixture.PrepareActiveActorAsync()).Id));
-        var delegated = await actorRepository.GetAsync(new ActorId((await _fixture.PrepareActiveActorAsync()).Id));
-
-        var baseDateTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
-
-        var messageDelegation = new MessageDelegation(delegator!, DelegationMessageType.Rsm017Inbound);
-        messageDelegation.DelegateTo(delegated!.Id, new GridAreaId((await _fixture.PrepareGridAreaAsync()).Id), baseDateTime);
-
-        var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
-        var messageId = await messageDelegationRepository.AddOrUpdateAsync(messageDelegation);
-
-        var freshMessageDelegation = await messageDelegationRepository.GetAsync(messageId);
-        freshMessageDelegation!.StopDelegation(freshMessageDelegation.Delegations.Single(), baseDateTime.Plus(Duration.FromDays(2)));
-        await messageDelegationRepository.AddOrUpdateAsync(freshMessageDelegation!);
-
-        // Act
-        var actual = (await actorAuditLogEntryRepository.GetAsync(delegator!.Id)).Where(x => new[]
-        {
-            ActorAuditedChange.DelegationStart,
-            ActorAuditedChange.DelegationStop,
-            ActorAuditedChange.DelegationActorTo,
-            ActorAuditedChange.DelegationMessageType,
-        }.Contains(x.Change)).ToArray();
-
-        var actualStart = actual.Single(x => x.Change == ActorAuditedChange.DelegationStart);
-        var actualActorTo = actual.Single(x => x.Change == ActorAuditedChange.DelegationActorTo);
-        var actualActorMessageType = actual.Single(x => x.Change == ActorAuditedChange.DelegationMessageType);
     }
 
     private static async Task<IUnitOfWork> LockActorAsync(IServiceProvider serviceProvider)
