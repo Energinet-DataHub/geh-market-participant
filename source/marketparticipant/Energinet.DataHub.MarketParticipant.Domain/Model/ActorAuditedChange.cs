@@ -25,4 +25,8 @@ public enum ActorAuditedChange
     ContactCategoryRemoved = 7,
     CertificateCredentials = 8,
     ClientSecretCredentials = 9,
+    DelegationStart = 10,
+    DelegationStop = 11,
+    DelegationMessageType = 12,
+    DelegationActorTo = 13,
 }
