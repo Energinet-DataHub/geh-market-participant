@@ -20,12 +20,12 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class ActorDelegationAuditLogRepository : IActorDelegationAuditLogRepository
+public sealed class MessageDelegationAuditLogRepository : IMessageDelegationAuditLogRepository
 {
     private readonly IMarketParticipantDbContext _context;
     private readonly IMessageDelegationRepository _messageDelegationRepository;
 
-    public ActorDelegationAuditLogRepository(
+    public MessageDelegationAuditLogRepository(
         IMarketParticipantDbContext context,
         IMessageDelegationRepository messageDelegationRepository)
     {

@@ -29,11 +29,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class ActorDelegationAuditLogRepositoryTests
+public sealed class MessageDelegationAuditLogRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public ActorDelegationAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    public MessageDelegationAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
