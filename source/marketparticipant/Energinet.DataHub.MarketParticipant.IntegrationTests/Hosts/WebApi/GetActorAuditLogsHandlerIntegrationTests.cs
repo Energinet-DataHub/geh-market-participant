@@ -20,13 +20,16 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
+using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
@@ -285,6 +288,33 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             _ => null);
     }
 
+    [Fact]
+    public async Task GetAuditLogs_DelegationCreated_IsAudited()
+    {
+        var expectedDelegateTo = await _databaseFixture.PrepareActorAsync();
+        var gridAreaId = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
+        var expectedStartTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
+        var expectedMessageType = DelegationMessageType.Rsm017Inbound;
+
+        await TestAuditOMessageDelegationChangeAsync(
+            response =>
+            {
+                var actualStart = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStart).CurrentValue;
+                var actualDelegatedTo = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationActorTo).CurrentValue;
+                var actualMessageType = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationMessageType).CurrentValue;
+
+                Assert.Equal(expectedStartTime.ToDateTimeOffset().ToString(DateTimeFormatInfo.CurrentInfo), actualStart);
+                Assert.Equal(expectedDelegateTo.Id.ToString(), actualDelegatedTo);
+                Assert.Equal(expectedMessageType.ToString(), actualMessageType);
+            },
+            actor =>
+            {
+                var messageDelegation = new MessageDelegation(actor, expectedMessageType);
+                messageDelegation.DelegateTo(new ActorId(expectedDelegateTo.Id), gridAreaId, expectedStartTime);
+                return messageDelegation;
+            });
+    }
+
     private async Task TestAuditOfActorChangeAsync(
         Action<GetActorAuditLogsResponse> assert,
         params Action<Actor>[] changeActions)
@@ -406,5 +436,114 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
 
         // Assert
         assert(actual);
+    }
+
+    private async Task TestAuditOMessageDelegationChangeAsync(
+        Action<GetActorAuditLogsResponse> assert,
+        params Func<Actor, MessageDelegation?>[] messageDelegationGenerator)
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+
+        var delegatorEntity = await _databaseFixture.PrepareActorAsync();
+        var delegator = MapActor(await _databaseFixture.PrepareActorAsync());
+
+        var userContext = new Mock<IUserContext<FrontendUser>>();
+
+        host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
+        host.ServiceCollection.AddScoped(_ => userContext.Object);
+
+        await using var scope = host.BeginScope();
+
+        var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var command = new GetActorAuditLogsCommand(delegator.Id.Value);
+        var auditLogsProcessed = 2;
+
+        foreach (var generator in messageDelegationGenerator)
+        {
+            var auditedUser = await _databaseFixture.PrepareUserAsync();
+
+            userContext
+                .Setup(uc => uc.CurrentUser)
+                .Returns(new FrontendUser(auditedUser.Id, delegatorEntity.OrganizationId, delegatorEntity.Id, false));
+
+            var delegation = generator(delegator);
+
+            if (delegation != null)
+            {
+                await messageDelegationRepository.AddOrUpdateAsync(delegation);
+            }
+
+            var auditLogs = await mediator.Send(command);
+
+            foreach (var actorAuditLog in auditLogs.AuditLogs.Skip(auditLogsProcessed))
+            {
+                Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
+                Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
+                Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
+
+                auditLogsProcessed++;
+            }
+        }
+
+        // Act
+        var actual = await mediator.Send(command);
+
+        // Assert
+        assert(actual);
+    }
+
+#pragma warning disable SA1204
+    private static Actor MapActor(ActorEntity from)
+#pragma warning restore SA1204
+    {
+        var marketRoles = from.MarketRoles.Select(marketRole =>
+        {
+            var function = marketRole.Function;
+            var gridAreas = marketRole
+                .GridAreas
+                .Select(grid => new ActorGridArea(
+                    new GridAreaId(grid.GridAreaId),
+                    grid.MeteringPointTypes.Select(e => (MeteringPointType)e.MeteringTypeId)));
+
+            return new ActorMarketRole(function, gridAreas.ToList(), marketRole.Comment);
+        });
+
+        var actorNumber = ActorNumber.Create(from.ActorNumber);
+        var actorStatus = from.Status;
+        var actorName = new ActorName(from.Name);
+
+        return new Actor(
+            new ActorId(from.Id),
+            new OrganizationId(from.OrganizationId),
+            from.ActorId.HasValue ? new ExternalActorId(from.ActorId.Value) : null,
+            actorNumber,
+            actorStatus,
+            marketRoles,
+            actorName,
+            MapCredentials(from));
+    }
+
+    private static ActorCredentials? MapCredentials(ActorEntity actor)
+    {
+        if (actor.CertificateCredential != null)
+        {
+            return new ActorCertificateCredentials(
+                actor.CertificateCredential.CertificateThumbprint,
+                actor.CertificateCredential.KeyVaultSecretIdentifier,
+                actor.CertificateCredential.ExpirationDate.ToInstant());
+        }
+
+        if (actor.ClientSecretCredential != null)
+        {
+            return new ActorClientSecretCredentials(
+                actor.ActorId!.Value,
+                Guid.Parse(actor.ClientSecretCredential.ClientSecretIdentifier),
+                actor.ClientSecretCredential.ExpirationDate.ToInstant());
+        }
+
+        return null;
     }
 }

@@ -49,7 +49,7 @@ public sealed class MessageDelegationAuditLogRepositoryTests
 
         await using var scope = host.BeginScope();
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogRepository>();
+        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationAuditLogRepository>();
 
         var delegator = await actorRepository.GetAsync(new ActorId((await _fixture.PrepareActiveActorAsync()).Id));
         var delegated = await actorRepository.GetAsync(new ActorId((await _fixture.PrepareActiveActorAsync()).Id));
@@ -79,6 +79,6 @@ public sealed class MessageDelegationAuditLogRepositoryTests
         Assert.NotNull(actual.SingleOrDefault(x => x.Change == ActorAuditedChange.DelegationStart));
         Assert.NotNull(actual.SingleOrDefault(x => x.Change == ActorAuditedChange.DelegationActorTo));
         Assert.NotNull(actual.SingleOrDefault(x => x.Change == ActorAuditedChange.DelegationMessageType));
-        Assert.NotNull(actual.SingleOrDefault(x => x.Change == ActorAuditedChange.DelegationMessageType));
+        Assert.NotNull(actual.SingleOrDefault(x => x.Change == ActorAuditedChange.DelegationStop));
     }
 }

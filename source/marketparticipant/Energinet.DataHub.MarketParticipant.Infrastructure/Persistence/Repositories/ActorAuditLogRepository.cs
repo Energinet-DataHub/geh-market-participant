@@ -25,14 +25,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 public sealed class ActorAuditLogRepository : IActorAuditLogRepository
 {
     private readonly IMarketParticipantDbContext _context;
-    private readonly IMessageDelegationRepository _messageDelegationRepository;
 
-    public ActorAuditLogRepository(
-        IMarketParticipantDbContext context,
-        IMessageDelegationRepository messageDelegationRepository)
+    public ActorAuditLogRepository(IMarketParticipantDbContext context)
     {
         _context = context;
-        _messageDelegationRepository = messageDelegationRepository;
     }
 
     public async Task<IEnumerable<AuditLog<ActorAuditedChange>>> GetAsync(ActorId actor)
@@ -46,13 +42,9 @@ public sealed class ActorAuditLogRepository : IActorAuditLogRepository
         var clientSecretAuditLogs = await GetActorClientSecretCredentialAuditsAsync(actor)
             .ConfigureAwait(false);
 
-        var messageDelegationAuditLogs = await GetActorDelegationAuditsAsync(actor)
-            .ConfigureAwait(false);
-
         return actorAuditLogs
             .Concat(certificateAuditLogs)
-            .Concat(clientSecretAuditLogs)
-            .Concat(messageDelegationAuditLogs);
+            .Concat(clientSecretAuditLogs);
     }
 
     private Task<IEnumerable<AuditLog<ActorAuditedChange>>> GetActorAuditsAsync(ActorId actor)
@@ -83,37 +75,5 @@ public sealed class ActorAuditLogRepository : IActorAuditLogRepository
             .Add(ActorAuditedChange.ClientSecretCredentials, entity => entity.ExpirationDate.ToInstant(), AuditedChangeCompareAt.BothCreationAndDeletion)
             .WithGrouping(entity => entity.Id)
             .BuildAsync();
-    }
-
-    private async Task<IEnumerable<AuditLog<ActorAuditedChange>>> GetActorDelegationAuditsAsync(ActorId actor)
-    {
-        var messageDelegations = await _messageDelegationRepository
-            .GetForActorAsync(actor)
-            .ConfigureAwait(false);
-
-        var allAudits = new List<AuditLog<ActorAuditedChange>>();
-
-        foreach (var messageDelegation in messageDelegations)
-        {
-            foreach (var delegationPeriod in messageDelegation.Delegations)
-            {
-                var dataSource = new HistoryTableDataSource<DelegationPeriodEntity>(
-                    _context.DelegationPeriods,
-                    entity => entity.Id == delegationPeriod.Id.Value);
-
-                var audits = await new AuditLogBuilder<ActorAuditedChange, DelegationPeriodEntity>(dataSource)
-                    .Add(ActorAuditedChange.DelegationActorTo, entity => entity.DelegatedToActorId, AuditedChangeCompareAt.Creation)
-                    .Add(ActorAuditedChange.DelegationMessageType, _ => messageDelegation.MessageType, AuditedChangeCompareAt.Creation)
-                    .Add(ActorAuditedChange.DelegationStart, entity => entity.StartsAt, AuditedChangeCompareAt.Creation)
-                    .Add(ActorAuditedChange.DelegationStop, entity => entity.StopsAt)
-                    .WithGrouping(entity => entity.Id)
-                    .BuildAsync()
-                    .ConfigureAwait(false);
-
-                allAudits.AddRange(audits);
-            }
-        }
-
-        return allAudits;
     }
 }
