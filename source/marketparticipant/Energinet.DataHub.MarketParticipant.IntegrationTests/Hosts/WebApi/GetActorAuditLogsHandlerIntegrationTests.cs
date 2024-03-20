@@ -22,7 +22,6 @@ using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -446,7 +445,6 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
 
         var delegatorEntity = await _databaseFixture.PrepareActorAsync();
-        var delegator = MapActor(await _databaseFixture.PrepareActorAsync());
 
         var userContext = new Mock<IUserContext<FrontendUser>>();
 
@@ -455,10 +453,12 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
 
         await using var scope = host.BeginScope();
 
+        var actorRepo = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+        var delegator = await actorRepo.GetAsync(new ActorId(delegatorEntity.Id));
         var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var command = new GetActorAuditLogsCommand(delegator.Id.Value);
+        var command = new GetActorAuditLogsCommand(delegator!.Id.Value);
         var auditLogsProcessed = 2;
 
         foreach (var generator in messageDelegationGenerator)
@@ -493,57 +493,5 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
 
         // Assert
         assert(actual);
-    }
-
-#pragma warning disable SA1204
-    private static Actor MapActor(ActorEntity from)
-#pragma warning restore SA1204
-    {
-        var marketRoles = from.MarketRoles.Select(marketRole =>
-        {
-            var function = marketRole.Function;
-            var gridAreas = marketRole
-                .GridAreas
-                .Select(grid => new ActorGridArea(
-                    new GridAreaId(grid.GridAreaId),
-                    grid.MeteringPointTypes.Select(e => (MeteringPointType)e.MeteringTypeId)));
-
-            return new ActorMarketRole(function, gridAreas.ToList(), marketRole.Comment);
-        });
-
-        var actorNumber = ActorNumber.Create(from.ActorNumber);
-        var actorStatus = from.Status;
-        var actorName = new ActorName(from.Name);
-
-        return new Actor(
-            new ActorId(from.Id),
-            new OrganizationId(from.OrganizationId),
-            from.ActorId.HasValue ? new ExternalActorId(from.ActorId.Value) : null,
-            actorNumber,
-            actorStatus,
-            marketRoles,
-            actorName,
-            MapCredentials(from));
-    }
-
-    private static ActorCredentials? MapCredentials(ActorEntity actor)
-    {
-        if (actor.CertificateCredential != null)
-        {
-            return new ActorCertificateCredentials(
-                actor.CertificateCredential.CertificateThumbprint,
-                actor.CertificateCredential.KeyVaultSecretIdentifier,
-                actor.CertificateCredential.ExpirationDate.ToInstant());
-        }
-
-        if (actor.ClientSecretCredential != null)
-        {
-            return new ActorClientSecretCredentials(
-                actor.ActorId!.Value,
-                Guid.Parse(actor.ClientSecretCredential.ClientSecretIdentifier),
-                actor.ClientSecretCredential.ExpirationDate.ToInstant());
-        }
-
-        return null;
     }
 }
