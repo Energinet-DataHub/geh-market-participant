@@ -48,7 +48,8 @@ public sealed class ActorAuditLogRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var contextGet = _fixture.DatabaseManager.CreateDbContext();
-        var actorAuditLogEntryRepository = new ActorAuditLogRepository(contextGet);
+        var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
+        var actorAuditLogEntryRepository = new ActorAuditLogRepository(contextGet, messageDelegationRepository);
 
         // Act
         var actual = await actorAuditLogEntryRepository
