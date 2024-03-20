@@ -12,21 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public sealed record ActorId
+public sealed class BalanceResponsiblePartiesChanged(
+    ActorNumber electricalSupplier,
+    ActorNumber balanceResponsibleParty,
+    GridAreaCode gridAreaCode,
+    Instant received,
+    Instant validFrom,
+    Instant? validTo)
 {
-    public ActorId(Guid value)
-    {
-        Value = value;
-    }
-
-    public Guid Value { get; }
-
-    public override string ToString()
-    {
-        return Value.ToString();
-    }
+    public ActorNumber ElectricalSupplier { get; } = electricalSupplier;
+    public ActorNumber BalanceResponsibleParty { get; } = balanceResponsibleParty;
+    public GridAreaCode GridAreaCode { get; } = gridAreaCode;
+    public Instant Received { get; } = received;
+    public Instant ValidFrom { get; } = validFrom;
+    public Instant? ValidTo { get; } = validTo;
 }

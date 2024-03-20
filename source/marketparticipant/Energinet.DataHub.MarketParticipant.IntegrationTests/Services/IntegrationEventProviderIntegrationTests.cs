@@ -17,11 +17,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
@@ -149,7 +152,7 @@ public sealed class IntegrationEventProviderIntegrationTests
             DateTime.UtcNow.AddYears(1).ToInstant());
 
         actor.Activate();
-        ((IPublishDomainEvents)actor).ClearPublishedDomainEvents();
+        ((IPublishDomainEvents)actor).DomainEvents.ClearPublishedDomainEvents();
 
         actor.Credentials = null;
 
@@ -182,6 +185,36 @@ public sealed class IntegrationEventProviderIntegrationTests
         await domainEventRepository.EnqueueAsync(actor);
     }
 
+    private async Task PrepareMessageDelegationConfiguredEventAsync(IServiceProvider scope)
+    {
+        var actorA = await _fixture.PrepareActorAsync();
+        var actorB = await _fixture.PrepareActorAsync();
+        var gridArea = await _fixture.PrepareGridAreaAsync();
+
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var messageDelegationEntity = new MessageDelegationEntity
+        {
+            DelegatedByActorId = actorA.Id,
+            ConcurrencyToken = Guid.NewGuid(),
+            MessageType = DelegationMessageType.Rsm014Inbound
+        };
+
+        await context.MessageDelegations.AddAsync(messageDelegationEntity);
+        await context.SaveChangesAsync();
+
+        var messageDelegation = await scope
+            .GetRequiredService<IMessageDelegationRepository>()
+            .GetAsync(new MessageDelegationId(messageDelegationEntity.Id));
+
+        messageDelegation!.DelegateTo(
+            new ActorId(actorB.Id),
+            new GridAreaId(gridArea.Id),
+            Instant.FromDateTimeOffset(DateTimeOffset.UtcNow));
+
+        var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
+        await domainEventRepository.EnqueueAsync(messageDelegation);
+    }
+
     private Task PrepareDomainEventAsync(IServiceProvider scope, Type domainEvent)
     {
         return domainEvent.Name switch
@@ -190,6 +223,7 @@ public sealed class IntegrationEventProviderIntegrationTests
             nameof(ActorCertificateCredentialsAssigned) => PrepareActorCertificateCredentialsAssignedEventAsync(scope),
             nameof(ActorCertificateCredentialsRemoved) => PrepareActorCertificateCredentialsRemovedEventAsync(scope),
             nameof(GridAreaOwnershipAssigned) => PrepareGridAreaOwnershipAssignedEventAsync(scope),
+            nameof(MessageDelegationConfigured) => PrepareMessageDelegationConfiguredEventAsync(scope),
             _ => throw new NotSupportedException($"Domain event {domainEvent.Name} is missing a test.")
         };
     }

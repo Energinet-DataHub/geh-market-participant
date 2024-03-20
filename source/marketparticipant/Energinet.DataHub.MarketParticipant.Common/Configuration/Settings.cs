@@ -81,4 +81,6 @@ public static class Settings
         = new("CVR_PASSWORD");
     public static Setting<string> OrganizationIdentityUpdateNotificationToEmail { get; }
         = new("CVR_ORG_UPDATED_NOTIFICATION_TO_EMAIL");
+    public static Setting<string> BalanceResponsiblePartiesChangedNotificationToEmail { get; }
+        = new("BALANCE_RESPONSIBLE_CHANGED_NOTIFICATION_TO_EMAIL");
 }

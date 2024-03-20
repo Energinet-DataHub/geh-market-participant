@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Configuration;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,10 +74,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 new(Settings.SenderEmail.Key, "fake_value"),
                 new(Settings.BccEmail.Key, "fake_value"),
                 new(Settings.OrganizationIdentityUpdateNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
+                new(Settings.BalanceResponsiblePartiesChangedNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
                 new(Settings.UserInviteFlow.Key, "fake_value"),
                 new(Settings.EnvironmentDescription.Key, "fake_value"),
                 new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
-                new(Settings.ServiceBusTopicName.Key, "fake_value")
+                new(Settings.ServiceBusTopicName.Key, "fake_value"),
+                new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.ConnectionString)}", "fake_value"),
+                new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.SharedIntegrationEventTopic)}", "fake_value"),
             };
 
             return new ConfigurationBuilder()

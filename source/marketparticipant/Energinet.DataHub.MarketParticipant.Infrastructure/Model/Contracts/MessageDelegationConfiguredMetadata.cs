@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-public sealed record EmailRecipientConfig(
-    string SenderEmail,
-    string BccEmail,
-    string OrgUpdateNotificationToEmail,
-    string BalanceResponsibleChangedNotificationToEmail,
-    string UserInviteFlow,
-    string? EnvironmentDescription);
+public partial class MessageDelegationConfigured
+{
+    public const string EventName = "MessageDelegationConfigured";
+    public const int CurrentMinorVersion = 1;
+}

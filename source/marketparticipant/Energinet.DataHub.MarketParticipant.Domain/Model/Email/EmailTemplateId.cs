@@ -19,4 +19,5 @@ public enum EmailTemplateId
     UserInvite = 1,
     UserAssignedToActor = 2,
     OrganizationIdentityChanged = 3,
+    BalanceResponsiblePartiesChanged = 4,
 }
