@@ -296,6 +296,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         var expectedMessageType = DelegationMessageType.Rsm017Inbound;
 
         await TestAuditOMessageDelegationChangeAsync(
+            null,
             response =>
             {
                 var actualStart = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStart).CurrentValue;
@@ -310,6 +311,43 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             {
                 var messageDelegation = new MessageDelegation(actor, expectedMessageType);
                 messageDelegation.DelegateTo(new ActorId(expectedDelegateTo.Id), gridAreaId, expectedStartTime);
+                return messageDelegation;
+            });
+    }
+
+    [Fact]
+    public async Task GetAuditLogs_DelegationStopped_IsAudited()
+    {
+        var delegatedEntity = await _databaseFixture.PrepareActorAsync();
+        var delegatorEntity = await _databaseFixture.PrepareActorAsync();
+        var gridAreaId = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
+        var startTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
+        var expectedMessageType = DelegationMessageType.Rsm017Inbound;
+        var stopsAt = startTime.Plus(Duration.FromDays(2));
+
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+        var delegated = await actorRepository.GetAsync(new ActorId(delegatedEntity.Id));
+        var delegator = await actorRepository.GetAsync(new ActorId(delegatorEntity.Id));
+        var messageDelegation = new MessageDelegation(delegator!, expectedMessageType);
+        messageDelegation.DelegateTo(delegated!.Id, gridAreaId, startTime);
+
+        var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
+        var id = await messageDelegationRepository.AddOrUpdateAsync(messageDelegation);
+        messageDelegation = await messageDelegationRepository.GetAsync(id);
+
+        await TestAuditOMessageDelegationChangeAsync(
+            delegator,
+            response =>
+            {
+                var actualStop = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStop).CurrentValue;
+
+                Assert.Equal(stopsAt.ToDateTimeOffset().ToString(DateTimeFormatInfo.CurrentInfo), actualStop);
+            },
+            _ =>
+            {
+                messageDelegation!.StopDelegation(messageDelegation.Delegations.Single(), stopsAt);
                 return messageDelegation;
             });
     }
@@ -438,13 +476,12 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     }
 
     private async Task TestAuditOMessageDelegationChangeAsync(
+        Actor? delegator,
         Action<GetActorAuditLogsResponse> assert,
-        params Func<Actor, MessageDelegation?>[] messageDelegationGenerator)
+        params Func<Actor, MessageDelegation>[] messageDelegationGenerator)
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
-
-        var delegatorEntity = await _databaseFixture.PrepareActorAsync();
 
         var userContext = new Mock<IUserContext<FrontendUser>>();
 
@@ -454,7 +491,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         await using var scope = host.BeginScope();
 
         var actorRepo = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var delegator = await actorRepo.GetAsync(new ActorId(delegatorEntity.Id));
+        delegator ??= await actorRepo.GetAsync(new ActorId((await _databaseFixture.PrepareActorAsync()).Id));
         var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
@@ -467,20 +504,21 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
 
             userContext
                 .Setup(uc => uc.CurrentUser)
-                .Returns(new FrontendUser(auditedUser.Id, delegatorEntity.OrganizationId, delegatorEntity.Id, false));
+                .Returns(new FrontendUser(auditedUser.Id, delegator.OrganizationId.Value, delegator.Id.Value, false));
 
             var delegation = generator(delegator);
 
-            if (delegation != null)
-            {
-                await messageDelegationRepository.AddOrUpdateAsync(delegation);
-            }
+            await messageDelegationRepository.AddOrUpdateAsync(delegation);
 
             var auditLogs = await mediator.Send(command);
 
-            foreach (var actorAuditLog in auditLogs.AuditLogs.Skip(auditLogsProcessed))
+            var actorAuditLogs = auditLogs.AuditLogs.Skip(auditLogsProcessed).Where(x => x.AuditIdentityId == auditedUser.Id).ToList();
+
+            if (!actorAuditLogs.Any())
+                Assert.Fail("No audit logs produced");
+
+            foreach (var actorAuditLog in actorAuditLogs)
             {
-                Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
                 Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
 
