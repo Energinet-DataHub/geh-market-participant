@@ -151,13 +151,13 @@ markpartDomain = group "Market Participant" {
         }
 
         markpartIntegrationEvents = component "Integration Event Receiver" {
-            description "Receiver for domain events sent to shared servicebus."
+            description "Receiver for domain event sent to shared servicebus."
             technology "ServiceBus"
             tags "Microsoft Azure - Function Apps" "Titans"
 
             # Common relationships
             dh3.sharedServiceBus -> this "Receives integration events" "integration event/amqp"
-            this -> dh3.sharedExternalSendGrid "Sends change notification" "SendGrid/https"
+            markPartIESendGrid = this -> dh3.sharedExternalSendGrid "Sends change notification" "SendGrid/https"
         }
 
         markpartUserInvitationExpiredTimerTrigger = component "UserInvitationExpiredTimerTrigger" {

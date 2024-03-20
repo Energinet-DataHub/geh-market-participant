@@ -40,12 +40,14 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             include ->markpartDomain->
             include actorB2BSystem frontendSinglePageApplication dh3User
             exclude "element.tag==Intermediate Technology"
+            exclude wholesaleApi
         }
 
         container dh3 "MarketParticipantDetailed" {
             title "[Container] DataHub 3.0 - Market Participant (Detailed with OAuth)"
             include ->markpartDomain->
             include actorB2BSystem ediApi bffApi frontendSinglePageApplication dh3User
+            exclude wholesaleApi
         }
         
         component markpartApi "MarketParticipantAPIs" {
