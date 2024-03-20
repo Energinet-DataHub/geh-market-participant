@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,8 +29,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
     [IntegrationTest]
     public sealed class EmailEventRepositoryTests
     {
-        private readonly UserInviteEmailTemplate _emailTemplate = new(new Dictionary<string, string>());
-
         private readonly MarketParticipantDatabaseFixture _fixture;
 
         public EmailEventRepositoryTests(MarketParticipantDatabaseFixture fixture)
@@ -37,10 +36,18 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             _fixture = fixture;
         }
 
-        [Fact]
-        public async Task Insert_UserInviteEmailTemplate_IsReturned()
+        public static TheoryData<EmailTemplate> EmailTemplates { get; } = new(
+            typeof(EmailTemplate)
+                .Assembly
+                .GetTypes()
+                .Where(t => t.IsSubclassOf(typeof(EmailTemplate)))
+                .Select(t => (EmailTemplate)Activator.CreateInstance(t, new Dictionary<string, string>())!));
+
+        [Theory]
+        [MemberData(nameof(EmailTemplates))]
+        public async Task Insert_EmailTemplate_CanBeReadBack(EmailTemplate emailTemplate)
         {
-            // arrange
+            // Arrange
             await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
@@ -49,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var emailEventRepository = new EmailEventRepository(context);
 
             var emailRandom = new MockedEmailAddress();
-            var newEmailEvent = new EmailEvent(emailRandom, _emailTemplate);
+            var newEmailEvent = new EmailEvent(emailRandom, emailTemplate);
 
             // act
             await emailEventRepository.InsertAsync(newEmailEvent);
@@ -57,30 +64,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // assert
             var emailEventRepository2 = new EmailEventRepository(context2);
             var savedEvents = await emailEventRepository2.GetAllPendingEmailEventsAsync();
-            Assert.Single(savedEvents, e => e.Email.Equals(emailRandom) && e.EmailTemplate is UserInviteEmailTemplate);
-        }
-
-        [Fact]
-        public async Task Insert_UserAssignedToActorEmailTemplate_IsReturned()
-        {
-            // arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-
-            var emailEventRepository = new EmailEventRepository(context);
-
-            var emailRandom = new MockedEmailAddress();
-            var newEmailEvent = new EmailEvent(emailRandom, new UserAssignedToActorEmailTemplate(new Dictionary<string, string>()));
-
-            // act
-            await emailEventRepository.InsertAsync(newEmailEvent);
-
-            // assert
-            var emailEventRepository2 = new EmailEventRepository(context2);
-            var savedEvents = await emailEventRepository2.GetAllPendingEmailEventsAsync();
-            Assert.Single(savedEvents, e => e.Email.Equals(emailRandom) && e.EmailTemplate is UserAssignedToActorEmailTemplate);
+            Assert.Single(savedEvents, e =>
+                e.Email.Equals(emailRandom) &&
+                e.EmailTemplate.GetType() == emailTemplate.GetType());
         }
 
         [Fact]
@@ -96,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var emailEventRepository1 = new EmailEventRepository(context1);
 
             var emailRandom = new MockedEmailAddress();
-            var newEmailEvent = new EmailEvent(emailRandom, _emailTemplate);
+            var newEmailEvent = new EmailEvent(emailRandom, new UserInviteEmailTemplate(new Dictionary<string, string>()));
 
             // act
             await emailEventRepository1.InsertAsync(newEmailEvent);
