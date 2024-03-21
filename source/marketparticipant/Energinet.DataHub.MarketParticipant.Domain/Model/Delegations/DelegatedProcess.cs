@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
+public enum DelegatedProcess
 {
-    public sealed record CreateMessageDelegationCommand(CreateMessageDelegationDto CreateDelegation) : IRequest;
+    RequestEnergyResults = 1,
+    ReceiveEnergyResults,
+    RequestWholesaleResults,
+    ReceiveWholesaleResults
 }

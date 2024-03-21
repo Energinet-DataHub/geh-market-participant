@@ -22,48 +22,48 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-public sealed class MessageDelegation : IPublishDomainEvents
+public sealed class ProcessDelegation : IPublishDomainEvents
 {
     private readonly DomainEventList _domainEvents;
     private readonly List<DelegationPeriod> _delegations = [];
 
-    public MessageDelegation(Actor messageOwner, DelegationMessageType messageType)
+    public ProcessDelegation(Actor processOwner, DelegatedProcess process)
     {
-        ArgumentNullException.ThrowIfNull(messageOwner);
+        ArgumentNullException.ThrowIfNull(processOwner);
 
-        if (messageOwner.MarketRoles.All(role =>
+        if (processOwner.MarketRoles.All(role =>
                 role.Function != EicFunction.GridAccessProvider
                 && role.Function != EicFunction.BalanceResponsibleParty
                 && role.Function != EicFunction.EnergySupplier
                 && role.Function != EicFunction.BillingAgent))
         {
-            throw new ValidationException("Actor must have a valid market role to delegate messages.")
-                .WithErrorCode("message_delegation.actor_invalid_market_role");
+            throw new ValidationException("Actor's market role does not support process delegation.")
+                .WithErrorCode("process_delegation.actor_invalid_market_role");
         }
 
-        DelegatedBy = messageOwner.Id;
-        MessageType = messageType;
+        DelegatedBy = processOwner.Id;
+        Process = process;
         _domainEvents = new DomainEventList();
     }
 
-    public MessageDelegation(
-        MessageDelegationId id,
+    public ProcessDelegation(
+        ProcessDelegationId id,
         ActorId delegatedBy,
-        DelegationMessageType messageType,
+        DelegatedProcess process,
         Guid concurrencyToken,
         IEnumerable<DelegationPeriod> delegations)
     {
         Id = id;
         DelegatedBy = delegatedBy;
-        MessageType = messageType;
+        Process = process;
         ConcurrencyToken = concurrencyToken;
         _domainEvents = new DomainEventList(Id.Value);
         _delegations.AddRange(delegations);
     }
 
-    public MessageDelegationId Id { get; } = new(Guid.Empty);
+    public ProcessDelegationId Id { get; } = new(Guid.Empty);
     public ActorId DelegatedBy { get; }
-    public DelegationMessageType MessageType { get; }
+    public DelegatedProcess Process { get; }
     public Guid ConcurrencyToken { get; }
 
     public IReadOnlyCollection<DelegationPeriod> Delegations => _delegations;
@@ -77,11 +77,11 @@ public sealed class MessageDelegation : IPublishDomainEvents
         if (IsThereDelegationPeriodOverlap(startsAt, gridAreaId))
         {
             throw new ValidationException("Delegation already exists for the given grid area and time period")
-                .WithErrorCode("message_delegation.overlap");
+                .WithErrorCode("process_delegation.overlap");
         }
 
         _delegations.Add(delegationPeriod);
-        _domainEvents.Add(new MessageDelegationConfigured(this, delegationPeriod));
+        _domainEvents.Add(new ProcessDelegationConfigured(this, delegationPeriod));
     }
 
     public void StopDelegation(DelegationPeriod existingPeriod, Instant? stopsAt)
@@ -96,12 +96,12 @@ public sealed class MessageDelegation : IPublishDomainEvents
         if (IsThereDelegationPeriodOverlap(existingPeriod.StartsAt, existingPeriod.GridAreaId, stopsAt))
         {
             throw new ValidationException("Delegation already exists for the given grid area and time period")
-                .WithErrorCode("message_delegation.overlap");
+                .WithErrorCode("process_delegation.overlap");
         }
 
         var delegationPeriod = existingPeriod with { StopsAt = stopsAt };
         _delegations.Add(delegationPeriod);
-        _domainEvents.Add(new MessageDelegationConfigured(this, delegationPeriod));
+        _domainEvents.Add(new ProcessDelegationConfigured(this, delegationPeriod));
     }
 
     private bool IsThereDelegationPeriodOverlap(Instant startsAt, GridAreaId gridAreaId, Instant? stopsAt = null)

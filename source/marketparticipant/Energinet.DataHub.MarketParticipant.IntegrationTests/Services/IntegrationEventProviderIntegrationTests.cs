@@ -185,34 +185,34 @@ public sealed class IntegrationEventProviderIntegrationTests
         await domainEventRepository.EnqueueAsync(actor);
     }
 
-    private async Task PrepareMessageDelegationConfiguredEventAsync(IServiceProvider scope)
+    private async Task PrepareProcessDelegationConfiguredEventAsync(IServiceProvider scope)
     {
         var actorA = await _fixture.PrepareActorAsync();
         var actorB = await _fixture.PrepareActorAsync();
         var gridArea = await _fixture.PrepareGridAreaAsync();
 
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var messageDelegationEntity = new MessageDelegationEntity
+        var processDelegationEntity = new ProcessDelegationEntity
         {
             DelegatedByActorId = actorA.Id,
             ConcurrencyToken = Guid.NewGuid(),
-            MessageType = DelegationMessageType.Rsm014Inbound
+            DelegatedProcess = DelegatedProcess.ReceiveEnergyResults
         };
 
-        await context.MessageDelegations.AddAsync(messageDelegationEntity);
+        await context.ProcessDelegations.AddAsync(processDelegationEntity);
         await context.SaveChangesAsync();
 
-        var messageDelegation = await scope
-            .GetRequiredService<IMessageDelegationRepository>()
-            .GetAsync(new MessageDelegationId(messageDelegationEntity.Id));
+        var processDelegation = await scope
+            .GetRequiredService<IProcessDelegationRepository>()
+            .GetAsync(new ProcessDelegationId(processDelegationEntity.Id));
 
-        messageDelegation!.DelegateTo(
+        processDelegation!.DelegateTo(
             new ActorId(actorB.Id),
             new GridAreaId(gridArea.Id),
             Instant.FromDateTimeOffset(DateTimeOffset.UtcNow));
 
         var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
-        await domainEventRepository.EnqueueAsync(messageDelegation);
+        await domainEventRepository.EnqueueAsync(processDelegation);
     }
 
     private Task PrepareDomainEventAsync(IServiceProvider scope, Type domainEvent)
@@ -223,7 +223,7 @@ public sealed class IntegrationEventProviderIntegrationTests
             nameof(ActorCertificateCredentialsAssigned) => PrepareActorCertificateCredentialsAssignedEventAsync(scope),
             nameof(ActorCertificateCredentialsRemoved) => PrepareActorCertificateCredentialsRemovedEventAsync(scope),
             nameof(GridAreaOwnershipAssigned) => PrepareGridAreaOwnershipAssignedEventAsync(scope),
-            nameof(MessageDelegationConfigured) => PrepareMessageDelegationConfiguredEventAsync(scope),
+            nameof(ProcessDelegationConfigured) => PrepareProcessDelegationConfiguredEventAsync(scope),
             _ => throw new NotSupportedException($"Domain event {domainEvent.Name} is missing a test.")
         };
     }

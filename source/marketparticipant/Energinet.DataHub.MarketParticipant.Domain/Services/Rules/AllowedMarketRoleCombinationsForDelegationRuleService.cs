@@ -33,14 +33,14 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
     };
 
     private readonly IActorRepository _actorRepository;
-    private readonly IMessageDelegationRepository _messageDelegationRepository;
+    private readonly IProcessDelegationRepository _processDelegationRepository;
 
     public AllowedMarketRoleCombinationsForDelegationRuleService(
         IActorRepository actorRepository,
-        IMessageDelegationRepository messageDelegationRepository)
+        IProcessDelegationRepository processDelegationRepository)
     {
         _actorRepository = actorRepository;
-        _messageDelegationRepository = messageDelegationRepository;
+        _processDelegationRepository = processDelegationRepository;
     }
 
     public async Task ValidateAsync(OrganizationId organizationId, EicFunction newMarketRole)
@@ -62,7 +62,7 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
 
         foreach (var delegatedActor in delegatedActors)
         {
-            var existingDelegations = await _messageDelegationRepository
+            var existingDelegations = await _processDelegationRepository
                 .GetDelegatedToActorAsync(delegatedActor.Id)
                 .ConfigureAwait(false);
 
@@ -83,15 +83,15 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
         }
     }
 
-    public async Task ValidateAsync(MessageDelegation messageDelegation)
+    public async Task ValidateAsync(ProcessDelegation processDelegation)
     {
-        ArgumentNullException.ThrowIfNull(messageDelegation);
+        ArgumentNullException.ThrowIfNull(processDelegation);
 
         var delegatedBy = await _actorRepository
-            .GetAsync(messageDelegation.DelegatedBy)
+            .GetAsync(processDelegation.DelegatedBy)
             .ConfigureAwait(false);
 
-        var delegatedTo = messageDelegation
+        var delegatedTo = processDelegation
             .Delegations
             .Select(d => d.DelegatedTo)
             .ToHashSet();
@@ -131,7 +131,7 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
                 if (forbidden.Contains(eicFunction))
                 {
                     throw new ValidationException($"Delegated '{actorMarketRole.Function}' cannot be used in an organization containing market role '{eicFunction}'.")
-                        .WithErrorCode("message_delegation.market_role_forbidden")
+                        .WithErrorCode("process_delegation.market_role_forbidden")
                         .WithArgs(("assigned_market_role", actorMarketRole.Function), ("conflicting_market_role", eicFunction));
                 }
             }

@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 public sealed class DelegationPeriodEntity : IAuditedEntity
 {
     public Guid Id { get; set; }
-    public Guid MessageDelegationId { get; set; }
+    public Guid ProcessDelegationId { get; set; }
     public Guid DelegatedToActorId { get; set; }
     public Guid GridAreaId { get; set; }
     public DateTimeOffset StartsAt { get; set; }
