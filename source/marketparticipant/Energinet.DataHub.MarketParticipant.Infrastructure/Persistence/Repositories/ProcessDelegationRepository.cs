@@ -25,23 +25,23 @@ using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class MessageDelegationRepository(IMarketParticipantDbContext marketParticipantDbContext)
-    : IMessageDelegationRepository
+public sealed class ProcessDelegationRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    : IProcessDelegationRepository
 {
-    public async Task<MessageDelegation?> GetAsync(MessageDelegationId id)
+    public async Task<ProcessDelegation?> GetAsync(ProcessDelegationId id)
     {
         var messageDelegation = await marketParticipantDbContext
-            .MessageDelegations
+            .ProcessDelegations
             .SingleOrDefaultAsync(messageDelegation => messageDelegation.Id == id.Value)
             .ConfigureAwait(false);
 
         return messageDelegation == null ? null : Map(messageDelegation);
     }
 
-    public async Task<IEnumerable<MessageDelegation>> GetForActorAsync(ActorId delegatedBy)
+    public async Task<IEnumerable<ProcessDelegation>> GetForActorAsync(ActorId delegatedBy)
     {
         var messageDelegations = await marketParticipantDbContext
-            .MessageDelegations
+            .ProcessDelegations
             .Where(messageDelegation => messageDelegation.DelegatedByActorId == delegatedBy.Value)
             .ToListAsync()
             .ConfigureAwait(false);
@@ -49,10 +49,10 @@ public sealed class MessageDelegationRepository(IMarketParticipantDbContext mark
         return messageDelegations.Select(Map);
     }
 
-    public async Task<IEnumerable<MessageDelegation>> GetDelegatedToActorAsync(ActorId delegatedTo)
+    public async Task<IEnumerable<ProcessDelegation>> GetDelegatedToActorAsync(ActorId delegatedTo)
     {
         var messageDelegations = await marketParticipantDbContext
-            .MessageDelegations
+            .ProcessDelegations
             .Where(messageDelegation => messageDelegation.Delegations.Any(d => d.DelegatedToActorId == delegatedTo.Value))
             .ToListAsync()
             .ConfigureAwait(false);
@@ -60,45 +60,45 @@ public sealed class MessageDelegationRepository(IMarketParticipantDbContext mark
         return messageDelegations.Select(Map);
     }
 
-    public async Task<MessageDelegation?> GetForActorAsync(ActorId delegatedBy, DelegationMessageType messageType)
+    public async Task<ProcessDelegation?> GetForActorAsync(ActorId delegatedBy, DelegatedProcess process)
     {
         var messageDelegation = await marketParticipantDbContext
-            .MessageDelegations
+            .ProcessDelegations
             .SingleOrDefaultAsync(messageDelegation =>
                 messageDelegation.DelegatedByActorId == delegatedBy.Value &&
-                messageDelegation.MessageType == messageType)
+                messageDelegation.DelegatedProcess == process)
             .ConfigureAwait(false);
 
         return messageDelegation == null ? null : Map(messageDelegation);
     }
 
-    public async Task<MessageDelegationId> AddOrUpdateAsync(MessageDelegation messageDelegation)
+    public async Task<ProcessDelegationId> AddOrUpdateAsync(ProcessDelegation processDelegation)
     {
-        ArgumentNullException.ThrowIfNull(messageDelegation);
+        ArgumentNullException.ThrowIfNull(processDelegation);
 
-        MessageDelegationEntity destination;
+        ProcessDelegationEntity destination;
 
-        if (messageDelegation.Id.Value == default)
+        if (processDelegation.Id.Value == default)
         {
-            destination = new MessageDelegationEntity
+            destination = new ProcessDelegationEntity
             {
-                DelegatedByActorId = messageDelegation.DelegatedBy.Value,
-                MessageType = messageDelegation.MessageType
+                DelegatedByActorId = processDelegation.DelegatedBy.Value,
+                DelegatedProcess = processDelegation.Process
             };
         }
         else
         {
             destination = await marketParticipantDbContext
-                .MessageDelegations
-                .FindAsync(messageDelegation.Id.Value)
-                .ConfigureAwait(false) ?? throw new InvalidOperationException($"Delegation '{messageDelegation.Id.Value}' is missing, even though it cannot be deleted.");
+                .ProcessDelegations
+                .FindAsync(processDelegation.Id.Value)
+                .ConfigureAwait(false) ?? throw new InvalidOperationException($"Delegation '{processDelegation.Id.Value}' is missing, even though it cannot be deleted.");
 
             // Check concurrency token to ensure the loaded entity has not changed since delegation was updated.
-            if (destination.ConcurrencyToken != messageDelegation.ConcurrencyToken)
-                throw new DbUpdateConcurrencyException($"Delegation '{messageDelegation.Id.Value}' was changed concurrently.");
+            if (destination.ConcurrencyToken != processDelegation.ConcurrencyToken)
+                throw new DbUpdateConcurrencyException($"Delegation '{processDelegation.Id.Value}' was changed concurrently.");
         }
 
-        foreach (var delegationPeriod in messageDelegation.Delegations)
+        foreach (var delegationPeriod in processDelegation.Delegations)
         {
             DelegationPeriodEntity delegationPeriodEntity;
 
@@ -124,23 +124,23 @@ public sealed class MessageDelegationRepository(IMarketParticipantDbContext mark
         }
 
         destination.ConcurrencyToken = Guid.NewGuid();
-        marketParticipantDbContext.MessageDelegations.Update(destination);
+        marketParticipantDbContext.ProcessDelegations.Update(destination);
 
         await marketParticipantDbContext
             .SaveChangesAsync()
             .ConfigureAwait(false);
 
-        return new MessageDelegationId(destination.Id);
+        return new ProcessDelegationId(destination.Id);
     }
 
-    private static MessageDelegation Map(MessageDelegationEntity messageDelegationEntity)
+    private static ProcessDelegation Map(ProcessDelegationEntity processDelegationEntity)
     {
-        return new MessageDelegation(
-            new MessageDelegationId(messageDelegationEntity.Id),
-            new ActorId(messageDelegationEntity.DelegatedByActorId),
-            messageDelegationEntity.MessageType,
-            messageDelegationEntity.ConcurrencyToken,
-            messageDelegationEntity.Delegations.Select(Map));
+        return new ProcessDelegation(
+            new ProcessDelegationId(processDelegationEntity.Id),
+            new ActorId(processDelegationEntity.DelegatedByActorId),
+            processDelegationEntity.DelegatedProcess,
+            processDelegationEntity.ConcurrencyToken,
+            processDelegationEntity.Delegations.Select(Map));
     }
 
     private static DelegationPeriod Map(DelegationPeriodEntity delegationPeriodEntity)

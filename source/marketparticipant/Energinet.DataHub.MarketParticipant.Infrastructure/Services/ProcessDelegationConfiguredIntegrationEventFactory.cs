@@ -17,20 +17,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using NodaTime.Serialization.Protobuf;
+using DelegatedProcess = Energinet.DataHub.MarketParticipant.Domain.Model.Delegations.DelegatedProcess;
 using EicFunction = Energinet.DataHub.MarketParticipant.Domain.Model.EicFunction;
-using MessageDelegationConfigured = Energinet.DataHub.MarketParticipant.Domain.Model.Events.MessageDelegationConfigured;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
-public sealed class MessageDelegationConfiguredIntegrationEventFactory : IIntegrationEventFactory<MessageDelegationConfigured>
+public sealed class ProcessDelegationConfiguredIntegrationEventFactory : IIntegrationEventFactory<Domain.Model.Events.ProcessDelegationConfigured>
 {
     private readonly IActorRepository _actorRepository;
     private readonly IGridAreaRepository _gridAreaRepository;
 
-    public MessageDelegationConfiguredIntegrationEventFactory(
+    public ProcessDelegationConfiguredIntegrationEventFactory(
         IActorRepository actorRepository,
         IGridAreaRepository gridAreaRepository)
     {
@@ -38,7 +39,7 @@ public sealed class MessageDelegationConfiguredIntegrationEventFactory : IIntegr
         _gridAreaRepository = gridAreaRepository;
     }
 
-    public async Task<IntegrationEvent> CreateAsync(MessageDelegationConfigured domainEvent, int sequenceNumber)
+    public async Task<IntegrationEvent> CreateAsync(Domain.Model.Events.ProcessDelegationConfigured domainEvent, int sequenceNumber)
     {
         ArgumentNullException.ThrowIfNull(domainEvent);
 
@@ -62,27 +63,22 @@ public sealed class MessageDelegationConfiguredIntegrationEventFactory : IIntegr
 
         var integrationEvent = new IntegrationEvent(
             domainEvent.EventId,
-            Model.Contracts.MessageDelegationConfigured.EventName,
-            Model.Contracts.MessageDelegationConfigured.CurrentMinorVersion,
-            new Model.Contracts.MessageDelegationConfigured
+            Model.Contracts.ProcessDelegationConfigured.EventName,
+            Model.Contracts.ProcessDelegationConfigured.CurrentMinorVersion,
+            new Model.Contracts.ProcessDelegationConfigured
             {
                 DelegatedByActorNumber = delegatedByActorNumber,
                 DelegatedByActorRole = MapMarketRole(delegatedByMarketRole),
                 DelegatedToActorNumber = delegatedToActorNumber,
                 DelegatedToActorRole = MapMarketRole(delegatedToMarketRole),
                 GridAreaCode = gridArea!.Code.Value,
-                MessageType = domainEvent.MessageType switch
+                Process = domainEvent.Process switch
                 {
-                    DelegationMessageType.Rsm012Inbound => DelegatedMessageType.MessageTypeRsm012Inbound,
-                    DelegationMessageType.Rsm012Outbound => DelegatedMessageType.MessageTypeRsm012Outbound,
-                    DelegationMessageType.Rsm014Inbound => DelegatedMessageType.MessageTypeRsm014Inbound,
-                    DelegationMessageType.Rsm016Inbound => DelegatedMessageType.MessageTypeRsm016Inbound,
-                    DelegationMessageType.Rsm016Outbound => DelegatedMessageType.MessageTypeRsm016Outbound,
-                    DelegationMessageType.Rsm017Inbound => DelegatedMessageType.MessageTypeRsm017Inbound,
-                    DelegationMessageType.Rsm017Outbound => DelegatedMessageType.MessageTypeRsm017Outbound,
-                    DelegationMessageType.Rsm018Inbound => DelegatedMessageType.MessageTypeRsm018Inbound,
-                    DelegationMessageType.Rsm019Inbound => DelegatedMessageType.MessageTypeRsm019Inbound,
-                    _ => throw new InvalidOperationException($"Delegation message type {domainEvent.MessageType} is not supported in integration event.")
+                    DelegatedProcess.RequestEnergyResults => Model.Contracts.DelegatedProcess.ProcessRequestEnergyResults,
+                    DelegatedProcess.ReceiveEnergyResults => Model.Contracts.DelegatedProcess.ProcessReceiveEnergyResults,
+                    DelegatedProcess.RequestWholesaleResults => Model.Contracts.DelegatedProcess.ProcessRequestWholesaleResults,
+                    DelegatedProcess.ReceiveWholesaleResults => Model.Contracts.DelegatedProcess.ProcessReceiveWholesaleResults,
+                    _ => throw new InvalidOperationException($"Delegation process type {domainEvent.Process} is not supported in integration event.")
                 },
                 StartsAt = domainEvent.StartsAt.ToTimestamp(),
                 StopsAt = domainEvent.StopsAt.ToTimestamp(),

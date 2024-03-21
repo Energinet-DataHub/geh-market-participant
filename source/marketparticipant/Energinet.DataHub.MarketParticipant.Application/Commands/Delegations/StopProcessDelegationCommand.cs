@@ -12,13 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 
-public interface IMessageDelegationAuditLogRepository
-{
-    Task<IEnumerable<AuditLog<ActorAuditedChange>>> GetAsync(ActorId actor);
-}
+public sealed record StopProcessDelegationCommand(StopProcessDelegationDto StopProcessDelegation) : IRequest;

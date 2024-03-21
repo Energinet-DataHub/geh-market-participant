@@ -16,41 +16,40 @@ using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class CreateProcessDelegationCommandRuleSet : AbstractValidator<CreateProcessDelegationCommand>
 {
-    public sealed class CreateMessageDelegationCommandRuleSet : AbstractValidator<CreateMessageDelegationCommand>
+    public CreateProcessDelegationCommandRuleSet()
     {
-        public CreateMessageDelegationCommandRuleSet()
-        {
-            RuleFor(command => command.CreateDelegation)
-                .NotNull()
-                .ChildRules(validator =>
-                {
-                    validator
-                        .RuleFor(delegation => delegation.DelegatedFrom)
-                        .NotEmpty();
+        RuleFor(command => command.CreateDelegation)
+            .NotNull()
+            .ChildRules(validator =>
+            {
+                validator
+                    .RuleFor(delegation => delegation.DelegatedFrom)
+                    .NotEmpty();
 
-                    validator
-                        .RuleFor(delegation => delegation.DelegatedTo)
-                        .NotEmpty();
+                validator
+                    .RuleFor(delegation => delegation.DelegatedTo)
+                    .NotEmpty();
 
-                    validator
-                        .RuleFor(delegation => delegation.GridAreas)
-                        .NotEmpty();
+                validator
+                    .RuleFor(delegation => delegation.GridAreas)
+                    .NotEmpty();
 
-                    validator
-                        .RuleForEach(delegation => delegation.GridAreas)
-                        .NotEmpty();
+                validator
+                    .RuleForEach(delegation => delegation.GridAreas)
+                    .NotEmpty();
 
-                    validator
-                        .RuleFor(delegation => delegation.MessageTypes)
-                        .NotEmpty();
+                validator
+                    .RuleFor(delegation => delegation.DelegatedProcesses)
+                    .NotEmpty();
 
-                    validator
-                        .RuleForEach(delegation => delegation.MessageTypes)
-                        .NotEmpty()
-                        .Must(Enum.IsDefined);
-                });
-        }
+                validator
+                    .RuleForEach(delegation => delegation.DelegatedProcesses)
+                    .NotEmpty()
+                    .Must(Enum.IsDefined);
+            });
     }
 }

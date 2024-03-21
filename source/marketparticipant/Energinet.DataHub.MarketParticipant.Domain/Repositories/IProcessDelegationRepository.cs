@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+public interface IProcessDelegationRepository
 {
-    public sealed record CreateMessageDelegationDto(
-        Guid DelegatedFrom,
-        Guid DelegatedTo,
-        IEnumerable<Guid> GridAreas,
-        IEnumerable<DelegationMessageType> MessageTypes,
-        DateTimeOffset StartsAt);
+    Task<ProcessDelegation?> GetAsync(ProcessDelegationId id);
+    Task<IEnumerable<ProcessDelegation>> GetForActorAsync(ActorId delegatedBy);
+    Task<IEnumerable<ProcessDelegation>> GetDelegatedToActorAsync(ActorId delegatedTo);
+
+    Task<ProcessDelegation?> GetForActorAsync(ActorId delegatedBy, DelegatedProcess process);
+    Task<ProcessDelegationId> AddOrUpdateAsync(ProcessDelegation processDelegation);
 }

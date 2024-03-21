@@ -13,17 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 
-public sealed class MessageDelegationEntity
-{
-    public Guid Id { get; set; }
-    public Guid DelegatedByActorId { get; set; }
-    public Guid ConcurrencyToken { get; set; }
-    public DelegationMessageType MessageType { get; set; }
-
-    public Collection<DelegationPeriodEntity> Delegations { get; } = new();
-}
+public sealed record ProcessDelegationDto(
+    Guid Id,
+    Guid DelegatedBy,
+    DelegatedProcess Process,
+    IEnumerable<DelegationPeriodDto> Periods);

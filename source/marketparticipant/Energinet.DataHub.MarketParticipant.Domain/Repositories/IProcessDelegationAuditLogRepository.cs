@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public enum DelegationMessageType
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+public interface IProcessDelegationAuditLogRepository
 {
-    Rsm012Inbound = 1,
-    Rsm012Outbound,
-    Rsm014Inbound,
-    Rsm016Inbound,
-    Rsm016Outbound,
-    Rsm017Inbound,
-    Rsm017Outbound,
-    Rsm018Inbound,
-    Rsm019Inbound
+    Task<IEnumerable<AuditLog<ActorAuditedChange>>> GetAsync(ActorId actor);
 }

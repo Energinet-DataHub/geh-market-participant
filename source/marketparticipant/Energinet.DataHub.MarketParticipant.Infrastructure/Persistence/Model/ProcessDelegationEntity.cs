@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System;
+using System.Collections.ObjectModel;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public interface IMessageDelegationRepository
+public sealed class ProcessDelegationEntity
 {
-    Task<MessageDelegation?> GetAsync(MessageDelegationId id);
-    Task<IEnumerable<MessageDelegation>> GetForActorAsync(ActorId delegatedBy);
-    Task<IEnumerable<MessageDelegation>> GetDelegatedToActorAsync(ActorId delegatedTo);
+    public Guid Id { get; set; }
+    public Guid DelegatedByActorId { get; set; }
+    public Guid ConcurrencyToken { get; set; }
+    public DelegatedProcess DelegatedProcess { get; set; }
 
-    Task<MessageDelegation?> GetForActorAsync(ActorId delegatedBy, DelegationMessageType messageType);
-    Task<MessageDelegationId> AddOrUpdateAsync(MessageDelegation messageDelegation);
+    public Collection<DelegationPeriodEntity> Delegations { get; } = new();
 }
