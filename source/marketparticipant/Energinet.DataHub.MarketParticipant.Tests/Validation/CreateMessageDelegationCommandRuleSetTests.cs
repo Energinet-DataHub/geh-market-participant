@@ -16,176 +16,173 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Xunit;
 using Xunit.Categories;
-namespace Energinet.DataHub.MarketParticipant.Tests.Validation
+namespace Energinet.DataHub.MarketParticipant.Tests.Validation;
+
+[UnitTest]
+public sealed class CreateProcessDelegationCommandRuleSetTests
 {
-    [UnitTest]
-    public sealed class CreateMessageDelegationCommandRuleSetTests
+    [Fact]
+    public async Task Validate_CreateProcessDelegationDto_ValidatesProperty()
     {
-        [Fact]
-        public async Task Validate_CreateMessageDelegationDto_ValidatesProperty()
+        // Arrange
+        const string propertyName = nameof(CreateProcessDelegationCommand.CreateDelegation);
+
+        var target = new CreateProcessDelegationCommandRuleSet();
+        var command = new CreateProcessDelegationCommand(null!);
+
+        // Act
+        var result = await target.ValidateAsync(command);
+
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+    }
+
+    [Theory]
+    [InlineData("8F9B8218-BAE6-412B-B91B-0C78A55FF128", true)]
+    [InlineData("00000000-0000-0000-0000-000000000000", false)]
+    public async Task Validate_DelegatedFrom_ValidatesProperty(string value, bool isValid)
+    {
+        // Arrange
+        const string propertyName = $"{nameof(CreateProcessDelegationCommand.CreateDelegation)}.{nameof(CreateProcessDelegationsDto.DelegatedFrom)}";
+        var gridAreaList = new List<Guid>() { Guid.NewGuid() };
+        var messageTypeList = new List<DelegatedProcess>() { DelegatedProcess.RequestEnergyResults };
+        var delegationDto = new CreateProcessDelegationsDto(
+            Guid.Parse(value),
+            Guid.NewGuid(),
+            gridAreaList,
+            messageTypeList,
+            DateTimeOffset.UtcNow);
+
+        var target = new CreateProcessDelegationCommandRuleSet();
+        var command = new CreateProcessDelegationCommand(delegationDto);
+
+        // Act
+        var result = await target.ValidateAsync(command);
+
+        // Assert
+        if (isValid)
         {
-            // Arrange
-            const string propertyName = nameof(CreateMessageDelegationCommand.CreateDelegation);
-
-            var target = new CreateMessageDelegationCommandRuleSet();
-            var command = new CreateMessageDelegationCommand(null!);
-
-            // Act
-            var result = await target.ValidateAsync(command);
-
-            // Assert
-            Assert.False(result.IsValid);
+            Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            Assert.True(result.IsValid);
+        }
+        else
+        {
             Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            Assert.False(result.IsValid);
         }
+    }
 
-        [Theory]
-        [InlineData("8F9B8218-BAE6-412B-B91B-0C78A55FF128", true)]
-        [InlineData("00000000-0000-0000-0000-000000000000", false)]
-        public async Task Validate_DelegatedFrom_ValidatesProperty(string value, bool isValid)
+    [Theory]
+    [InlineData("8F9B8218-BAE6-412B-B91B-0C78A55FF128", true)]
+    [InlineData("00000000-0000-0000-0000-000000000000", false)]
+    public async Task Validate_DelegatedTo_ValidatesProperty(string value, bool isValid)
+    {
+        // Arrange
+        const string propertyName = $"{nameof(CreateProcessDelegationCommand.CreateDelegation)}.{nameof(CreateProcessDelegationsDto.DelegatedTo)}";
+        var gridAreaList = new List<Guid>() { Guid.NewGuid() };
+        var messageTypeList = new List<DelegatedProcess>() { DelegatedProcess.RequestEnergyResults };
+        var delegationDto = new CreateProcessDelegationsDto(
+            Guid.NewGuid(),
+            Guid.Parse(value),
+            gridAreaList,
+            messageTypeList,
+            DateTimeOffset.UtcNow);
+
+        var target = new CreateProcessDelegationCommandRuleSet();
+        var command = new CreateProcessDelegationCommand(delegationDto);
+
+        // Act
+        var result = await target.ValidateAsync(command);
+
+        // Assert
+        if (isValid)
         {
-            // Arrange
-            const string propertyName = $"{nameof(CreateMessageDelegationCommand.CreateDelegation)}.{nameof(CreateMessageDelegationDto.DelegatedFrom)}";
-            var gridAreaList = new List<Guid>() { Guid.NewGuid() };
-            var messageTypeList = new List<DelegationMessageType>() { DelegationMessageType.Rsm012Inbound };
-            var delegationDto = new CreateMessageDelegationDto(
-                Guid.Parse(value),
-                Guid.NewGuid(),
-                gridAreaList,
-                messageTypeList,
-                DateTimeOffset.UtcNow);
-
-            var target = new CreateMessageDelegationCommandRuleSet();
-            var command = new CreateMessageDelegationCommand(delegationDto);
-
-            // Act
-            var result = await target.ValidateAsync(command);
-
-            // Assert
-            if (isValid)
-            {
-                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
-                Assert.True(result.IsValid);
-            }
-            else
-            {
-                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-                Assert.False(result.IsValid);
-            }
+            Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            Assert.True(result.IsValid);
         }
-
-        [Theory]
-        [InlineData("8F9B8218-BAE6-412B-B91B-0C78A55FF128", true)]
-        [InlineData("00000000-0000-0000-0000-000000000000", false)]
-        public async Task Validate_DelegatedTo_ValidatesProperty(string value, bool isValid)
+        else
         {
-            // Arrange
-            const string propertyName = $"{nameof(CreateMessageDelegationCommand.CreateDelegation)}.{nameof(CreateMessageDelegationDto.DelegatedTo)}";
-            var gridAreaList = new List<Guid>() { Guid.NewGuid() };
-            var messageTypeList = new List<DelegationMessageType>() { DelegationMessageType.Rsm012Inbound };
-            var delegationDto = new CreateMessageDelegationDto(
-                Guid.NewGuid(),
-                Guid.Parse(value),
-                gridAreaList,
-                messageTypeList,
-                DateTimeOffset.UtcNow);
-
-            var target = new CreateMessageDelegationCommandRuleSet();
-            var command = new CreateMessageDelegationCommand(delegationDto);
-
-            // Act
-            var result = await target.ValidateAsync(command);
-
-            // Assert
-            if (isValid)
-            {
-                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
-                Assert.True(result.IsValid);
-            }
-            else
-            {
-                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-                Assert.False(result.IsValid);
-            }
+            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            Assert.False(result.IsValid);
         }
+    }
 
-        [Theory]
-        [InlineData(new[] { "8F9B8218-BAE6-412B-B91B-0C78A55FF128", "8F9B8218-BAE6-412B-B91B-0C78A55FF122" }, true)]
-        [InlineData(new[] { "00000000-0000-0000-0000-000000000000", "8F9B8218-BAE6-412B-B91B-0C78A55FF128" }, false)]
-        [InlineData(new[] { "8F9B8218-BAE6-412B-B91B-0C78A55FF128", "00000000-0000-0000-0000-000000000000" }, false)]
-        [InlineData(new string[] { }, false)]
-        public async Task Validate_GridAreas_ValidatesProperty(string[] value, bool isValid)
+    [Theory]
+    [InlineData(new[] { "8F9B8218-BAE6-412B-B91B-0C78A55FF128", "8F9B8218-BAE6-412B-B91B-0C78A55FF122" }, true)]
+    [InlineData(new[] { "00000000-0000-0000-0000-000000000000", "8F9B8218-BAE6-412B-B91B-0C78A55FF128" }, false)]
+    [InlineData(new[] { "8F9B8218-BAE6-412B-B91B-0C78A55FF128", "00000000-0000-0000-0000-000000000000" }, false)]
+    [InlineData(new string[] { }, false)]
+    public async Task Validate_GridAreas_ValidatesProperty(string[] value, bool isValid)
+    {
+        // Arrange
+        const string propertyName = $"{nameof(CreateProcessDelegationCommand.CreateDelegation)}.{nameof(CreateProcessDelegationsDto.GridAreas)}";
+        var gridAreaList = value.Select(Guid.Parse).ToList();
+        var messageTypeList = new List<DelegatedProcess>() { DelegatedProcess.RequestEnergyResults };
+        var delegationDto = new CreateProcessDelegationsDto(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            gridAreaList,
+            messageTypeList,
+            DateTimeOffset.UtcNow);
+
+        var target = new CreateProcessDelegationCommandRuleSet();
+        var command = new CreateProcessDelegationCommand(delegationDto);
+
+        // Act
+        var result = await target.ValidateAsync(command);
+
+        // Assert
+        if (isValid)
         {
-            // Arrange
-            const string propertyName = $"{nameof(CreateMessageDelegationCommand.CreateDelegation)}.{nameof(CreateMessageDelegationDto.GridAreas)}";
-            var gridAreaList = value.Select(Guid.Parse).ToList();
-            var messageTypeList = new List<DelegationMessageType>() { DelegationMessageType.Rsm012Inbound };
-            var delegationDto = new CreateMessageDelegationDto(
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-                gridAreaList,
-                messageTypeList,
-                DateTimeOffset.UtcNow);
-
-            var target = new CreateMessageDelegationCommandRuleSet();
-            var command = new CreateMessageDelegationCommand(delegationDto);
-
-            // Act
-            var result = await target.ValidateAsync(command);
-
-            // Assert
-            if (isValid)
-            {
-                Assert.DoesNotContain(result.Errors, x => x.PropertyName.StartsWith(propertyName, StringComparison.OrdinalIgnoreCase));
-                Assert.True(result.IsValid);
-            }
-            else
-            {
-                Assert.Contains(result.Errors, x => x.PropertyName.StartsWith(propertyName, StringComparison.OrdinalIgnoreCase));
-                Assert.False(result.IsValid);
-            }
+            Assert.DoesNotContain(result.Errors, x => x.PropertyName.StartsWith(propertyName, StringComparison.OrdinalIgnoreCase));
+            Assert.True(result.IsValid);
         }
-
-        [Theory]
-        [InlineData(new[] { DelegationMessageType.Rsm012Inbound, DelegationMessageType.Rsm014Inbound }, true)]
-        [InlineData(new[] { DelegationMessageType.Rsm012Inbound, (DelegationMessageType)550 }, false)]
-        [InlineData(new DelegationMessageType[] { }, false)]
-        public async Task Validate_MessagesTypes_ValidatesProperty(DelegationMessageType[] value, bool isValid)
+        else
         {
-            // Arrange
-            const string propertyName = $"{nameof(CreateMessageDelegationCommand.CreateDelegation)}.{nameof(CreateMessageDelegationDto.MessageTypes)}";
-            var gridAreaList = new List<Guid>() { Guid.NewGuid() };
-            var messageTypeList = new List<DelegationMessageType>(value);
-            var delegationDto = new CreateMessageDelegationDto(
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-                gridAreaList,
-                messageTypeList,
-                DateTimeOffset.UtcNow);
+            Assert.Contains(result.Errors, x => x.PropertyName.StartsWith(propertyName, StringComparison.OrdinalIgnoreCase));
+            Assert.False(result.IsValid);
+        }
+    }
 
-            var target = new CreateMessageDelegationCommandRuleSet();
-            var command = new CreateMessageDelegationCommand(delegationDto);
+    [Theory]
+    [InlineData(new[] { DelegatedProcess.ReceiveEnergyResults, DelegatedProcess.ReceiveWholesaleResults }, true)]
+    [InlineData(new[] { DelegatedProcess.RequestEnergyResults, (DelegatedProcess)550 }, false)]
+    [InlineData(new DelegatedProcess[] { }, false)]
+    public async Task Validate_Process_ValidatesProperty(DelegatedProcess[] value, bool isValid)
+    {
+        // Arrange
+        const string propertyName = $"{nameof(CreateProcessDelegationCommand.CreateDelegation)}.{nameof(CreateProcessDelegationsDto.DelegatedProcesses)}";
+        var gridAreaList = new List<Guid>() { Guid.NewGuid() };
+        var messageTypeList = new List<DelegatedProcess>(value);
+        var delegationDto = new CreateProcessDelegationsDto(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            gridAreaList,
+            messageTypeList,
+            DateTimeOffset.UtcNow);
 
-            // Act
-            var result = await target.ValidateAsync(command);
+        var target = new CreateProcessDelegationCommandRuleSet();
+        var command = new CreateProcessDelegationCommand(delegationDto);
 
-            // Assert
-            if (isValid)
-            {
-                Assert.DoesNotContain(result.Errors, x => x.PropertyName.StartsWith(propertyName, StringComparison.OrdinalIgnoreCase));
-                Assert.True(result.IsValid);
-            }
-            else
-            {
-                Assert.Contains(result.Errors, x => x.PropertyName.StartsWith(propertyName, StringComparison.OrdinalIgnoreCase));
-                Assert.False(result.IsValid);
-            }
+        // Act
+        var result = await target.ValidateAsync(command);
+
+        // Assert
+        if (isValid)
+        {
+            Assert.DoesNotContain(result.Errors, x => x.PropertyName.StartsWith(propertyName, StringComparison.OrdinalIgnoreCase));
+            Assert.True(result.IsValid);
+        }
+        else
+        {
+            Assert.Contains(result.Errors, x => x.PropertyName.StartsWith(propertyName, StringComparison.OrdinalIgnoreCase));
+            Assert.False(result.IsValid);
         }
     }
 }

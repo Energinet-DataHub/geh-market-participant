@@ -27,7 +27,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Model;
 
 [UnitTest]
-public sealed class MessageDelegationTests
+public sealed class ProcessDelegationTests
 {
     public static TheoryData<IReadOnlyList<(Instant StartsAt, Instant? StopsAt)>, bool, int> OverlapCases { get; } =
         new()
@@ -153,15 +153,15 @@ public sealed class MessageDelegationTests
     {
         // arrange
         var testData = CreateTestBasicTestData();
-        var messageDelegation = new MessageDelegation(testData.ActorFrom, DelegationMessageType.Rsm012Inbound);
+        var processDelegation = new ProcessDelegation(testData.ActorFrom, DelegatedProcess.RequestEnergyResults);
 
         // act
-        messageDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, Instant.FromDateTimeOffset(DateTimeOffset.Now));
-        messageDelegation.StopDelegation(messageDelegation.Delegations.Single(), Instant.FromDateTimeOffset(DateTimeOffset.Now.AddMonths(1)));
-        messageDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, Instant.FromDateTimeOffset(DateTimeOffset.Now.AddMonths(2)));
+        processDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, Instant.FromDateTimeOffset(DateTimeOffset.Now));
+        processDelegation.StopDelegation(processDelegation.Delegations.Single(), Instant.FromDateTimeOffset(DateTimeOffset.Now.AddMonths(1)));
+        processDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, Instant.FromDateTimeOffset(DateTimeOffset.Now.AddMonths(2)));
 
         // assert
-        Assert.Equal(2, messageDelegation.Delegations.Count);
+        Assert.Equal(2, processDelegation.Delegations.Count);
     }
 
     [Theory]
@@ -170,7 +170,7 @@ public sealed class MessageDelegationTests
     {
         // arrange
         var testData = CreateTestBasicTestData();
-        var messageDelegation = new MessageDelegation(testData.ActorFrom, DelegationMessageType.Rsm012Inbound);
+        var processDelegation = new ProcessDelegation(testData.ActorFrom, DelegatedProcess.RequestEnergyResults);
         var exceptions = new List<Exception>();
 
         // act
@@ -178,12 +178,12 @@ public sealed class MessageDelegationTests
         {
             var exception = Record.Exception(() =>
             {
-                messageDelegation.DelegateTo(
+                processDelegation.DelegateTo(
                     testData.ActorTo.Id,
                     testData.GridArea.Id,
                     delegationPeriod.StartsAt);
 
-                messageDelegation.StopDelegation(messageDelegation.Delegations.Last(), delegationPeriod.StopsAt);
+                processDelegation.StopDelegation(processDelegation.Delegations.Last(), delegationPeriod.StopsAt);
             });
 
             if (exception != null)
@@ -201,7 +201,7 @@ public sealed class MessageDelegationTests
             Assert.Empty(exceptions);
         }
 
-        Assert.Equal(expectedDelegationCount, messageDelegation.Delegations.Count);
+        Assert.Equal(expectedDelegationCount, processDelegation.Delegations.Count);
     }
 
     [Fact]
@@ -209,14 +209,14 @@ public sealed class MessageDelegationTests
     {
         // Arrange
         var testData = CreateTestBasicTestData();
-        var messageDelegation = new MessageDelegation(testData.ActorFrom, DelegationMessageType.Rsm017Inbound);
+        var processDelegation = new ProcessDelegation(testData.ActorFrom, DelegatedProcess.ReceiveWholesaleResults);
 
         // Act
         var expectedStartsAt = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
-        messageDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, expectedStartsAt);
+        processDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, expectedStartsAt);
 
         // Assert
-        var actual = (MessageDelegationConfigured)((IPublishDomainEvents)messageDelegation)
+        var actual = (ProcessDelegationConfigured)((IPublishDomainEvents)processDelegation)
             .DomainEvents
             .ToList()
             .Single();
@@ -224,7 +224,7 @@ public sealed class MessageDelegationTests
         Assert.Equal(testData.ActorFrom.Id, actual.DelegatedBy);
         Assert.Equal(testData.ActorTo.Id, actual.DelegatedTo);
         Assert.Equal(testData.GridArea.Id, actual.GridAreaId);
-        Assert.Equal(DelegationMessageType.Rsm017Inbound, actual.MessageType);
+        Assert.Equal(DelegatedProcess.ReceiveWholesaleResults, actual.Process);
         Assert.Equal(expectedStartsAt, actual.StartsAt);
         Assert.Equal(Instant.MaxValue, actual.StopsAt);
     }
@@ -234,28 +234,28 @@ public sealed class MessageDelegationTests
     {
         // Arrange
         var testData = CreateTestBasicTestData();
-        var messageDelegation = new MessageDelegation(testData.ActorFrom, DelegationMessageType.Rsm019Inbound);
+        var processDelegation = new ProcessDelegation(testData.ActorFrom, DelegatedProcess.ReceiveWholesaleResults);
 
         var expectedStartsAt = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
         var expectedStopsAt = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow).Plus(Duration.FromDays(-5));
 
         // Act
-        messageDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, expectedStartsAt);
-        messageDelegation.StopDelegation(messageDelegation.Delegations.Single(), expectedStopsAt);
+        processDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, expectedStartsAt);
+        processDelegation.StopDelegation(processDelegation.Delegations.Single(), expectedStopsAt);
 
         // Assert
-        var domainEvents = ((IPublishDomainEvents)messageDelegation)
+        var domainEvents = ((IPublishDomainEvents)processDelegation)
             .DomainEvents
             .ToList();
 
         Assert.Equal(2, domainEvents.Count);
 
-        var actual = (MessageDelegationConfigured)domainEvents.Last();
+        var actual = (ProcessDelegationConfigured)domainEvents.Last();
 
         Assert.Equal(testData.ActorFrom.Id, actual.DelegatedBy);
         Assert.Equal(testData.ActorTo.Id, actual.DelegatedTo);
         Assert.Equal(testData.GridArea.Id, actual.GridAreaId);
-        Assert.Equal(DelegationMessageType.Rsm019Inbound, actual.MessageType);
+        Assert.Equal(DelegatedProcess.ReceiveWholesaleResults, actual.Process);
         Assert.Equal(expectedStartsAt, actual.StartsAt);
         Assert.Equal(expectedStopsAt, actual.StopsAt);
     }

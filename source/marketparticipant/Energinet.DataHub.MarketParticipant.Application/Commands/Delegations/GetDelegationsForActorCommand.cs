@@ -15,7 +15,6 @@
 using System;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
-{
-    public sealed record GetDelegationsForActorCommand(Guid ActorId) : IRequest<GetDelegationsForActorResponse>;
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+
+public sealed record GetDelegationsForActorCommand(Guid ActorId) : IRequest<GetDelegationsForActorResponse>;

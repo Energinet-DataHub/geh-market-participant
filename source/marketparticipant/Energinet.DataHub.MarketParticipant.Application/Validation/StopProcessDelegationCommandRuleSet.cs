@@ -12,10 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+using FluentValidation;
 
-public partial class MessageDelegationConfigured
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class StopProcessDelegationCommandRuleSet : AbstractValidator<StopProcessDelegationCommand>
 {
-    public const string EventName = "MessageDelegationConfigured";
-    public const int CurrentMinorVersion = 1;
+    public StopProcessDelegationCommandRuleSet()
+    {
+        RuleFor(command => command.StopProcessDelegation.Id)
+            .NotEmpty();
+        RuleFor(command => command.StopProcessDelegation.PeriodId)
+            .NotEmpty();
+    }
 }

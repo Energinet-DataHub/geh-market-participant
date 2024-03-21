@@ -13,7 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 
-public sealed record MessageDelegationId(Guid Value);
+public sealed record CreateProcessDelegationsDto(
+    Guid DelegatedFrom,
+    Guid DelegatedTo,
+    IEnumerable<Guid> GridAreas,
+    IEnumerable<DelegatedProcess> DelegatedProcesses,
+    DateTimeOffset StartsAt);
