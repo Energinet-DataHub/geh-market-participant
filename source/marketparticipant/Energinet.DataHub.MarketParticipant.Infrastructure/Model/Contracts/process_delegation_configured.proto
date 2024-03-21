@@ -22,7 +22,7 @@ option csharp_namespace = "Energinet.DataHub.MarketParticipant.Infrastructure.Mo
 /*
  * ProcessDelegationConfigured Integration Event.
  *
- * Occurs when an actor (delegated_by) configures delegation a certain process to another actor (delegated_to).
+ * Occurs when an actor (delegated_by) configures a delegation for a certain process to another actor (delegated_to).
  * Delegations cannot be deleted, but their validity period (stops_at) can be either shortened or extended.
  * Delegations cannot overlap, *EXCEPT* if a delegation ends before it begins.
  */
