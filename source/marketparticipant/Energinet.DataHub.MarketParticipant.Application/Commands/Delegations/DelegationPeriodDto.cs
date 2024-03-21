@@ -21,4 +21,4 @@ public sealed record DelegationPeriodDto(
     Guid DelegatedTo,
     Guid GridAreaId,
     DateTimeOffset StartsAt,
-    DateTimeOffset? ExpiresAt = null);
+    DateTimeOffset? StopsAt);

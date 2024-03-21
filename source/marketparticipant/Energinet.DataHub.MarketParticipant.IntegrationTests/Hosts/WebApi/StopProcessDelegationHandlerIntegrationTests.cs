@@ -73,6 +73,6 @@ public sealed class StopProcessDelegationHandlerIntegrationTests(MarketParticipa
         Assert.True(response.Delegations.First().Periods.First().DelegatedTo == actorTo.Id);
         Assert.True(response.Delegations.First().Periods.First().GridAreaId == gridArea.Id);
         Assert.True(response.Delegations.First().Periods.First().StartsAt == startsAt);
-        Assert.True(response.Delegations.First().Periods.First().ExpiresAt == stopProcessDelegationDto.StopsAt);
+        Assert.True(response.Delegations.First().Periods.First().StopsAt == stopProcessDelegationDto.StopsAt);
     }
 }
