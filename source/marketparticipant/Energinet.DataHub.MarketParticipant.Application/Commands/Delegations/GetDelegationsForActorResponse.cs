@@ -14,7 +14,6 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
-{
-    public sealed record GetDelegationsForActorResponse(IEnumerable<MessageDelegationDto> Delegations);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+
+public sealed record GetDelegationsForActorResponse(IEnumerable<ProcessDelegationDto> Delegations);

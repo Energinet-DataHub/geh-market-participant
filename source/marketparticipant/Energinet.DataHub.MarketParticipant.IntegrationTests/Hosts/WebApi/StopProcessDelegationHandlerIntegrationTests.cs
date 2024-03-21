@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
@@ -29,10 +28,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class CreateMessageDelegationHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
+public sealed class StopProcessDelegationHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
 {
     [Fact]
-    public async Task CreateMessageDelegation_ValidCommand_CanReadBack()
+    public async Task StopProcessDelegation_ValidCommand_CanReadBack()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
@@ -43,19 +42,29 @@ public sealed class CreateMessageDelegationHandlerIntegrationTests(MarketPartici
         var gridArea = await fixture.PrepareGridAreaAsync();
         var startsAt = DateTimeOffset.UtcNow;
 
-        var messageDelegationDto = new CreateMessageDelegationDto(
+        var processDelegationDto = new CreateProcessDelegationsDto(
             actorFrom.Id,
             actorTo.Id,
-            new List<Guid>() { gridArea.Id },
-            new List<DelegationMessageType>() { DelegationMessageType.Rsm012Inbound },
+            [gridArea.Id],
+            [DelegatedProcess.RequestEnergyResults],
             startsAt);
 
-        var createCommand = new CreateMessageDelegationCommand(messageDelegationDto);
+        var createCommand = new CreateProcessDelegationCommand(processDelegationDto);
         var fetchCommand = new GetDelegationsForActorCommand(actorFrom.Id);
-
-        // Act + Assert
         await mediator.Send(createCommand);
         var response = await mediator.Send(fetchCommand);
+
+        var stopProcessDelegationDto = new StopProcessDelegationDto(
+            response.Delegations.First().Id,
+            response.Delegations.First().Periods.First().Id,
+            DateTimeOffset.UtcNow.AddMonths(5));
+
+        var stopCommand = new StopProcessDelegationCommand(stopProcessDelegationDto);
+
+        // Act + Assert
+        await mediator.Send(stopCommand);
+        response = await mediator.Send(fetchCommand);
+
         Assert.NotNull(response);
         Assert.NotEmpty(response.Delegations);
         Assert.Single(response.Delegations);
@@ -64,5 +73,6 @@ public sealed class CreateMessageDelegationHandlerIntegrationTests(MarketPartici
         Assert.True(response.Delegations.First().Periods.First().DelegatedTo == actorTo.Id);
         Assert.True(response.Delegations.First().Periods.First().GridAreaId == gridArea.Id);
         Assert.True(response.Delegations.First().Periods.First().StartsAt == startsAt);
+        Assert.True(response.Delegations.First().Periods.First().ExpiresAt == stopProcessDelegationDto.StopsAt);
     }
 }

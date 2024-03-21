@@ -131,9 +131,9 @@ public interface IMarketParticipantDbContext
     DbSet<UsedActorCertificatesEntity> UsedActorCertificates { get; }
 
     /// <summary>
-    ///     Represent access to the MessageDelegation database table
+    ///     Represent access to the ProcessDelegations database table
     /// </summary>
-    DbSet<MessageDelegationEntity> MessageDelegations { get; }
+    DbSet<ProcessDelegationEntity> ProcessDelegations { get; }
 
     /// <summary>
     ///     Represent access to the DelegationPeriod database table

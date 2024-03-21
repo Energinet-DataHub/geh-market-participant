@@ -16,4 +16,4 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-public sealed record MessageDelegationId(Guid Value);
+public sealed record ProcessDelegationId(Guid Value);

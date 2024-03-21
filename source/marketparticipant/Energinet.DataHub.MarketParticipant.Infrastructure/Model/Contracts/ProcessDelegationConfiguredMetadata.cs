@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
-
-public sealed record MessageDelegationDto(
-    Guid Id,
-    Guid DelegatedBy,
-    DelegationMessageType MessageType,
-    IEnumerable<MessageDelegationPeriodDto> Periods);
+public partial class ProcessDelegationConfigured
+{
+    public const string EventName = "ProcessDelegationConfigured";
+    public const int CurrentMinorVersion = 1;
+}

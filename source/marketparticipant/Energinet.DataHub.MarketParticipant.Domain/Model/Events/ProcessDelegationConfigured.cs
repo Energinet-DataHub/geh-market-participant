@@ -20,15 +20,15 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-public sealed class MessageDelegationConfigured : DomainEvent
+public sealed class ProcessDelegationConfigured : DomainEvent
 {
     [JsonConstructor]
     [Browsable(false)]
-    public MessageDelegationConfigured(
+    public ProcessDelegationConfigured(
         Guid eventId,
         ActorId delegatedBy,
         ActorId delegatedTo,
-        DelegationMessageType messageType,
+        DelegatedProcess process,
         GridAreaId gridAreaId,
         Instant startsAt,
         Instant stopsAt)
@@ -36,21 +36,21 @@ public sealed class MessageDelegationConfigured : DomainEvent
         EventId = eventId;
         DelegatedBy = delegatedBy;
         DelegatedTo = delegatedTo;
-        MessageType = messageType;
+        Process = process;
         GridAreaId = gridAreaId;
         StartsAt = startsAt;
         StopsAt = stopsAt;
     }
 
-    public MessageDelegationConfigured(MessageDelegation messageDelegation, DelegationPeriod delegationPeriod)
+    public ProcessDelegationConfigured(ProcessDelegation processDelegation, DelegationPeriod delegationPeriod)
     {
-        ArgumentNullException.ThrowIfNull(messageDelegation);
+        ArgumentNullException.ThrowIfNull(processDelegation);
         ArgumentNullException.ThrowIfNull(delegationPeriod);
 
         EventId = Guid.NewGuid();
-        DelegatedBy = messageDelegation.DelegatedBy;
+        DelegatedBy = processDelegation.DelegatedBy;
         DelegatedTo = delegationPeriod.DelegatedTo;
-        MessageType = messageDelegation.MessageType;
+        Process = processDelegation.Process;
         GridAreaId = delegationPeriod.GridAreaId;
         StartsAt = delegationPeriod.StartsAt;
         StopsAt = delegationPeriod.StopsAt ?? Instant.MaxValue;
@@ -58,7 +58,7 @@ public sealed class MessageDelegationConfigured : DomainEvent
 
     public ActorId DelegatedBy { get; }
     public ActorId DelegatedTo { get; }
-    public DelegationMessageType MessageType { get; }
+    public DelegatedProcess Process { get; }
     public GridAreaId GridAreaId { get; }
     public Instant StartsAt { get; }
     public Instant StopsAt { get; }

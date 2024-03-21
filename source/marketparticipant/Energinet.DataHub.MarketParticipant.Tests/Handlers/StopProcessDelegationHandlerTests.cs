@@ -31,15 +31,15 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
 
 [UnitTest]
-public sealed class StopMessageDelegationHandlerTests
+public sealed class StopProcessDelegationHandlerTests
 {
     [Fact]
-    public async Task Handle_StopMessageDelegation_CorrectDoesNotThrow()
+    public async Task Handle_StopProcessDelegation_CorrectDoesNotThrow()
     {
         // Arrange
-        var messageRepo = new Mock<IMessageDelegationRepository>();
-        var target = new StopMessageDelegationHandler(
-            messageRepo.Object,
+        var processDelegationRepository = new Mock<IProcessDelegationRepository>();
+        var target = new StopProcessDelegationHandler(
+            processDelegationRepository.Object,
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create());
 
@@ -51,18 +51,19 @@ public sealed class StopMessageDelegationHandlerTests
             Instant.FromDateTimeOffset(DateTimeOffset.UtcNow),
             null);
 
-        var messageDelegation = new MessageDelegation(
-            new MessageDelegationId(Guid.NewGuid()),
+        var processDelegation = new ProcessDelegation(
+            new ProcessDelegationId(Guid.NewGuid()),
             actorFrom.Id,
-            DelegationMessageType.Rsm012Inbound,
+            DelegatedProcess.RequestEnergyResults,
             Guid.NewGuid(),
             new List<DelegationPeriod>() { delegationPeriod });
-        messageRepo
-            .Setup(x => x.GetAsync(It.Is<MessageDelegationId>(match => match.Value == messageDelegation.Id.Value)))
-            .ReturnsAsync(messageDelegation);
 
-        var command = new StopMessageDelegationCommand(new StopMessageDelegationDto(
-            messageDelegation.Id.Value,
+        processDelegationRepository
+            .Setup(x => x.GetAsync(It.Is<ProcessDelegationId>(match => match.Value == processDelegation.Id.Value)))
+            .ReturnsAsync(processDelegation);
+
+        var command = new StopProcessDelegationCommand(new StopProcessDelegationDto(
+            processDelegation.Id.Value,
             delegationPeriod.Id.Value,
             DateTimeOffset.UtcNow));
 
@@ -71,12 +72,12 @@ public sealed class StopMessageDelegationHandlerTests
     }
 
     [Fact]
-    public async Task Handle_StopMessageDelegation_IncorrectDelegationIdThrows()
+    public async Task Handle_StopProcessDelegation_IncorrectDelegationIdThrows()
     {
         // Arrange
-        var messageRepo = new Mock<IMessageDelegationRepository>();
-        var target = new StopMessageDelegationHandler(
-            messageRepo.Object,
+        var processDelegationRepository = new Mock<IProcessDelegationRepository>();
+        var target = new StopProcessDelegationHandler(
+            processDelegationRepository.Object,
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create());
 
@@ -88,18 +89,19 @@ public sealed class StopMessageDelegationHandlerTests
             Instant.FromDateTimeOffset(DateTimeOffset.UtcNow),
             null);
 
-        var messageDelegation = new MessageDelegation(
-            new MessageDelegationId(Guid.NewGuid()),
+        var processDelegation = new ProcessDelegation(
+            new ProcessDelegationId(Guid.NewGuid()),
             actorFrom.Id,
-            DelegationMessageType.Rsm012Inbound,
+            DelegatedProcess.RequestEnergyResults,
             Guid.NewGuid(),
             new List<DelegationPeriod>() { delegationPeriod });
-        messageRepo
-            .Setup(x => x.GetAsync(It.Is<MessageDelegationId>(match => match.Value == messageDelegation.Id.Value)))
-            .ReturnsAsync(messageDelegation);
 
-        var testDelegationId = new MessageDelegationId(Guid.NewGuid());
-        var command = new StopMessageDelegationCommand(new StopMessageDelegationDto(
+        processDelegationRepository
+            .Setup(x => x.GetAsync(It.Is<ProcessDelegationId>(match => match.Value == processDelegation.Id.Value)))
+            .ReturnsAsync(processDelegation);
+
+        var testDelegationId = new ProcessDelegationId(Guid.NewGuid());
+        var command = new StopProcessDelegationCommand(new StopProcessDelegationDto(
             testDelegationId.Value,
             delegationPeriod.Id.Value,
             DateTimeOffset.UtcNow));
@@ -117,12 +119,12 @@ public sealed class StopMessageDelegationHandlerTests
     }
 
     [Fact]
-    public async Task Handle_StopMessageDelegation_IncorrectPeriodIdThrows()
+    public async Task Handle_StopProcessDelegation_IncorrectPeriodIdThrows()
     {
         // Arrange
-        var messageRepo = new Mock<IMessageDelegationRepository>();
-        var target = new StopMessageDelegationHandler(
-            messageRepo.Object,
+        var processDelegationRepository = new Mock<IProcessDelegationRepository>();
+        var target = new StopProcessDelegationHandler(
+            processDelegationRepository.Object,
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create());
 
@@ -134,19 +136,20 @@ public sealed class StopMessageDelegationHandlerTests
             Instant.FromDateTimeOffset(DateTimeOffset.UtcNow),
             null);
 
-        var messageDelegation = new MessageDelegation(
-            new MessageDelegationId(Guid.NewGuid()),
+        var processDelegation = new ProcessDelegation(
+            new ProcessDelegationId(Guid.NewGuid()),
             actorFrom.Id,
-            DelegationMessageType.Rsm012Inbound,
+            DelegatedProcess.RequestEnergyResults,
             Guid.NewGuid(),
             new List<DelegationPeriod>() { delegationPeriod });
-        messageRepo
-            .Setup(x => x.GetAsync(It.Is<MessageDelegationId>(match => match.Value == messageDelegation.Id.Value)))
-            .ReturnsAsync(messageDelegation);
+
+        processDelegationRepository
+            .Setup(x => x.GetAsync(It.Is<ProcessDelegationId>(match => match.Value == processDelegation.Id.Value)))
+            .ReturnsAsync(processDelegation);
 
         var testPeriodId = new DelegationPeriodId(Guid.NewGuid());
-        var command = new StopMessageDelegationCommand(new StopMessageDelegationDto(
-            messageDelegation.Id.Value,
+        var command = new StopProcessDelegationCommand(new StopProcessDelegationDto(
+            processDelegation.Id.Value,
             testPeriodId.Value,
             DateTimeOffset.UtcNow));
 
@@ -163,13 +166,13 @@ public sealed class StopMessageDelegationHandlerTests
     }
 
     [Fact]
-    public async Task Handle_StopMessageDelegation_PublishesEvents()
+    public async Task Handle_StopProcessDelegation_PublishesEvents()
     {
         // Arrange
-        var messageDelegationRepository = new Mock<IMessageDelegationRepository>();
+        var processDelegationRepository = new Mock<IProcessDelegationRepository>();
         var domainEventRepository = new Mock<IDomainEventRepository>();
-        var target = new StopMessageDelegationHandler(
-            messageDelegationRepository.Object,
+        var target = new StopProcessDelegationHandler(
+            processDelegationRepository.Object,
             domainEventRepository.Object,
             UnitOfWorkProviderMock.Create());
 
@@ -180,19 +183,19 @@ public sealed class StopMessageDelegationHandlerTests
             Instant.FromDateTimeOffset(DateTimeOffset.UtcNow),
             null);
 
-        var messageDelegation = new MessageDelegation(
-            new MessageDelegationId(Guid.NewGuid()),
+        var processDelegation = new ProcessDelegation(
+            new ProcessDelegationId(Guid.NewGuid()),
             new ActorId(Guid.NewGuid()),
-            DelegationMessageType.Rsm012Inbound,
+            DelegatedProcess.RequestEnergyResults,
             Guid.NewGuid(),
             [delegationPeriod]);
 
-        messageDelegationRepository
-            .Setup(x => x.GetAsync(It.Is<MessageDelegationId>(match => match.Value == messageDelegation.Id.Value)))
-            .ReturnsAsync(messageDelegation);
+        processDelegationRepository
+            .Setup(x => x.GetAsync(It.Is<ProcessDelegationId>(match => match.Value == processDelegation.Id.Value)))
+            .ReturnsAsync(processDelegation);
 
-        var command = new StopMessageDelegationCommand(new StopMessageDelegationDto(
-            messageDelegation.Id.Value,
+        var command = new StopProcessDelegationCommand(new StopProcessDelegationDto(
+            processDelegation.Id.Value,
             delegationPeriod.Id.Value,
             DateTimeOffset.UtcNow));
 
@@ -200,6 +203,6 @@ public sealed class StopMessageDelegationHandlerTests
         await target.Handle(command, CancellationToken.None);
 
         // Assert
-        domainEventRepository.Verify(x => x.EnqueueAsync(messageDelegation));
+        domainEventRepository.Verify(x => x.EnqueueAsync(processDelegation));
     }
 }

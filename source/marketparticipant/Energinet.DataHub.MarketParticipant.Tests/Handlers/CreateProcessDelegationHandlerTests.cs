@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,17 +32,17 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
 
 [UnitTest]
-public sealed class CreateMessageDelegationHandlerTests
+public sealed class CreateProcessDelegationHandlerTests
 {
     [Fact]
-    public async Task Handle_NewMessageDelegation_CorrectDoesNotThrow()
+    public async Task Handle_NewProcessDelegation_CorrectDoesNotThrow()
     {
         // Arrange
         var actorRepo = new Mock<IActorRepository>();
-        var messageDelegationRepository = new Mock<IMessageDelegationRepository>();
-        var target = new CreateMessageDelegationHandler(
+        var processDelegationRepository = new Mock<IProcessDelegationRepository>();
+        var target = new CreateProcessDelegationHandler(
             actorRepo.Object,
-            messageDelegationRepository.Object,
+            processDelegationRepository.Object,
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
@@ -59,15 +58,15 @@ public sealed class CreateMessageDelegationHandlerTests
             .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
             .ReturnsAsync(actorTo);
 
-        messageDelegationRepository
-            .Setup(x => x.AddOrUpdateAsync(It.IsAny<MessageDelegation>()))
-            .ReturnsAsync(new MessageDelegationId(Guid.NewGuid()));
+        processDelegationRepository
+            .Setup(x => x.AddOrUpdateAsync(It.IsAny<ProcessDelegation>()))
+            .ReturnsAsync(new ProcessDelegationId(Guid.NewGuid()));
 
-        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+        var command = new CreateProcessDelegationCommand(new CreateProcessDelegationsDto(
             actorFrom.Id.Value,
             actorTo.Id.Value,
-            new List<Guid> { Guid.NewGuid() },
-            new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
+            [Guid.NewGuid()],
+            [DelegatedProcess.RequestEnergyResults],
             DateTimeOffset.UtcNow));
 
         // Act + Assert
@@ -75,13 +74,13 @@ public sealed class CreateMessageDelegationHandlerTests
     }
 
     [Fact]
-    public async Task Handle_NewMessageDelegation_InActiveActorFromThrows()
+    public async Task Handle_NewProcessDelegation_InActiveActorFromThrows()
     {
         // Arrange
         var actorRepo = new Mock<IActorRepository>();
-        var target = new CreateMessageDelegationHandler(
+        var target = new CreateProcessDelegationHandler(
             actorRepo.Object,
-            new Mock<IMessageDelegationRepository>().Object,
+            new Mock<IProcessDelegationRepository>().Object,
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
@@ -97,11 +96,11 @@ public sealed class CreateMessageDelegationHandlerTests
             .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
             .ReturnsAsync(actorTo);
 
-        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+        var command = new CreateProcessDelegationCommand(new CreateProcessDelegationsDto(
             actorFrom.Id.Value,
             actorTo.Id.Value,
-            new List<Guid> { Guid.NewGuid() },
-            new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
+            [Guid.NewGuid()],
+            [DelegatedProcess.RequestEnergyResults],
             DateTimeOffset.UtcNow));
 
         // Act
@@ -111,19 +110,19 @@ public sealed class CreateMessageDelegationHandlerTests
         Assert.NotNull(exception);
         Assert.IsType<ValidationException>(exception);
         Assert.Contains(
-            $"Actors to delegate from/to must both be active to delegate messages",
+            "Actors to delegate from/to must both be active to delegate messages",
             exception.Message,
             StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
-    public async Task Handle_NewMessageDelegation_InActiveActorToThrows()
+    public async Task Handle_NewProcessDelegation_InActiveActorToThrows()
     {
         // Arrange
         var actorRepo = new Mock<IActorRepository>();
-        var target = new CreateMessageDelegationHandler(
+        var target = new CreateProcessDelegationHandler(
             actorRepo.Object,
-            new Mock<IMessageDelegationRepository>().Object,
+            new Mock<IProcessDelegationRepository>().Object,
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
@@ -139,11 +138,11 @@ public sealed class CreateMessageDelegationHandlerTests
             .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
             .ReturnsAsync(actorTo);
 
-        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+        var command = new CreateProcessDelegationCommand(new CreateProcessDelegationsDto(
             actorFrom.Id.Value,
             actorTo.Id.Value,
-            new List<Guid> { Guid.NewGuid() },
-            new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
+            [Guid.NewGuid()],
+            [DelegatedProcess.RequestEnergyResults],
             DateTimeOffset.UtcNow));
 
         // Act
@@ -153,19 +152,19 @@ public sealed class CreateMessageDelegationHandlerTests
         Assert.NotNull(exception);
         Assert.IsType<ValidationException>(exception);
         Assert.Contains(
-            $"Actors to delegate from/to must both be active to delegate messages.",
+            "Actors to delegate from/to must both be active to delegate messages.",
             exception.Message,
             StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
-    public async Task Handle_NewMessageDelegation_UnknownActorFromThrows()
+    public async Task Handle_NewProcessDelegation_UnknownActorFromThrows()
     {
         // Arrange
         var actorRepo = new Mock<IActorRepository>();
-        var target = new CreateMessageDelegationHandler(
+        var target = new CreateProcessDelegationHandler(
             actorRepo.Object,
-            new Mock<IMessageDelegationRepository>().Object,
+            new Mock<IProcessDelegationRepository>().Object,
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
@@ -178,11 +177,11 @@ public sealed class CreateMessageDelegationHandlerTests
             .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
             .ReturnsAsync(actorTo);
 
-        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+        var command = new CreateProcessDelegationCommand(new CreateProcessDelegationsDto(
             actorFrom.Id.Value,
             actorTo.Id.Value,
-            new List<Guid> { Guid.NewGuid() },
-            new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
+            [Guid.NewGuid()],
+            [DelegatedProcess.RequestEnergyResults],
             DateTimeOffset.UtcNow));
 
         // Act
@@ -198,13 +197,13 @@ public sealed class CreateMessageDelegationHandlerTests
     }
 
     [Fact]
-    public async Task Handle_NewMessageDelegation_UnknownActorToThrows()
+    public async Task Handle_NewProcessDelegation_UnknownActorToThrows()
     {
         // Arrange
         var actorRepo = new Mock<IActorRepository>();
-        var target = new CreateMessageDelegationHandler(
+        var target = new CreateProcessDelegationHandler(
             actorRepo.Object,
-            new Mock<IMessageDelegationRepository>().Object,
+            new Mock<IProcessDelegationRepository>().Object,
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
@@ -217,11 +216,11 @@ public sealed class CreateMessageDelegationHandlerTests
             .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorFrom.Id.Value)))
             .ReturnsAsync(actorFrom);
 
-        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+        var command = new CreateProcessDelegationCommand(new CreateProcessDelegationsDto(
             actorFrom.Id.Value,
             actorTo.Id.Value,
-            new List<Guid> { Guid.NewGuid() },
-            new List<DelegationMessageType> { DelegationMessageType.Rsm012Inbound },
+            [Guid.NewGuid()],
+            [DelegatedProcess.RequestEnergyResults],
             DateTimeOffset.UtcNow));
 
         // Act
@@ -237,21 +236,21 @@ public sealed class CreateMessageDelegationHandlerTests
     }
 
     [Fact]
-    public async Task Handle_NewMessageDelegation_PublishesEvents()
+    public async Task Handle_NewProcessDelegation_PublishesEvents()
     {
         // Arrange
         var actorRepository = new Mock<IActorRepository>();
-        var messageDelegationRepository = new Mock<IMessageDelegationRepository>();
+        var processDelegationRepository = new Mock<IProcessDelegationRepository>();
         var domainEventRepository = new Mock<IDomainEventRepository>();
-        var target = new CreateMessageDelegationHandler(
+        var target = new CreateProcessDelegationHandler(
             actorRepository.Object,
-            messageDelegationRepository.Object,
+            processDelegationRepository.Object,
             domainEventRepository.Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
             new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
-        var messageDelegationId = new MessageDelegationId(Guid.NewGuid());
+        var processDelegationId = new ProcessDelegationId(Guid.NewGuid());
         var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
         var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
 
@@ -262,21 +261,21 @@ public sealed class CreateMessageDelegationHandlerTests
             .Setup(x => x.GetAsync(It.Is<ActorId>(match => match.Value == actorTo.Id.Value)))
             .ReturnsAsync(actorTo);
 
-        messageDelegationRepository
-            .Setup(x => x.AddOrUpdateAsync(It.IsAny<MessageDelegation>()))
-            .ReturnsAsync(messageDelegationId);
+        processDelegationRepository
+            .Setup(x => x.AddOrUpdateAsync(It.IsAny<ProcessDelegation>()))
+            .ReturnsAsync(processDelegationId);
 
-        var command = new CreateMessageDelegationCommand(new CreateMessageDelegationDto(
+        var command = new CreateProcessDelegationCommand(new CreateProcessDelegationsDto(
             actorFrom.Id.Value,
             actorTo.Id.Value,
             [Guid.NewGuid()],
-            [DelegationMessageType.Rsm012Inbound],
+            [DelegatedProcess.RequestEnergyResults],
             DateTimeOffset.UtcNow));
 
         // Act
         await target.Handle(command, CancellationToken.None);
 
         // Assert
-        domainEventRepository.Verify(x => x.EnqueueAsync(It.IsAny<MessageDelegation>(), messageDelegationId.Value));
+        domainEventRepository.Verify(x => x.EnqueueAsync(It.IsAny<ProcessDelegation>(), processDelegationId.Value));
     }
 }

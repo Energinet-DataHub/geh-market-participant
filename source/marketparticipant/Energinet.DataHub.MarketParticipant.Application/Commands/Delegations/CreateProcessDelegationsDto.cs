@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
-public enum DelegationMessageType
-{
-    Rsm012Inbound = 1,
-    Rsm012Outbound,
-    Rsm014Inbound,
-    Rsm016Inbound,
-    Rsm016Outbound,
-    Rsm017Inbound,
-    Rsm017Outbound,
-    Rsm018Inbound,
-    Rsm019Inbound
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+
+public sealed record CreateProcessDelegationsDto(
+    Guid DelegatedFrom,
+    Guid DelegatedTo,
+    IEnumerable<Guid> GridAreas,
+    IEnumerable<DelegatedProcess> DelegatedProcesses,
+    DateTimeOffset StartsAt);

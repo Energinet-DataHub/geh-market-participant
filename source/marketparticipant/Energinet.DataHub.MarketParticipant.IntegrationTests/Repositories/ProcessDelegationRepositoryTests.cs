@@ -30,12 +30,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class MessageDelegationRepositoryTests
+public sealed class ProcessDelegationRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
     private readonly IEntityLock _lock;
 
-    public MessageDelegationRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    public ProcessDelegationRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
         _lock = new Mock<IEntityLock>().Object;
@@ -49,11 +49,11 @@ public sealed class MessageDelegationRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var messageDelegationRepository = new MessageDelegationRepository(context);
+        var processDelegationRepository = new ProcessDelegationRepository(context);
 
         // Act
-        var actual = await messageDelegationRepository
-            .GetForActorAsync(new ActorId(Guid.NewGuid()), DelegationMessageType.Rsm012Inbound);
+        var actual = await processDelegationRepository
+            .GetForActorAsync(new ActorId(Guid.NewGuid()), DelegatedProcess.RequestEnergyResults);
 
         // Assert
         Assert.Null(actual);
@@ -76,27 +76,27 @@ public sealed class MessageDelegationRepositoryTests
         var actorB = await actorRepository.GetAsync(new ActorId(actorEntityB.Id));
         var actorC = await actorRepository.GetAsync(new ActorId(actorEntityC.Id));
 
-        var expectedA = new MessageDelegation(actorA!, DelegationMessageType.Rsm017Inbound);
-        var expectedB = new MessageDelegation(actorB!, DelegationMessageType.Rsm016Outbound);
+        var expectedA = new ProcessDelegation(actorA!, DelegatedProcess.RequestWholesaleResults);
+        var expectedB = new ProcessDelegation(actorB!, DelegatedProcess.ReceiveEnergyResults);
 
         var baseDateTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
         expectedA.DelegateTo(actorC!.Id, new GridAreaId(gridAreaId.Id), baseDateTime);
         expectedB.DelegateTo(actorC.Id, new GridAreaId(gridAreaId.Id), baseDateTime);
 
-        var messageDelegationRepository = new MessageDelegationRepository(context);
+        var processDelegationRepository = new ProcessDelegationRepository(context);
 
         // Act
-        await messageDelegationRepository.AddOrUpdateAsync(expectedA);
-        var messageId = await messageDelegationRepository.AddOrUpdateAsync(expectedB);
+        await processDelegationRepository.AddOrUpdateAsync(expectedA);
+        var processDelegationId = await processDelegationRepository.AddOrUpdateAsync(expectedB);
 
         // Assert
-        var actual = await messageDelegationRepository
-            .GetForActorAsync(actorB!.Id, DelegationMessageType.Rsm016Outbound);
+        var actual = await processDelegationRepository
+            .GetForActorAsync(actorB!.Id, DelegatedProcess.RequestEnergyResults);
 
         Assert.NotNull(actual);
-        Assert.Equal(messageId, actual.Id);
+        Assert.Equal(processDelegationId, actual.Id);
         Assert.Equal(expectedB.DelegatedBy, actual.DelegatedBy);
-        Assert.Equal(expectedB.MessageType, actual.MessageType);
+        Assert.Equal(expectedB.Process, actual.Process);
 
         var actualDelegation = actual.Delegations.Single();
 
@@ -107,7 +107,7 @@ public sealed class MessageDelegationRepositoryTests
     }
 
     [Fact]
-    public async Task GetForActorAsync_WithoutMessageType_GetsAll()
+    public async Task GetForActorAsync_WithoutProcess_GetsAll()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -123,25 +123,25 @@ public sealed class MessageDelegationRepositoryTests
         var actorB = await actorRepository.GetAsync(new ActorId(actorEntityB.Id));
         var actorC = await actorRepository.GetAsync(new ActorId(actorEntityC.Id));
 
-        var expectedA = new MessageDelegation(actorA!, DelegationMessageType.Rsm017Inbound);
-        var expectedB = new MessageDelegation(actorA!, DelegationMessageType.Rsm016Outbound);
+        var expectedA = new ProcessDelegation(actorA!, DelegatedProcess.ReceiveEnergyResults);
+        var expectedB = new ProcessDelegation(actorA!, DelegatedProcess.RequestWholesaleResults);
 
         var baseDateTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
         expectedA.DelegateTo(actorB!.Id, new GridAreaId(gridAreaId.Id), baseDateTime);
         expectedB.DelegateTo(actorC!.Id, new GridAreaId(gridAreaId.Id), baseDateTime);
 
-        var messageDelegationRepository = new MessageDelegationRepository(context);
+        var processDelegationRepository = new ProcessDelegationRepository(context);
 
         // Act
-        await messageDelegationRepository.AddOrUpdateAsync(expectedA);
-        await messageDelegationRepository.AddOrUpdateAsync(expectedB);
+        await processDelegationRepository.AddOrUpdateAsync(expectedA);
+        await processDelegationRepository.AddOrUpdateAsync(expectedB);
 
         // Assert
-        var actual = (await messageDelegationRepository.GetForActorAsync(actorA!.Id)).ToList();
+        var actual = (await processDelegationRepository.GetForActorAsync(actorA!.Id)).ToList();
 
         Assert.NotNull(actual);
-        Assert.Contains(actual, md => md.DelegatedBy == actorA.Id && md.MessageType == DelegationMessageType.Rsm017Inbound);
-        Assert.Contains(actual, md => md.DelegatedBy == actorA.Id && md.MessageType == DelegationMessageType.Rsm016Outbound);
+        Assert.Contains(actual, md => md.DelegatedBy == actorA.Id && md.Process == DelegatedProcess.ReceiveEnergyResults);
+        Assert.Contains(actual, md => md.DelegatedBy == actorA.Id && md.Process == DelegatedProcess.RequestWholesaleResults);
     }
 
     [Fact]
@@ -161,26 +161,26 @@ public sealed class MessageDelegationRepositoryTests
         var actorB = await actorRepository.GetAsync(new ActorId(actorEntityB.Id));
         var actorC = await actorRepository.GetAsync(new ActorId(actorEntityC.Id));
 
-        var expectedA = new MessageDelegation(actorA!, DelegationMessageType.Rsm017Inbound);
-        var expectedB = new MessageDelegation(actorB!, DelegationMessageType.Rsm016Outbound);
+        var expectedA = new ProcessDelegation(actorA!, DelegatedProcess.ReceiveEnergyResults);
+        var expectedB = new ProcessDelegation(actorB!, DelegatedProcess.RequestWholesaleResults);
 
         var baseDateTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
         expectedA.DelegateTo(actorC!.Id, new GridAreaId(gridAreaId.Id), baseDateTime);
         expectedB.DelegateTo(actorC.Id, new GridAreaId(gridAreaId.Id), baseDateTime);
 
-        var messageDelegationRepository = new MessageDelegationRepository(context);
-        await messageDelegationRepository.AddOrUpdateAsync(expectedA);
-        await messageDelegationRepository.AddOrUpdateAsync(expectedB);
+        var processDelegationRepository = new ProcessDelegationRepository(context);
+        await processDelegationRepository.AddOrUpdateAsync(expectedA);
+        await processDelegationRepository.AddOrUpdateAsync(expectedB);
 
         // Act
-        var actual = (await messageDelegationRepository
+        var actual = (await processDelegationRepository
             .GetDelegatedToActorAsync(actorC.Id))
             .ToList();
 
         // Assert
         Assert.NotNull(actual);
-        Assert.Contains(actual, md => md.DelegatedBy == actorA!.Id && md.MessageType == DelegationMessageType.Rsm017Inbound);
-        Assert.Contains(actual, md => md.DelegatedBy == actorB!.Id && md.MessageType == DelegationMessageType.Rsm016Outbound);
+        Assert.Contains(actual, md => md.DelegatedBy == actorA!.Id && md.Process == DelegatedProcess.ReceiveEnergyResults);
+        Assert.Contains(actual, md => md.DelegatedBy == actorB!.Id && md.Process == DelegatedProcess.RequestWholesaleResults);
     }
 
     [Fact]
@@ -200,24 +200,24 @@ public sealed class MessageDelegationRepositoryTests
 
         var baseDateTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
 
-        var expected = new MessageDelegation(actorA!, DelegationMessageType.Rsm017Inbound);
+        var expected = new ProcessDelegation(actorA!, DelegatedProcess.ReceiveWholesaleResults);
         expected.DelegateTo(actorB!.Id, new GridAreaId(gridAreaId.Id), baseDateTime);
         expected.StopDelegation(expected.Delegations.Last(), baseDateTime.Plus(Duration.FromDays(2)));
         expected.DelegateTo(actorB.Id, new GridAreaId(gridAreaId.Id), baseDateTime.Plus(Duration.FromDays(5)));
 
-        var messageDelegationRepository = new MessageDelegationRepository(context);
+        var processDelegationRepository = new ProcessDelegationRepository(context);
 
         // Act
-        var messageId = await messageDelegationRepository.AddOrUpdateAsync(expected);
+        var processDelegationId = await processDelegationRepository.AddOrUpdateAsync(expected);
 
         // Assert
-        var actual = await messageDelegationRepository
-            .GetForActorAsync(actorA!.Id, DelegationMessageType.Rsm017Inbound);
+        var actual = await processDelegationRepository
+            .GetForActorAsync(actorA!.Id, DelegatedProcess.ReceiveWholesaleResults);
 
         Assert.NotNull(actual);
-        Assert.Equal(messageId, actual.Id);
+        Assert.Equal(processDelegationId, actual.Id);
         Assert.Equal(expected.DelegatedBy, actual.DelegatedBy);
-        Assert.Equal(expected.MessageType, actual.MessageType);
+        Assert.Equal(expected.Process, actual.Process);
 
         var actualDelegationA = actual.Delegations.First();
 
@@ -252,26 +252,26 @@ public sealed class MessageDelegationRepositoryTests
         var baseDateTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
         var expectedStop = baseDateTime.Plus(Duration.FromDays(10));
 
-        var expected = new MessageDelegation(actorA!, DelegationMessageType.Rsm012Outbound);
+        var expected = new ProcessDelegation(actorA!, DelegatedProcess.RequestEnergyResults);
         expected.DelegateTo(actorB!.Id, new GridAreaId(gridAreaId.Id), baseDateTime);
 
-        var messageDelegationRepository = new MessageDelegationRepository(context);
-        await messageDelegationRepository.AddOrUpdateAsync(expected);
+        var processDelegationRepository = new ProcessDelegationRepository(context);
+        await processDelegationRepository.AddOrUpdateAsync(expected);
 
-        var toUpdate = await messageDelegationRepository.GetForActorAsync(actorA!.Id, DelegationMessageType.Rsm012Outbound);
+        var toUpdate = await processDelegationRepository.GetForActorAsync(actorA!.Id, DelegatedProcess.RequestEnergyResults);
         toUpdate!.StopDelegation(toUpdate.Delegations.Single(), expectedStop);
 
         // Act
-        var messageId = await messageDelegationRepository.AddOrUpdateAsync(toUpdate);
+        var processDelegationId = await processDelegationRepository.AddOrUpdateAsync(toUpdate);
 
         // Assert
-        var actual = await messageDelegationRepository
-            .GetForActorAsync(actorA.Id, DelegationMessageType.Rsm012Outbound);
+        var actual = await processDelegationRepository
+            .GetForActorAsync(actorA.Id, DelegatedProcess.RequestEnergyResults);
 
         Assert.NotNull(actual);
-        Assert.Equal(messageId, actual.Id);
+        Assert.Equal(processDelegationId, actual.Id);
         Assert.Equal(expected.DelegatedBy, actual.DelegatedBy);
-        Assert.Equal(expected.MessageType, actual.MessageType);
+        Assert.Equal(expected.Process, actual.Process);
 
         var actualDelegation = actual.Delegations.Single();
 
