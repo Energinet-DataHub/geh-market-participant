@@ -71,8 +71,6 @@ public class GetPermissionRelationsHandlerTests
 
         // Act
         var permissionRelationHandler = new GetPermissionRelationsHandler(new PermissionRelationService(mockPermissionRepository.Object, mockUserRoleRepository.Object));
-
-        // Act
         var resultStream = await permissionRelationHandler.Handle(new GetPermissionRelationsCommand(), default);
 
         // Assert
