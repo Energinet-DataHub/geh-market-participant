@@ -91,7 +91,7 @@ public sealed class ProcessDelegationRepositoryTests
 
         // Assert
         var actual = await processDelegationRepository
-            .GetForActorAsync(actorB!.Id, DelegatedProcess.RequestEnergyResults);
+            .GetForActorAsync(actorB!.Id, DelegatedProcess.ReceiveEnergyResults);
 
         Assert.NotNull(actual);
         Assert.Equal(processDelegationId, actual.Id);

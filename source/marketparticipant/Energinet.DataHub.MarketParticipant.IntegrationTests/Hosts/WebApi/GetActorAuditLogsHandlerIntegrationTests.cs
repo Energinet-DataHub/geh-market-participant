@@ -294,19 +294,18 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         var expectedGridArea = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
         var expectedStartTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
         var expectedProcess = DelegatedProcess.RequestWholesaleResults;
-        Actor? delegated = null;
 
         await TestAuditOfProcessDelegationChangeAsync(
             null,
             response =>
             {
                 Assert.Equal(
-                    $"({delegated!.Id.Value};{expectedStartTime.ToDateTimeOffset()};{expectedGridArea.Value};{expectedProcess})",
+                    $"({expectedDelegateTo.Id};{expectedStartTime.ToDateTimeOffset()};{expectedGridArea.Value};{expectedProcess})",
                     response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStart).CurrentValue);
             },
             actor =>
             {
-                var processDelegation = new ProcessDelegation(delegated = actor, expectedProcess);
+                var processDelegation = new ProcessDelegation(actor, expectedProcess);
                 processDelegation.DelegateTo(new ActorId(expectedDelegateTo.Id), expectedGridArea, expectedStartTime);
                 return processDelegation;
             });
@@ -339,7 +338,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             response =>
             {
                 Assert.Equal(
-                    $"({delegated!.Id.Value};{expectedStartTime.ToDateTimeOffset()};{expectedGridArea.Value};{expectedProcess};{expectedStop.ToDateTimeOffset()})",
+                    $"({delegated.Id.Value};{expectedStartTime.ToDateTimeOffset()};{expectedGridArea.Value};{expectedProcess};{expectedStop.ToDateTimeOffset()})",
                     response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStop).CurrentValue);
             },
             _ =>
