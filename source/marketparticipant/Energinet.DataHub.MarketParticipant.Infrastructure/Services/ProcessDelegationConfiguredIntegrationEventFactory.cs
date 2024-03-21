@@ -78,7 +78,7 @@ public sealed class ProcessDelegationConfiguredIntegrationEventFactory : IIntegr
                     DelegatedProcess.ReceiveEnergyResults => Model.Contracts.DelegatedProcess.ProcessReceiveEnergyResults,
                     DelegatedProcess.RequestWholesaleResults => Model.Contracts.DelegatedProcess.ProcessRequestWholesaleResults,
                     DelegatedProcess.ReceiveWholesaleResults => Model.Contracts.DelegatedProcess.ProcessReceiveWholesaleResults,
-                    _ => throw new InvalidOperationException($"Delegation message type {domainEvent.Process} is not supported in integration event.")
+                    _ => throw new InvalidOperationException($"Delegation process type {domainEvent.Process} is not supported in integration event.")
                 },
                 StartsAt = domainEvent.StartsAt.ToTimestamp(),
                 StopsAt = domainEvent.StopsAt.ToTimestamp(),
