@@ -12,19 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public enum ActorAuditedChange
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+public interface IMessageDelegationAuditLogRepository
 {
-    Name = 1,
-    Status = 2,
-    ContactName = 3,
-    ContactEmail = 4,
-    ContactPhone = 5,
-    ContactCategoryAdded = 6,
-    ContactCategoryRemoved = 7,
-    CertificateCredentials = 8,
-    ClientSecretCredentials = 9,
-    DelegationStart = 10,
-    DelegationStop = 11,
+    Task<IEnumerable<AuditLog<ActorAuditedChange>>> GetAsync(ActorId actor);
 }

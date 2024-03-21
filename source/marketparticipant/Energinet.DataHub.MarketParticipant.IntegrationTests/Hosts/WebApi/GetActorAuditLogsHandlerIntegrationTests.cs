@@ -20,6 +20,7 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -27,6 +28,7 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
+using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
@@ -285,6 +287,67 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             _ => null);
     }
 
+    [Fact]
+    public async Task GetAuditLogs_DelegationCreated_IsAudited()
+    {
+        var expectedDelegateTo = await _databaseFixture.PrepareActorAsync();
+        var expectedGridArea = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
+        var expectedStartTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
+        var expectedMessageType = DelegationMessageType.Rsm017Inbound;
+
+        await TestAuditOMessageDelegationChangeAsync(
+            null,
+            response =>
+            {
+                Assert.Equal(
+                    $"({expectedStartTime.ToDateTimeOffset()};{expectedGridArea.Value};{expectedMessageType})",
+                    response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStart).CurrentValue);
+            },
+            actor =>
+            {
+                var messageDelegation = new MessageDelegation(actor, expectedMessageType);
+                messageDelegation.DelegateTo(new ActorId(expectedDelegateTo.Id), expectedGridArea, expectedStartTime);
+                return messageDelegation;
+            });
+    }
+
+    [Fact]
+    public async Task GetAuditLogs_DelegationStopped_IsAudited()
+    {
+        var delegatedEntity = await _databaseFixture.PrepareActorAsync();
+        var delegatorEntity = await _databaseFixture.PrepareActorAsync();
+        var expectedGridArea = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
+        var expectedStartTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
+        var expectedMessageType = DelegationMessageType.Rsm017Inbound;
+        var expectedStop = expectedStartTime.Plus(Duration.FromDays(2));
+
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+        var delegated = await actorRepository.GetAsync(new ActorId(delegatedEntity.Id));
+        var delegator = await actorRepository.GetAsync(new ActorId(delegatorEntity.Id));
+        var messageDelegation = new MessageDelegation(delegator!, expectedMessageType);
+        messageDelegation.DelegateTo(delegated!.Id, expectedGridArea, expectedStartTime);
+
+        var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
+        var id = await messageDelegationRepository.AddOrUpdateAsync(messageDelegation);
+        messageDelegation = await messageDelegationRepository.GetAsync(id);
+
+        await TestAuditOMessageDelegationChangeAsync(
+            delegator,
+            response =>
+            {
+                Assert.Equal(
+                    $"({expectedStartTime.ToDateTimeOffset()};{expectedGridArea.Value};{expectedMessageType};{expectedStop.ToDateTimeOffset()})",
+                    response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStop).CurrentValue);
+            },
+            _ =>
+            {
+                messageDelegation!.StopDelegation(messageDelegation.Delegations.Single(), expectedStop);
+                return messageDelegation;
+            });
+    }
+
     private async Task TestAuditOfActorChangeAsync(
         Action<GetActorAuditLogsResponse> assert,
         params Action<Actor>[] changeActions)
@@ -394,6 +457,64 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             foreach (var actorAuditLog in auditLogs.AuditLogs.Skip(auditLogsProcessed))
             {
                 Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
+                Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
+                Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
+
+                auditLogsProcessed++;
+            }
+        }
+
+        // Act
+        var actual = await mediator.Send(command);
+
+        // Assert
+        assert(actual);
+    }
+
+    private async Task TestAuditOMessageDelegationChangeAsync(
+        Actor? delegator,
+        Action<GetActorAuditLogsResponse> assert,
+        params Func<Actor, MessageDelegation>[] messageDelegationGenerator)
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+
+        var userContext = new Mock<IUserContext<FrontendUser>>();
+
+        host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
+        host.ServiceCollection.AddScoped(_ => userContext.Object);
+
+        await using var scope = host.BeginScope();
+
+        var actorRepo = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+        delegator ??= await actorRepo.GetAsync(new ActorId((await _databaseFixture.PrepareActorAsync()).Id));
+        var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var command = new GetActorAuditLogsCommand(delegator!.Id.Value);
+        var auditLogsProcessed = 2;
+
+        foreach (var generator in messageDelegationGenerator)
+        {
+            var auditedUser = await _databaseFixture.PrepareUserAsync();
+
+            userContext
+                .Setup(uc => uc.CurrentUser)
+                .Returns(new FrontendUser(auditedUser.Id, delegator.OrganizationId.Value, delegator.Id.Value, false));
+
+            var delegation = generator(delegator);
+
+            await messageDelegationRepository.AddOrUpdateAsync(delegation);
+
+            var auditLogs = await mediator.Send(command);
+
+            var actorAuditLogs = auditLogs.AuditLogs.Skip(auditLogsProcessed).Where(x => x.AuditIdentityId == auditedUser.Id).ToList();
+
+            if (!actorAuditLogs.Any())
+                Assert.Fail("No audit logs produced");
+
+            foreach (var actorAuditLog in actorAuditLogs)
+            {
                 Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
 
