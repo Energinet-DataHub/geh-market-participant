@@ -291,7 +291,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     public async Task GetAuditLogs_DelegationCreated_IsAudited()
     {
         var expectedDelegateTo = await _databaseFixture.PrepareActorAsync();
-        var gridAreaId = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
+        var expectedGridArea = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
         var expectedStartTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
         var expectedMessageType = DelegationMessageType.Rsm017Inbound;
 
@@ -299,18 +299,14 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             null,
             response =>
             {
-                var actualStart = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStart).CurrentValue;
-                var actualDelegatedTo = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationActorTo).CurrentValue;
-                var actualMessageType = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationMessageType).CurrentValue;
-
-                Assert.Equal(expectedStartTime.ToDateTimeOffset().ToString(DateTimeFormatInfo.CurrentInfo), actualStart);
-                Assert.Equal(expectedDelegateTo.Id.ToString(), actualDelegatedTo);
-                Assert.Equal(expectedMessageType.ToString(), actualMessageType);
+                Assert.Equal(
+                    $"({expectedStartTime.ToDateTimeOffset()};{expectedGridArea.Value};{expectedMessageType})",
+                    response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStart).CurrentValue);
             },
             actor =>
             {
                 var messageDelegation = new MessageDelegation(actor, expectedMessageType);
-                messageDelegation.DelegateTo(new ActorId(expectedDelegateTo.Id), gridAreaId, expectedStartTime);
+                messageDelegation.DelegateTo(new ActorId(expectedDelegateTo.Id), expectedGridArea, expectedStartTime);
                 return messageDelegation;
             });
     }
@@ -320,10 +316,10 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     {
         var delegatedEntity = await _databaseFixture.PrepareActorAsync();
         var delegatorEntity = await _databaseFixture.PrepareActorAsync();
-        var gridAreaId = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
-        var startTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
+        var expectedGridArea = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
+        var expectedStartTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
         var expectedMessageType = DelegationMessageType.Rsm017Inbound;
-        var stopsAt = startTime.Plus(Duration.FromDays(2));
+        var expectedStop = expectedStartTime.Plus(Duration.FromDays(2));
 
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
@@ -331,7 +327,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         var delegated = await actorRepository.GetAsync(new ActorId(delegatedEntity.Id));
         var delegator = await actorRepository.GetAsync(new ActorId(delegatorEntity.Id));
         var messageDelegation = new MessageDelegation(delegator!, expectedMessageType);
-        messageDelegation.DelegateTo(delegated!.Id, gridAreaId, startTime);
+        messageDelegation.DelegateTo(delegated!.Id, expectedGridArea, expectedStartTime);
 
         var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
         var id = await messageDelegationRepository.AddOrUpdateAsync(messageDelegation);
@@ -341,13 +337,13 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             delegator,
             response =>
             {
-                var actualStop = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStop).CurrentValue;
-
-                Assert.Equal(stopsAt.ToDateTimeOffset().ToString(DateTimeFormatInfo.CurrentInfo), actualStop);
+                Assert.Equal(
+                    $"({expectedStartTime.ToDateTimeOffset()};{expectedGridArea.Value};{expectedMessageType};{expectedStop.ToDateTimeOffset()})",
+                    response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStop).CurrentValue);
             },
             _ =>
             {
-                messageDelegation!.StopDelegation(messageDelegation.Delegations.Single(), stopsAt);
+                messageDelegation!.StopDelegation(messageDelegation.Delegations.Single(), expectedStop);
                 return messageDelegation;
             });
     }

@@ -71,14 +71,10 @@ public sealed class MessageDelegationAuditLogRepositoryTests
         {
             ActorAuditedChange.DelegationStart,
             ActorAuditedChange.DelegationStop,
-            ActorAuditedChange.DelegationActorTo,
-            ActorAuditedChange.DelegationMessageType,
         }.Contains(x.Change)).ToArray();
 
         // assert
         Assert.NotNull(actual.SingleOrDefault(x => x.Change == ActorAuditedChange.DelegationStart));
-        Assert.NotNull(actual.SingleOrDefault(x => x.Change == ActorAuditedChange.DelegationActorTo));
-        Assert.NotNull(actual.SingleOrDefault(x => x.Change == ActorAuditedChange.DelegationMessageType));
         Assert.NotNull(actual.SingleOrDefault(x => x.Change == ActorAuditedChange.DelegationStop));
     }
 }

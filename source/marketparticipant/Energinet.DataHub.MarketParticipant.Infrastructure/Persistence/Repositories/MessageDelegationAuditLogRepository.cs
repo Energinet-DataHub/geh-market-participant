@@ -49,11 +49,11 @@ public sealed class MessageDelegationAuditLogRepository : IMessageDelegationAudi
                     _context.DelegationPeriods,
                     entity => entity.Id == delegationPeriod.Id.Value);
 
+                string? AuditedValueSelector(DelegationPeriodEntity entity) => $"({entity.StartsAt};{entity.GridAreaId};{messageDelegation.MessageType}{(entity.StopsAt != null ? $";{entity.StopsAt}" : string.Empty)})";
+
                 var audits = await new AuditLogBuilder<ActorAuditedChange, DelegationPeriodEntity>(dataSource)
-                    .Add(ActorAuditedChange.DelegationActorTo, entity => entity.DelegatedToActorId, AuditedChangeCompareAt.Creation)
-                    .Add(ActorAuditedChange.DelegationMessageType, _ => messageDelegation.MessageType, AuditedChangeCompareAt.Creation)
-                    .Add(ActorAuditedChange.DelegationStart, entity => entity.StartsAt, AuditedChangeCompareAt.Creation)
-                    .Add(ActorAuditedChange.DelegationStop, entity => entity.StopsAt)
+                    .Add(ActorAuditedChange.DelegationStart, entity => entity.StartsAt, AuditedValueSelector, AuditedChangeCompareAt.Creation)
+                    .Add(ActorAuditedChange.DelegationStop, entity => entity.StopsAt, AuditedValueSelector, AuditedChangeCompareAt.ChangeOnly)
                     .WithGrouping(entity => entity.Id)
                     .BuildAsync()
                     .ConfigureAwait(false);
