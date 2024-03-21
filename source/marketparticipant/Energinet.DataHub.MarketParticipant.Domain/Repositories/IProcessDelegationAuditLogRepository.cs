@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-public interface IMessageDelegationAuditLogRepository
+public interface IProcessDelegationAuditLogRepository
 {
     Task<IEnumerable<AuditLog<ActorAuditedChange>>> GetAsync(ActorId actor);
 }

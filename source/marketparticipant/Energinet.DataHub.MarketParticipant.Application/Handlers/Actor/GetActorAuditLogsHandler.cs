@@ -28,16 +28,16 @@ public sealed class GetActorAuditLogsHandler : IRequestHandler<GetActorAuditLogs
 {
     private readonly IActorAuditLogRepository _actorAuditLogRepository;
     private readonly IActorContactAuditLogRepository _actorContactAuditLogRepository;
-    private readonly IMessageDelegationAuditLogRepository _messageDelegationAuditLogRepository;
+    private readonly IProcessDelegationAuditLogRepository _processDelegationAuditLogRepository;
 
     public GetActorAuditLogsHandler(
         IActorAuditLogRepository actorAuditLogRepository,
         IActorContactAuditLogRepository actorContactAuditLogRepository,
-        IMessageDelegationAuditLogRepository messageDelegationAuditLogRepository)
+        IProcessDelegationAuditLogRepository processDelegationAuditLogRepository)
     {
         _actorAuditLogRepository = actorAuditLogRepository;
         _actorContactAuditLogRepository = actorContactAuditLogRepository;
-        _messageDelegationAuditLogRepository = messageDelegationAuditLogRepository;
+        _processDelegationAuditLogRepository = processDelegationAuditLogRepository;
     }
 
     public async Task<GetActorAuditLogsResponse> Handle(
@@ -54,7 +54,7 @@ public sealed class GetActorAuditLogsHandler : IRequestHandler<GetActorAuditLogs
             .GetAsync(new ActorId(request.ActorId))
             .ConfigureAwait(false);
 
-        var actorDelegationAuditLogs = await _messageDelegationAuditLogRepository
+        var actorDelegationAuditLogs = await _processDelegationAuditLogRepository
             .GetAsync(new ActorId(request.ActorId))
             .ConfigureAwait(false);
 

@@ -29,11 +29,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class MessageDelegationAuditLogRepositoryTests
+public sealed class ProcessDelegationAuditLogRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public MessageDelegationAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    public ProcessDelegationAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -49,22 +49,22 @@ public sealed class MessageDelegationAuditLogRepositoryTests
 
         await using var scope = host.BeginScope();
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationAuditLogRepository>();
+        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IProcessDelegationAuditLogRepository>();
 
         var delegator = await actorRepository.GetAsync(new ActorId((await _fixture.PrepareActiveActorAsync()).Id));
         var delegated = await actorRepository.GetAsync(new ActorId((await _fixture.PrepareActiveActorAsync()).Id));
 
         var baseDateTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
 
-        var messageDelegation = new MessageDelegation(delegator!, DelegationMessageType.Rsm017Inbound);
-        messageDelegation.DelegateTo(delegated!.Id, new GridAreaId((await _fixture.PrepareGridAreaAsync()).Id), baseDateTime);
+        var processDelegation = new ProcessDelegation(delegator!, DelegatedProcess.RequestWholesaleResults);
+        processDelegation.DelegateTo(delegated!.Id, new GridAreaId((await _fixture.PrepareGridAreaAsync()).Id), baseDateTime);
 
-        var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
-        var messageId = await messageDelegationRepository.AddOrUpdateAsync(messageDelegation);
+        var processDelegationRepository = scope.ServiceProvider.GetRequiredService<IProcessDelegationRepository>();
+        var processDelegationId = await processDelegationRepository.AddOrUpdateAsync(processDelegation);
 
-        var freshMessageDelegation = await messageDelegationRepository.GetAsync(messageId);
+        var freshMessageDelegation = await processDelegationRepository.GetAsync(processDelegationId);
         freshMessageDelegation!.StopDelegation(freshMessageDelegation.Delegations.Single(), baseDateTime.Plus(Duration.FromDays(2)));
-        await messageDelegationRepository.AddOrUpdateAsync(freshMessageDelegation);
+        await processDelegationRepository.AddOrUpdateAsync(freshMessageDelegation);
 
         // act
         var actual = (await actorAuditLogEntryRepository.GetAsync(delegator!.Id)).Where(x => new[]

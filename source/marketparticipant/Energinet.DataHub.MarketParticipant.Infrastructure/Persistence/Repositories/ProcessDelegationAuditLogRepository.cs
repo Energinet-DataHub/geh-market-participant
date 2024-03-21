@@ -20,36 +20,36 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class MessageDelegationAuditLogRepository : IMessageDelegationAuditLogRepository
+public sealed class ProcessDelegationAuditLogRepository : IProcessDelegationAuditLogRepository
 {
     private readonly IMarketParticipantDbContext _context;
-    private readonly IMessageDelegationRepository _messageDelegationRepository;
+    private readonly IProcessDelegationRepository _processDelegationRepository;
 
-    public MessageDelegationAuditLogRepository(
+    public ProcessDelegationAuditLogRepository(
         IMarketParticipantDbContext context,
-        IMessageDelegationRepository messageDelegationRepository)
+        IProcessDelegationRepository processDelegationRepository)
     {
         _context = context;
-        _messageDelegationRepository = messageDelegationRepository;
+        _processDelegationRepository = processDelegationRepository;
     }
 
     public async Task<IEnumerable<AuditLog<ActorAuditedChange>>> GetAsync(ActorId actor)
     {
-        var messageDelegations = await _messageDelegationRepository
+        var processDelegations = await _processDelegationRepository
             .GetForActorAsync(actor)
             .ConfigureAwait(false);
 
         var allAudits = new List<AuditLog<ActorAuditedChange>>();
 
-        foreach (var messageDelegation in messageDelegations)
+        foreach (var processDelegation in processDelegations)
         {
-            foreach (var delegationPeriod in messageDelegation.Delegations)
+            foreach (var delegationPeriod in processDelegation.Delegations)
             {
                 var dataSource = new HistoryTableDataSource<DelegationPeriodEntity>(
                     _context.DelegationPeriods,
                     entity => entity.Id == delegationPeriod.Id.Value);
 
-                string? AuditedValueSelector(DelegationPeriodEntity entity) => $"({entity.StartsAt};{entity.GridAreaId};{messageDelegation.MessageType}{(entity.StopsAt != null ? $";{entity.StopsAt}" : string.Empty)})";
+                string? AuditedValueSelector(DelegationPeriodEntity entity) => $"({entity.StartsAt};{entity.GridAreaId};{processDelegation.Process}{(entity.StopsAt != null ? $";{entity.StopsAt}" : string.Empty)})";
 
                 var audits = await new AuditLogBuilder<ActorAuditedChange, DelegationPeriodEntity>(dataSource)
                     .Add(ActorAuditedChange.DelegationStart, entity => entity.StartsAt, AuditedValueSelector, AuditedChangeCompareAt.Creation)
