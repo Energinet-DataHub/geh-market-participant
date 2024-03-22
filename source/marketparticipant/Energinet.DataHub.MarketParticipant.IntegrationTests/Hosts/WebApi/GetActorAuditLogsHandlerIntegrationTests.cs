@@ -300,7 +300,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             response =>
             {
                 Assert.Equal(
-                    $"({expectedDelegateTo.Id};{expectedStartTime.ToDateTimeOffset()};{expectedGridArea.Value};{expectedProcess})",
+                    $"({expectedDelegateTo.Id};{expectedStartTime:yyyy-MM-dd};{expectedGridArea.Value};{expectedProcess})",
                     response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStart).CurrentValue);
             },
             actor =>
@@ -338,7 +338,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             response =>
             {
                 Assert.Equal(
-                    $"({delegated.Id.Value};{expectedStartTime.ToDateTimeOffset()};{expectedGridArea.Value};{expectedProcess};{expectedStop.ToDateTimeOffset()})",
+                    $"({delegated.Id.Value};{expectedStartTime:yyyy-MM-dd};{expectedGridArea.Value};{expectedProcess};{expectedStop:yyyy-MM-dd})",
                     response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStop).CurrentValue);
             },
             _ =>
