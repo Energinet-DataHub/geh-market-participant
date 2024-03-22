@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,22 +27,28 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class GetPermissionsHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
+public sealed class CreateActorContactHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
 {
     [Fact]
-    public async Task GetPermissions_ValidCommand_CanReadBack()
+    public async Task CreateActorContact_ValidCommand_CanReadBack()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var fetchCommand = new GetPermissionsCommand();
+        var actor = await fixture.PrepareActiveActorAsync();
+
+        var createActorContactDto = new CreateActorContactDto(
+            "test",
+            ContactCategory.Default,
+            new MockedEmailAddress().ToString(),
+            "12345678");
+
+        var createCommand = new CreateActorContactCommand(actor.Id, createActorContactDto);
 
         // Act + Assert
-        await mediator.Send(fetchCommand);
-        var response = await mediator.Send(fetchCommand);
+        var response = await mediator.Send(createCommand);
         Assert.NotNull(response);
-        Assert.NotNull(response.Permissions);
-        Assert.NotEmpty(response.Permissions);
+        Assert.NotEqual(Guid.Empty, response.ContactId);
     }
 }
