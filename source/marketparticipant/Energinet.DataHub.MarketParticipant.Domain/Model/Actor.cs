@@ -214,7 +214,7 @@ public sealed class Actor : IPublishDomainEvents
         {
             throw new ValidationException($"Market role for {marketRole.Function} was not found.")
                 .WithErrorCode("actor.market_role.not_found")
-                .WithArgs(("market_role", marketRole.Function));
+                .WithArgs(("market_role", marketRole.Function.ToString()));
         }
     }
 

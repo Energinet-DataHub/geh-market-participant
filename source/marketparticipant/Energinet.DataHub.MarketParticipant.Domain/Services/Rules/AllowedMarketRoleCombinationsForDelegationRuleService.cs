@@ -132,7 +132,7 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
                 {
                     throw new ValidationException($"Delegated '{actorMarketRole.Function}' cannot be used in an organization containing market role '{eicFunction}'.")
                         .WithErrorCode("process_delegation.market_role_forbidden")
-                        .WithArgs(("assigned_market_role", actorMarketRole.Function), ("conflicting_market_role", eicFunction));
+                        .WithArgs(("assigned_market_role", actorMarketRole.Function.ToString()), ("conflicting_market_role", eicFunction.ToString()));
                 }
             }
         }
