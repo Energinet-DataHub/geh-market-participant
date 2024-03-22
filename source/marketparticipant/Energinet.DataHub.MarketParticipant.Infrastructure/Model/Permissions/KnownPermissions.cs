@@ -142,17 +142,8 @@ public static class KnownPermissions
             EicFunction.BalanceResponsibleParty,
             EicFunction.BillingAgent,
             EicFunction.GridAccessProvider,
-            EicFunction.ImbalanceSettlementResponsible,
-            EicFunction.MeteredDataAdministrator,
-            EicFunction.MeteredDataResponsible,
-            EicFunction.MeteringPointAdministrator,
-            EicFunction.SystemOperator,
-            EicFunction.DanishEnergyAgency,
-            EicFunction.DataHubAdministrator,
-            EicFunction.IndependentAggregator,
-            EicFunction.SerialEnergyTrader,
-            EicFunction.MeterOperator,
             EicFunction.EnergySupplier,
+            EicFunction.DataHubAdministrator
         }),
     };
 }

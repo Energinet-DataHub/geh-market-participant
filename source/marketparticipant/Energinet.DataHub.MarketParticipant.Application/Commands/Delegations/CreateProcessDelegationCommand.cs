@@ -12,13 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 
-public sealed record MessageDelegationPeriodDto(
-    Guid Id,
-    Guid DelegatedTo,
-    Guid GridAreaId,
-    DateTimeOffset StartsAt,
-    DateTimeOffset? ExpiresAt = null);
+public sealed record CreateProcessDelegationCommand(CreateProcessDelegationsDto CreateDelegation) : IRequest;

@@ -21,5 +21,5 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 public interface IAllowedMarketRoleCombinationsForDelegationRuleService
 {
     Task ValidateAsync(OrganizationId organizationId, EicFunction newMarketRole);
-    Task ValidateAsync(MessageDelegation messageDelegation);
+    Task ValidateAsync(ProcessDelegation processDelegation);
 }

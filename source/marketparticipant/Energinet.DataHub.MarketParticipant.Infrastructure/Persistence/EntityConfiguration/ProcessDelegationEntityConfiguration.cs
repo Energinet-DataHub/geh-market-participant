@@ -19,13 +19,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 
-public sealed class MessageDelegationEntityConfiguration : IEntityTypeConfiguration<MessageDelegationEntity>
+public sealed class ProcessDelegationEntityConfiguration : IEntityTypeConfiguration<ProcessDelegationEntity>
 {
-    public void Configure(EntityTypeBuilder<MessageDelegationEntity> builder)
+    public void Configure(EntityTypeBuilder<ProcessDelegationEntity> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.ToTable("MessageDelegation");
+        builder.ToTable("ProcessDelegation");
         builder.HasKey(d => d.Id);
         builder.Property(d => d.Id).ValueGeneratedOnAdd();
         builder.Property(d => d.ConcurrencyToken).IsConcurrencyToken();
@@ -33,7 +33,7 @@ public sealed class MessageDelegationEntityConfiguration : IEntityTypeConfigurat
         builder
             .HasMany(d => d.Delegations)
             .WithOne()
-            .HasForeignKey(period => period.MessageDelegationId);
+            .HasForeignKey(period => period.ProcessDelegationId);
 
         builder.Navigation(d => d.Delegations).AutoInclude();
     }

@@ -50,7 +50,7 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
         await using var context = _databaseFixture.DatabaseManager.CreateDbContext();
 
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
+        var processDelegationRepository = scope.ServiceProvider.GetRequiredService<IProcessDelegationRepository>();
 
         var delegatedByActorEntity = await _databaseFixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
@@ -60,9 +60,9 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
         var delegatedBy = await actorRepository.GetAsync(new ActorId(delegatedByActorEntity.Id));
         var delegatedTo = await CreateDelegationOrganizationAsync(EicFunction.BalanceResponsibleParty);
 
-        await CreateTestDelegationAsync(messageDelegationRepository, delegatedBy!, delegatedTo);
+        await CreateTestDelegationAsync(processDelegationRepository, delegatedBy!, delegatedTo);
 
-        var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, messageDelegationRepository);
+        var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, processDelegationRepository);
 
         // Act + Assert
         await ruleService.ValidateAsync(new OrganizationId(delegatedTo.OrganizationId), EicFunction.EnergySupplier);
@@ -77,7 +77,7 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
         await using var context = _databaseFixture.DatabaseManager.CreateDbContext();
 
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
+        var processDelegationRepository = scope.ServiceProvider.GetRequiredService<IProcessDelegationRepository>();
 
         var delegatedByActorEntity = await _databaseFixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
@@ -87,13 +87,13 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
         var delegatedBy = await actorRepository.GetAsync(new ActorId(delegatedByActorEntity.Id));
         var delegatedTo = await CreateDelegationOrganizationAsync(EicFunction.BalanceResponsibleParty);
 
-        await CreateTestDelegationAsync(messageDelegationRepository, delegatedBy!, delegatedTo);
+        await CreateTestDelegationAsync(processDelegationRepository, delegatedBy!, delegatedTo);
 
-        var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, messageDelegationRepository);
+        var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, processDelegationRepository);
 
         // Act + Assert
         var exception = await Assert.ThrowsAsync<ValidationException>(() => ruleService.ValidateAsync(new OrganizationId(delegatedTo.OrganizationId), EicFunction.EnergySupplier));
-        Assert.Equal("message_delegation.market_role_forbidden", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
+        Assert.Equal("process_delegation.market_role_forbidden", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
         await using var context = _databaseFixture.DatabaseManager.CreateDbContext();
 
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
+        var processDelegationRepository = scope.ServiceProvider.GetRequiredService<IProcessDelegationRepository>();
 
         var gridAreaEntity = await _databaseFixture.PrepareGridAreaAsync();
 
@@ -117,10 +117,10 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
         var delegatedBy = await actorRepository.GetAsync(new ActorId(delegatedByActorEntity.Id));
         var delegatedTo = await CreateDelegationOrganizationAsync(EicFunction.EnergySupplier);
 
-        var delegation = new MessageDelegation(delegatedBy!, DelegationMessageType.Rsm017Inbound);
+        var delegation = new ProcessDelegation(delegatedBy!, DelegatedProcess.ReceiveWholesaleResults);
         delegation.DelegateTo(new ActorId(delegatedTo.Id), new GridAreaId(gridAreaEntity.Id), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow));
 
-        var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, messageDelegationRepository);
+        var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, processDelegationRepository);
 
         // Act + Assert
         await ruleService.ValidateAsync(delegation);
@@ -135,7 +135,7 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
         await using var context = _databaseFixture.DatabaseManager.CreateDbContext();
 
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var messageDelegationRepository = scope.ServiceProvider.GetRequiredService<IMessageDelegationRepository>();
+        var processDelegationRepository = scope.ServiceProvider.GetRequiredService<IProcessDelegationRepository>();
 
         var gridAreaEntity = await _databaseFixture.PrepareGridAreaAsync();
 
@@ -147,14 +147,14 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
         var delegatedBy = await actorRepository.GetAsync(new ActorId(delegatedByActorEntity.Id));
         var delegatedTo = await CreateDelegationOrganizationAsync(EicFunction.GridAccessProvider);
 
-        var delegation = new MessageDelegation(delegatedBy!, DelegationMessageType.Rsm017Inbound);
+        var delegation = new ProcessDelegation(delegatedBy!, DelegatedProcess.ReceiveWholesaleResults);
         delegation.DelegateTo(new ActorId(delegatedTo.Id), new GridAreaId(gridAreaEntity.Id), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow));
 
-        var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, messageDelegationRepository);
+        var ruleService = new AllowedMarketRoleCombinationsForDelegationRuleService(actorRepository, processDelegationRepository);
 
         // Act + Assert
         var exception = await Assert.ThrowsAsync<ValidationException>(() => ruleService.ValidateAsync(delegation));
-        Assert.Equal("message_delegation.market_role_forbidden", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
+        Assert.Equal("process_delegation.market_role_forbidden", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
     }
 
     private async Task<ActorEntity> CreateDelegationOrganizationAsync(EicFunction secondActorEicFunction)
@@ -174,13 +174,13 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleServiceIntegra
         return delegatedActorEntity;
     }
 
-    private async Task CreateTestDelegationAsync(IMessageDelegationRepository messageDelegationRepository, Actor delegatedBy, ActorEntity delegateTo)
+    private async Task CreateTestDelegationAsync(IProcessDelegationRepository processDelegationRepository, Actor delegatedBy, ActorEntity delegateTo)
     {
         var gridAreaEntity = await _databaseFixture.PrepareGridAreaAsync();
 
-        var delegation = new MessageDelegation(delegatedBy, DelegationMessageType.Rsm017Inbound);
+        var delegation = new ProcessDelegation(delegatedBy, DelegatedProcess.ReceiveWholesaleResults);
         delegation.DelegateTo(new ActorId(delegateTo.Id), new GridAreaId(gridAreaEntity.Id), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow));
 
-        await messageDelegationRepository.AddOrUpdateAsync(delegation);
+        await processDelegationRepository.AddOrUpdateAsync(delegation);
     }
 }

@@ -14,10 +14,9 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations
-{
-    public sealed record StopMessageDelegationDto(
-        Guid Id,
-        Guid PeriodId,
-        DateTimeOffset? StopsAt);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+
+public sealed record StopProcessDelegationDto(
+    Guid Id,
+    Guid PeriodId,
+    DateTimeOffset? StopsAt);

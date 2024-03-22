@@ -22,37 +22,36 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations;
+
+public sealed class GetDelegationsForActorHandler(
+    IActorRepository actorRepository,
+    IProcessDelegationRepository processDelegationRepository)
+    : IRequestHandler<GetDelegationsForActorCommand, GetDelegationsForActorResponse>
 {
-    public sealed class GetDelegationsForActorHandler(
-        IActorRepository actorRepository,
-        IMessageDelegationRepository messageDelegationRepository)
-        : IRequestHandler<GetDelegationsForActorCommand, GetDelegationsForActorResponse>
+    public async Task<GetDelegationsForActorResponse> Handle(GetDelegationsForActorCommand request, CancellationToken cancellationToken)
     {
-        public async Task<GetDelegationsForActorResponse> Handle(GetDelegationsForActorCommand request, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var actor = await actorRepository
-                .GetAsync(new ActorId(request.ActorId))
-                .ConfigureAwait(false);
+        var actor = await actorRepository
+            .GetAsync(new ActorId(request.ActorId))
+            .ConfigureAwait(false);
 
-            NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
+        NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
-            var delegations = await messageDelegationRepository
-                .GetForActorAsync(new ActorId(request.ActorId))
-                .ConfigureAwait(false);
+        var delegations = await processDelegationRepository
+            .GetForActorAsync(new ActorId(request.ActorId))
+            .ConfigureAwait(false);
 
-            return new GetDelegationsForActorResponse(delegations.Select(x => new MessageDelegationDto(
-                x.Id.Value,
-                x.DelegatedBy.Value,
-                x.MessageType,
-                x.Delegations.Select(y => new MessageDelegationPeriodDto(
-                    y.Id.Value,
-                    y.DelegatedTo.Value,
-                    y.GridAreaId.Value,
-                    y.StartsAt.ToDateTimeOffset(),
-                    y.StopsAt?.ToDateTimeOffset())))));
-        }
+        return new GetDelegationsForActorResponse(delegations.Select(x => new ProcessDelegationDto(
+            x.Id.Value,
+            x.DelegatedBy.Value,
+            x.Process,
+            x.Delegations.Select(y => new DelegationPeriodDto(
+                y.Id.Value,
+                y.DelegatedTo.Value,
+                y.GridAreaId.Value,
+                y.StartsAt.ToDateTimeOffset(),
+                y.StopsAt?.ToDateTimeOffset())))));
     }
 }
