@@ -23,7 +23,7 @@ limitations under the License.
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="11.0.0-alpha-675" />
+    <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="11.0.0-alpha-408" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.21.0" />
     <PackageReference Include="FluentValidation" Version="11.9.0" />
     <PackageReference Include="MediatR" Version="12.2.0" />
