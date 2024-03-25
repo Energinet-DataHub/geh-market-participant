@@ -22,19 +22,22 @@ limitations under the License.
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="4.6.1"/>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.2"/>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0"/>
-    <PackageReference Include="xunit" Version="2.7.0"/>
-    <PackageReference Include="xunit.categories" Version="2.0.8"/>
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7"/>
-    <PackageReference Include="coverlet.collector" Version="6.0.1"/>
+    <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="xunit" Version="2.7.0" />
+    <PackageReference Include="xunit.categories" Version="2.0.8" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.csproj"/>
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi\Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi.csproj"/>
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.Organization\Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj"/>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.csproj" />
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi\Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi.csproj" />
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.Organization\Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,7 +47,7 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Common\Certificates\integration-actor-test-certificate-public.cer"/>
+    <EmbeddedResource Include="Common\Certificates\integration-actor-test-certificate-public.cer" />
   </ItemGroup>
 
 </Project>
