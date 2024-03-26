@@ -49,7 +49,7 @@ public sealed class ProcessDelegationAuditLogRepository : IProcessDelegationAudi
                     _context.DelegationPeriods,
                     entity => entity.Id == delegationPeriod.Id.Value);
 
-                string? AuditedValueSelector(DelegationPeriodEntity entity) => $"({entity.DelegatedToActorId};{entity.StartsAt:yyyy-MM-dd};{entity.GridAreaId};{processDelegation.Process}{(entity.StopsAt != null ? $";{entity.StopsAt:yyyy-MM-dd}" : string.Empty)})";
+                string? AuditedValueSelector(DelegationPeriodEntity entity) => $"({entity.DelegatedToActorId};{entity.StartsAt:u};{entity.GridAreaId};{processDelegation.Process}{(entity.StopsAt != null ? $";{entity.StopsAt:u}" : string.Empty)})";
 
                 var audits = await new AuditLogBuilder<ActorAuditedChange, DelegationPeriodEntity>(dataSource)
                     .Add(ActorAuditedChange.DelegationStart, entity => entity.StartsAt, AuditedValueSelector, AuditedChangeCompareAt.Creation)
