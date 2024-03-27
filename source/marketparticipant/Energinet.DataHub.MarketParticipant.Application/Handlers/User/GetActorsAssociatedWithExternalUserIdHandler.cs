@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
@@ -58,39 +56,46 @@ public sealed class GetActorsAssociatedWithExternalUserIdHandler
         if (actorIds.Count != 0)
             return new GetActorsAssociatedWithExternalUserIdResponse(actorIds.Select(id => id.Value));
 
-        // If there are no associated actors found for an external user, there are three possibilities:
-        // 1) User is completely unknown.
-        // 2) User lost access to all actors, because all user role assignments were removed.
-        // 3) User is an unlinked OpenId identity, calling first time after sign-in.
         var existingUser = await _userRepository
             .GetAsync(externalUserId)
             .ConfigureAwait(false);
 
+        // If there are no associated actors found for an external user, there are three possibilities:
+        // 1) User lost access to all actors, because all user role assignments were removed.
         if (existingUser != null)
             return new GetActorsAssociatedWithExternalUserIdResponse([]);
 
-        var openIdActorIds = await GetActorsAssociatedWithOpenIdAsync(externalUserId).ConfigureAwait(false);
-        return new GetActorsAssociatedWithExternalUserIdResponse(openIdActorIds.Select(id => id.Value));
+        // 2) User is an unlinked OpenId identity, calling first time after sign-in.
+        var linkedIdentity = await GetActorsAssociatedWithOpenIdAsync(externalUserId).ConfigureAwait(false);
+        if (linkedIdentity != null)
+        {
+            var linkedActorIds = await _userQueryRepository
+                 .GetActorsAsync(linkedIdentity)
+                 .ConfigureAwait(false);
+
+            return new GetActorsAssociatedWithExternalUserIdResponse(linkedActorIds.Select(id => id.Value));
+        }
+
+        // 3) User is completely unknown.
+        return new GetActorsAssociatedWithExternalUserIdResponse([]);
     }
 
-    private async Task<IEnumerable<ActorId>> GetActorsAssociatedWithOpenIdAsync(ExternalUserId externalUserId)
+    private async Task<ExternalUserId?> GetActorsAssociatedWithOpenIdAsync(ExternalUserId externalUserId)
     {
         var openIdIdentity = await _userIdentityRepository
             .FindIdentityReadyForOpenIdSetupAsync(externalUserId)
             .ConfigureAwait(false);
 
         if (openIdIdentity == null)
-            return [];
+            return null;
 
         var linkedIdentity = await _userIdentityRepository
             .GetAsync(openIdIdentity.Email)
             .ConfigureAwait(false);
 
         if (linkedIdentity == null)
-            return [];
+            return null;
 
-        return await _userQueryRepository
-            .GetActorsAsync(linkedIdentity.Id)
-            .ConfigureAwait(false);
+        return linkedIdentity.Id;
     }
 }

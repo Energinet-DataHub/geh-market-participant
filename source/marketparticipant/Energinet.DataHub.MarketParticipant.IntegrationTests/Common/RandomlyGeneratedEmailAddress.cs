@@ -19,16 +19,16 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
 #pragma warning disable CA1062, CA2225
 
-public sealed class MockedEmailAddress
+public sealed class RandomlyGeneratedEmailAddress
 {
     private readonly string _value = $"{Guid.NewGuid()}@test.datahub.dk";
 
-    public static implicit operator string(MockedEmailAddress mock)
+    public static implicit operator string(RandomlyGeneratedEmailAddress mock)
     {
         return mock._value;
     }
 
-    public static implicit operator EmailAddress(MockedEmailAddress mock)
+    public static implicit operator EmailAddress(RandomlyGeneratedEmailAddress mock)
     {
         return new EmailAddress(mock._value);
     }

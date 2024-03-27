@@ -114,7 +114,7 @@ public sealed class ResetUserTwoFactorAuthenticationHandlerTests : WebApiIntegra
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "first",
             "last",
@@ -170,7 +170,7 @@ public sealed class ResetUserTwoFactorAuthenticationHandlerTests : WebApiIntegra
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             initialUserIdentityStatus,
             "first",
             "last",

@@ -17,6 +17,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -105,7 +106,10 @@ public sealed class CreateProcessDelegationHandlerIntegrationTests(MarketPartici
 
         processDelegationDto = processDelegationDto with { GridAreas = [otherGridArea.Id] };
 
-        // Act + Assert
-        await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(new CreateProcessDelegationCommand(processDelegationDto)));
+        // Act
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(new CreateProcessDelegationCommand(processDelegationDto)));
+
+        // Assert
+        Assert.Equal("process_delegation.grid_area_not_allowed", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
     }
 }

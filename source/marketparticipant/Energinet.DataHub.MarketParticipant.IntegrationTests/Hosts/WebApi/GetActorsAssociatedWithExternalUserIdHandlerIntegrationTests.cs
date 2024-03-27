@@ -111,7 +111,7 @@ public sealed class GetActorsAssociatedWithExternalUserIdHandlerIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var openIdUserEmail = new MockedEmailAddress();
+        var openIdUserEmail = new RandomlyGeneratedEmailAddress();
         var openIdIdentity = new List<ObjectIdentity>
         {
             new()

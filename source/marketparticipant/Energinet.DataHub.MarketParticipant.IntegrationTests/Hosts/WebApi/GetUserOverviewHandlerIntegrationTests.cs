@@ -55,7 +55,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .ReturnsAsync((IEnumerable<ExternalUserId> x) =>
                 x.Select(y => new UserIdentity(
                     y,
-                    new MockedEmailAddress(),
+                    new RandomlyGeneratedEmailAddress(),
                     UserIdentityStatus.Active,
                     y.ToString(),
                     y.ToString(),
@@ -109,7 +109,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .ReturnsAsync(userIdsToReturn.Select(y =>
                 new UserIdentity(
                     y,
-                    new MockedEmailAddress(),
+                    new RandomlyGeneratedEmailAddress(),
                     UserIdentityStatus.Inactive,
                     y.ToString(),
                     y.ToString(),
@@ -155,7 +155,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             {
                 new UserIdentity(
                     new ExternalUserId(user.ExternalId),
-                    new MockedEmailAddress(),
+                    new RandomlyGeneratedEmailAddress(),
                     UserIdentityStatus.Active,
                     "fake_value",
                     "fake_value",
@@ -203,7 +203,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             {
                 new UserIdentity(
                     new ExternalUserId(user.ExternalId),
-                    new MockedEmailAddress(),
+                    new RandomlyGeneratedEmailAddress(),
                     UserIdentityStatus.Inactive,
                     "fake_value",
                     "fake_value",
@@ -264,7 +264,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         {
             return new UserIdentity(
                 new ExternalUserId(userEntity.ExternalId),
-                new MockedEmailAddress(),
+                new RandomlyGeneratedEmailAddress(),
                 userStatus,
                 "fake_value",
                 "fake_value",

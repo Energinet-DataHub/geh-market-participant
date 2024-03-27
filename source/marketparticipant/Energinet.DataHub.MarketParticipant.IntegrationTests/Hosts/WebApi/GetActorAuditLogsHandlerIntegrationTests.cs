@@ -220,7 +220,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     {
         var initialName = Guid.NewGuid().ToString();
         var changedName = Guid.NewGuid().ToString();
-        var emailAddress = new MockedEmailAddress();
+        var emailAddress = new RandomlyGeneratedEmailAddress();
 
         return TestAuditOfActorContactChangeAsync(
             response =>
@@ -237,8 +237,8 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     [Fact]
     public Task GetAuditLogs_ChangeActorContactEmail_IsAudited()
     {
-        var initialEmail = new MockedEmailAddress();
-        var changedEmail = new MockedEmailAddress();
+        var initialEmail = new RandomlyGeneratedEmailAddress();
+        var changedEmail = new RandomlyGeneratedEmailAddress();
 
         return TestAuditOfActorContactChangeAsync(
             response =>
@@ -257,7 +257,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     {
         var initialPhone = new PhoneNumber("+45 12345678");
         var changedPhone = new PhoneNumber("+45 87654321");
-        var emailAddress = new MockedEmailAddress();
+        var emailAddress = new RandomlyGeneratedEmailAddress();
 
         return TestAuditOfActorContactChangeAsync(
             response =>
@@ -283,7 +283,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
                 Assert.NotNull(expectedCreated);
                 Assert.NotNull(expectedDeleted);
             },
-            actorId => new ActorContact(actorId, "mocked", ContactCategory.Default, new MockedEmailAddress(), null),
+            actorId => new ActorContact(actorId, "mocked", ContactCategory.Default, new RandomlyGeneratedEmailAddress(), null),
             _ => null);
     }
 

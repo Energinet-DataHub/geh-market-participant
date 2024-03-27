@@ -117,7 +117,7 @@ public sealed class GetAuditIdentityHandlerIntegrationTests
         var externalUserId = new ExternalUserId(auditUser.ExternalId);
         var userIdentity = new UserIdentity(
             externalUserId,
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "expected_first_name",
             "expected_last_name",
