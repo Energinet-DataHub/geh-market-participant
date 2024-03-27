@@ -40,7 +40,7 @@ public sealed class DeleteActorContactHandlerIntegrationTests(MarketParticipantD
         var createActorContactDto = new CreateActorContactDto(
             "test",
             ContactCategory.Default,
-            new MockedEmailAddress().ToString(),
+            new RandomlyGeneratedEmailAddress().ToString(),
             "12345678");
 
         var createCommand = new CreateActorContactCommand(actor.Id, createActorContactDto);

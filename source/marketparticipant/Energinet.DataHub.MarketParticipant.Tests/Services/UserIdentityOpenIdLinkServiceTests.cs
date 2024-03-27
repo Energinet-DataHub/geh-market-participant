@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var externalUserId = new ExternalUserId(Guid.NewGuid());
-            var email = new MockedEmailAddress();
+            var email = new RandomlyGeneratedEmailAddress();
 
             var userIdentityRepository = new Mock<IUserIdentityRepository>();
             userIdentityRepository
@@ -92,7 +92,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var externalUserId = new ExternalUserId(Guid.NewGuid());
-            var email = new MockedEmailAddress();
+            var email = new RandomlyGeneratedEmailAddress();
 
             var userRepository = new Mock<IUserRepository>();
             var userIdentityRepository = new Mock<IUserIdentityRepository>();
@@ -119,7 +119,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var externalUserId = new ExternalUserId(Guid.NewGuid());
-            var email = new MockedEmailAddress();
+            var email = new RandomlyGeneratedEmailAddress();
 
             var userIdentityRepository = new Mock<IUserIdentityRepository>();
             userIdentityRepository
@@ -151,7 +151,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var externalUserId = new ExternalUserId(Guid.NewGuid());
-            var email = new MockedEmailAddress();
+            var email = new RandomlyGeneratedEmailAddress();
 
             var userIdentityRepository = new Mock<IUserIdentityRepository>();
             userIdentityRepository
@@ -180,7 +180,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             userRepository.Verify(e => e.GetAsync(userToReturnFromService.Id));
         }
 
-        private static UserIdentity GetUserIdentity(ExternalUserId externalUserId, MockedEmailAddress email, string signInType)
+        private static UserIdentity GetUserIdentity(ExternalUserId externalUserId, RandomlyGeneratedEmailAddress email, string signInType)
         {
             return new UserIdentity(
                 externalUserId,

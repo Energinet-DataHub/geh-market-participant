@@ -13,10 +13,13 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -49,7 +52,23 @@ public sealed class ProcessDelegationAuditLogRepository : IProcessDelegationAudi
                     _context.DelegationPeriods,
                     entity => entity.Id == delegationPeriod.Id.Value);
 
-                string? AuditedValueSelector(DelegationPeriodEntity entity) => $"({entity.DelegatedToActorId};{entity.StartsAt:yyyy-MM-dd};{entity.GridAreaId};{processDelegation.Process}{(entity.StopsAt != null ? $";{entity.StopsAt:yyyy-MM-dd}" : string.Empty)})";
+                string? AuditedValueSelector(DelegationPeriodEntity entity)
+                {
+                    IEnumerable<object> parts =
+                    [
+                        entity.DelegatedToActorId,
+                        entity.StartsAt.ToInstant().ToString("g", CultureInfo.InvariantCulture),
+                        entity.GridAreaId,
+                        processDelegation.Process
+                    ];
+
+                    if (entity.StopsAt.HasValue)
+                    {
+                        parts = parts.Append(entity.StopsAt.Value.ToInstant().ToString("g", CultureInfo.InvariantCulture));
+                    }
+
+                    return $"({string.Join(';', parts)})";
+                }
 
                 var audits = await new AuditLogBuilder<ActorAuditedChange, DelegationPeriodEntity>(dataSource)
                     .Add(ActorAuditedChange.DelegationStart, entity => entity.StartsAt, AuditedValueSelector, AuditedChangeCompareAt.Creation)

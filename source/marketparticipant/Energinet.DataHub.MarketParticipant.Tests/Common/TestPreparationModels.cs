@@ -83,7 +83,7 @@ internal static class TestPreparationModels
 
     public static UserIdentity MockedUserIdentity(Guid externalUserId) => new(
         new ExternalUserId(externalUserId),
-        new MockedEmailAddress(),
+        new RandomlyGeneratedEmailAddress(),
         UserIdentityStatus.Active,
         "Mocked First Name",
         "Mocked Last Name",

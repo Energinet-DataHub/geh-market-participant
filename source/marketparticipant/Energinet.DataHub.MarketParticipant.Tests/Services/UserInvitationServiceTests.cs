@@ -55,7 +55,7 @@ public sealed class UserInvitationServiceTests
         null);
 
     private readonly UserInvitation _validInvitation = new(
-        new MockedEmailAddress(),
+        new RandomlyGeneratedEmailAddress(),
         new InvitationUserDetails(
             "John",
             "Doe",

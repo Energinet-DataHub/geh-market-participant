@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new ActorId(Guid.NewGuid()),
                 "fake_value",
                 category,
-                new MockedEmailAddress(),
+                new RandomlyGeneratedEmailAddress(),
                 null);
         }
     }

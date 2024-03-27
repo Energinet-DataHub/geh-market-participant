@@ -108,7 +108,7 @@ public sealed class EmailContentGeneratorTests
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.Empty),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             firstName,
             "fake_value",

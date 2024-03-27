@@ -45,7 +45,6 @@ message ProcessDelegationConfigured {
 
   /*
    * The market role of the actor that handles the delegated process.
-   * This is currently always EIC_FUNCTION_DELEGATED.
    */
   EicFunction delegated_to_actor_role = 4;
 

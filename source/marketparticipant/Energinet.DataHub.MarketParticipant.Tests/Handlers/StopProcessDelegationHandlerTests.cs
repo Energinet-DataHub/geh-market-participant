@@ -54,6 +54,7 @@ public sealed class StopProcessDelegationHandlerTests
         var processDelegation = new ProcessDelegation(
             new ProcessDelegationId(Guid.NewGuid()),
             actorFrom.Id,
+            [],
             DelegatedProcess.RequestEnergyResults,
             Guid.NewGuid(),
             new List<DelegationPeriod>() { delegationPeriod });
@@ -92,6 +93,7 @@ public sealed class StopProcessDelegationHandlerTests
         var processDelegation = new ProcessDelegation(
             new ProcessDelegationId(Guid.NewGuid()),
             actorFrom.Id,
+            [],
             DelegatedProcess.RequestEnergyResults,
             Guid.NewGuid(),
             new List<DelegationPeriod>() { delegationPeriod });
@@ -139,6 +141,7 @@ public sealed class StopProcessDelegationHandlerTests
         var processDelegation = new ProcessDelegation(
             new ProcessDelegationId(Guid.NewGuid()),
             actorFrom.Id,
+            [],
             DelegatedProcess.RequestEnergyResults,
             Guid.NewGuid(),
             new List<DelegationPeriod>() { delegationPeriod });
@@ -186,6 +189,7 @@ public sealed class StopProcessDelegationHandlerTests
         var processDelegation = new ProcessDelegation(
             new ProcessDelegationId(Guid.NewGuid()),
             new ActorId(Guid.NewGuid()),
+            [],
             DelegatedProcess.RequestEnergyResults,
             Guid.NewGuid(),
             [delegationPeriod]);

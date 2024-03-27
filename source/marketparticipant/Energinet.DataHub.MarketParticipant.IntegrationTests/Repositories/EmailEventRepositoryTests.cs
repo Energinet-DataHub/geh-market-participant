@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var emailEventRepository = new EmailEventRepository(context);
 
-            var emailRandom = new MockedEmailAddress();
+            var emailRandom = new RandomlyGeneratedEmailAddress();
             var newEmailEvent = new EmailEvent(emailRandom, emailTemplate);
 
             // act
@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var emailEventRepository1 = new EmailEventRepository(context1);
 
-            var emailRandom = new MockedEmailAddress();
+            var emailRandom = new RandomlyGeneratedEmailAddress();
             var newEmailEvent = new EmailEvent(emailRandom, new UserInviteEmailTemplate(new Dictionary<string, string>()));
 
             // act
