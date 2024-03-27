@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
@@ -214,12 +215,15 @@ public sealed class ProcessDelegationTests
 
         var processDelegation = new ProcessDelegation(actorFrom, DelegatedProcess.RequestEnergyResults);
 
-        // Act + Assert
-        Assert.Throws<ValidationException>(() =>
+        // Act
+        var exception = Assert.Throws<ValidationException>(() =>
             processDelegation.DelegateTo(
                 new ActorId(Guid.NewGuid()),
                 new GridAreaId(Guid.NewGuid()),
                 SystemClock.Instance.GetCurrentInstant()));
+
+        // Assert
+        Assert.Equal("process_delegation.grid_area_not_allowed", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
     }
 
     [Fact]
