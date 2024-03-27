@@ -54,7 +54,7 @@ public sealed class GetUserProfileHandlerIntegrationTests
         var userIdentityMock = new Mock<IUserIdentityRepository>();
         var userIdentity = new UserIdentity(
             new ExternalUserId(user.ExternalId),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "expected_firstname",
             "expected_lastname",
@@ -112,7 +112,7 @@ public sealed class GetUserProfileHandlerIntegrationTests
         var userIdentityMock = new Mock<IUserIdentityRepository>();
         var userIdentity = new UserIdentity(
             new ExternalUserId(user.ExternalId),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "expected_name",
             "expected_name",

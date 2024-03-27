@@ -226,7 +226,7 @@ public sealed class UserOverviewRepositoryTests
             {
                 new UserIdentity(
                     externalId,
-                    new MockedEmailAddress(),
+                    new RandomlyGeneratedEmailAddress(),
                     UserIdentityStatus.Active,
                     "fake_value",
                     "fake_value",
@@ -276,7 +276,7 @@ public sealed class UserOverviewRepositoryTests
             {
                 new UserIdentity(
                     externalId,
-                    new MockedEmailAddress(),
+                    new RandomlyGeneratedEmailAddress(),
                     UserIdentityStatus.Active,
                     "fake_value",
                     "fake_value",
@@ -331,7 +331,7 @@ public sealed class UserOverviewRepositoryTests
             {
                 new UserIdentity(
                     new ExternalUserId(userEntity.ExternalId),
-                    new MockedEmailAddress(),
+                    new RandomlyGeneratedEmailAddress(),
                     UserIdentityStatus.Active,
                     "fake_value",
                     "fake_value",

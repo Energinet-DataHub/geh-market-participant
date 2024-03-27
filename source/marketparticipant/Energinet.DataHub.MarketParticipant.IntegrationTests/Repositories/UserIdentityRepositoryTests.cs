@@ -151,7 +151,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
             new SharedUserReferenceId(),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             "User Integration Tests",
             "(Always safe to delete)",
             new PhoneNumber("+45 70000000"),
@@ -236,7 +236,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         var newPhoneNumber = new PhoneNumber("+45 70007777");
 
         // Act
-        var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        var externalId = await _graphServiceClientFixture.CreateUserAsync(new RandomlyGeneratedEmailAddress());
         var user = (await target.GetAsync(externalId))!;
 
         user.FirstName = newFirstName;
@@ -273,7 +273,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             userPasswordGenerator);
 
         // Act
-        var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        var externalId = await _graphServiceClientFixture.CreateUserAsync(new RandomlyGeneratedEmailAddress());
         var userIdentity = await target.GetAsync(externalId);
 
         var openIdLoginIdentity = new LoginIdentity("federated", Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
@@ -330,7 +330,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             }
         };
 
-        var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress(), openIdIdentity);
+        var externalId = await _graphServiceClientFixture.CreateUserAsync(new RandomlyGeneratedEmailAddress(), openIdIdentity);
 
         // Act
         var userIdentity = await target.FindIdentityReadyForOpenIdSetupAsync(externalId);
@@ -360,7 +360,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             userIdentityAuthenticationService,
             userPasswordGenerator);
 
-        var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        var externalId = await _graphServiceClientFixture.CreateUserAsync(new RandomlyGeneratedEmailAddress());
         await _graphServiceClientFixture
             .Client
             .Users[externalId.Value.ToString()]

@@ -30,46 +30,62 @@ public sealed class ProcessDelegationRepository(IMarketParticipantDbContext mark
 {
     public async Task<ProcessDelegation?> GetAsync(ProcessDelegationId id)
     {
-        var messageDelegation = await marketParticipantDbContext
-            .ProcessDelegations
-            .SingleOrDefaultAsync(messageDelegation => messageDelegation.Id == id.Value)
+        var query =
+            from pd in marketParticipantDbContext.ProcessDelegations
+            join actor in marketParticipantDbContext.Actors on pd.DelegatedByActorId equals actor.Id
+            where pd.Id == id.Value
+            select new { actor, pd };
+
+        var processDelegation = await query
+            .SingleOrDefaultAsync()
             .ConfigureAwait(false);
 
-        return messageDelegation == null ? null : Map(messageDelegation);
+        return processDelegation == null ? null : Map(processDelegation.actor, processDelegation.pd);
     }
 
     public async Task<IEnumerable<ProcessDelegation>> GetForActorAsync(ActorId delegatedBy)
     {
-        var messageDelegations = await marketParticipantDbContext
-            .ProcessDelegations
-            .Where(messageDelegation => messageDelegation.DelegatedByActorId == delegatedBy.Value)
+        var query =
+            from pd in marketParticipantDbContext.ProcessDelegations
+            join actor in marketParticipantDbContext.Actors on pd.DelegatedByActorId equals actor.Id
+            where pd.DelegatedByActorId == delegatedBy.Value
+            select new { actor, pd };
+
+        var processDelegations = await query
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return messageDelegations.Select(Map);
+        return processDelegations.Select(processDelegation => Map(processDelegation.actor, processDelegation.pd));
     }
 
     public async Task<IEnumerable<ProcessDelegation>> GetDelegatedToActorAsync(ActorId delegatedTo)
     {
-        var messageDelegations = await marketParticipantDbContext
-            .ProcessDelegations
-            .Where(messageDelegation => messageDelegation.Delegations.Any(d => d.DelegatedToActorId == delegatedTo.Value))
+        var query =
+            from pd in marketParticipantDbContext.ProcessDelegations
+            join actor in marketParticipantDbContext.Actors on pd.DelegatedByActorId equals actor.Id
+            where pd.Delegations.Any(d => d.DelegatedToActorId == delegatedTo.Value)
+            select new { actor, pd };
+
+        var processDelegations = await query
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return messageDelegations.Select(Map);
+        return processDelegations.Select(processDelegation => Map(processDelegation.actor, processDelegation.pd));
     }
 
     public async Task<ProcessDelegation?> GetForActorAsync(ActorId delegatedBy, DelegatedProcess process)
     {
-        var messageDelegation = await marketParticipantDbContext
-            .ProcessDelegations
-            .SingleOrDefaultAsync(messageDelegation =>
-                messageDelegation.DelegatedByActorId == delegatedBy.Value &&
-                messageDelegation.DelegatedProcess == process)
+        var query =
+            from pd in marketParticipantDbContext.ProcessDelegations
+            join actor in marketParticipantDbContext.Actors on pd.DelegatedByActorId equals actor.Id
+            where pd.DelegatedByActorId == delegatedBy.Value && pd.DelegatedProcess == process
+            select new { actor, pd };
+
+        var processDelegation = await query
+            .SingleOrDefaultAsync()
             .ConfigureAwait(false);
 
-        return messageDelegation == null ? null : Map(messageDelegation);
+        return processDelegation == null ? null : Map(processDelegation.actor, processDelegation.pd);
     }
 
     public async Task<ProcessDelegationId> AddOrUpdateAsync(ProcessDelegation processDelegation)
@@ -133,11 +149,12 @@ public sealed class ProcessDelegationRepository(IMarketParticipantDbContext mark
         return new ProcessDelegationId(destination.Id);
     }
 
-    private static ProcessDelegation Map(ProcessDelegationEntity processDelegationEntity)
+    private static ProcessDelegation Map(ActorEntity actorEntity, ProcessDelegationEntity processDelegationEntity)
     {
         return new ProcessDelegation(
             new ProcessDelegationId(processDelegationEntity.Id),
             new ActorId(processDelegationEntity.DelegatedByActorId),
+            actorEntity.MarketRoles.SelectMany(mr => mr.GridAreas).Select(ga => new GridAreaId(ga.GridAreaId)),
             processDelegationEntity.DelegatedProcess,
             processDelegationEntity.ConcurrencyToken,
             processDelegationEntity.Delegations.Select(Map));

@@ -75,7 +75,7 @@ public sealed class EmailEventIntegrationTests
     {
         return new UserIdentity(
             externalUserId,
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "firstName",
             "lastName",
