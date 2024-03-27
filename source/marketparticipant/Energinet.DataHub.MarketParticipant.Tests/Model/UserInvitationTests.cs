@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model;
 public sealed class UserInvitationTests
 {
     private readonly UserInvitation _validInvitation = new(
-        new MockedEmailAddress(),
+        new RandomlyGeneratedEmailAddress(),
         new InvitationUserDetails(
             "John",
             "Doe",

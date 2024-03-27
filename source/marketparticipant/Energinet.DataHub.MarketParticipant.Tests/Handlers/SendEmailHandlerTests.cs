@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // arrange
             var events = new[]
             {
-                new EmailEvent(new MockedEmailAddress(), _emailTemplate)
+                new EmailEvent(new RandomlyGeneratedEmailAddress(), _emailTemplate)
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
