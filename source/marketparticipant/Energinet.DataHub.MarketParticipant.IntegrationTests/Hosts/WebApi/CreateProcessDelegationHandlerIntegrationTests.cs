@@ -13,10 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -52,8 +55,10 @@ public sealed class CreateProcessDelegationHandlerIntegrationTests(MarketPartici
         var createCommand = new CreateProcessDelegationCommand(processDelegationDto);
         var fetchCommand = new GetDelegationsForActorCommand(actorFrom.Id);
 
-        // Act + Assert
+        // Act
         await mediator.Send(createCommand);
+
+        // Assert
         var response = await mediator.Send(fetchCommand);
         Assert.NotNull(response);
         Assert.NotEmpty(response.Delegations);
@@ -63,5 +68,44 @@ public sealed class CreateProcessDelegationHandlerIntegrationTests(MarketPartici
         Assert.True(response.Delegations.First().Periods.First().DelegatedTo == actorTo.Id);
         Assert.True(response.Delegations.First().Periods.First().GridAreaId == gridArea.Id);
         Assert.True(response.Delegations.First().Periods.First().StartsAt == startsAt);
+    }
+
+    [Fact]
+    public async Task CreateProcessDelegation_GridAreaNotAllowed_ThrowsException()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
+        await using var scope = host.BeginScope();
+
+        var allowedGridArea = await fixture.PrepareGridAreaAsync();
+        var inputMarketRoles = new MarketRoleEntity
+        {
+            Function = EicFunction.GridAccessProvider,
+            GridAreas = { new MarketRoleGridAreaEntity { GridAreaId = allowedGridArea.Id } }
+        };
+
+        var actorFrom = await fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActiveActor,
+            inputMarketRoles);
+
+        var actorTo = await fixture.PrepareActiveActorAsync();
+        var otherGridArea = await fixture.PrepareGridAreaAsync();
+
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var processDelegationDto = new CreateProcessDelegationsDto(
+            actorFrom.Id,
+            actorTo.Id,
+            [allowedGridArea.Id],
+            [DelegatedProcess.RequestEnergyResults],
+            DateTimeOffset.UtcNow);
+
+        await mediator.Send(new CreateProcessDelegationCommand(processDelegationDto));
+
+        processDelegationDto = processDelegationDto with { GridAreas = [otherGridArea.Id] };
+
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(new CreateProcessDelegationCommand(processDelegationDto)));
     }
 }

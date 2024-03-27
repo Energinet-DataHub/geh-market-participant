@@ -292,7 +292,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     {
         var expectedDelegateTo = await _databaseFixture.PrepareActorAsync();
         var expectedGridArea = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
-        var expectedStartTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
+        var expectedStartTime = SystemClock.Instance.GetCurrentInstant();
         var expectedProcess = DelegatedProcess.RequestWholesaleResults;
 
         await TestAuditOfProcessDelegationChangeAsync(
@@ -300,7 +300,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             response =>
             {
                 Assert.Equal(
-                    $"({expectedDelegateTo.Id};{expectedStartTime:yyyy-MM-dd};{expectedGridArea.Value};{expectedProcess})",
+                    $"({expectedDelegateTo.Id};{expectedStartTime:g};{expectedGridArea.Value};{expectedProcess})",
                     response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStart).CurrentValue);
             },
             actor =>
@@ -317,7 +317,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         var delegatedEntity = await _databaseFixture.PrepareActorAsync();
         var delegatorEntity = await _databaseFixture.PrepareActorAsync();
         var expectedGridArea = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
-        var expectedStartTime = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
+        var expectedStartTime = SystemClock.Instance.GetCurrentInstant();
         var expectedProcess = DelegatedProcess.RequestWholesaleResults;
         var expectedStop = expectedStartTime.Plus(Duration.FromDays(2));
 
@@ -338,7 +338,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             response =>
             {
                 Assert.Equal(
-                    $"({delegated.Id.Value};{expectedStartTime:yyyy-MM-dd};{expectedGridArea.Value};{expectedProcess};{expectedStop:yyyy-MM-dd})",
+                    $"({delegated.Id.Value};{expectedStartTime:g};{expectedGridArea.Value};{expectedProcess};{expectedStop:g})",
                     response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStop).CurrentValue);
             },
             _ =>

@@ -26,6 +26,7 @@ public sealed class ProcessDelegation : IPublishDomainEvents
 {
     private readonly DomainEventList _domainEvents;
     private readonly List<DelegationPeriod> _delegations = [];
+    private readonly List<GridAreaId> _allowedGridAreas = [];
 
     public ProcessDelegation(Actor processOwner, DelegatedProcess process)
     {
@@ -34,8 +35,7 @@ public sealed class ProcessDelegation : IPublishDomainEvents
         if (processOwner.MarketRoles.All(role =>
                 role.Function != EicFunction.GridAccessProvider
                 && role.Function != EicFunction.BalanceResponsibleParty
-                && role.Function != EicFunction.EnergySupplier
-                && role.Function != EicFunction.BillingAgent))
+                && role.Function != EicFunction.EnergySupplier))
         {
             throw new ValidationException("Actor's market role does not support process delegation.")
                 .WithErrorCode("process_delegation.actor_invalid_market_role");
@@ -43,12 +43,19 @@ public sealed class ProcessDelegation : IPublishDomainEvents
 
         DelegatedBy = processOwner.Id;
         Process = process;
+
+        _allowedGridAreas.AddRange(processOwner
+            .MarketRoles
+            .SelectMany(mr => mr.GridAreas)
+            .Select(ga => ga.Id));
+
         _domainEvents = new DomainEventList();
     }
 
     public ProcessDelegation(
         ProcessDelegationId id,
         ActorId delegatedBy,
+        IEnumerable<GridAreaId> actorGridAreas,
         DelegatedProcess process,
         Guid concurrencyToken,
         IEnumerable<DelegationPeriod> delegations)
@@ -59,6 +66,7 @@ public sealed class ProcessDelegation : IPublishDomainEvents
         ConcurrencyToken = concurrencyToken;
         _domainEvents = new DomainEventList(Id.Value);
         _delegations.AddRange(delegations);
+        _allowedGridAreas.AddRange(actorGridAreas);
     }
 
     public ProcessDelegationId Id { get; } = new(Guid.Empty);
@@ -78,6 +86,12 @@ public sealed class ProcessDelegation : IPublishDomainEvents
         {
             throw new ValidationException("Delegation already exists for the given grid area and time period")
                 .WithErrorCode("process_delegation.overlap");
+        }
+
+        if (_allowedGridAreas.Count > 0 && !_allowedGridAreas.Contains(gridAreaId))
+        {
+            throw new ValidationException("Actor cannot delegate for a grid area it is not responsible for.")
+                .WithErrorCode("process_delegation.grid_area_not_allowed");
         }
 
         _delegations.Add(delegationPeriod);
