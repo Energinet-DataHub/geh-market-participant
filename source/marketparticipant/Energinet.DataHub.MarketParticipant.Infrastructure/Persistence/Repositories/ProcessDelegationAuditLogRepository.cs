@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -53,14 +54,18 @@ public sealed class ProcessDelegationAuditLogRepository : IProcessDelegationAudi
 
                 string? AuditedValueSelector(DelegationPeriodEntity entity)
                 {
-                    object[] parts =
+                    IEnumerable<object> parts =
                     [
                         entity.DelegatedToActorId,
                         entity.StartsAt.ToInstant().ToString("g", CultureInfo.InvariantCulture),
                         entity.GridAreaId,
-                        processDelegation.Process,
-                        entity.StopsAt?.ToInstant().ToString("g", CultureInfo.InvariantCulture) ?? string.Empty
+                        processDelegation.Process
                     ];
+
+                    if (entity.StopsAt.HasValue)
+                    {
+                        parts = parts.Append(entity.StopsAt.Value.ToInstant().ToString("g", CultureInfo.InvariantCulture));
+                    }
 
                     return $"({string.Join(';', parts)})";
                 }
