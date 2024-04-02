@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -37,14 +39,25 @@ public sealed class CreateGridAreaHandlerTests
     [Fact]
     public async Task CreateGridArea_WhenCalled_CreatesGridArea()
     {
-        // arrange, act
-        var id = await WebApiIntegrationTestHost.RunInScopeAsync(
+        // arrange
+        GridAreaId id = null!;
+
+        // act
+        await RunInScopeAsync(
             _databaseFixture,
-            async sp => (await sp.GetRequiredService<IMediator>().Send(new CreateGridAreaCommand(new CreateGridAreaDto("GridArea", "404", "DK2")))).GridAreaId);
+            async sp => id = (await sp.GetRequiredService<IMediator>().Send(new CreateGridAreaCommand(new CreateGridAreaDto("GridArea", "404", "DK2")))).GridAreaId);
 
         // assert
-        await WebApiIntegrationTestHost.RunInScopeAsync(
+        await RunInScopeAsync(
             _databaseFixture,
             async sp => Assert.NotNull(await sp.GetRequiredService<IGridAreaRepository>().GetAsync(id)));
+    }
+
+    private static async Task RunInScopeAsync(MarketParticipantDatabaseFixture databaseFixture, Func<IServiceProvider, Task> action)
+    {
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(databaseFixture);
+        await using var scope = host.BeginScope();
+
+        await action(scope.ServiceProvider);
     }
 }
