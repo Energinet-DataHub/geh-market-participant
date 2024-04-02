@@ -44,18 +44,16 @@ public sealed class CreateGridAreaHandlerTests
 
         // act
         await RunInScopeAsync(
-            _databaseFixture,
             async sp => id = (await sp.GetRequiredService<IMediator>().Send(new CreateGridAreaCommand(new CreateGridAreaDto("GridArea", "404", "DK2")))).GridAreaId);
 
         // assert
         await RunInScopeAsync(
-            _databaseFixture,
             async sp => Assert.NotNull(await sp.GetRequiredService<IGridAreaRepository>().GetAsync(id)));
     }
 
-    private static async Task RunInScopeAsync(MarketParticipantDatabaseFixture databaseFixture, Func<IServiceProvider, Task> action)
+    private async Task RunInScopeAsync(Func<IServiceProvider, Task> action)
     {
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(databaseFixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
         await action(scope.ServiceProvider);
