@@ -65,6 +65,26 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
         return Task.FromResult(host);
     }
 
+    public static async Task<T> RunInScopeAsync<T>(MarketParticipantDatabaseFixture databaseFixture, Func<IServiceProvider, Task<T>> action)
+    {
+        ArgumentNullException.ThrowIfNull(databaseFixture);
+        ArgumentNullException.ThrowIfNull(action);
+
+        await using var host = await InitializeAsync(databaseFixture);
+        await using var scope = host.BeginScope();
+
+        return await action(scope.ServiceProvider);
+    }
+
+    public static Task RunInScopeAsync(MarketParticipantDatabaseFixture databaseFixture, Func<IServiceProvider, Task> action)
+    {
+        return RunInScopeAsync(databaseFixture, async sp =>
+        {
+            await action(sp);
+            return 0;
+        });
+    }
+
     public AsyncServiceScope BeginScope()
     {
         var serviceProvider = ServiceCollection.BuildServiceProvider();
