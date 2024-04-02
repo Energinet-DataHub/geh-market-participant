@@ -39,8 +39,8 @@ limitations under the License.
     <PackageReference Include="NodaTime.Serialization.Protobuf" Version="2.0.1" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.2.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
-    <PackageReference Include="Microsoft.Graph" Version="5.45.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.26.0" />
+    <PackageReference Include="Microsoft.Graph" Version="5.46.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.26.1" />
     <PackageReference Include="Grpc.Tools" Version="2.62.0" PrivateAssets="All" />
   </ItemGroup>
 
