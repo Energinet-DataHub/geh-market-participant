@@ -38,6 +38,7 @@ internal static class ApimCertificateStoreExtensions
             var apimServicePrincipalClientSecret = configuration.GetValue<string>("APIM_SP_CLIENT_SECRET");
 
             var certificatesKeyVault = configuration.GetValue<Uri>("CERTIFICATES_KEY_VAULT");
+            ArgumentNullException.ThrowIfNull(certificatesKeyVault);
 
             var apimCredentials = new ClientSecretCredential(
                 apimTenantId,

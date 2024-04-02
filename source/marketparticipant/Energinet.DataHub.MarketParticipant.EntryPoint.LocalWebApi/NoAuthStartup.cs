@@ -16,6 +16,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
@@ -49,7 +50,7 @@ public class NoAuthStartup : WebApi.Startup
             ValidateLifetime = false,
             RequireExpirationTime = false,
             RequireSignedTokens = false,
-            SignatureValidator = (t, _) => new JwtSecurityToken(t),
+            SignatureValidator = (t, _) => new JsonWebToken(t),
 #pragma warning restore CA5404
         };
     }
