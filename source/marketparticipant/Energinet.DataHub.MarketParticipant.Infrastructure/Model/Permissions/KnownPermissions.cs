@@ -140,7 +140,6 @@ public static class KnownPermissions
         new(PermissionId.DelegationView, "delegation:view", InstantPattern.ExtendedIso.Parse("2024-03-05T00:00:00Z").Value, new[]
         {
             EicFunction.BalanceResponsibleParty,
-            EicFunction.BillingAgent,
             EicFunction.GridAccessProvider,
             EicFunction.EnergySupplier,
             EicFunction.DataHubAdministrator

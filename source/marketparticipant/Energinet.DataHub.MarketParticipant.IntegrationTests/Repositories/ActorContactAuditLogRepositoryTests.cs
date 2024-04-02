@@ -66,7 +66,7 @@ public sealed class ActorContactAuditLogRepositoryTests
 
         // Arrange - Setup contact
         var actor = await _fixture.PrepareActorAsync();
-        var actorContact = new ActorContact(new ActorId(actor.Id), "OrgName", ContactCategory.Default, new MockedEmailAddress(), new PhoneNumber("1234567"));
+        var actorContact = new ActorContact(new ActorId(actor.Id), "OrgName", ContactCategory.Default, new RandomlyGeneratedEmailAddress(), new PhoneNumber("1234567"));
 
         // Arrange - Setup repositories
         await using var scope = host.BeginScope();
@@ -105,7 +105,7 @@ public sealed class ActorContactAuditLogRepositoryTests
 
         // Arrange - Setup contact
         var actor = await _fixture.PrepareActorAsync();
-        var actorContact = new ActorContact(new ActorId(actor.Id), "OrgName", ContactCategory.Default, new MockedEmailAddress(), new PhoneNumber("12345678"));
+        var actorContact = new ActorContact(new ActorId(actor.Id), "OrgName", ContactCategory.Default, new RandomlyGeneratedEmailAddress(), new PhoneNumber("12345678"));
 
         // Arrange - Setup repositories
         await using var scope = host.BeginScope();
@@ -146,7 +146,7 @@ public sealed class ActorContactAuditLogRepositoryTests
 
         // Arrange - Setup contact
         var actor = await _fixture.PrepareActorAsync();
-        var email = new MockedEmailAddress();
+        var email = new RandomlyGeneratedEmailAddress();
         var phone = new PhoneNumber("12345678");
         var actorContact = new ActorContact(new ActorId(actor.Id), "OrgName", ContactCategory.Default, email, phone);
         var actorContactChanged = new ActorContact(new ActorId(actor.Id), "new Contact", ContactCategory.Default, email, phone);
@@ -195,8 +195,8 @@ public sealed class ActorContactAuditLogRepositoryTests
         // Arrange - Setup contact
         var actor = await _fixture.PrepareActorAsync();
         var phone = new PhoneNumber("12345678");
-        var actorContact = new ActorContact(new ActorId(actor.Id), "OrgName", ContactCategory.Default, new MockedEmailAddress(), phone);
-        var actorContactChanged = new ActorContact(new ActorId(actor.Id), "OrgName", ContactCategory.Default, new MockedEmailAddress(), phone);
+        var actorContact = new ActorContact(new ActorId(actor.Id), "OrgName", ContactCategory.Default, new RandomlyGeneratedEmailAddress(), phone);
+        var actorContactChanged = new ActorContact(new ActorId(actor.Id), "OrgName", ContactCategory.Default, new RandomlyGeneratedEmailAddress(), phone);
 
         // Arrange - Setup repositories
         await using var scope = host.BeginScope();
@@ -241,7 +241,7 @@ public sealed class ActorContactAuditLogRepositoryTests
 
         // Arrange - Setup contact
         var actor = await _fixture.PrepareActorAsync();
-        var email = new MockedEmailAddress();
+        var email = new RandomlyGeneratedEmailAddress();
         var actorContact = new ActorContact(new ActorId(actor.Id), "OrgName", ContactCategory.Default, email, new PhoneNumber("12345678"));
         var actorContactChanged = new ActorContact(new ActorId(actor.Id), "OrgName", ContactCategory.Default, email, new PhoneNumber("87654321"));
 
@@ -288,7 +288,7 @@ public sealed class ActorContactAuditLogRepositoryTests
 
         // Arrange - Setup contacts
         var actor = await _fixture.PrepareActorAsync();
-        var email = new MockedEmailAddress();
+        var email = new RandomlyGeneratedEmailAddress();
         var phone = new PhoneNumber("12345678");
         var actorContact = new ActorContact(new ActorId(actor.Id), "NameDefault", ContactCategory.Default, email, phone);
         var actorContactOtherCategory = new ActorContact(new ActorId(actor.Id), "NameCharges", ContactCategory.Charges, email, phone);
@@ -336,7 +336,7 @@ public sealed class ActorContactAuditLogRepositoryTests
 
         // Arrange - Setup contacts
         var actor = await _fixture.PrepareActorAsync();
-        var email = new MockedEmailAddress();
+        var email = new RandomlyGeneratedEmailAddress();
         var phone = new PhoneNumber("12345678");
         var actorContact = new ActorContact(new ActorId(actor.Id), "NameDefault", ContactCategory.Default, email, phone);
         var actorContactOtherCategory = new ActorContact(new ActorId(actor.Id), "NameCharges", ContactCategory.Charges, email, phone);
@@ -391,7 +391,7 @@ public sealed class ActorContactAuditLogRepositoryTests
 
         // Arrange - Setup contacts
         var actor = await _fixture.PrepareActorAsync();
-        var email = new MockedEmailAddress();
+        var email = new RandomlyGeneratedEmailAddress();
         var phone = new PhoneNumber("12345678");
         var actorContact = new ActorContact(new ActorId(actor.Id), "NameDefault", ContactCategory.Default, email, phone);
         var actorContactOtherCategory = new ActorContact(new ActorId(actor.Id), "NameCharges", ContactCategory.Charges, email, phone);
@@ -453,7 +453,7 @@ public sealed class ActorContactAuditLogRepositoryTests
 
         // Arrange - Setup contacts
         var actor = await _fixture.PrepareActorAsync();
-        var email = new MockedEmailAddress();
+        var email = new RandomlyGeneratedEmailAddress();
         var phone = new PhoneNumber("12345678");
         var actorContact = new ActorContact(new ActorId(actor.Id), "NameDefault", ContactCategory.Default, email, phone);
         var actorContactChanged = new ActorContact(new ActorId(actor.Id), "NameDefaultChanged", ContactCategory.Default, email, phone);

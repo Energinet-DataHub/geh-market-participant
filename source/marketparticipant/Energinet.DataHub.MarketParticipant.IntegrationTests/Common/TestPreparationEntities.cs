@@ -64,7 +64,7 @@ internal static class TestPreparationEntities
 
     public static UserEntity UnconnectedUser => new()
     {
-        Email = new MockedEmailAddress(),
+        Email = new RandomlyGeneratedEmailAddress(),
         ExternalId = Guid.NewGuid()
     };
 
@@ -90,7 +90,7 @@ internal static class TestPreparationEntities
 
     public static EmailEventEntity ValidEmailEvent => new()
     {
-        Email = new MockedEmailAddress(),
+        Email = new RandomlyGeneratedEmailAddress(),
         TemplateId = 1,
         TemplateParameters = "{}",
         Created = DateTimeOffset.UtcNow,

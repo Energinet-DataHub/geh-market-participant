@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -27,28 +25,30 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class CreateActorContactHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
+public sealed class GetGridAreasHandlerTests
 {
-    [Fact]
-    public async Task CreateActorContact_ValidCommand_CanReadBack()
+    private readonly MarketParticipantDatabaseFixture _databaseFixture;
+
+    public GetGridAreasHandlerTests(MarketParticipantDatabaseFixture databaseFixture)
     {
-        // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
+        _databaseFixture = databaseFixture;
+    }
+
+    [Fact]
+    public async Task GetGridAreas_WhenCalled_ReturnsGridAreas()
+    {
+        // arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var actor = await fixture.PrepareActiveActorAsync();
 
-        var createActorContactDto = new CreateActorContactDto(
-            "test",
-            ContactCategory.Default,
-            new RandomlyGeneratedEmailAddress().ToString(),
-            "12345678");
+        var expectedGridArea = await _databaseFixture.PrepareGridAreaAsync();
 
-        var createCommand = new CreateActorContactCommand(actor.Id, createActorContactDto);
+        var target = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        // Act + Assert
-        var response = await mediator.Send(createCommand);
-        Assert.NotNull(response);
-        Assert.NotEqual(Guid.Empty, response.ContactId);
+        // act
+        var actual = await target.Send(new GetGridAreasCommand());
+
+        // assert
+        Assert.Contains(actual.GridAreas, x => x.Id == expectedGridArea.Id);
     }
 }

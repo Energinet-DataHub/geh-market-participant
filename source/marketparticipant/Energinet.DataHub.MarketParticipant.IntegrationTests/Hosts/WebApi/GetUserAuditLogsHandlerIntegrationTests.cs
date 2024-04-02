@@ -270,7 +270,7 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
             .Setup(r => r.GetAsync(new ExternalUserId(userEntity.ExternalId)))
             .ReturnsAsync(new UserIdentity(
                 new ExternalUserId(userEntity.ExternalId),
-                new MockedEmailAddress(),
+                new RandomlyGeneratedEmailAddress(),
                 UserIdentityStatus.Active,
                 InitialFirstName,
                 InitialLastName,

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
@@ -202,6 +203,27 @@ public sealed class ProcessDelegationTests
         }
 
         Assert.Equal(expectedDelegationCount, processDelegation.Delegations.Count);
+    }
+
+    [Fact]
+    public void Validate_GridAreaNotOwned_ThrowsException()
+    {
+        // Arrange
+        var actorFrom = TestPreparationModels.MockedActor();
+        actorFrom.RemoveMarketRole(actorFrom.MarketRoles.Single());
+        actorFrom.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, [new ActorGridArea(new GridAreaId(Guid.NewGuid()), [])]));
+
+        var processDelegation = new ProcessDelegation(actorFrom, DelegatedProcess.RequestEnergyResults);
+
+        // Act
+        var exception = Assert.Throws<ValidationException>(() =>
+            processDelegation.DelegateTo(
+                new ActorId(Guid.NewGuid()),
+                new GridAreaId(Guid.NewGuid()),
+                SystemClock.Instance.GetCurrentInstant()));
+
+        // Assert
+        Assert.Equal("process_delegation.grid_area_not_allowed", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
     }
 
     [Fact]

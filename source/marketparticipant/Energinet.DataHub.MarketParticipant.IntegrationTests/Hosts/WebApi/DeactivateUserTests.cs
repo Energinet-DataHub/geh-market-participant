@@ -111,7 +111,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase<Star
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "first",
             "last",
@@ -154,7 +154,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase<Star
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "first",
             "last",
@@ -225,7 +225,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase<Star
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             initialUserIdentityStatus,
             "first",
             "last",
