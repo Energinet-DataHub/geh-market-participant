@@ -39,8 +39,6 @@ public sealed class UpdateOrganizationHandlerIntegrationTests
     public async Task UpdateOrganization_InvalidCommand_CanReadBack()
     {
         // Arrange
-        const string blankValue = "  ";
-
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
