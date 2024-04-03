@@ -83,4 +83,6 @@ public interface IUserIdentityRepository
     Task DeleteAsync(ExternalUserId externalUserId);
     Task DisableUserAccountAsync(ExternalUserId externalUserId);
     Task EnableUserAccountAsync(ExternalUserId externalUserId);
+
+    Task RemoveMitIdAsync(ExternalUserId externalUserId);
 }

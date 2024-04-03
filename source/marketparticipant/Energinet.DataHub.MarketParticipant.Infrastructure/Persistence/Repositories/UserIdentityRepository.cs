@@ -260,6 +260,24 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return UpdateUserAccountStatusAsync(externalUserId, true);
     }
 
+    public async Task RemoveMitIdAsync(ExternalUserId externalUserId)
+    {
+        ArgumentNullException.ThrowIfNull(externalUserId);
+
+        var user = (await _graphClient
+            .Users[externalUserId.Value.ToString()]
+            .GetAsync(x => x.QueryParameters.Select = _selectors)
+            .ConfigureAwait(false))!;
+
+        await _graphClient
+            .Users[externalUserId.Value.ToString()]
+            .PatchAsync(new User
+            {
+                Identities = user.Identities!.Where(loginIdentity => loginIdentity.SignInType != "federated").ToList()
+            })
+            .ConfigureAwait(false);
+    }
+
     public Task DisableUserAccountAsync(ExternalUserId externalUserId)
     {
         return UpdateUserAccountStatusAsync(externalUserId, false);
