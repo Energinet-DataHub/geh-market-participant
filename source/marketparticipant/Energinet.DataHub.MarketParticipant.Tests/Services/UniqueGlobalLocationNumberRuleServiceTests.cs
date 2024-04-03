@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             "1",
             "1111",
             "Test City",
-            "Test Country");
+            "DK");
 
         private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
 

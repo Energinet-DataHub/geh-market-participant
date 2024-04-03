@@ -32,7 +32,7 @@ internal static class TestPreparationEntities
         StreetName = "Vej Allé",
         Number = "7",
         City = "Vejle",
-        Country = "Denmark",
+        Country = "DK",
         ZipCode = "7100"
     };
 

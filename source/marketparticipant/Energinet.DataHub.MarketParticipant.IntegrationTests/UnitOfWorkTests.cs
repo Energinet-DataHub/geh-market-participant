@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 "1",
                 "1111",
                 "Test City",
-                "Test Country");
+                "DK");
 
             var validBusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New();
             return new Organization("Test", validBusinessRegisterIdentifier, validAddress, new MockedDomain());

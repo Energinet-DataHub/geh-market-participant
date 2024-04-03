@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             "1",
             "1111",
             "Test City",
-            "Test Country");
+            "DK");
 
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678");
             var organizationId = Guid.NewGuid();
