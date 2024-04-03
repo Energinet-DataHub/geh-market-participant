@@ -71,6 +71,14 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
         return serviceProvider.CreateAsyncScope();
     }
 
+    public async Task<T> InScopeAsync<T>(Func<IServiceProvider, Task<T>> action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        await using var scope = BeginScope();
+        return await action(scope.ServiceProvider);
+    }
+
     public ValueTask DisposeAsync()
     {
         return ValueTask.CompletedTask;
