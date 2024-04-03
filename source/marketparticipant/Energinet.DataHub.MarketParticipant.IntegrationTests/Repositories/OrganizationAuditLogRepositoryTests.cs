@@ -36,7 +36,7 @@ public sealed class OrganizationAuditLogRepositoryTests
         "1",
         "1111",
         "Test City",
-        "Test Country");
+        "DK");
     private readonly OrganizationDomain _validDomain = new(new MockedDomain());
 
     public OrganizationAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
