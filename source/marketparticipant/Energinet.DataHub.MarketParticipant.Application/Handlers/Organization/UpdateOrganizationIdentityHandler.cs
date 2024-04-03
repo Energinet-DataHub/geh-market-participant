@@ -26,7 +26,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 
-public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOrganisationIdentityTriggerCommand>
+public class UpdateOrganizationIdentityHandler : IRequestHandler<UpdateOrganisationIdentityCommand>
 {
     private static readonly CultureInfo _danishCulture = new("da-DK");
 
@@ -34,14 +34,14 @@ public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOr
     private readonly IOrganizationIdentityRepository _organizationIdentityRepository;
     private readonly IEmailEventRepository _emailEventRepository;
     private readonly EmailRecipientConfig _emailRecipientConfig;
-    private readonly ILogger<UpdateOrganizationIdentityTriggerHandler> _logger;
+    private readonly ILogger<UpdateOrganizationIdentityHandler> _logger;
 
-    public UpdateOrganizationIdentityTriggerHandler(
+    public UpdateOrganizationIdentityHandler(
         IOrganizationRepository organizationRepository,
         IOrganizationIdentityRepository organizationIdentityRepository,
         IEmailEventRepository emailEventRepository,
         EmailRecipientConfig emailRecipientConfig,
-        ILogger<UpdateOrganizationIdentityTriggerHandler> logger)
+        ILogger<UpdateOrganizationIdentityHandler> logger)
     {
         _organizationRepository = organizationRepository;
         _organizationIdentityRepository = organizationIdentityRepository;
@@ -50,14 +50,15 @@ public class UpdateOrganizationIdentityTriggerHandler : IRequestHandler<UpdateOr
         _logger = logger;
     }
 
-    public async Task Handle(UpdateOrganisationIdentityTriggerCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateOrganisationIdentityCommand request, CancellationToken cancellationToken)
     {
         var allOrganizations = await _organizationRepository
             .GetAsync()
             .ConfigureAwait(false);
 
         var organizationsToCheck = allOrganizations
-            .Where(e => !e.BusinessRegisterIdentifier.Identifier.StartsWith("ENDK", StringComparison.InvariantCultureIgnoreCase));
+            .Where(e => !e.BusinessRegisterIdentifier.Identifier.StartsWith("ENDK", StringComparison.InvariantCultureIgnoreCase))
+            .Where(e => string.Equals(e.Address.Country, "DK", StringComparison.OrdinalIgnoreCase));
 
         foreach (var organization in organizationsToCheck)
         {

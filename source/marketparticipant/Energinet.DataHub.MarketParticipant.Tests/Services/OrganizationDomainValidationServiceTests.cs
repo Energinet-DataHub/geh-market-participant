@@ -109,7 +109,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organization = new Organization(
                 "TestOrg",
                 new BusinessRegisterIdentifier("identifier"),
-                new Address(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
+                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
                 orgDomainToTest);
 
             organizationRepositoryMock
