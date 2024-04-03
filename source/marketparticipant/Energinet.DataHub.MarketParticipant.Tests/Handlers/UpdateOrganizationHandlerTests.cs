@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "1",
                 "1111",
                 "Test City",
-                "Test Country");
+                "DK");
 
             var organization = new Organization(
                 new OrganizationId(orgId),

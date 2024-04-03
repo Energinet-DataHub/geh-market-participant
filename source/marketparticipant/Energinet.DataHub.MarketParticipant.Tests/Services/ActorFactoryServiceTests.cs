@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             "1",
             "1111",
             "Test City",
-            "Test Country");
+            "DK");
 
         private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
         private readonly OrganizationDomain _validDomain = new("energinet.dk");

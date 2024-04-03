@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             "1",
             "1111",
             "Test City",
-            "Test Country");
+            "DK");
 
         private readonly OrganizationDomain _validDomain = new("energinet.dk");
 
