@@ -12,23 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using System;
+using MediatR;
 
-public enum PermissionId
-{
-    GridAreasManage = 3,
-    ActorsManage = 4,
-    UsersManage = 5,
-    UsersView = 6,
-    UserRolesManage = 7,
-    ImbalancePricesManage = 8,
-    CalculationsManage = 9,
-    SettlementReportsManage = 10,
-    ESettExchangeManage = 11,
-    RequestAggregatedMeasureData = 12,
-    ActorCredentialsManage = 13,
-    ActorMasterDataManage = 14,
-    DelegationView = 15,
-    DelegationManage = 16,
-    UsersReactivate = 17,
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
+
+public sealed record ReactivateUserCommand(Guid UserId) : IRequest;
