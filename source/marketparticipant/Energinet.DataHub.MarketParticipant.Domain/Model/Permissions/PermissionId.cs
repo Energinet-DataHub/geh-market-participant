@@ -30,5 +30,5 @@ public enum PermissionId
     ActorMasterDataManage = 14,
     DelegationView = 15,
     DelegationManage = 16,
-    UsersReactivate = 17,
+    UsersReActivate = 17,
 }

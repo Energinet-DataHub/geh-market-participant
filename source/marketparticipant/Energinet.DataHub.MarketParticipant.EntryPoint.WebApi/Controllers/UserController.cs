@@ -208,11 +208,11 @@ public class UserController : ControllerBase
     }
 
     [HttpPut("{userId:guid}/reactivate")]
-    [AuthorizeUser(PermissionId.UsersReactivate)]
+    [AuthorizeUser(PermissionId.UsersReActivate)]
     public async Task<ActionResult> ReactivateAsync(Guid userId)
     {
         await _mediator
-            .Send(new ReactivateUserCommand(userId))
+            .Send(new ReActivateUserCommand(userId))
             .ConfigureAwait(false);
 
         return Ok();

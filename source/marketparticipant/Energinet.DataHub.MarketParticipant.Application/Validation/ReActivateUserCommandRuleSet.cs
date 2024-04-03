@@ -17,9 +17,9 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class ReactivateUserCommandRuleSet : AbstractValidator<ReactivateUserCommand>
+public sealed class ReActivateUserCommandRuleSet : AbstractValidator<ReActivateUserCommand>
 {
-    public ReactivateUserCommandRuleSet()
+    public ReActivateUserCommandRuleSet()
     {
         RuleFor(command => command.UserId)
             .NotEmpty();

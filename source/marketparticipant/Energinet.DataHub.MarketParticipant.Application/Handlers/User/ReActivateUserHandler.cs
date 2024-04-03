@@ -25,7 +25,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-public sealed class ReactivateUserHandler : IRequestHandler<ReactivateUserCommand>
+public sealed class ReActivateUserHandler : IRequestHandler<ReActivateUserCommand>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
@@ -33,7 +33,7 @@ public sealed class ReactivateUserHandler : IRequestHandler<ReactivateUserComman
     private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
     private readonly IAuditIdentityProvider _auditIdentityProvider;
 
-    public ReactivateUserHandler(
+    public ReActivateUserHandler(
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
         IUserStatusCalculator userStatusCalculator,
@@ -47,17 +47,17 @@ public sealed class ReactivateUserHandler : IRequestHandler<ReactivateUserComman
         _auditIdentityProvider = auditIdentityProvider;
     }
 
-    public async Task Handle(ReactivateUserCommand request, CancellationToken cancellationToken)
+    public async Task Handle(ReActivateUserCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var user = await _userRepository.GetAsync(new UserId(request.UserId)).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
-        await ReactivateUserAsync(user).ConfigureAwait(false);
+        await ReActivateUserAsync(user).ConfigureAwait(false);
     }
 
-    private async Task ReactivateUserAsync(Domain.Model.Users.User user)
+    private async Task ReActivateUserAsync(Domain.Model.Users.User user)
     {
         var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value);
