@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,29 +25,31 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class CreateGridAreaHandlerTests
+public sealed class GetActorsHandlerTests
 {
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
 
-    public CreateGridAreaHandlerTests(MarketParticipantDatabaseFixture databaseFixture)
+    public GetActorsHandlerTests(MarketParticipantDatabaseFixture databaseFixture)
     {
         _databaseFixture = databaseFixture;
     }
 
     [Fact]
-    public async Task CreateGridArea_WhenCalled_CanReadBack()
+    public async Task GetActors_WhenCalled_ReturnsActors()
     {
         // arrange
+        var expectedActor = await _databaseFixture.PrepareActorAsync();
+
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+
+        var target = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // act
-        var id = await host.InScopeAsync(
-            async sp => (await sp.GetRequiredService<IMediator>().Send(new CreateGridAreaCommand(new CreateGridAreaDto("GridArea", "404", "DK2")))).GridAreaId);
-
-        var actual = await host.InScopeAsync(
-            async sp => await sp.GetRequiredService<IGridAreaRepository>().GetAsync(id));
+        var actual = await target.Send(new GetActorsCommand(expectedActor.OrganizationId));
 
         // assert
-        Assert.NotNull(actual);
+        Assert.Single(actual.Actors);
+        Assert.Contains(actual.Actors, x => x.ActorId == expectedActor.Id);
     }
 }
