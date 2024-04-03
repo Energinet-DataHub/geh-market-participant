@@ -211,6 +211,13 @@ public class UserController : ControllerBase
     [AuthorizeUser(PermissionId.UsersReActivate)]
     public async Task<ActionResult> ReactivateAsync(Guid userId)
     {
+        var identityUserPermission = await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false);
+
+        if (identityUserPermission != IdentityUserPermission.AdministratedByActor)
+        {
+            return Unauthorized();
+        }
+
         await _mediator
             .Send(new ReActivateUserCommand(userId))
             .ConfigureAwait(false);
