@@ -15,9 +15,8 @@
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class UpdateOrganisationIdentityCommandRuleSet : AbstractValidator<UpdateOrganisationIdentityCommand>
 {
-    public sealed class UpdateOrganisationIdentityTriggerCommandRuleSet : AbstractValidator<UpdateOrganisationIdentityTriggerCommand>
-    {
-    }
 }

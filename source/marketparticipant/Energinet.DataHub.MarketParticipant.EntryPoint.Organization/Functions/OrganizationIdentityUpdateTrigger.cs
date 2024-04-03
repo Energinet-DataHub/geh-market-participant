@@ -44,7 +44,7 @@ public class OrganizationIdentityUpdateTrigger
 
         if (isEnabled)
         {
-            await _mediator.Send(new UpdateOrganisationIdentityTriggerCommand()).ConfigureAwait(false);
+            await _mediator.Send(new UpdateOrganisationIdentityCommand()).ConfigureAwait(false);
         }
         else
         {

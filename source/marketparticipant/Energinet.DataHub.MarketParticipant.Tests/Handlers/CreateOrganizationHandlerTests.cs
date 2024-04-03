@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "1",
                 "1111",
                 "Test City",
-                "Test Country");
+                "DK");
             const string validCvr = "123";
             const string orgName = "fake_value";
 

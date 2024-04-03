@@ -16,4 +16,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 
-public sealed record UpdateOrganisationIdentityTriggerCommand : IRequest;
+public sealed record UpdateOrganisationIdentityCommand : IRequest;

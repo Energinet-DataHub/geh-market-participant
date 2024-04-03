@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
@@ -59,7 +60,7 @@ public sealed class UpdateOrganizationIdentityIntegrationTests
         host.ServiceCollection.AddScoped(_ => orgIdentityRepository.Object);
 
         await using var scope = host.BeginScope();
-        var command = new UpdateOrganisationIdentityTriggerCommand();
+        var command = new UpdateOrganisationIdentityCommand();
 
         // Act
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -74,5 +75,39 @@ public sealed class UpdateOrganizationIdentityIntegrationTests
         orgIdentityRepository.Verify(x => x.GetAsync(It.Is<BusinessRegisterIdentifier>(e => e.Identifier == newOrg.BusinessRegisterIdentifier)), Times.Once);
         Assert.Equal(newOrg.Name + " updated identity", orgResult.Organization.Name);
         Assert.Single(savedEmailEvents, e => e.EmailTemplate.TemplateId is EmailTemplateId.OrganizationIdentityChanged);
+    }
+
+    [Fact]
+    public async Task UpdateOrganizationIdentity_ForeignCountry_DoesNotUpdate()
+    {
+        // Arrange
+        await _fixture.EmailEventsClearNotSentAsync();
+
+        var foreignOrganizationEntity = await _fixture.PrepareOrganizationAsync(TestPreparationEntities.ValidOrganization.Patch(e =>
+        {
+            e.Name = "Foreign Organization Entity";
+            e.Country = "SE";
+        }));
+
+        var orgIdentityRepository = new Mock<IOrganizationIdentityRepository>();
+        orgIdentityRepository
+            .Setup(e => e.GetAsync(It.IsAny<BusinessRegisterIdentifier>()))
+            .ReturnsAsync(new OrganizationIdentity("85A46C3A-8193-4530-AC9E-2C550F80B247"));
+
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.RemoveAll<IOrganizationIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => orgIdentityRepository.Object);
+
+        await using var scope = host.BeginScope();
+        var command = new UpdateOrganisationIdentityCommand();
+
+        // Act
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        await mediator.Send(command);
+
+        // Assert
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var actual = await context.Organizations.SingleAsync(organization => organization.Id == foreignOrganizationEntity.Id);
+        Assert.Equal(foreignOrganizationEntity.Name, actual.Name);
     }
 }

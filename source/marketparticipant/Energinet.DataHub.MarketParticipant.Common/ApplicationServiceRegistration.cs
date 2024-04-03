@@ -99,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IValidator<GetUserProfileCommand>, GetUserProfileCommandRuleSet>();
             services.AddScoped<IValidator<UpdateActorNameCommand>, UpdateActorNameCommandRuleSet>();
             services.AddScoped<IValidator<GetOrganizationIdentityCommand>, GetOrganizationIdentityCommandRuleSet>();
-            services.AddScoped<IValidator<UpdateOrganisationIdentityTriggerCommand>, UpdateOrganisationIdentityTriggerCommandRuleSet>();
+            services.AddScoped<IValidator<UpdateOrganisationIdentityCommand>, UpdateOrganisationIdentityCommandRuleSet>();
             services.AddScoped<IValidator<GetDelegationsForActorCommand>, GetDelegationsForActorCommandRuleSet>();
             services.AddScoped<IValidator<CreateProcessDelegationCommand>, CreateProcessDelegationCommandRuleSet>();
             services.AddScoped<IValidator<StopProcessDelegationCommand>, StopProcessDelegationCommandRuleSet>();
