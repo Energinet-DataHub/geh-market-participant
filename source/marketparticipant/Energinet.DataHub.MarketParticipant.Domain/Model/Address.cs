@@ -12,12 +12,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
+
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record Address
 {
-    public record Address(
-        string? StreetName,
-        string? Number,
-        string? ZipCode,
-        string? City,
-        string Country);
+    public Address(
+        string? streetName,
+        string? number,
+        string? zipCode,
+        string? city,
+        string country)
+    {
+        EnsureValidCountry(country);
+
+        StreetName = streetName;
+        Number = number;
+        ZipCode = zipCode;
+        City = city;
+        Country = country;
+    }
+
+    public string? StreetName { get; }
+    public string? Number { get; }
+    public string? ZipCode { get; }
+    public string? City { get; }
+    public string Country { get; }
+
+    private static void EnsureValidCountry([NotNull] string? country)
+    {
+        ArgumentNullException.ThrowIfNull(country);
+
+        try
+        {
+            if (country.Length == 2)
+            {
+                _ = new RegionInfo(country);
+            }
+            else
+            {
+                throw new ArgumentException(country);
+            }
+        }
+        catch (ArgumentException)
+        {
+            throw new ValidationException($"The specified country '{country}' is not supported.")
+                .WithErrorCode("organization.country.invalid")
+                .WithArgs(("country", country));
+        }
+    }
 }
