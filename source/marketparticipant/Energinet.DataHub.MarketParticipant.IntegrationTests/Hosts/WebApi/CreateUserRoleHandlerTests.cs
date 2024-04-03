@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -25,27 +27,27 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class CreateGridAreaHandlerTests
+public sealed class CreateUserRoleHandlerTests
 {
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
 
-    public CreateGridAreaHandlerTests(MarketParticipantDatabaseFixture databaseFixture)
+    public CreateUserRoleHandlerTests(MarketParticipantDatabaseFixture databaseFixture)
     {
         _databaseFixture = databaseFixture;
     }
 
     [Fact]
-    public async Task CreateGridArea_WhenCalled_CanReadBack()
+    public async Task CreateUserRole_WhenCalled_CanReadBack()
     {
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
 
         // act
         var id = await host.InScopeAsync(
-            async sp => (await sp.GetRequiredService<IMediator>().Send(new CreateGridAreaCommand(new CreateGridAreaDto("GridArea", "404", "DK2")))).GridAreaId);
+            async sp => (await sp.GetRequiredService<IMediator>().Send(new CreateUserRoleCommand(new CreateUserRoleDto("Name", "desc", UserRoleStatus.Active, EicFunction.Delegated, [])))).UserRoleId);
 
         var actual = await host.InScopeAsync(
-            async sp => await sp.GetRequiredService<IGridAreaRepository>().GetAsync(id));
+            async sp => await sp.GetRequiredService<IUserRoleRepository>().GetAsync(new UserRoleId(id)));
 
         // assert
         Assert.NotNull(actual);
