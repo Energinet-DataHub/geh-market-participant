@@ -209,7 +209,7 @@ public class UserController : ControllerBase
 
     [HttpPut("{userId:guid}/reactivate")]
     [AuthorizeUser(PermissionId.UsersReActivate)]
-    public async Task<ActionResult> ReactivateAsync(Guid userId)
+    public async Task<ActionResult> ReActivateAsync(Guid userId)
     {
         var identityUserPermission = await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false);
 
