@@ -103,6 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IValidator<GetDelegationsForActorCommand>, GetDelegationsForActorCommandRuleSet>();
             services.AddScoped<IValidator<CreateProcessDelegationCommand>, CreateProcessDelegationCommandRuleSet>();
             services.AddScoped<IValidator<StopProcessDelegationCommand>, StopProcessDelegationCommandRuleSet>();
+            services.AddScoped<IValidator<ReActivateUserCommand>, ReActivateUserCommandRuleSet>();
 
             services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
             services.AddScoped<IActorClientSecretService, ActorClientSecretService>();

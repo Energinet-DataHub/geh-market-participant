@@ -144,5 +144,9 @@ public static class KnownPermissions
             EicFunction.EnergySupplier,
             EicFunction.DataHubAdministrator
         }),
+        new(PermissionId.UsersReActivate, "users:reactivate", InstantPattern.ExtendedIso.Parse("2024-04-02T00:00:00Z").Value, new[]
+        {
+            EicFunction.DataHubAdministrator
+        }),
     };
 }

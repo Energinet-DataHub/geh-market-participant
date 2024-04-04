@@ -207,6 +207,24 @@ public class UserController : ControllerBase
         return Ok();
     }
 
+    [HttpPut("{userId:guid}/reactivate")]
+    [AuthorizeUser(PermissionId.UsersReActivate)]
+    public async Task<ActionResult> ReActivateAsync(Guid userId)
+    {
+        var identityUserPermission = await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false);
+
+        if (identityUserPermission != IdentityUserPermission.AdministratedByActor)
+        {
+            return Unauthorized();
+        }
+
+        await _mediator
+            .Send(new ReActivateUserCommand(userId))
+            .ConfigureAwait(false);
+
+        return Ok();
+    }
+
     [HttpPut("{userId:guid}/reset-2fa")]
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<ActionResult> ResetTwoFactorAuthenticationAsync(Guid userId)
