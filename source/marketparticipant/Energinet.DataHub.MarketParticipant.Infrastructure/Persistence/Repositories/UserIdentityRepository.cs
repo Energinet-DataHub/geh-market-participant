@@ -219,13 +219,28 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         ArgumentNullException.ThrowIfNull(userIdentity);
 
+        // Solution 1 ?
+        _userIdentityAuthenticationService.PatchAuthenticationAsync(userIdentity.Id, userIdentity.Authentication);
+
         return _graphClient
             .Users[userIdentity.Id.Value.ToString()]
             .PatchAsync(new User
             {
                 GivenName = userIdentity.FirstName,
                 Surname = userIdentity.LastName,
-                MobilePhone = userIdentity.PhoneNumber?.Number
+                MobilePhone = userIdentity.PhoneNumber?.Number,
+                // Solution 2 ?
+                Authentication = new Authentication
+                {
+                    PhoneMethods = new List<PhoneAuthenticationMethod>
+                    {
+                        new()
+                        {
+                            PhoneNumber = userIdentity.PhoneNumber!.Number,
+                            PhoneType = AuthenticationPhoneType.Mobile
+                        }
+                    }
+                }
             });
     }
 

@@ -55,6 +55,29 @@ public sealed class ExternalSmsAuthenticationMethod : IExternalAuthenticationMet
                 });
     }
 
+    public Task PatchAsync(AuthenticationRequestBuilder authenticationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(authenticationBuilder);
+
+        return authenticationBuilder
+            .PatchAsync(
+                new Authentication
+                {
+                    PhoneMethods = new List<PhoneAuthenticationMethod>
+                    {
+                        new()
+                        {
+                            PhoneNumber = _smsAuthenticationMethod.PhoneNumber.Number,
+                            PhoneType = AuthenticationPhoneType.Mobile
+                        }
+                    }
+                },
+                configuration => configuration.Options = new List<IRequestOption>
+                {
+                    NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
+                });
+    }
+
     public async Task<bool> DoesAlreadyExistAsync(IBaseClient client, AuthenticationRequestBuilder authenticationBuilder)
     {
         ArgumentNullException.ThrowIfNull(authenticationBuilder);

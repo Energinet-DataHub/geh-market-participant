@@ -31,6 +31,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirecto
         Task AssignAsync(AuthenticationRequestBuilder authenticationBuilder);
 
         /// <summary>
+        /// Updates users phone number for sms authentication.
+        /// </summary>
+        /// <param name="authenticationBuilder">A configured authentication builder for the target user.</param>
+        Task PatchAsync(AuthenticationRequestBuilder authenticationBuilder);
+
+        /// <summary>
         /// Verifies if the current authentication method is already applied to the user configured in the provided builder.
         /// </summary>
         /// <param name="client"><see cref="IBaseClient"/>.</param>
