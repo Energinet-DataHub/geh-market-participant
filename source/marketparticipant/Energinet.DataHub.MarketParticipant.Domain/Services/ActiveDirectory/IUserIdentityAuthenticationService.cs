@@ -31,9 +31,9 @@ public interface IUserIdentityAuthenticationService
     Task AddAuthenticationAsync(ExternalUserId userId, AuthenticationMethod authenticationMethod);
 
     /// <summary>
-    /// Patches the authentication method for the given user.
+    /// Find authentication method id for phone.
     /// </summary>
-    /// <param name="userId">The external id of the user to add authentication method to.</param>
+    /// <param name="userId">The external id of the user.</param>
     Task<string?> FindPhoneAuthenticationIdAsync(ExternalUserId userId);
 
     /// <summary>
