@@ -54,7 +54,7 @@ public sealed class ExternalSmsAuthenticationMethod : IExternalAuthenticationMet
             .ConfigureAwait(false);
 
         return phoneMethods
-            .First(method => method.PhoneType == AuthenticationPhoneType.Mobile)
+            .FirstOrDefault(method => method.PhoneType == AuthenticationPhoneType.Mobile)?
             .Id;
     }
 
