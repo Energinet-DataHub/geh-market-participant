@@ -188,10 +188,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
         protected virtual void SetupAuthentication(IConfiguration configuration, IServiceCollection services)
         {
+            var mitIdExternalOpenIdUrl = configuration.GetSetting(Settings.MitIdExternalOpenIdUrl);
             var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
             var internalOpenIdUrl = configuration.GetSetting(Settings.InternalOpenIdUrl);
             var backendAppId = configuration.GetSetting(Settings.BackendBffAppId);
-            services.AddJwtBearerAuthentication(externalOpenIdUrl, internalOpenIdUrl, backendAppId);
+            services.AddJwtBearerAuthentication(mitIdExternalOpenIdUrl, externalOpenIdUrl, internalOpenIdUrl, backendAppId);
         }
     }
 }
