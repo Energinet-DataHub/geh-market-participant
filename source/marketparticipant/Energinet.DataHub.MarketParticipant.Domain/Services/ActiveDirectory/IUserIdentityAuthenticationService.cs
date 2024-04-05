@@ -34,8 +34,7 @@ public interface IUserIdentityAuthenticationService
     /// Patches the authentication method for the given user.
     /// </summary>
     /// <param name="userId">The external id of the user to add authentication method to.</param>
-    /// <param name="authenticationMethod">The updated authentication method.</param>
-    Task PatchAuthenticationAsync(ExternalUserId userId, AuthenticationMethod authenticationMethod);
+    Task<string?> FindPhoneAuthenticationIdAsync(ExternalUserId userId);
 
     /// <summary>
     /// Removes all software 2FA authentication methods for the given user.

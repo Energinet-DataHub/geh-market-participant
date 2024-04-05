@@ -255,6 +255,55 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task UpdateUserPhoneNumberAndAuthentication()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+
+        var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
+        var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
+
+        var target = new UserIdentityRepository(
+            graphServiceClient,
+            azureIdentityConfig,
+            userIdentityAuthenticationService,
+            userPasswordGenerator);
+
+        var newFirstName = "New First Name";
+        var newLastName = "New Last Name";
+        var newPhoneNumber = new PhoneNumber("+45 71117777");
+
+        // Act
+        var externalId = await _graphServiceClientFixture
+            .CreateUserAsync(new RandomlyGeneratedEmailAddress());
+        await userIdentityAuthenticationService
+            .AddAuthenticationAsync(externalId, new SmsAuthenticationMethod(new PhoneNumber("+45 23112323")));
+
+        var user = (await target.GetAsync(externalId))!;
+
+        user.FirstName = newFirstName;
+        user.LastName = newLastName;
+        user.PhoneNumber = newPhoneNumber;
+
+        await target.UpdateUserAsync(user);
+
+        // Assert
+        var actual = await target.GetAsync(externalId);
+        var authMethodId = await userIdentityAuthenticationService.FindPhoneAuthenticationIdAsync(externalId);
+        var actualPhoneAuthMethod = await _graphServiceClientFixture.Client.Users[externalId.Value.ToString()].Authentication.PhoneMethods[authMethodId!].GetAsync();
+
+        Assert.NotNull(actual);
+        Assert.NotNull(actualPhoneAuthMethod);
+        Assert.Equal(newFirstName, actual.FirstName);
+        Assert.Equal(newLastName, actual.LastName);
+        Assert.Equal(actualPhoneAuthMethod.PhoneNumber, actual.PhoneNumber?.Number);
+        Assert.Equal(newPhoneNumber.Number, actualPhoneAuthMethod.PhoneNumber);
+    }
+
+    [Fact]
     public async Task AssignUserLoginIdentities()
     {
         // Arrange

@@ -215,33 +215,34 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return externalUserId;
     }
 
-    public Task UpdateUserAsync(UserIdentity userIdentity)
+    public async Task UpdateUserAsync(UserIdentity userIdentity)
     {
         ArgumentNullException.ThrowIfNull(userIdentity);
 
-        // Solution 1 ?
-        _userIdentityAuthenticationService.PatchAuthenticationAsync(userIdentity.Id, userIdentity.Authentication);
+        var phoneAuthenticationId = await _userIdentityAuthenticationService
+            .FindPhoneAuthenticationIdAsync(userIdentity.Id)
+            .ConfigureAwait(false);
 
-        return _graphClient
+        await _graphClient
             .Users[userIdentity.Id.Value.ToString()]
             .PatchAsync(new User
             {
                 GivenName = userIdentity.FirstName,
                 Surname = userIdentity.LastName,
-                MobilePhone = userIdentity.PhoneNumber?.Number,
-                // Solution 2 ?
-                Authentication = new Authentication
+                MobilePhone = userIdentity.PhoneNumber?.Number
+            }).ConfigureAwait(false);
+
+        if (!string.IsNullOrWhiteSpace(phoneAuthenticationId))
+        {
+            await _graphClient
+                .Users[userIdentity.Id.Value.ToString()]
+                .Authentication
+                .PhoneMethods[phoneAuthenticationId]
+                .PatchAsync(new PhoneAuthenticationMethod
                 {
-                    PhoneMethods = new List<PhoneAuthenticationMethod>
-                    {
-                        new()
-                        {
-                            PhoneNumber = userIdentity.PhoneNumber!.Number,
-                            PhoneType = AuthenticationPhoneType.Mobile
-                        }
-                    }
-                }
-            });
+                    PhoneNumber = userIdentity.PhoneNumber!.Number
+                }).ConfigureAwait(false);
+        }
     }
 
     public Task AssignUserLoginIdentitiesAsync(UserIdentity userIdentity)

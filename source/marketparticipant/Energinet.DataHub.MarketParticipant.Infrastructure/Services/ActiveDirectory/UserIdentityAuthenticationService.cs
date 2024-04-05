@@ -65,35 +65,12 @@ public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticat
         }
     }
 
-    public async Task PatchAuthenticationAsync(ExternalUserId userId, AuthenticationMethod authenticationMethod)
+    public Task<string?> FindPhoneAuthenticationIdAsync(ExternalUserId userId)
     {
         ArgumentNullException.ThrowIfNull(userId);
-        ArgumentNullException.ThrowIfNull(authenticationMethod);
-
-        if (authenticationMethod == AuthenticationMethod.Undetermined)
-            throw new ArgumentOutOfRangeException(nameof(authenticationMethod));
 
         var authenticationBuilder = GetUserAuthenticationBuilder(userId);
-        var externalAuthenticationMethod = ChooseExternalMethod(authenticationMethod);
-
-        var authAlreadyExist = await externalAuthenticationMethod
-            .DoesAlreadyExistAsync(_graphClient, authenticationBuilder)
-            .ConfigureAwait(false);
-
-        if (!authAlreadyExist)
-        {
-            try
-            {
-                await externalAuthenticationMethod
-                    .PatchAsync(authenticationBuilder)
-                    .ConfigureAwait(false);
-            }
-            catch (ODataError ex) when (ex.ResponseStatusCode == (int)HttpStatusCode.BadRequest)
-            {
-                externalAuthenticationMethod.EnsureNoValidationException(ex);
-                throw;
-            }
-        }
+        return ExternalSmsAuthenticationMethod.FindPhoneAuthenticationMethodAsync(_graphClient, authenticationBuilder);
     }
 
     public async Task RemoveAllSoftwareTwoFactorAuthenticationMethodsAsync(ExternalUserId userId)

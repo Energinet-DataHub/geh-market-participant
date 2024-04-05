@@ -37,6 +37,27 @@ public sealed class ExternalSmsAuthenticationMethod : IExternalAuthenticationMet
         _smsAuthenticationMethod = smsAuthenticationMethod;
     }
 
+    public static async Task<string?> FindPhoneAuthenticationMethodAsync(IBaseClient client, AuthenticationRequestBuilder authenticationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(authenticationBuilder);
+
+        var collection = await authenticationBuilder
+            .PhoneMethods
+            .GetAsync(configuration => configuration.Options = new List<IRequestOption>
+            {
+                NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
+            })
+            .ConfigureAwait(false);
+
+        var phoneMethods = await collection!
+            .IteratePagesAsync<PhoneAuthenticationMethod, PhoneAuthenticationMethodCollectionResponse>(client)
+            .ConfigureAwait(false);
+
+        return phoneMethods
+            .First(method => method.PhoneType == AuthenticationPhoneType.Mobile)
+            .Id;
+    }
+
     public Task AssignAsync(AuthenticationRequestBuilder authenticationBuilder)
     {
         ArgumentNullException.ThrowIfNull(authenticationBuilder);
@@ -48,29 +69,6 @@ public sealed class ExternalSmsAuthenticationMethod : IExternalAuthenticationMet
                 {
                     PhoneNumber = _smsAuthenticationMethod.PhoneNumber.Number,
                     PhoneType = AuthenticationPhoneType.Mobile
-                },
-                configuration => configuration.Options = new List<IRequestOption>
-                {
-                    NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
-                });
-    }
-
-    public Task PatchAsync(AuthenticationRequestBuilder authenticationBuilder)
-    {
-        ArgumentNullException.ThrowIfNull(authenticationBuilder);
-
-        return authenticationBuilder
-            .PatchAsync(
-                new Authentication
-                {
-                    PhoneMethods = new List<PhoneAuthenticationMethod>
-                    {
-                        new()
-                        {
-                            PhoneNumber = _smsAuthenticationMethod.PhoneNumber.Number,
-                            PhoneType = AuthenticationPhoneType.Mobile
-                        }
-                    }
                 },
                 configuration => configuration.Options = new List<IRequestOption>
                 {
