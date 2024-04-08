@@ -65,14 +65,6 @@ public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticat
         }
     }
 
-    public Task<string?> FindPhoneAuthenticationIdAsync(ExternalUserId userId)
-    {
-        ArgumentNullException.ThrowIfNull(userId);
-
-        var authenticationBuilder = GetUserAuthenticationBuilder(userId);
-        return ExternalSmsAuthenticationMethod.FindPhoneAuthenticationMethodAsync(_graphClient, authenticationBuilder);
-    }
-
     public async Task RemoveAllSoftwareTwoFactorAuthenticationMethodsAsync(ExternalUserId userId)
     {
         ArgumentNullException.ThrowIfNull(userId);

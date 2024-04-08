@@ -37,27 +37,6 @@ public sealed class ExternalSmsAuthenticationMethod : IExternalAuthenticationMet
         _smsAuthenticationMethod = smsAuthenticationMethod;
     }
 
-    public static async Task<string?> FindPhoneAuthenticationMethodAsync(IBaseClient client, AuthenticationRequestBuilder authenticationBuilder)
-    {
-        ArgumentNullException.ThrowIfNull(authenticationBuilder);
-
-        var collection = await authenticationBuilder
-            .PhoneMethods
-            .GetAsync(configuration => configuration.Options = new List<IRequestOption>
-            {
-                NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
-            })
-            .ConfigureAwait(false);
-
-        var phoneMethods = await collection!
-            .IteratePagesAsync<PhoneAuthenticationMethod, PhoneAuthenticationMethodCollectionResponse>(client)
-            .ConfigureAwait(false);
-
-        return phoneMethods
-            .FirstOrDefault(method => method.PhoneType == AuthenticationPhoneType.Mobile)?
-            .Id;
-    }
-
     public Task AssignAsync(AuthenticationRequestBuilder authenticationBuilder)
     {
         ArgumentNullException.ThrowIfNull(authenticationBuilder);

@@ -29,6 +29,7 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
+using Microsoft.Kiota.Abstractions;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -292,7 +293,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
 
         // Assert
         var actual = await target.GetAsync(externalId);
-        var authMethodId = await userIdentityAuthenticationService.FindPhoneAuthenticationIdAsync(externalId);
+        var authMethodId = await FindAuthenticationMethodIdAsync(externalId);
         var actualPhoneAuthMethod = await _graphServiceClientFixture.Client.Users[externalId.Value.ToString()].Authentication.PhoneMethods[authMethodId!].GetAsync();
 
         Assert.NotNull(actual);
@@ -493,5 +494,26 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
     {
         await _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
         await _graphServiceClientFixture.CleanupExternalUserAsync(DisabledTestUserEmail);
+    }
+
+    private async Task<string?> FindAuthenticationMethodIdAsync(ExternalUserId userId)
+    {
+        var collection = await _graphServiceClientFixture.Client
+            .Users[userId.ToString()]
+            .Authentication
+            .PhoneMethods
+            .GetAsync(configuration => configuration.Options = new List<IRequestOption>
+            {
+                NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
+            })
+            .ConfigureAwait(false);
+
+        var phoneMethods = await collection!
+            .IteratePagesAsync<PhoneAuthenticationMethod, PhoneAuthenticationMethodCollectionResponse>(_graphServiceClientFixture.Client)
+            .ConfigureAwait(false);
+
+        return phoneMethods
+            .FirstOrDefault(method => method.PhoneType == AuthenticationPhoneType.Mobile)?
+            .Id;
     }
 }

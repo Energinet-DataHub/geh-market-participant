@@ -25,6 +25,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
+using Microsoft.Kiota.Abstractions;
 using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication.AuthenticationMethod;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
 using User = Microsoft.Graph.Models.User;
@@ -219,9 +220,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         ArgumentNullException.ThrowIfNull(userIdentity);
 
-        var phoneAuthenticationId = await _userIdentityAuthenticationService
-            .FindPhoneAuthenticationIdAsync(userIdentity.Id)
-            .ConfigureAwait(false);
+        var authenticationId = await FindAuthenticationMethodIdAsync(userIdentity.Id).ConfigureAwait(false);
 
         await _graphClient
             .Users[userIdentity.Id.Value.ToString()]
@@ -232,12 +231,12 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 MobilePhone = userIdentity.PhoneNumber?.Number
             }).ConfigureAwait(false);
 
-        if (!string.IsNullOrWhiteSpace(phoneAuthenticationId))
+        if (!string.IsNullOrWhiteSpace(authenticationId))
         {
             await _graphClient
                 .Users[userIdentity.Id.Value.ToString()]
                 .Authentication
-                .PhoneMethods[phoneAuthenticationId]
+                .PhoneMethods[authenticationId]
                 .PatchAsync(new PhoneAuthenticationMethod
                 {
                     PhoneNumber = userIdentity.PhoneNumber!.Number
@@ -313,6 +312,27 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         return user is { UserType: "Member", Identities: { } } &&
                user.Identities.Any(ident => ident.SignInType == "emailAddress");
+    }
+
+    private async Task<string?> FindAuthenticationMethodIdAsync(ExternalUserId userId)
+    {
+        var collection = await _graphClient
+            .Users[userId.ToString()]
+            .Authentication
+            .PhoneMethods
+            .GetAsync(configuration => configuration.Options = new List<IRequestOption>
+            {
+                NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
+            })
+            .ConfigureAwait(false);
+
+        var phoneMethods = await collection!
+            .IteratePagesAsync<PhoneAuthenticationMethod, PhoneAuthenticationMethodCollectionResponse>(_graphClient)
+            .ConfigureAwait(false);
+
+        return phoneMethods
+            .FirstOrDefault(method => method.PhoneType == AuthenticationPhoneType.Mobile)?
+            .Id;
     }
 
     private Task UpdateUserAccountStatusAsync(ExternalUserId externalUserId, bool enabled)

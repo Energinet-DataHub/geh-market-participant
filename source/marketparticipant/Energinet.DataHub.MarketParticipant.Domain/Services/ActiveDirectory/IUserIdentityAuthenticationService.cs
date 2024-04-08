@@ -31,12 +31,6 @@ public interface IUserIdentityAuthenticationService
     Task AddAuthenticationAsync(ExternalUserId userId, AuthenticationMethod authenticationMethod);
 
     /// <summary>
-    /// Find authentication method id for phone.
-    /// </summary>
-    /// <param name="userId">The external id of the user.</param>
-    Task<string?> FindPhoneAuthenticationIdAsync(ExternalUserId userId);
-
-    /// <summary>
     /// Removes all software 2FA authentication methods for the given user.
     /// </summary>
     /// <param name="userId">The external id of the user.</param>
