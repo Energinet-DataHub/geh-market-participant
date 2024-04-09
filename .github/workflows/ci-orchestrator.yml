@@ -38,7 +38,6 @@ jobs:
   #
   # Branch policy status check
   #
-  #
 
   allow_merge_ci_orchestrator:
     runs-on: ubuntu-latest
