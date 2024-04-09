@@ -261,13 +261,28 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             });
     }
 
-    public Task DeleteAsync(ExternalUserId externalUserId)
+    public async Task DeleteAsync(ExternalUserId externalUserId)
     {
         ArgumentNullException.ThrowIfNull(externalUserId);
 
-        return _graphClient
-            .Users[externalUserId.Value.ToString()]
-            .DeleteAsync();
+        for (var i = 0; i < 15; i++)
+        {
+            try
+            {
+                await _graphClient
+                    .Users[externalUserId.Value.ToString()]
+                    .DeleteAsync()
+                    .ConfigureAwait(false);
+
+                return;
+            }
+            catch (ODataError ex) when (ex.ResponseStatusCode == 404)
+            {
+                await Task.Delay(500).ConfigureAwait(false);
+            }
+        }
+
+        throw new InvalidOperationException($"Could not delete user {externalUserId.Value}.");
     }
 
     public Task EnableUserAccountAsync(ExternalUserId externalUserId)
