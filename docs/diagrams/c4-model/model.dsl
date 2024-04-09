@@ -15,7 +15,7 @@ markpartDomain = group "Market Participant" {
     }
 
     markpartKeyVault = container "Market Participant Internal Key Vault" {
-        description "Stores key used for signing tokens."
+        description "Stores key  used for signing tokens."
         technology "Azure Key Vault"
         tags "Microsoft Azure - Key Vaults" "Titans"
     }
