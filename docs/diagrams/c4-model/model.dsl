@@ -4,7 +4,7 @@ markpartDomain = group "Market Participant" {
     #
     # Common (managed by Market Participant)
     #
-    
+
     #
     # Domain
     #
@@ -45,7 +45,7 @@ markpartDomain = group "Market Participant" {
             # Common relationships
             this -> dh3.sharedB2C "Accesses user information" "Microsoft.Graph/https"
         }
-        
+
         markpartUserController = component "UserController" {
             description "API for managing users."
 
