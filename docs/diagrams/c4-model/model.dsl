@@ -23,7 +23,7 @@ markpartDomain = group "Market Participant" {
     markpartCertKeyVault = container "Market Participant Certificate Key Vault" {
         description "Store public DH2 certificates used for B2B authentication."
         technology "Azure Key Vault"
-        tags "Microsoft Azure - Key Vaults" "Titans"
+        tags "Microsoft Azure - Key Vault" "Titans"
     }
 
     markpartApi = container "Market Participant API" {
