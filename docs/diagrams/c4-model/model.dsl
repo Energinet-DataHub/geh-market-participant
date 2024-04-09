@@ -4,7 +4,7 @@ markpartDomain = group "Market Participant" {
     #
     # Common (managed by Market Participant)
     #
-    
+
     #
     # Domain
     #
@@ -21,7 +21,7 @@ markpartDomain = group "Market Participant" {
     }
 
     markpartCertKeyVault = container "Market Participant Certificate Key Vault" {
-        description "Stores public DH2 certificates used for B2B authentication."
+        description "Store public DH2 certificates used for B2B authentication."
         technology "Azure Key Vault"
         tags "Microsoft Azure - Key Vaults" "Titans"
     }
@@ -45,7 +45,7 @@ markpartDomain = group "Market Participant" {
             # Common relationships
             this -> dh3.sharedB2C "Accesses user information" "Microsoft.Graph/https"
         }
-        
+
         markpartUserController = component "UserController" {
             description "API for managing users."
 
