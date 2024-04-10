@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actors;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;

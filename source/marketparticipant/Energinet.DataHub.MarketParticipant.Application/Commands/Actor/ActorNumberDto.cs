@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors
 {
     public sealed record ActorNumberDto(string Value);
 }

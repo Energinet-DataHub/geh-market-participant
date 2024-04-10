@@ -15,7 +15,7 @@
 using System;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas
 {
     public record UpdateGridAreaCommand(Guid Id, ChangeGridAreaDto GridAreaDto) : IRequest;
 }

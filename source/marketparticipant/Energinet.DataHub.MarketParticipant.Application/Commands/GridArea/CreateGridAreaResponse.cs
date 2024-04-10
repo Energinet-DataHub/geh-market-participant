@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas
 {
     public sealed record CreateGridAreaResponse(GridAreaId GridAreaId);
 }

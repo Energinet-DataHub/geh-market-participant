@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contacts
 {
     public sealed record CreateActorContactDto(
         string Name,

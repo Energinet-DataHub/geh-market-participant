@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas
 {
     public sealed record GetGridAreaResponse(GridAreaDto GridArea);
 }

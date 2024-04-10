@@ -15,7 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Xunit;
 using Xunit.Categories;

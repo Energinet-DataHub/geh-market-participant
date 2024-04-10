@@ -15,6 +15,6 @@
 using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 
 public sealed record GetGridAreaAuditLogsResponse(IEnumerable<AuditLogDto<GridAreaAuditedChange>> AuditLogs);

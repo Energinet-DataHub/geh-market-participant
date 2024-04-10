@@ -15,7 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Extensions;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Domain;

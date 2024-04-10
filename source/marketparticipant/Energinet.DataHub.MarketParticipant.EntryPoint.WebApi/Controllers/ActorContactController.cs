@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;

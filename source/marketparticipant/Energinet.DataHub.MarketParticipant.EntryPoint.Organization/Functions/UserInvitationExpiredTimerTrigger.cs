@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 

@@ -15,6 +15,6 @@
 using System;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
 public sealed record ActorRequestSecretCommand(Guid ActorId) : IRequest<ActorRequestSecretResponse>;

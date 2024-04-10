@@ -14,7 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 
 public sealed record GetOrganizationIdentityResponse(bool OrganizationFound, [property: MemberNotNullWhen(true, nameof(GetOrganizationIdentityResponse.OrganizationFound))]
     OrganizationIdentityDto? OrganizationIdentity);

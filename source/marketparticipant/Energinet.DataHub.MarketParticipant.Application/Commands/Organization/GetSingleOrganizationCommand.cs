@@ -15,7 +15,7 @@
 using System;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organizations
 {
     public sealed record GetSingleOrganizationCommand(Guid OrganizationId) : IRequest<GetSingleOrganizationResponse>;
 }

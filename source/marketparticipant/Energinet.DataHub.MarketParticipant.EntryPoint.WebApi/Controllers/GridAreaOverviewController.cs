@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

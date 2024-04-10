@@ -14,6 +14,6 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.Users;
 
 public sealed record GetUserOverviewResponse(IEnumerable<UserOverviewItemDto> Users, int TotalUserCount);

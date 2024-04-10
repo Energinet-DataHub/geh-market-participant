@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas
 {
     public sealed record GridAreaDto(
         Guid Id,

@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors
 {
     public sealed record CreateActorResponse(Guid ActorId);
 }

@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
 public sealed record ActorDto(
     Guid ActorId,

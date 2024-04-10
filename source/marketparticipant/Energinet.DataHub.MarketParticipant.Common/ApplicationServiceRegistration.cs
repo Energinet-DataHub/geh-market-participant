@@ -13,16 +13,16 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application.Commands;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actors;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Application.Validation;

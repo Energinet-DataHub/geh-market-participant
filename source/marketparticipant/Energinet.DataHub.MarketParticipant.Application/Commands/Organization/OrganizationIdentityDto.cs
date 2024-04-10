@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 
 public record OrganizationIdentityDto(string Name);

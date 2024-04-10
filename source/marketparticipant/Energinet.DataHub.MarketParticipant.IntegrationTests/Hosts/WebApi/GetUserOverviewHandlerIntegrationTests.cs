@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
@@ -76,7 +76,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         var filter = new UserOverviewFilterDto(actor.Id, null, Enumerable.Empty<Guid>(), Array.Empty<UserStatus>());
-        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
+        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.Users.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
         var actual = await mediator.Send(command);
@@ -125,7 +125,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var filter = new UserOverviewFilterDto(actor.Id, "test", Enumerable.Empty<Guid>(), Array.Empty<UserStatus>());
-        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
+        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.Users.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
         var actual = await mediator.Send(command);
@@ -172,7 +172,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var filter = new UserOverviewFilterDto(actor.Id, "test", Enumerable.Empty<Guid>(), new[] { UserStatus.Active });
-        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
+        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.Users.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
         var actual = await mediator.Send(command);
@@ -220,7 +220,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var filter = new UserOverviewFilterDto(actor.Id, "test", new[] { userRoleA.Id }, Enumerable.Empty<UserStatus>());
-        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
+        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.Users.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
         var actual = await mediator.Send(command);
@@ -293,7 +293,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var filter = new UserOverviewFilterDto(actor.Id, "test", Enumerable.Empty<Guid>(), Enumerable.Empty<UserStatus>());
-        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
+        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.Users.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
         var actual = await mediator.Send(command);

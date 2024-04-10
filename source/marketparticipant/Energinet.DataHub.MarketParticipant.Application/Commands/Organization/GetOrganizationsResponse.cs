@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organizations
 {
     public sealed record GetOrganizationsResponse(IEnumerable<OrganizationDto> Organizations);
 }

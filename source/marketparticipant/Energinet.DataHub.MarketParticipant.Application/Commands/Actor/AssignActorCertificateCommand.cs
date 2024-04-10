@@ -16,7 +16,7 @@ using System;
 using System.IO;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors
 {
     public sealed record AssignActorCertificateCommand(Guid ActorId, Stream Certificate) : IRequest;
 }

@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas
 {
     public sealed record GetGridAreasResponse(IEnumerable<GridAreaDto> GridAreas);
 }

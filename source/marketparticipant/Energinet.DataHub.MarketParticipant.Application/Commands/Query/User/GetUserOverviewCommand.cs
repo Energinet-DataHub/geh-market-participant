@@ -14,7 +14,7 @@
 
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.Users;
 
 public sealed record GetUserOverviewCommand(UserOverviewFilterDto Filter, int PageNumber, int PageSize, UserOverviewSortProperty SortProperty, SortDirection SortDirection)
     : IRequest<GetUserOverviewResponse>;

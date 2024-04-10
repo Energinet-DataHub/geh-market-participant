@@ -15,6 +15,6 @@
 using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 
 public sealed record GetOrganizationAuditLogsResponse(IEnumerable<AuditLogDto<OrganizationAuditedChange>> AuditLogs);

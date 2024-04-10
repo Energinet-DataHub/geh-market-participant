@@ -14,6 +14,6 @@
 
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 
 public sealed record GetOrganizationIdentityCommand(string BusinessRegisterIdentifier) : IRequest<GetOrganizationIdentityResponse>;

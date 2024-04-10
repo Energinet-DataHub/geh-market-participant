@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organizations
 {
     public sealed record OrganizationDto(
         Guid OrganizationId,
