@@ -17,17 +17,16 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
+
+public class GridAreaLinkEntityConfiguration : IEntityTypeConfiguration<GridAreaLinkEntity>
 {
-    public class GridAreaLinkEntityConfiguration : IEntityTypeConfiguration<GridAreaLinkEntity>
+    public void Configure(EntityTypeBuilder<GridAreaLinkEntity> builder)
     {
-        public void Configure(EntityTypeBuilder<GridAreaLinkEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("GridAreaLink");
-            builder.HasKey(gridArea => gridArea.Id);
-            builder.Property(p => p.Id).ValueGeneratedOnAdd();
-            builder.Property(p => p.GridAreaId);
-        }
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        builder.ToTable("GridAreaLink");
+        builder.HasKey(gridArea => gridArea.Id);
+        builder.Property(p => p.Id).ValueGeneratedOnAdd();
+        builder.Property(p => p.GridAreaId);
     }
 }

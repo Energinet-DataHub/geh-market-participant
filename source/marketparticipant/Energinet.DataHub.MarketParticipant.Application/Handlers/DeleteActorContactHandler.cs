@@ -21,43 +21,42 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers;
+
+public sealed class DeleteActorContactHandler : IRequestHandler<DeleteActorContactCommand>
 {
-    public sealed class DeleteActorContactHandler : IRequestHandler<DeleteActorContactCommand>
+    private readonly IActorRepository _actorRepository;
+    private readonly IActorContactRepository _contactRepository;
+
+    public DeleteActorContactHandler(
+        IActorRepository actorRepository,
+        IActorContactRepository contactRepository)
     {
-        private readonly IActorRepository _actorRepository;
-        private readonly IActorContactRepository _contactRepository;
+        _actorRepository = actorRepository;
+        _contactRepository = contactRepository;
+    }
 
-        public DeleteActorContactHandler(
-            IActorRepository actorRepository,
-            IActorContactRepository contactRepository)
+    public async Task Handle(DeleteActorContactCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
+
+        var actor = await _actorRepository
+            .GetAsync(new ActorId(request.ActorId))
+            .ConfigureAwait(false);
+
+        NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
+
+        var contact = await _contactRepository
+            .GetAsync(new ContactId(request.ContactId))
+            .ConfigureAwait(false);
+
+        if (contact == null || contact.ActorId != actor.Id)
         {
-            _actorRepository = actorRepository;
-            _contactRepository = contactRepository;
+            return;
         }
 
-        public async Task Handle(DeleteActorContactCommand request, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
-
-            var actor = await _actorRepository
-                .GetAsync(new ActorId(request.ActorId))
-                .ConfigureAwait(false);
-
-            NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
-
-            var contact = await _contactRepository
-                .GetAsync(new ContactId(request.ContactId))
-                .ConfigureAwait(false);
-
-            if (contact == null || contact.ActorId != actor.Id)
-            {
-                return;
-            }
-
-            await _contactRepository
-                .RemoveAsync(contact)
-                .ConfigureAwait(false);
-        }
+        await _contactRepository
+            .RemoveAsync(contact)
+            .ConfigureAwait(false);
     }
 }

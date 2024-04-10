@@ -15,14 +15,13 @@
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetSingleOrganizationCommandRuleSet : AbstractValidator<GetSingleOrganizationCommand>
 {
-    public sealed class GetSingleOrganizationCommandRuleSet : AbstractValidator<GetSingleOrganizationCommand>
+    public GetSingleOrganizationCommandRuleSet()
     {
-        public GetSingleOrganizationCommandRuleSet()
-        {
-            RuleFor(command => command.OrganizationId)
-                .NotEmpty();
-        }
+        RuleFor(command => command.OrganizationId)
+            .NotEmpty();
     }
 }

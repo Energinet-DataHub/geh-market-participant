@@ -16,7 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -25,97 +25,96 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class UpdateActorNameHandlerTests
 {
-    [UnitTest]
-    public sealed class UpdateActorNameHandlerTests
+    [Fact]
+    public async Task Handle_NoActor_ThrowsNotFoundException()
     {
-        [Fact]
-        public async Task Handle_NoActor_ThrowsNotFoundException()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var target = new UpdateActorNameHandler(
-                actorRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IDomainEventRepository>().Object);
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var target = new UpdateActorNameHandler(
+            actorRepositoryMock.Object,
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IDomainEventRepository>().Object);
 
-            var actorId = Guid.NewGuid();
+        var actorId = Guid.NewGuid();
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
-                .ReturnsAsync((Actor?)null);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
+            .ReturnsAsync((Actor?)null);
 
-            var command = new UpdateActorNameCommand(
-                actorId,
-                new ActorNameDto("NewActorName"));
+        var command = new UpdateActorNameCommand(
+            actorId,
+            new ActorNameDto("NewActorName"));
 
-            // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
+    }
 
-        [Fact]
-        public async Task Handle_RepositoryCalledWithNewName_Ok()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var domainEventRepository = new Mock<IDomainEventRepository>();
+    [Fact]
+    public async Task Handle_RepositoryCalledWithNewName_Ok()
+    {
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var domainEventRepository = new Mock<IDomainEventRepository>();
 
-            var target = new UpdateActorNameHandler(
-                actorRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                domainEventRepository.Object);
+        var target = new UpdateActorNameHandler(
+            actorRepositoryMock.Object,
+            UnitOfWorkProviderMock.Create(),
+            domainEventRepository.Object);
 
-            var actor = MockActor(actorRepositoryMock);
+        var actor = MockActor(actorRepositoryMock);
 
-            var command = new UpdateActorNameCommand(
-                actor.Id.Value,
-                new ActorNameDto("NewActorName"));
+        var command = new UpdateActorNameCommand(
+            actor.Id.Value,
+            new ActorNameDto("NewActorName"));
 
-            // Act
-            await target.Handle(command, CancellationToken.None);
+        // Act
+        await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            actorRepositoryMock
-                .Verify(e => e.AddOrUpdateAsync(It.Is<Actor>(a => a.Name.Value == "NewActorName")));
-        }
+        // Assert
+        actorRepositoryMock
+            .Verify(e => e.AddOrUpdateAsync(It.Is<Actor>(a => a.Name.Value == "NewActorName")));
+    }
 
-        [Fact]
-        public async Task Handle_DomainEvents_ArePublished()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var domainEventRepository = new Mock<IDomainEventRepository>();
+    [Fact]
+    public async Task Handle_DomainEvents_ArePublished()
+    {
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var domainEventRepository = new Mock<IDomainEventRepository>();
 
-            var target = new UpdateActorNameHandler(
-                actorRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                domainEventRepository.Object);
+        var target = new UpdateActorNameHandler(
+            actorRepositoryMock.Object,
+            UnitOfWorkProviderMock.Create(),
+            domainEventRepository.Object);
 
-            var actor = MockActor(actorRepositoryMock);
+        var actor = MockActor(actorRepositoryMock);
 
-            var command = new UpdateActorNameCommand(
-                actor.Id.Value,
-                new ActorNameDto("NewActorName"));
+        var command = new UpdateActorNameCommand(
+            actor.Id.Value,
+            new ActorNameDto("NewActorName"));
 
-            // Act
-            await target.Handle(command, CancellationToken.None);
+        // Act
+        await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            domainEventRepository.Verify(
-                x => x.EnqueueAsync(It.IsAny<Actor>()),
-                Times.Once);
-        }
+        // Assert
+        domainEventRepository.Verify(
+            x => x.EnqueueAsync(It.IsAny<Actor>()),
+            Times.Once);
+    }
 
-        private static Actor MockActor(Mock<IActorRepository> actorRepositoryMock)
-        {
-            var actor = TestPreparationModels.MockedActor();
+    private static Actor MockActor(Mock<IActorRepository> actorRepositoryMock)
+    {
+        var actor = TestPreparationModels.MockedActor();
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
-                .ReturnsAsync(actor);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+            .ReturnsAsync(actor);
 
-            return actor;
-        }
+        return actor;
     }
 }

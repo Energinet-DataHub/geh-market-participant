@@ -19,19 +19,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 
-namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
+namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
+
+internal static class AzureAdB2CRolesRegistration
 {
-    internal static class AzureAdB2CRolesRegistration
+    public static void AddActiveDirectoryRoles(this IServiceCollection services)
     {
-        public static void AddActiveDirectoryRoles(this IServiceCollection services)
+        services.AddSingleton<IActiveDirectoryB2BRolesProvider>(provider =>
         {
-            services.AddSingleton<IActiveDirectoryB2BRolesProvider>(provider =>
-            {
-                var configuration = provider.GetRequiredService<IConfiguration>();
-                var graphClient = provider.GetRequiredService<GraphServiceClient>();
-                var appObjectId = configuration.GetSetting(Settings.B2CBackendObjectId);
-                return new ActiveDirectoryB2BRolesProvider(graphClient, appObjectId);
-            });
-        }
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            var graphClient = provider.GetRequiredService<GraphServiceClient>();
+            var appObjectId = configuration.GetSetting(Settings.B2CBackendObjectId);
+            return new ActiveDirectoryB2BRolesProvider(graphClient, appObjectId);
+        });
     }
 }

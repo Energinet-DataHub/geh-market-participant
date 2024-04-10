@@ -17,22 +17,21 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+
+public sealed class OverlappingActorContactCategoriesRuleService : IOverlappingActorContactCategoriesRuleService
 {
-    public sealed class OverlappingActorContactCategoriesRuleService : IOverlappingActorContactCategoriesRuleService
+    public void ValidateCategoriesAcrossContacts(IEnumerable<ActorContact> contacts)
     {
-        public void ValidateCategoriesAcrossContacts(IEnumerable<ActorContact> contacts)
+        ArgumentNullException.ThrowIfNull(contacts, nameof(contacts));
+
+        var categories = new HashSet<ContactCategory>();
+
+        foreach (var contact in contacts)
         {
-            ArgumentNullException.ThrowIfNull(contacts, nameof(contacts));
-
-            var categories = new HashSet<ContactCategory>();
-
-            foreach (var contact in contacts)
+            if (!categories.Add(contact.Category))
             {
-                if (!categories.Add(contact.Category))
-                {
-                    throw new ValidationException($"Cannot add '{contact.Category}', as a contact with this category is already present.");
-                }
+                throw new ValidationException($"Cannot add '{contact.Category}', as a contact with this category is already present.");
             }
         }
     }

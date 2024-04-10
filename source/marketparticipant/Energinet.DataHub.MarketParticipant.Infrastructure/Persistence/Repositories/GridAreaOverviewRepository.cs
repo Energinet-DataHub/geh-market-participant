@@ -19,68 +19,67 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+
+public class GridAreaOverviewRepository : IGridAreaOverviewRepository
 {
-    public class GridAreaOverviewRepository : IGridAreaOverviewRepository
+    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+
+    public GridAreaOverviewRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
-        private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+        _marketParticipantDbContext = marketParticipantDbContext;
+    }
 
-        public GridAreaOverviewRepository(IMarketParticipantDbContext marketParticipantDbContext)
-        {
-            _marketParticipantDbContext = marketParticipantDbContext;
-        }
-
-        public async Task<IEnumerable<GridAreaOverviewItem>> GetAsync()
-        {
-            var actorsWithMarketRoleGridArea =
-                from actor in _marketParticipantDbContext.Actors
-                join marketRole in _marketParticipantDbContext.MarketRoles
-                    on actor.Id equals marketRole.ActorId
-                join marketRoleGridArea in _marketParticipantDbContext.MarketRoleGridAreas
-                    on marketRole.Id equals marketRoleGridArea.MarketRoleId
-                join organization in _marketParticipantDbContext.Organizations
-                    on actor.OrganizationId equals organization.Id
-                where marketRole.Function == EicFunction.GridAccessProvider
-                select new
-                {
-                    actor,
-                    organization,
-                    marketRole,
-                    marketRoleGridArea,
-                };
-
-            var gridAreas =
-                from gridArea in _marketParticipantDbContext.GridAreas
-                join actorWithMarketRoleGridArea in actorsWithMarketRoleGridArea
-                    on gridArea.Id equals actorWithMarketRoleGridArea.marketRoleGridArea.GridAreaId into gr
-                from actorWithMarketRoleGridArea in gr.DefaultIfEmpty()
-                select new
-                {
-                    actorWithMarketRoleGridArea.actor,
-                    actorWithMarketRoleGridArea.organization,
-                    gridArea,
-                };
-
-            var result = await gridAreas.ToListAsync().ConfigureAwait(false);
-
-            return result.Select(x =>
+    public async Task<IEnumerable<GridAreaOverviewItem>> GetAsync()
+    {
+        var actorsWithMarketRoleGridArea =
+            from actor in _marketParticipantDbContext.Actors
+            join marketRole in _marketParticipantDbContext.MarketRoles
+                on actor.Id equals marketRole.ActorId
+            join marketRoleGridArea in _marketParticipantDbContext.MarketRoleGridAreas
+                on marketRole.Id equals marketRoleGridArea.MarketRoleId
+            join organization in _marketParticipantDbContext.Organizations
+                on actor.OrganizationId equals organization.Id
+            where marketRole.Function == EicFunction.GridAccessProvider
+            select new
             {
-                var gridArea = x.gridArea;
-                var actor = x.actor;
-                var organization = x.organization;
+                actor,
+                organization,
+                marketRole,
+                marketRoleGridArea,
+            };
 
-                return new GridAreaOverviewItem(
-                    new GridAreaId(gridArea.Id),
-                    new GridAreaName(gridArea.Name),
-                    new GridAreaCode(gridArea.Code),
-                    gridArea.PriceAreaCode,
-                    gridArea.ValidFrom,
-                    gridArea.ValidTo,
-                    actor != null ? ActorNumber.Create(actor.ActorNumber) : null,
-                    actor != null ? new ActorName(actor.Name) : null,
-                    organization?.Name,
-                    gridArea.FullFlexDate);
-            });
-        }
+        var gridAreas =
+            from gridArea in _marketParticipantDbContext.GridAreas
+            join actorWithMarketRoleGridArea in actorsWithMarketRoleGridArea
+                on gridArea.Id equals actorWithMarketRoleGridArea.marketRoleGridArea.GridAreaId into gr
+            from actorWithMarketRoleGridArea in gr.DefaultIfEmpty()
+            select new
+            {
+                actorWithMarketRoleGridArea.actor,
+                actorWithMarketRoleGridArea.organization,
+                gridArea,
+            };
+
+        var result = await gridAreas.ToListAsync().ConfigureAwait(false);
+
+        return result.Select(x =>
+        {
+            var gridArea = x.gridArea;
+            var actor = x.actor;
+            var organization = x.organization;
+
+            return new GridAreaOverviewItem(
+                new GridAreaId(gridArea.Id),
+                new GridAreaName(gridArea.Name),
+                new GridAreaCode(gridArea.Code),
+                gridArea.PriceAreaCode,
+                gridArea.ValidFrom,
+                gridArea.ValidTo,
+                actor != null ? ActorNumber.Create(actor.ActorNumber) : null,
+                actor != null ? new ActorName(actor.Name) : null,
+                organization?.Name,
+                gridArea.FullFlexDate);
+        });
     }
 }

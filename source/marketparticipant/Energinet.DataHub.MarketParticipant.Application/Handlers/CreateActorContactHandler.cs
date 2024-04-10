@@ -23,62 +23,61 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers;
+
+public sealed class CreateActorContactHandler : IRequestHandler<CreateActorContactCommand, CreateActorContactResponse>
 {
-    public sealed class CreateActorContactHandler : IRequestHandler<CreateActorContactCommand, CreateActorContactResponse>
+    private readonly IActorRepository _actorRepository;
+    private readonly IActorContactRepository _contactRepository;
+    private readonly IOverlappingActorContactCategoriesRuleService _overlappingContactCategoriesRuleService;
+
+    public CreateActorContactHandler(
+        IActorRepository actorRepository,
+        IActorContactRepository contactRepository,
+        IOverlappingActorContactCategoriesRuleService overlappingContactCategoriesRuleService)
     {
-        private readonly IActorRepository _actorRepository;
-        private readonly IActorContactRepository _contactRepository;
-        private readonly IOverlappingActorContactCategoriesRuleService _overlappingContactCategoriesRuleService;
+        _actorRepository = actorRepository;
+        _contactRepository = contactRepository;
+        _overlappingContactCategoriesRuleService = overlappingContactCategoriesRuleService;
+    }
 
-        public CreateActorContactHandler(
-            IActorRepository actorRepository,
-            IActorContactRepository contactRepository,
-            IOverlappingActorContactCategoriesRuleService overlappingContactCategoriesRuleService)
-        {
-            _actorRepository = actorRepository;
-            _contactRepository = contactRepository;
-            _overlappingContactCategoriesRuleService = overlappingContactCategoriesRuleService;
-        }
+    public async Task<CreateActorContactResponse> Handle(CreateActorContactCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        public async Task<CreateActorContactResponse> Handle(CreateActorContactCommand request, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+        var actor = await _actorRepository
+            .GetAsync(new ActorId(request.ActorId))
+            .ConfigureAwait(false);
 
-            var actor = await _actorRepository
-                .GetAsync(new ActorId(request.ActorId))
-                .ConfigureAwait(false);
+        NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
-            NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
+        var existingContacts = await _contactRepository
+            .GetAsync(actor.Id)
+            .ConfigureAwait(false);
 
-            var existingContacts = await _contactRepository
-                .GetAsync(actor.Id)
-                .ConfigureAwait(false);
+        var contact = CreateContact(actor.Id, request.Contact);
 
-            var contact = CreateContact(actor.Id, request.Contact);
+        _overlappingContactCategoriesRuleService
+            .ValidateCategoriesAcrossContacts(existingContacts.Append(contact));
 
-            _overlappingContactCategoriesRuleService
-                .ValidateCategoriesAcrossContacts(existingContacts.Append(contact));
+        var contactId = await _contactRepository
+            .AddAsync(contact)
+            .ConfigureAwait(false);
 
-            var contactId = await _contactRepository
-                .AddAsync(contact)
-                .ConfigureAwait(false);
+        return new CreateActorContactResponse(contactId.Value);
+    }
 
-            return new CreateActorContactResponse(contactId.Value);
-        }
+    private static ActorContact CreateContact(ActorId actorId, CreateActorContactDto contactDto)
+    {
+        var optionalPhoneNumber = contactDto.Phone == null
+            ? null
+            : new PhoneNumber(contactDto.Phone);
 
-        private static ActorContact CreateContact(ActorId actorId, CreateActorContactDto contactDto)
-        {
-            var optionalPhoneNumber = contactDto.Phone == null
-                ? null
-                : new PhoneNumber(contactDto.Phone);
-
-            return new ActorContact(
-                actorId,
-                contactDto.Name,
-                contactDto.Category,
-                new EmailAddress(contactDto.Email),
-                optionalPhoneNumber);
-        }
+        return new ActorContact(
+            actorId,
+            contactDto.Name,
+            contactDto.Category,
+            new EmailAddress(contactDto.Email),
+            optionalPhoneNumber);
     }
 }

@@ -26,101 +26,100 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class UpdateOrganizationHandlerTests
 {
-    [UnitTest]
-    public sealed class UpdateOrganizationHandlerTests
+    [Fact]
+    public async Task Handle_UpdateOrganization_ReturnsOk()
     {
-        [Fact]
-        public async Task Handle_UpdateOrganization_ReturnsOk()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+        // Arrange
+        var organizationRepository = new Mock<IOrganizationRepository>();
+        var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
 
-            var target = new UpdateOrganizationHandler(
-                organizationRepository.Object,
-                organizationExistsHelperService.Object,
-                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
+        var target = new UpdateOrganizationHandler(
+            organizationRepository.Object,
+            organizationExistsHelperService.Object,
+            new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
-            var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
+        var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "DK");
+        var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
+        var validAddress = new Address(
+            "test Street",
+            "1",
+            "1111",
+            "Test City",
+            "DK");
 
-            var organization = new Organization(
-                new OrganizationId(orgId),
-                "fake_value",
-                validBusinessRegisterIdentifier,
-                validAddress,
-                new OrganizationDomain("energinet.dk"),
-                OrganizationStatus.Active);
+        var organization = new Organization(
+            new OrganizationId(orgId),
+            "fake_value",
+            validBusinessRegisterIdentifier,
+            validAddress,
+            new OrganizationDomain("energinet.dk"),
+            OrganizationStatus.Active);
 
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
-                .ReturnsAsync(organization);
+        organizationExistsHelperService
+            .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
+            .ReturnsAsync(organization);
 
-            organizationRepository
-                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
-                .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
+        organizationRepository
+            .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
+            .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
 
-            var changeDto = new ChangeOrganizationDto("New name", "Active", "TestDomain.dk");
+        var changeDto = new ChangeOrganizationDto("New name", "Active", "TestDomain.dk");
 
-            var command = new UpdateOrganizationCommand(orgId, changeDto);
+        var command = new UpdateOrganizationCommand(orgId, changeDto);
 
-            // Act + Assert
-            await target.Handle(command, CancellationToken.None);
-        }
+        // Act + Assert
+        await target.Handle(command, CancellationToken.None);
+    }
 
-        [Fact]
-        public async Task Handle_UpdateOrganizationDeleted_ThrowsException()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+    [Fact]
+    public async Task Handle_UpdateOrganizationDeleted_ThrowsException()
+    {
+        // Arrange
+        var organizationRepository = new Mock<IOrganizationRepository>();
+        var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
 
-            var target = new UpdateOrganizationHandler(
-                organizationRepository.Object,
-                organizationExistsHelperService.Object,
-                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
+        var target = new UpdateOrganizationHandler(
+            organizationRepository.Object,
+            organizationExistsHelperService.Object,
+            new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
-            var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
+        var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "DK");
+        var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
+        var validAddress = new Address(
+            "test Street",
+            "1",
+            "1111",
+            "Test City",
+            "DK");
 
-            var dbOrganization = new Organization(
-                new OrganizationId(orgId),
-                "fake_value",
-                validBusinessRegisterIdentifier,
-                validAddress,
-                new OrganizationDomain("energinet.dk"),
-                OrganizationStatus.Deleted);
+        var dbOrganization = new Organization(
+            new OrganizationId(orgId),
+            "fake_value",
+            validBusinessRegisterIdentifier,
+            validAddress,
+            new OrganizationDomain("energinet.dk"),
+            OrganizationStatus.Deleted);
 
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
-                .ReturnsAsync(dbOrganization);
+        organizationExistsHelperService
+            .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
+            .ReturnsAsync(dbOrganization);
 
-            organizationRepository
-                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
-                .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
+        organizationRepository
+            .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
+            .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
 
-            var changeOrganizationDto = new ChangeOrganizationDto("New name", "Active", "TestDomain");
+        var changeOrganizationDto = new ChangeOrganizationDto("New name", "Active", "TestDomain");
 
-            var command = new UpdateOrganizationCommand(orgId, changeOrganizationDto);
+        var command = new UpdateOrganizationCommand(orgId, changeOrganizationDto);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() => target.Handle(command, CancellationToken.None));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => target.Handle(command, CancellationToken.None));
     }
 }

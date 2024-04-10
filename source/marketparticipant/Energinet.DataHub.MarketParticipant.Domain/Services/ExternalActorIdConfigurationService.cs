@@ -16,39 +16,38 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+public sealed class ExternalActorIdConfigurationService : IExternalActorIdConfigurationService
 {
-    public sealed class ExternalActorIdConfigurationService : IExternalActorIdConfigurationService
+    private readonly IActiveDirectoryB2CService _activeDirectoryService;
+
+    public ExternalActorIdConfigurationService(IActiveDirectoryB2CService activeDirectoryService)
     {
-        private readonly IActiveDirectoryB2CService _activeDirectoryService;
+        _activeDirectoryService = activeDirectoryService;
+    }
 
-        public ExternalActorIdConfigurationService(IActiveDirectoryB2CService activeDirectoryService)
+    public async Task AssignExternalActorIdAsync(Actor actor)
+    {
+        ArgumentNullException.ThrowIfNull(actor);
+
+        if (actor.ExternalActorId != null)
         {
-            _activeDirectoryService = activeDirectoryService;
-        }
-
-        public async Task AssignExternalActorIdAsync(Actor actor)
-        {
-            ArgumentNullException.ThrowIfNull(actor);
-
-            if (actor.ExternalActorId != null)
+            if (actor.Status is not (ActorStatus.Active or ActorStatus.Passive))
             {
-                if (actor.Status is not (ActorStatus.Active or ActorStatus.Passive))
-                {
-                    // There is an external id, but it is no longer allowed.
-                    await _activeDirectoryService
-                        .DeleteAppRegistrationAsync(actor)
-                        .ConfigureAwait(false);
-                }
+                // There is an external id, but it is no longer allowed.
+                await _activeDirectoryService
+                    .DeleteAppRegistrationAsync(actor)
+                    .ConfigureAwait(false);
             }
-            else
+        }
+        else
+        {
+            if (actor.Status is ActorStatus.Active or ActorStatus.Passive)
             {
-                if (actor.Status is ActorStatus.Active or ActorStatus.Passive)
-                {
-                    await _activeDirectoryService
-                        .AssignApplicationRegistrationAsync(actor)
-                        .ConfigureAwait(false);
-                }
+                await _activeDirectoryService
+                    .AssignApplicationRegistrationAsync(actor)
+                    .ConfigureAwait(false);
             }
         }
     }

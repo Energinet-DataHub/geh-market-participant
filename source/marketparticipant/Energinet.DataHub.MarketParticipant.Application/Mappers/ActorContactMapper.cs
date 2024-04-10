@@ -16,19 +16,18 @@ using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Mappers
+namespace Energinet.DataHub.MarketParticipant.Application.Mappers;
+
+public static class ActorContactMapper
 {
-    public static class ActorContactMapper
+    public static ActorContactDto Map(ActorContact contact)
     {
-        public static ActorContactDto Map(ActorContact contact)
-        {
-            ArgumentNullException.ThrowIfNull(contact, nameof(contact));
-            return new ActorContactDto(
-                contact.Id.Value,
-                contact.Category,
-                contact.Name,
-                contact.Email.Address,
-                contact.Phone?.Number);
-        }
+        ArgumentNullException.ThrowIfNull(contact, nameof(contact));
+        return new ActorContactDto(
+            contact.Id.Value,
+            contact.Category,
+            contact.Name,
+            contact.Email.Address,
+            contact.Phone?.Number);
     }
 }

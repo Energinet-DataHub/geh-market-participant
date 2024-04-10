@@ -16,7 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -25,52 +25,51 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class GetActorHandlerTests
 {
-    [UnitTest]
-    public sealed class GetActorHandlerTests
+    [Fact]
+    public async Task Handle_NoActor_ThrowsNotFoundException()
     {
-        [Fact]
-        public async Task Handle_NoActor_ThrowsNotFoundException()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var target = new GetActorHandler(actorRepositoryMock.Object);
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var target = new GetActorHandler(actorRepositoryMock.Object);
 
-            var actorId = Guid.NewGuid();
+        var actorId = Guid.NewGuid();
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
-                .ReturnsAsync((Actor?)null);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
+            .ReturnsAsync((Actor?)null);
 
-            var command = new GetSingleActorCommand(actorId);
+        var command = new GetSingleActorCommand(actorId);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
+    }
 
-        [Fact]
-        public async Task Handle_HasActor_ReturnsActor()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var target = new GetActorHandler(actorRepositoryMock.Object);
+    [Fact]
+    public async Task Handle_HasActor_ReturnsActor()
+    {
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var target = new GetActorHandler(actorRepositoryMock.Object);
 
-            var actorId = Guid.NewGuid();
-            var actor = TestPreparationModels.MockedActor(actorId);
+        var actorId = Guid.NewGuid();
+        var actor = TestPreparationModels.MockedActor(actorId);
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
-                .ReturnsAsync(actor);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+            .ReturnsAsync(actor);
 
-            var command = new GetSingleActorCommand(actorId);
+        var command = new GetSingleActorCommand(actorId);
 
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            Assert.NotNull(response.Actor);
-            Assert.Equal(actorId, response.Actor.ActorId);
-        }
+        // Assert
+        Assert.NotNull(response.Actor);
+        Assert.Equal(actorId, response.Actor.ActorId);
     }
 }

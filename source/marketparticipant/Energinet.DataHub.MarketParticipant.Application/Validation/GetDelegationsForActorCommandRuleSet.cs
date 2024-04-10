@@ -16,14 +16,13 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetDelegationsForActorCommandRuleSet : AbstractValidator<GetDelegationsForActorCommand>
 {
-    public sealed class GetDelegationsForActorCommandRuleSet : AbstractValidator<GetDelegationsForActorCommand>
+    public GetDelegationsForActorCommandRuleSet()
     {
-        public GetDelegationsForActorCommandRuleSet()
-        {
-            RuleFor(command => command.ActorId)
-                .NotEmpty();
-        }
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
     }
 }

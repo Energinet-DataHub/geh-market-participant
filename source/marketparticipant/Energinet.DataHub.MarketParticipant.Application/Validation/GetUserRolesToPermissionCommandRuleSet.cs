@@ -17,14 +17,13 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetUserRolesToPermissionCommandRuleSet : AbstractValidator<GetUserRolesToPermissionCommand>
 {
-    public sealed class GetUserRolesToPermissionCommandRuleSet : AbstractValidator<GetUserRolesToPermissionCommand>
+    public GetUserRolesToPermissionCommandRuleSet()
     {
-        public GetUserRolesToPermissionCommandRuleSet()
-        {
-            RuleFor(command => command.PermissionId)
-                .Must(permissionId => Enum.IsDefined((PermissionId)permissionId));
-        }
+        RuleFor(command => command.PermissionId)
+            .Must(permissionId => Enum.IsDefined((PermissionId)permissionId));
     }
 }

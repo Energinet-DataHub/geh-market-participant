@@ -20,26 +20,25 @@ using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Validation
+namespace Energinet.DataHub.MarketParticipant.Tests.Validation;
+
+[UnitTest]
+public sealed class GetOrganizationCommandRuleSetTests
 {
-    [UnitTest]
-    public sealed class GetOrganizationCommandRuleSetTests
+    [Fact]
+    public async Task Validate_OrganizationId_ValidatesProperty()
     {
-        [Fact]
-        public async Task Validate_OrganizationId_ValidatesProperty()
-        {
-            // Arrange
-            const string propertyName = nameof(GetSingleOrganizationCommand.OrganizationId);
+        // Arrange
+        const string propertyName = nameof(GetSingleOrganizationCommand.OrganizationId);
 
-            var target = new GetSingleOrganizationCommandRuleSet();
-            var command = new GetSingleOrganizationCommand(Guid.Empty);
+        var target = new GetSingleOrganizationCommandRuleSet();
+        var command = new GetSingleOrganizationCommand(Guid.Empty);
 
-            // Act
-            var result = await target.ValidateAsync(command);
+        // Act
+        var result = await target.ValidateAsync(command);
 
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
     }
 }

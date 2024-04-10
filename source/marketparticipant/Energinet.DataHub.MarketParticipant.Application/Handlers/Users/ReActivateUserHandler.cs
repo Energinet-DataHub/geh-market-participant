@@ -57,7 +57,7 @@ public sealed class ReActivateUserHandler : IRequestHandler<ReActivateUserComman
         await ReActivateUserAsync(user).ConfigureAwait(false);
     }
 
-    private async Task ReActivateUserAsync(Domain.Model.Users.User user)
+    private async Task ReActivateUserAsync(User user)
     {
         var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value);

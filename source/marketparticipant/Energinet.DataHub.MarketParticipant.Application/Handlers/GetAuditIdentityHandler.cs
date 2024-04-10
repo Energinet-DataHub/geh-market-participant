@@ -106,7 +106,7 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
         return new GetAuditIdentityResponse($"{userIdentity.FirstName} ({userIdentity.Email})");
     }
 
-    private bool HasCurrentUserAccessToUser(Domain.Model.Users.User user)
+    private bool HasCurrentUserAccessToUser(User user)
     {
         return _userContext.CurrentUser.IsFas ||
                _userContext.CurrentUser.IsAssignedToActor(user.AdministratedBy.Value) ||

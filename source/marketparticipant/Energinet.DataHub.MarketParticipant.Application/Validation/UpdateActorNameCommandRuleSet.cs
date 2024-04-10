@@ -16,23 +16,22 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
-{
-    public sealed class UpdateActorNameCommandRuleSet : AbstractValidator<UpdateActorNameCommand>
-    {
-        public UpdateActorNameCommandRuleSet()
-        {
-            RuleFor(command => command.ActorId)
-                .NotEmpty();
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-            RuleFor(actor => actor.ActorName)
-                .NotNull()
-                .ChildRules(changeActorValidator =>
-                {
-                    changeActorValidator
-                        .RuleFor(x => x.Value)
-                        .NotEmpty();
-                });
-        }
+public sealed class UpdateActorNameCommandRuleSet : AbstractValidator<UpdateActorNameCommand>
+{
+    public UpdateActorNameCommandRuleSet()
+    {
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
+
+        RuleFor(actor => actor.ActorName)
+            .NotNull()
+            .ChildRules(changeActorValidator =>
+            {
+                changeActorValidator
+                    .RuleFor(x => x.Value)
+                    .NotEmpty();
+            });
     }
 }

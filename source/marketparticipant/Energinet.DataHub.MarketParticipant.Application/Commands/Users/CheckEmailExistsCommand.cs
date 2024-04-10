@@ -14,7 +14,6 @@
 
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users
-{
-    public sealed record CheckEmailExistsCommand(string EmailAddress) : IRequest<bool>;
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users;
+
+public sealed record CheckEmailExistsCommand(string EmailAddress) : IRequest<bool>;

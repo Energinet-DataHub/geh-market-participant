@@ -14,7 +14,6 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles
-{
-    public sealed record CreateUserRoleResponse(Guid UserRoleId);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+
+public sealed record CreateUserRoleResponse(Guid UserRoleId);

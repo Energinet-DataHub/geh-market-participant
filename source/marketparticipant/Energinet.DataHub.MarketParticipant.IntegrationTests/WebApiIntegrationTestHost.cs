@@ -54,7 +54,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
         if (b2CFixture != null)
         {
-            host.ServiceCollection.Replace(ServiceDescriptor.Scoped<IActiveDirectoryB2CService>(_ => b2CFixture.B2CService));
+            host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => b2CFixture.B2CService));
         }
 
         if (certificateFixture != null)

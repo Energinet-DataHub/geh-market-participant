@@ -15,9 +15,8 @@
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetGridAreaOverviewCommandRuleSet : AbstractValidator<GetGridAreaOverviewCommand>
 {
-    public sealed class GetGridAreaOverviewCommandRuleSet : AbstractValidator<GetGridAreaOverviewCommand>
-    {
-    }
 }

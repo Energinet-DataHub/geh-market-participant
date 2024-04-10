@@ -18,16 +18,15 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
+
+public class ActorContactEntityConfiguration : AuditedEntityTypeConfiguration<ActorContactEntity>
 {
-    public class ActorContactEntityConfiguration : AuditedEntityTypeConfiguration<ActorContactEntity>
+    protected override void ConfigureEntity(EntityTypeBuilder<ActorContactEntity> builder)
     {
-        protected override void ConfigureEntity(EntityTypeBuilder<ActorContactEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("ActorContact");
-            builder.HasKey(contact => contact.Id);
-            builder.Property(contact => contact.Id).ValueGeneratedOnAdd();
-        }
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        builder.ToTable("ActorContact");
+        builder.HasKey(contact => contact.Id);
+        builder.Property(contact => contact.Id).ValueGeneratedOnAdd();
     }
 }

@@ -16,47 +16,46 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
+
+public static class EnvironmentFilter
 {
-    public static class EnvironmentFilter
+    private static readonly string[] _validEnvironments = { "U-001", "U-002", "T-001", "TEST-001", "TEST-002", "B-001", "B-002", "PREPROD-001", "PREPROD-002", "PROD-001", "SANDBOX-002", "DEV-001", "DEV-002", "LOCALDEV" };
+
+    public static Func<string, bool> GetFilter(string[] args)
     {
-        private static readonly string[] _validEnvironments = { "U-001", "U-002", "T-001", "TEST-001", "TEST-002", "B-001", "B-002", "PREPROD-001", "PREPROD-002", "PROD-001", "SANDBOX-002", "DEV-001", "DEV-002", "LOCALDEV" };
+        ArgumentNullException.ThrowIfNull(args, nameof(args));
 
-        public static Func<string, bool> GetFilter(string[] args)
+        var environment = GetEnvironmentArgument(args)
+            .Replace("-", "_", StringComparison.InvariantCulture)
+            .ToUpperInvariant();
+
+        if (string.IsNullOrEmpty(environment))
         {
-            ArgumentNullException.ThrowIfNull(args, nameof(args));
-
-            var environment = GetEnvironmentArgument(args)
-                .Replace("-", "_", StringComparison.InvariantCulture)
-                .ToUpperInvariant();
-
-            if (string.IsNullOrEmpty(environment))
-            {
-                return file => (file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
-                                ((file.Contains(".Scripts.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
-                                 (file.Contains(".Scripts.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
-                                 file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase))) || (file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
-                    ((file.Contains(".Scripts.ALL.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
-                     (file.Contains(".Scripts.ALL.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
-                     file.Contains(".Scripts.ALL.Model.", StringComparison.OrdinalIgnoreCase)));
-            }
-
             return file => (file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
-                            ((file.Contains($".Scripts.{environment}.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
-                             (file.Contains($".Scripts.{environment}.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
-                             file.Contains($".Scripts.{environment}.Model.", StringComparison.OrdinalIgnoreCase))) || (file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
+                            ((file.Contains(".Scripts.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
+                             (file.Contains(".Scripts.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
+                             file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase))) || (file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
                 ((file.Contains(".Scripts.ALL.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
                  (file.Contains(".Scripts.ALL.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
                  file.Contains(".Scripts.ALL.Model.", StringComparison.OrdinalIgnoreCase)));
         }
 
-        private static string GetEnvironmentArgument(IReadOnlyList<string> args)
-        {
-            ArgumentNullException.ThrowIfNull(args);
+        return file => (file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
+                        ((file.Contains($".Scripts.{environment}.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
+                         (file.Contains($".Scripts.{environment}.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
+                         file.Contains($".Scripts.{environment}.Model.", StringComparison.OrdinalIgnoreCase))) || (file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
+            ((file.Contains(".Scripts.ALL.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
+             (file.Contains(".Scripts.ALL.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
+             file.Contains(".Scripts.ALL.Model.", StringComparison.OrdinalIgnoreCase)));
+    }
 
-            return args.Count > 1 && _validEnvironments.Contains(args[1].ToUpperInvariant())
-                ? args[1]
-                : string.Empty;
-        }
+    private static string GetEnvironmentArgument(IReadOnlyList<string> args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+
+        return args.Count > 1 && _validEnvironments.Contains(args[1].ToUpperInvariant())
+            ? args[1]
+            : string.Empty;
     }
 }

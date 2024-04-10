@@ -15,16 +15,15 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.Domain
+namespace Energinet.DataHub.MarketParticipant.Domain;
+
+/// <summary>
+/// A <see cref="IUnitOfWork"/> used to run several DB commands as one atomic operation. Inject <see cref="IUnitOfWorkProvider"/> and use <see cref="IUnitOfWorkProvider.NewUnitOfWorkAsync"/> to create and initilize a new <see cref="IUnitOfWork"/>
+/// </summary>
+public interface IUnitOfWork : IAsyncDisposable
 {
     /// <summary>
-    /// A <see cref="IUnitOfWork"/> used to run several DB commands as one atomic operation. Inject <see cref="IUnitOfWorkProvider"/> and use <see cref="IUnitOfWorkProvider.NewUnitOfWorkAsync"/> to create and initilize a new <see cref="IUnitOfWork"/>
+    /// Commits changes made from when the <see cref="IUnitOfWork"/> was initilized.
     /// </summary>
-    public interface IUnitOfWork : IAsyncDisposable
-    {
-        /// <summary>
-        /// Commits changes made from when the <see cref="IUnitOfWork"/> was initilized.
-        /// </summary>
-        Task CommitAsync();
-    }
+    Task CommitAsync();
 }

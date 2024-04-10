@@ -32,87 +32,86 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.MarketParticipant.Common
-{
-    internal static class ApplicationServiceRegistration
-    {
-        public static void AddApplicationServices(this IServiceCollection services)
-        {
-            services.AddScoped<IValidator<GetOrganizationsCommand>, GetOrganizationsCommandRuleSet>();
-            services.AddScoped<IValidator<GetPermissionsCommand>, GetPermissionsCommandRuleSet>();
-            services.AddScoped<IValidator<GetPermissionCommand>, GetPermissionCommandRuleSet>();
-            services.AddScoped<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>();
-            services.AddScoped<IValidator<CreateActorCommand>, CreateActorCommandRuleSet>();
-            services.AddScoped<IValidator<UpdateOrganizationCommand>, UpdateOrganizationCommandRuleSet>();
-            services.AddScoped<IValidator<UpdateActorCommand>, UpdateActorCommandRuleSet>();
-            services.AddScoped<IValidator<GetSingleOrganizationCommand>, GetSingleOrganizationCommandRuleSet>();
-            services.AddScoped<IValidator<GetSingleActorCommand>, GetSingleActorCommandRuleSet>();
-            services.AddScoped<IValidator<GetActorsCommand>, GetActorsCommandRuleSet>();
-            services.AddScoped<IValidator<GetAllActorsCommand>, GetAllActorsCommandRuleSet>();
-            services.AddScoped<IValidator<GetActorContactsCommand>, GetActorContactsCommandRuleSet>();
-            services.AddScoped<IValidator<CreateActorContactCommand>, CreateActorContactCommandRuleSet>();
-            services.AddScoped<IValidator<DeleteActorContactCommand>, DeleteActorContactCommandRuleSet>();
-            services.AddScoped<IValidator<CreateGridAreaCommand>, CreateGridAreaCommandRuleSet>();
-            services.AddScoped<IValidator<UpdateGridAreaCommand>, UpdateGridAreaCommandRuleSet>();
-            services.AddScoped<IValidator<GetGridAreasCommand>, GetGridAreasCommandRuleSet>();
-            services.AddScoped<IValidator<GetGridAreaCommand>, GetGridAreaCommandRuleSet>();
-            services.AddScoped<IValidator<GetGridAreaOverviewCommand>, GetGridAreaOverviewCommandRuleSet>();
-            services.AddScoped<IValidator<GetGridAreaAuditLogsCommand>, GetGridAreaAuditLogsCommandRuleSet>();
-            services.AddScoped<IValidator<GetUserOverviewCommand>, GetUserOverviewCommandRuleSet>();
-            services.AddScoped<IValidator<GetUserCommand>, GetUserCommandRuleSet>();
-            services.AddScoped<IValidator<GetUserRolesCommand>, GetUserRolesCommandRuleSet>();
-            services.AddScoped<IValidator<GetUserAuditLogsCommand>, GetUserAuditLogsCommandRuleSet>();
-            services.AddScoped<IValidator<GetUserRoleAuditLogsCommand>, GetUserRoleAuditLogEntriesCommandRuleSet>();
-            services.AddScoped<IValidator<GetUserPermissionsCommand>, GetUserPermissionsCommandRuleSet>();
-            services.AddScoped<IValidator<UpdatePermissionCommand>, UpdatePermissionCommandRuleSet>();
-            services.AddScoped<IValidator<GetActorsAssociatedWithUserCommand>, GetActorsAssociatedWithUserCommandRuleSet>();
-            services.AddScoped<IValidator<GetActorsAssociatedWithExternalUserIdCommand>, GetActorsAssociatedWithExternalUserIdCommandRuleSet>();
-            services.AddScoped<IValidator<GetAllUserRolesCommand>, GetAllUserRolesCommandRuleSet>();
-            services.AddScoped<IValidator<GetAvailableUserRolesForActorCommand>, GetAvailableUserRolesForActorCommandRuleSet>();
-            services.AddScoped<IValidator<UpdateUserRoleAssignmentsCommand>, UpdateUserRoleAssignmentsCommandRuleSet>();
-            services.AddScoped<IValidator<GetUserRoleCommand>, GetUserRoleCommandRuleSet>();
-            services.AddScoped<IValidator<CreateUserRoleCommand>, CreateUserRoleCommandRuleSet>();
-            services.AddScoped<IValidator<UpdateUserRoleCommand>, UpdateUserRoleCommandRuleSet>();
-            services.AddScoped<IValidator<GetSelectionActorsQueryCommand>, GetSelectionActorsQueryCommandRuleSet>();
-            services.AddScoped<IValidator<SynchronizeActorsCommand>, SynchronizeActorsCommandRuleSet>();
-            services.AddScoped<IValidator<GetPermissionDetailsCommand>, GetPermissionDetailsCommandRuleSet>();
-            services.AddScoped<IValidator<InviteUserCommand>, InviteUserCommandRuleSet>();
-            services.AddScoped<IValidator<ReInviteUserCommand>, ReInviteUserCommandRuleSet>();
-            services.AddScoped<IValidator<SendEmailCommand>, SendEmailCommandRuleSet>();
-            services.AddScoped<IValidator<GetPermissionAuditLogsCommand>, GetPermissionAuditLogEntriesCommandRuleSet>();
-            services.AddScoped<IValidator<GetUserRolesToPermissionCommand>, GetUserRolesToPermissionCommandRuleSet>();
-            services.AddScoped<IValidator<DeactivateUserRoleCommand>, DeactivateUserRoleCommandRuleSet>();
-            services.AddScoped<IValidator<UpdateUserIdentityCommand>, UpdateUserIdentityCommandRuleSet>();
-            services.AddScoped<IValidator<InitiateMitIdSignupCommand>, InitiateMitIdSignupCommandRuleSet>();
-            services.AddScoped<IValidator<DeactivateUserCommand>, DeactivateUserCommandRuleSet>();
-            services.AddScoped<IValidator<UserInvitationExpiredCommand>, UserInvitationExpiredCommandRuleSet>();
-            services.AddScoped<IValidator<GetAuditIdentityCommand>, GetAuditIdentityCommandRuleSet>();
-            services.AddScoped<IValidator<GetOrganizationAuditLogsCommand>, GetOrganizationAuditLogEntriesCommandRuleSet>();
-            services.AddScoped<IValidator<GetActorAuditLogsCommand>, GetActorAuditLogEntriesCommandRuleSet>();
-            services.AddScoped<IValidator<ResetUserTwoFactorAuthenticationCommand>, ResetUserTwoFactorAuthenticationRuleSet>();
-            services.AddScoped<IValidator<CheckEmailExistsCommand>, CheckEmailExistsCommandRuleSet>();
-            services.AddScoped<IValidator<AssignActorCertificateCommand>, AssignActorCertificateRuleSet>();
-            services.AddScoped<IValidator<RemoveActorCredentialsCommand>, RemoveActorCredentialsCommandRuleSet>();
-            services.AddScoped<IValidator<GetActorCredentialsCommand>, GetActorCredentialsCommandRuleSet>();
-            services.AddScoped<IValidator<ActorRequestSecretCommand>, ActorRequestSecretCommandRuleSet>();
-            services.AddScoped<IValidator<GetPermissionRelationsCommand>, GetPermissionsRelationCommandRuleSet>();
-            services.AddScoped<IValidator<GetUserProfileCommand>, GetUserProfileCommandRuleSet>();
-            services.AddScoped<IValidator<UpdateActorNameCommand>, UpdateActorNameCommandRuleSet>();
-            services.AddScoped<IValidator<GetOrganizationIdentityCommand>, GetOrganizationIdentityCommandRuleSet>();
-            services.AddScoped<IValidator<UpdateOrganisationIdentityCommand>, UpdateOrganisationIdentityCommandRuleSet>();
-            services.AddScoped<IValidator<GetDelegationsForActorCommand>, GetDelegationsForActorCommandRuleSet>();
-            services.AddScoped<IValidator<CreateProcessDelegationCommand>, CreateProcessDelegationCommandRuleSet>();
-            services.AddScoped<IValidator<StopProcessDelegationCommand>, StopProcessDelegationCommandRuleSet>();
-            services.AddScoped<IValidator<ReActivateUserCommand>, ReActivateUserCommandRuleSet>();
+namespace Energinet.DataHub.MarketParticipant.Common;
 
-            services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
-            services.AddScoped<IActorClientSecretService, ActorClientSecretService>();
-            services.AddScoped<IOrganizationExistsHelperService, OrganizationExistsHelperService>();
-            services.AddScoped<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>();
-            services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();
-            services.AddScoped<ICertificateValidation, NoCertificateValidation>();
-            services.AddScoped<IPermissionRelationService, PermissionRelationService>();
-            services.AddScoped<IBalanceResponsiblePartiesChangedEventHandler, BalanceResponsiblePartiesChangedEventHandler>();
-        }
+internal static class ApplicationServiceRegistration
+{
+    public static void AddApplicationServices(this IServiceCollection services)
+    {
+        services.AddScoped<IValidator<GetOrganizationsCommand>, GetOrganizationsCommandRuleSet>();
+        services.AddScoped<IValidator<GetPermissionsCommand>, GetPermissionsCommandRuleSet>();
+        services.AddScoped<IValidator<GetPermissionCommand>, GetPermissionCommandRuleSet>();
+        services.AddScoped<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>();
+        services.AddScoped<IValidator<CreateActorCommand>, CreateActorCommandRuleSet>();
+        services.AddScoped<IValidator<UpdateOrganizationCommand>, UpdateOrganizationCommandRuleSet>();
+        services.AddScoped<IValidator<UpdateActorCommand>, UpdateActorCommandRuleSet>();
+        services.AddScoped<IValidator<GetSingleOrganizationCommand>, GetSingleOrganizationCommandRuleSet>();
+        services.AddScoped<IValidator<GetSingleActorCommand>, GetSingleActorCommandRuleSet>();
+        services.AddScoped<IValidator<GetActorsCommand>, GetActorsCommandRuleSet>();
+        services.AddScoped<IValidator<GetAllActorsCommand>, GetAllActorsCommandRuleSet>();
+        services.AddScoped<IValidator<GetActorContactsCommand>, GetActorContactsCommandRuleSet>();
+        services.AddScoped<IValidator<CreateActorContactCommand>, CreateActorContactCommandRuleSet>();
+        services.AddScoped<IValidator<DeleteActorContactCommand>, DeleteActorContactCommandRuleSet>();
+        services.AddScoped<IValidator<CreateGridAreaCommand>, CreateGridAreaCommandRuleSet>();
+        services.AddScoped<IValidator<UpdateGridAreaCommand>, UpdateGridAreaCommandRuleSet>();
+        services.AddScoped<IValidator<GetGridAreasCommand>, GetGridAreasCommandRuleSet>();
+        services.AddScoped<IValidator<GetGridAreaCommand>, GetGridAreaCommandRuleSet>();
+        services.AddScoped<IValidator<GetGridAreaOverviewCommand>, GetGridAreaOverviewCommandRuleSet>();
+        services.AddScoped<IValidator<GetGridAreaAuditLogsCommand>, GetGridAreaAuditLogsCommandRuleSet>();
+        services.AddScoped<IValidator<GetUserOverviewCommand>, GetUserOverviewCommandRuleSet>();
+        services.AddScoped<IValidator<GetUserCommand>, GetUserCommandRuleSet>();
+        services.AddScoped<IValidator<GetUserRolesCommand>, GetUserRolesCommandRuleSet>();
+        services.AddScoped<IValidator<GetUserAuditLogsCommand>, GetUserAuditLogsCommandRuleSet>();
+        services.AddScoped<IValidator<GetUserRoleAuditLogsCommand>, GetUserRoleAuditLogEntriesCommandRuleSet>();
+        services.AddScoped<IValidator<GetUserPermissionsCommand>, GetUserPermissionsCommandRuleSet>();
+        services.AddScoped<IValidator<UpdatePermissionCommand>, UpdatePermissionCommandRuleSet>();
+        services.AddScoped<IValidator<GetActorsAssociatedWithUserCommand>, GetActorsAssociatedWithUserCommandRuleSet>();
+        services.AddScoped<IValidator<GetActorsAssociatedWithExternalUserIdCommand>, GetActorsAssociatedWithExternalUserIdCommandRuleSet>();
+        services.AddScoped<IValidator<GetAllUserRolesCommand>, GetAllUserRolesCommandRuleSet>();
+        services.AddScoped<IValidator<GetAvailableUserRolesForActorCommand>, GetAvailableUserRolesForActorCommandRuleSet>();
+        services.AddScoped<IValidator<UpdateUserRoleAssignmentsCommand>, UpdateUserRoleAssignmentsCommandRuleSet>();
+        services.AddScoped<IValidator<GetUserRoleCommand>, GetUserRoleCommandRuleSet>();
+        services.AddScoped<IValidator<CreateUserRoleCommand>, CreateUserRoleCommandRuleSet>();
+        services.AddScoped<IValidator<UpdateUserRoleCommand>, UpdateUserRoleCommandRuleSet>();
+        services.AddScoped<IValidator<GetSelectionActorsQueryCommand>, GetSelectionActorsQueryCommandRuleSet>();
+        services.AddScoped<IValidator<SynchronizeActorsCommand>, SynchronizeActorsCommandRuleSet>();
+        services.AddScoped<IValidator<GetPermissionDetailsCommand>, GetPermissionDetailsCommandRuleSet>();
+        services.AddScoped<IValidator<InviteUserCommand>, InviteUserCommandRuleSet>();
+        services.AddScoped<IValidator<ReInviteUserCommand>, ReInviteUserCommandRuleSet>();
+        services.AddScoped<IValidator<SendEmailCommand>, SendEmailCommandRuleSet>();
+        services.AddScoped<IValidator<GetPermissionAuditLogsCommand>, GetPermissionAuditLogEntriesCommandRuleSet>();
+        services.AddScoped<IValidator<GetUserRolesToPermissionCommand>, GetUserRolesToPermissionCommandRuleSet>();
+        services.AddScoped<IValidator<DeactivateUserRoleCommand>, DeactivateUserRoleCommandRuleSet>();
+        services.AddScoped<IValidator<UpdateUserIdentityCommand>, UpdateUserIdentityCommandRuleSet>();
+        services.AddScoped<IValidator<InitiateMitIdSignupCommand>, InitiateMitIdSignupCommandRuleSet>();
+        services.AddScoped<IValidator<DeactivateUserCommand>, DeactivateUserCommandRuleSet>();
+        services.AddScoped<IValidator<UserInvitationExpiredCommand>, UserInvitationExpiredCommandRuleSet>();
+        services.AddScoped<IValidator<GetAuditIdentityCommand>, GetAuditIdentityCommandRuleSet>();
+        services.AddScoped<IValidator<GetOrganizationAuditLogsCommand>, GetOrganizationAuditLogEntriesCommandRuleSet>();
+        services.AddScoped<IValidator<GetActorAuditLogsCommand>, GetActorAuditLogEntriesCommandRuleSet>();
+        services.AddScoped<IValidator<ResetUserTwoFactorAuthenticationCommand>, ResetUserTwoFactorAuthenticationRuleSet>();
+        services.AddScoped<IValidator<CheckEmailExistsCommand>, CheckEmailExistsCommandRuleSet>();
+        services.AddScoped<IValidator<AssignActorCertificateCommand>, AssignActorCertificateRuleSet>();
+        services.AddScoped<IValidator<RemoveActorCredentialsCommand>, RemoveActorCredentialsCommandRuleSet>();
+        services.AddScoped<IValidator<GetActorCredentialsCommand>, GetActorCredentialsCommandRuleSet>();
+        services.AddScoped<IValidator<ActorRequestSecretCommand>, ActorRequestSecretCommandRuleSet>();
+        services.AddScoped<IValidator<GetPermissionRelationsCommand>, GetPermissionsRelationCommandRuleSet>();
+        services.AddScoped<IValidator<GetUserProfileCommand>, GetUserProfileCommandRuleSet>();
+        services.AddScoped<IValidator<UpdateActorNameCommand>, UpdateActorNameCommandRuleSet>();
+        services.AddScoped<IValidator<GetOrganizationIdentityCommand>, GetOrganizationIdentityCommandRuleSet>();
+        services.AddScoped<IValidator<UpdateOrganisationIdentityCommand>, UpdateOrganisationIdentityCommandRuleSet>();
+        services.AddScoped<IValidator<GetDelegationsForActorCommand>, GetDelegationsForActorCommandRuleSet>();
+        services.AddScoped<IValidator<CreateProcessDelegationCommand>, CreateProcessDelegationCommandRuleSet>();
+        services.AddScoped<IValidator<StopProcessDelegationCommand>, StopProcessDelegationCommandRuleSet>();
+        services.AddScoped<IValidator<ReActivateUserCommand>, ReActivateUserCommandRuleSet>();
+
+        services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
+        services.AddScoped<IActorClientSecretService, ActorClientSecretService>();
+        services.AddScoped<IOrganizationExistsHelperService, OrganizationExistsHelperService>();
+        services.AddScoped<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>();
+        services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();
+        services.AddScoped<ICertificateValidation, NoCertificateValidation>();
+        services.AddScoped<IPermissionRelationService, PermissionRelationService>();
+        services.AddScoped<IBalanceResponsiblePartiesChangedEventHandler, BalanceResponsiblePartiesChangedEventHandler>();
     }
 }

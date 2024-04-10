@@ -17,20 +17,19 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
+
+public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
 {
-    public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
+    public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
-        public void Configure(EntityTypeBuilder<UserEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("User");
-            builder.HasKey(user => user.Id);
-            builder.Property(user => user.Id).ValueGeneratedOnAdd();
-            builder
-                .HasMany(user => user.RoleAssignments)
-                .WithOne()
-                .HasForeignKey(assignment => assignment.UserId);
-        }
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        builder.ToTable("User");
+        builder.HasKey(user => user.Id);
+        builder.Property(user => user.Id).ValueGeneratedOnAdd();
+        builder
+            .HasMany(user => user.RoleAssignments)
+            .WithOne()
+            .HasForeignKey(assignment => assignment.UserId);
     }
 }

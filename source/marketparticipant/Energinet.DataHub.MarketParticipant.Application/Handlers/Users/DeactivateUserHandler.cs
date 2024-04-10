@@ -67,7 +67,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
         }).ConfigureAwait(false);
     }
 
-    private async Task DeactivateUserAsync(Domain.Model.Users.User user)
+    private async Task DeactivateUserAsync(User user)
     {
         var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value);
@@ -99,7 +99,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
             .ConfigureAwait(false);
     }
 
-    private async Task RemoveUserFromCurrentActorAsync(Domain.Model.Users.User user)
+    private async Task RemoveUserFromCurrentActorAsync(User user)
     {
         var userRoleAssignments = user.RoleAssignments.Where(x => x.ActorId.Value == _userContext.CurrentUser.ActorId);
 

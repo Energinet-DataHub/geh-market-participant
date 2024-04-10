@@ -24,27 +24,26 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class GetPermissionDetailsHandlerTests
 {
-    [UnitTest]
-    public sealed class GetPermissionDetailsHandlerTests
+    [Fact]
+    public async Task Handle_Command_CallsRepository()
     {
-        [Fact]
-        public async Task Handle_Command_CallsRepository()
-        {
-            // arrange
-            var repositoryMock = new Mock<IPermissionRepository>();
-            repositoryMock
-                .Setup(x => x.GetForMarketRoleAsync(It.IsAny<EicFunction>()))
-                .ReturnsAsync(Array.Empty<Permission>());
+        // arrange
+        var repositoryMock = new Mock<IPermissionRepository>();
+        repositoryMock
+            .Setup(x => x.GetForMarketRoleAsync(It.IsAny<EicFunction>()))
+            .ReturnsAsync(Array.Empty<Permission>());
 
-            var target = new GetPermissionDetailsHandler(repositoryMock.Object);
+        var target = new GetPermissionDetailsHandler(repositoryMock.Object);
 
-            // act
-            var actual = await target.Handle(new GetPermissionDetailsCommand(EicFunction.BillingAgent), CancellationToken.None);
+        // act
+        var actual = await target.Handle(new GetPermissionDetailsCommand(EicFunction.BillingAgent), CancellationToken.None);
 
-            // assert
-            Assert.NotNull(actual.Permissions);
-        }
+        // assert
+        Assert.NotNull(actual.Permissions);
     }
 }

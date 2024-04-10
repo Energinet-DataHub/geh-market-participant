@@ -17,34 +17,33 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Model
+namespace Energinet.DataHub.MarketParticipant.Tests.Model;
+
+[UnitTest]
+public sealed class PhoneNumberTests
 {
-    [UnitTest]
-    public sealed class PhoneNumberTests
+    [Theory]
+    [InlineData("", false)]
+    [InlineData(" ", false)]
+    [InlineData(null, false)]
+    [InlineData("01020304", true)]
+    [InlineData("+45 01020304", true)]
+    [InlineData("123.456.7890", true)]
+    [InlineData("123-456-7890", true)]
+    [InlineData("+44 7222 555 555", true)]
+    [InlineData("+49 (173) 1799 806-44", true)]
+    [InlineData("010101 letters 02", false)]
+    [InlineData("000000000000000000000000000000", true)]
+    [InlineData("0000000000000000000000000000001", false)]
+    public void Ctor_PhoneNumber_ValidatesNumbers(string? value, bool isValid)
     {
-        [Theory]
-        [InlineData("", false)]
-        [InlineData(" ", false)]
-        [InlineData(null, false)]
-        [InlineData("01020304", true)]
-        [InlineData("+45 01020304", true)]
-        [InlineData("123.456.7890", true)]
-        [InlineData("123-456-7890", true)]
-        [InlineData("+44 7222 555 555", true)]
-        [InlineData("+49 (173) 1799 806-44", true)]
-        [InlineData("010101 letters 02", false)]
-        [InlineData("000000000000000000000000000000", true)]
-        [InlineData("0000000000000000000000000000001", false)]
-        public void Ctor_PhoneNumber_ValidatesNumbers(string? value, bool isValid)
+        if (isValid)
         {
-            if (isValid)
-            {
-                Assert.Equal(value, new PhoneNumber(value!).Number);
-            }
-            else
-            {
-                Assert.Throws<ValidationException>(() => new PhoneNumber(value!));
-            }
+            Assert.Equal(value, new PhoneNumber(value!).Number);
+        }
+        else
+        {
+            Assert.Throws<ValidationException>(() => new PhoneNumber(value!));
         }
     }
 }

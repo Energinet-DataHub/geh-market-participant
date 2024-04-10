@@ -16,7 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -26,109 +26,108 @@ using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class GetActorCredentialsHandlerTests
 {
-    [UnitTest]
-    public sealed class GetActorCredentialsHandlerTests
+    [Fact]
+    public async Task Handle_NoActor_ThrowsNotFoundException()
     {
-        [Fact]
-        public async Task Handle_NoActor_ThrowsNotFoundException()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var target = new GetActorCredentialsHandler(actorRepositoryMock.Object);
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var target = new GetActorCredentialsHandler(actorRepositoryMock.Object);
 
-            var actorId = Guid.NewGuid();
+        var actorId = Guid.NewGuid();
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
-                .ReturnsAsync((Actor?)null);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
+            .ReturnsAsync((Actor?)null);
 
-            var command = new GetActorCredentialsCommand(actorId);
+        var command = new GetActorCredentialsCommand(actorId);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
+    }
 
-        [Fact]
-        public async Task Handle_HasNoCredentials_ReturnsNull()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var target = new GetActorCredentialsHandler(actorRepositoryMock.Object);
+    [Fact]
+    public async Task Handle_HasNoCredentials_ReturnsNull()
+    {
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var target = new GetActorCredentialsHandler(actorRepositoryMock.Object);
 
-            var actorId = Guid.NewGuid();
-            var actor = TestPreparationModels.MockedActor(actorId);
+        var actorId = Guid.NewGuid();
+        var actor = TestPreparationModels.MockedActor(actorId);
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
-                .ReturnsAsync(actor);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+            .ReturnsAsync(actor);
 
-            var command = new GetActorCredentialsCommand(actorId);
+        var command = new GetActorCredentialsCommand(actorId);
 
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            Assert.Null(response);
-        }
+        // Assert
+        Assert.Null(response);
+    }
 
-        [Fact]
-        public async Task Handle_HasCertificateCredentials_ReturnsCorrectCredentials()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var target = new GetActorCredentialsHandler(actorRepositoryMock.Object);
+    [Fact]
+    public async Task Handle_HasCertificateCredentials_ReturnsCorrectCredentials()
+    {
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var target = new GetActorCredentialsHandler(actorRepositoryMock.Object);
 
-            var actorId = Guid.NewGuid();
-            var actor = TestPreparationModels.MockedActor(actorId);
-            actor.Credentials = new ActorCertificateCredentials(
-                "mock",
-                "mock",
-                DateTime.UtcNow.AddYears(1).ToInstant());
+        var actorId = Guid.NewGuid();
+        var actor = TestPreparationModels.MockedActor(actorId);
+        actor.Credentials = new ActorCertificateCredentials(
+            "mock",
+            "mock",
+            DateTime.UtcNow.AddYears(1).ToInstant());
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
-                .ReturnsAsync(actor);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+            .ReturnsAsync(actor);
 
-            var command = new GetActorCredentialsCommand(actorId);
+        var command = new GetActorCredentialsCommand(actorId);
 
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            Assert.NotNull(response);
-            Assert.NotNull(response.CredentialsDto.CertificateCredentials);
-            Assert.Null(response.CredentialsDto.ClientSecretCredentials);
-        }
+        // Assert
+        Assert.NotNull(response);
+        Assert.NotNull(response.CredentialsDto.CertificateCredentials);
+        Assert.Null(response.CredentialsDto.ClientSecretCredentials);
+    }
 
-        [Fact]
-        public async Task Handle_HasClientSecretCredentials_ReturnsCorrectCredentials()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var target = new GetActorCredentialsHandler(actorRepositoryMock.Object);
+    [Fact]
+    public async Task Handle_HasClientSecretCredentials_ReturnsCorrectCredentials()
+    {
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var target = new GetActorCredentialsHandler(actorRepositoryMock.Object);
 
-            var actorId = Guid.NewGuid();
-            var actor = TestPreparationModels.MockedActor(actorId);
-            actor.Credentials = new ActorClientSecretCredentials(
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-                DateTime.UtcNow.AddYears(1).ToInstant());
+        var actorId = Guid.NewGuid();
+        var actor = TestPreparationModels.MockedActor(actorId);
+        actor.Credentials = new ActorClientSecretCredentials(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            DateTime.UtcNow.AddYears(1).ToInstant());
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
-                .ReturnsAsync(actor);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+            .ReturnsAsync(actor);
 
-            var command = new GetActorCredentialsCommand(actorId);
+        var command = new GetActorCredentialsCommand(actorId);
 
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            Assert.NotNull(response);
-            Assert.NotNull(response.CredentialsDto.ClientSecretCredentials);
-            Assert.Null(response.CredentialsDto.CertificateCredentials);
-        }
+        // Assert
+        Assert.NotNull(response);
+        Assert.NotNull(response.CredentialsDto.ClientSecretCredentials);
+        Assert.Null(response.CredentialsDto.CertificateCredentials);
     }
 }

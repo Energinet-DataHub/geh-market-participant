@@ -189,7 +189,7 @@ public sealed class CheckEmailExistsHandlerIntegrationTests(
 
         var userIdProvider = new Mock<IUserContext<FrontendUser>>();
         userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
-        services.Replace(ServiceDescriptor.Scoped<IUserContext<FrontendUser>>(_ => userIdProvider.Object));
+        services.Replace(ServiceDescriptor.Scoped(_ => userIdProvider.Object));
 
         return mockUser;
     }

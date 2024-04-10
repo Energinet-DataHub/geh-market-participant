@@ -16,33 +16,32 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class UpdateOrganizationCommandRuleSet : AbstractValidator<UpdateOrganizationCommand>
 {
-    public sealed class UpdateOrganizationCommandRuleSet : AbstractValidator<UpdateOrganizationCommand>
+    public UpdateOrganizationCommandRuleSet()
     {
-        public UpdateOrganizationCommandRuleSet()
-        {
-            RuleFor(command => command.OrganizationId)
-                .NotEmpty();
+        RuleFor(command => command.OrganizationId)
+            .NotEmpty();
 
-            RuleFor(command => command.Organization)
-                .NotNull()
-                .ChildRules(validator =>
-                {
-                    validator
-                        .RuleFor(organization => organization.Name)
-                        .NotEmpty()
-                        .Length(1, 50);
+        RuleFor(command => command.Organization)
+            .NotNull()
+            .ChildRules(validator =>
+            {
+                validator
+                    .RuleFor(organization => organization.Name)
+                    .NotEmpty()
+                    .Length(1, 50);
 
-                    validator
-                        .RuleFor(organization => organization.Status)
-                        .NotEmpty()
-                        .IsEnumName(typeof(OrganizationStatus));
+                validator
+                    .RuleFor(organization => organization.Status)
+                    .NotEmpty()
+                    .IsEnumName(typeof(OrganizationStatus));
 
-                    validator
-                        .RuleFor(organization => organization.Domain)
-                        .Must(OrganizationDomain.IsValid);
-                });
-        }
+                validator
+                    .RuleFor(organization => organization.Domain)
+                    .Must(OrganizationDomain.IsValid);
+            });
     }
 }

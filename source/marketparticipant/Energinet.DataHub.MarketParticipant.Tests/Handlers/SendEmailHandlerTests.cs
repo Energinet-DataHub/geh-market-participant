@@ -25,37 +25,36 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class SendEmailHandlerTests
 {
-    [UnitTest]
-    public sealed class SendEmailHandlerTests
+    private readonly UserInviteEmailTemplate _emailTemplate = new(new Dictionary<string, string>());
+
+    [Fact]
+    public async Task Handle_EmailEventFound_EmailIsSent()
     {
-        private readonly UserInviteEmailTemplate _emailTemplate = new(new Dictionary<string, string>());
-
-        [Fact]
-        public async Task Handle_EmailEventFound_EmailIsSent()
+        // arrange
+        var events = new[]
         {
-            // arrange
-            var events = new[]
-            {
-                new EmailEvent(new RandomlyGeneratedEmailAddress(), _emailTemplate)
-            };
+            new EmailEvent(new RandomlyGeneratedEmailAddress(), _emailTemplate)
+        };
 
-            var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
-            emailEventsRepositoryMock.Setup(x => x.GetAllPendingEmailEventsAsync()).ReturnsAsync(events);
+        var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
+        emailEventsRepositoryMock.Setup(x => x.GetAllPendingEmailEventsAsync()).ReturnsAsync(events);
 
-            var emailSenderMock = new Mock<IEmailSender>();
+        var emailSenderMock = new Mock<IEmailSender>();
 
-            var target = new SendEmailHandler(
-                emailEventsRepositoryMock.Object,
-                emailSenderMock.Object);
+        var target = new SendEmailHandler(
+            emailEventsRepositoryMock.Object,
+            emailSenderMock.Object);
 
-            // act
-            await target.Handle(new SendEmailCommand(), CancellationToken.None);
+        // act
+        await target.Handle(new SendEmailCommand(), CancellationToken.None);
 
-            // assert
-            emailSenderMock.Verify(c => c.SendEmailAsync(events[0].Email, events[0]), Times.Exactly(1));
-            emailEventsRepositoryMock.Verify(c => c.MarkAsSentAsync(events[0]), Times.Exactly(1));
-        }
+        // assert
+        emailSenderMock.Verify(c => c.SendEmailAsync(events[0].Email, events[0]), Times.Exactly(1));
+        emailEventsRepositoryMock.Verify(c => c.MarkAsSentAsync(events[0]), Times.Exactly(1));
     }
 }

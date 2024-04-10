@@ -14,17 +14,16 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
-{
-    public sealed record GridAreaOverviewItem(
-        GridAreaId Id,
-        GridAreaName Name,
-        GridAreaCode Code,
-        PriceAreaCode PriceAreaCode,
-        DateTimeOffset ValidFrom,
-        DateTimeOffset? ValidTo,
-        ActorNumber? ActorNumber,
-        ActorName? ActorName,
-        string? OrganizationName,
-        DateTimeOffset? FullFlexDate);
-}
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record GridAreaOverviewItem(
+    GridAreaId Id,
+    GridAreaName Name,
+    GridAreaCode Code,
+    PriceAreaCode PriceAreaCode,
+    DateTimeOffset ValidFrom,
+    DateTimeOffset? ValidTo,
+    ActorNumber? ActorNumber,
+    ActorName? ActorName,
+    string? OrganizationName,
+    DateTimeOffset? FullFlexDate);

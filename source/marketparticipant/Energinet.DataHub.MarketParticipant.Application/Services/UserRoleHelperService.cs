@@ -19,25 +19,24 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
+
+public class EnsureUserRolePermissionsService : IEnsureUserRolePermissionsService
 {
-    public class EnsureUserRolePermissionsService : IEnsureUserRolePermissionsService
+    private readonly IPermissionRepository _permissionRepository;
+
+    public EnsureUserRolePermissionsService(IPermissionRepository permissionRepository)
     {
-        private readonly IPermissionRepository _permissionRepository;
+        _permissionRepository = permissionRepository;
+    }
 
-        public EnsureUserRolePermissionsService(IPermissionRepository permissionRepository)
-        {
-            _permissionRepository = permissionRepository;
-        }
+    public async Task<bool> EnsurePermissionsSelectedAreValidForMarketRoleAsync(IEnumerable<PermissionId> permissions, EicFunction eicFunction)
+    {
+        var permissionsToEic = await _permissionRepository
+            .GetForMarketRoleAsync(eicFunction)
+            .ConfigureAwait(false);
 
-        public async Task<bool> EnsurePermissionsSelectedAreValidForMarketRoleAsync(IEnumerable<PermissionId> permissions, EicFunction eicFunction)
-        {
-            var permissionsToEic = await _permissionRepository
-                .GetForMarketRoleAsync(eicFunction)
-                .ConfigureAwait(false);
-
-            var valid = permissions.All(x => permissionsToEic.Any(y => y.Id == x));
-            return valid;
-        }
+        var valid = permissions.All(x => permissionsToEic.Any(y => y.Id == x));
+        return valid;
     }
 }

@@ -15,9 +15,8 @@
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetPermissionsCommandRuleSet : AbstractValidator<GetPermissionsCommand>
 {
-    public sealed class GetPermissionsCommandRuleSet : AbstractValidator<GetPermissionsCommand>
-    {
-    }
 }

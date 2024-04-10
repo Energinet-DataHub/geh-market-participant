@@ -18,7 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -27,137 +27,136 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class CreateActorHandlerTests
 {
-    [UnitTest]
-    public sealed class CreateActorHandlerTests
+    [Fact]
+    public async Task Handle_NewActor_ActorIdReturned()
     {
-        [Fact]
-        public async Task Handle_NewActor_ActorIdReturned()
+        // Arrange
+        var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+        var actorFactory = new Mock<IActorFactoryService>();
+        var target = new CreateActorHandler(
+            organizationExistsHelperService.Object,
+            actorFactory.Object);
+
+        var organization = TestPreparationModels.MockedOrganization();
+        var actor = TestPreparationModels.MockedActor(Guid.NewGuid(), organization.Id.Value);
+
+        organizationExistsHelperService
+            .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
+            .ReturnsAsync(organization);
+
+        actorFactory
+            .Setup(x => x.CreateAsync(
+                organization,
+                It.Is<ActorNumber>(y => y.Value == actor.ActorNumber.Value),
+                It.Is<ActorName>(y => y.Value == string.Empty),
+                It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
+            .ReturnsAsync(actor);
+
+        var command = new CreateActorCommand(new CreateActorDto(
+            organization.Id.Value,
+            new ActorNameDto(string.Empty),
+            new ActorNumberDto(actor.ActorNumber.Value),
+            Array.Empty<ActorMarketRoleDto>()));
+
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(actor.Id.Value, response.ActorId);
+    }
+
+    [Fact]
+    public async Task Handle_NewActorWithMarketRoles_ActorIdReturned()
+    {
+        // Arrange
+        string actorGln = new MockedGln();
+        var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+        var actorFactory = new Mock<IActorFactoryService>();
+        var target = new CreateActorHandler(
+            organizationExistsHelperService.Object,
+            actorFactory.Object);
+
+        var organization = TestPreparationModels.MockedOrganization();
+        var actor = TestPreparationModels.MockedActor(Guid.NewGuid(), organization.Id.Value);
+
+        var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, Enumerable.Empty<ActorGridAreaDto>(), string.Empty);
+
+        organizationExistsHelperService
+            .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
+            .ReturnsAsync(organization);
+
+        actorFactory
+            .Setup(x => x.CreateAsync(
+                organization,
+                It.Is<ActorNumber>(y => y.Value == actorGln),
+                It.Is<ActorName>(y => y.Value == string.Empty),
+                It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
+            .ReturnsAsync(actor);
+
+        var command = new CreateActorCommand(new CreateActorDto(
+            organization.Id.Value,
+            new ActorNameDto(string.Empty),
+            new ActorNumberDto(actorGln),
+            new[] { marketRole }));
+
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(actor.Id.Value, response.ActorId);
+    }
+
+    [Fact]
+    public async Task Handle_NewActorWithMarketRoleGridAccessProvider_MultiGridAreas_ActorIdReturned()
+    {
+        // Arrange
+        string actorGln = new MockedGln();
+        var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+        var actorFactory = new Mock<IActorFactoryService>();
+        var target = new CreateActorHandler(
+            organizationExistsHelperService.Object,
+            actorFactory.Object);
+
+        var organization = TestPreparationModels.MockedOrganization();
+        var actor = TestPreparationModels.MockedActor(Guid.NewGuid(), organization.Id.Value);
+        var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
+
+        var validGridAreas = new List<ActorGridAreaDto>
         {
-            // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var actorFactory = new Mock<IActorFactoryService>();
-            var target = new CreateActorHandler(
-                organizationExistsHelperService.Object,
-                actorFactory.Object);
+            new(Guid.NewGuid(), validMeteringPointTypes),
+            new(Guid.NewGuid(), validMeteringPointTypes),
+            new(Guid.NewGuid(), validMeteringPointTypes)
+        };
 
-            var organization = TestPreparationModels.MockedOrganization();
-            var actor = TestPreparationModels.MockedActor(Guid.NewGuid(), organization.Id.Value);
+        var marketRole = new ActorMarketRoleDto(EicFunction.GridAccessProvider, validGridAreas, string.Empty);
 
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
-                .ReturnsAsync(organization);
+        organizationExistsHelperService
+            .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
+            .ReturnsAsync(organization);
 
-            actorFactory
-                .Setup(x => x.CreateAsync(
-                    organization,
-                    It.Is<ActorNumber>(y => y.Value == actor.ActorNumber.Value),
-                    It.Is<ActorName>(y => y.Value == string.Empty),
-                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
-                .ReturnsAsync(actor);
+        actorFactory
+            .Setup(x => x.CreateAsync(
+                organization,
+                It.Is<ActorNumber>(y => y.Value == actorGln),
+                It.Is<ActorName>(y => y.Value == string.Empty),
+                It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
+            .ReturnsAsync(actor);
 
-            var command = new CreateActorCommand(new CreateActorDto(
-                organization.Id.Value,
-                new ActorNameDto(string.Empty),
-                new ActorNumberDto(actor.ActorNumber.Value),
-                Array.Empty<ActorMarketRoleDto>()));
+        var command = new CreateActorCommand(new CreateActorDto(
+            organization.Id.Value,
+            new ActorNameDto(string.Empty),
+            new ActorNumberDto(actorGln),
+            new[] { marketRole }));
 
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            Assert.Equal(actor.Id.Value, response.ActorId);
-        }
-
-        [Fact]
-        public async Task Handle_NewActorWithMarketRoles_ActorIdReturned()
-        {
-            // Arrange
-            string actorGln = new MockedGln();
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var actorFactory = new Mock<IActorFactoryService>();
-            var target = new CreateActorHandler(
-                organizationExistsHelperService.Object,
-                actorFactory.Object);
-
-            var organization = TestPreparationModels.MockedOrganization();
-            var actor = TestPreparationModels.MockedActor(Guid.NewGuid(), organization.Id.Value);
-
-            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, Enumerable.Empty<ActorGridAreaDto>(), string.Empty);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
-                .ReturnsAsync(organization);
-
-            actorFactory
-                .Setup(x => x.CreateAsync(
-                    organization,
-                    It.Is<ActorNumber>(y => y.Value == actorGln),
-                    It.Is<ActorName>(y => y.Value == string.Empty),
-                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
-                .ReturnsAsync(actor);
-
-            var command = new CreateActorCommand(new CreateActorDto(
-                organization.Id.Value,
-                new ActorNameDto(string.Empty),
-                new ActorNumberDto(actorGln),
-                new[] { marketRole }));
-
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
-
-            // Assert
-            Assert.Equal(actor.Id.Value, response.ActorId);
-        }
-
-        [Fact]
-        public async Task Handle_NewActorWithMarketRoleGridAccessProvider_MultiGridAreas_ActorIdReturned()
-        {
-            // Arrange
-            string actorGln = new MockedGln();
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var actorFactory = new Mock<IActorFactoryService>();
-            var target = new CreateActorHandler(
-                organizationExistsHelperService.Object,
-                actorFactory.Object);
-
-            var organization = TestPreparationModels.MockedOrganization();
-            var actor = TestPreparationModels.MockedActor(Guid.NewGuid(), organization.Id.Value);
-            var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
-
-            var validGridAreas = new List<ActorGridAreaDto>
-            {
-                new(Guid.NewGuid(), validMeteringPointTypes),
-                new(Guid.NewGuid(), validMeteringPointTypes),
-                new(Guid.NewGuid(), validMeteringPointTypes)
-            };
-
-            var marketRole = new ActorMarketRoleDto(EicFunction.GridAccessProvider, validGridAreas, string.Empty);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
-                .ReturnsAsync(organization);
-
-            actorFactory
-                .Setup(x => x.CreateAsync(
-                    organization,
-                    It.Is<ActorNumber>(y => y.Value == actorGln),
-                    It.Is<ActorName>(y => y.Value == string.Empty),
-                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
-                .ReturnsAsync(actor);
-
-            var command = new CreateActorCommand(new CreateActorDto(
-                organization.Id.Value,
-                new ActorNameDto(string.Empty),
-                new ActorNumberDto(actorGln),
-                new[] { marketRole }));
-
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
-
-            // Assert
-            Assert.Equal(actor.Id.Value, response.ActorId);
-        }
+        // Assert
+        Assert.Equal(actor.Id.Value, response.ActorId);
     }
 }

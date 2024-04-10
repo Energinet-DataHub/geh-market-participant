@@ -21,55 +21,54 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
+
+[Collection(nameof(IntegrationTestCollectionFixture))]
+[IntegrationTest]
+public sealed class GridAreaAuditLogRepositoryTests
 {
-    [Collection(nameof(IntegrationTestCollectionFixture))]
-    [IntegrationTest]
-    public sealed class GridAreaAuditLogRepositoryTests
+    private readonly MarketParticipantDatabaseFixture _fixture;
+
+    public GridAreaAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
-        private readonly MarketParticipantDatabaseFixture _fixture;
+        _fixture = fixture;
+    }
 
-        public GridAreaAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
-        {
-            _fixture = fixture;
-        }
+    [Fact]
+    public async Task Get_GridAreaIdProvided_ReturnsLogEntriesForGridArea()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        [Fact]
-        public async Task Get_GridAreaIdProvided_ReturnsLogEntriesForGridArea()
-        {
-            // Arrange
-            await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var gridArea = new GridArea(
+            new GridAreaName("name"),
+            new GridAreaCode("100"),
+            PriceAreaCode.Dk1,
+            DateTimeOffset.MinValue,
+            null);
 
-            var gridArea = new GridArea(
-                new GridAreaName("name"),
-                new GridAreaCode("100"),
-                PriceAreaCode.Dk1,
-                DateTimeOffset.MinValue,
-                null);
+        var gridAreaRepository = new GridAreaRepository(context);
+        var gridAreaId = await gridAreaRepository.AddOrUpdateAsync(gridArea);
 
-            var gridAreaRepository = new GridAreaRepository(context);
-            var gridAreaId = await gridAreaRepository.AddOrUpdateAsync(gridArea);
+        var changedGridArea = new GridArea(
+            gridAreaId,
+            new GridAreaName("different name"),
+            new GridAreaCode("100"),
+            PriceAreaCode.Dk1,
+            DateTimeOffset.MinValue,
+            null);
 
-            var changedGridArea = new GridArea(
-                gridAreaId,
-                new GridAreaName("different name"),
-                new GridAreaCode("100"),
-                PriceAreaCode.Dk1,
-                DateTimeOffset.MinValue,
-                null);
+        await gridAreaRepository.AddOrUpdateAsync(changedGridArea);
 
-            await gridAreaRepository.AddOrUpdateAsync(changedGridArea);
+        var target = new GridAreaAuditLogRepository(context);
 
-            var target = new GridAreaAuditLogRepository(context);
+        // Act
+        var actual = (await target.GetAsync(gridAreaId)).ToList();
 
-            // Act
-            var actual = (await target.GetAsync(gridAreaId)).ToList();
-
-            // Assert
-            Assert.Single(actual);
-            Assert.Equal(changedGridArea.Name.Value, actual.Single().CurrentValue);
-        }
+        // Assert
+        Assert.Single(actual);
+        Assert.Equal(changedGridArea.Name.Value, actual.Single().CurrentValue);
     }
 }

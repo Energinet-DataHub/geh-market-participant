@@ -23,64 +23,63 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
+
+[ApiController]
+[Route("actor")]
+public sealed class ActorContactController : ControllerBase
 {
-    [ApiController]
-    [Route("actor")]
-    public sealed class ActorContactController : ControllerBase
+    private readonly IMediator _mediator;
+    private readonly IUserContext<FrontendUser> _userContext;
+
+    public ActorContactController(IMediator mediator, IUserContext<FrontendUser> userContext)
     {
-        private readonly IMediator _mediator;
-        private readonly IUserContext<FrontendUser> _userContext;
+        _mediator = mediator;
+        _userContext = userContext;
+    }
 
-        public ActorContactController(IMediator mediator, IUserContext<FrontendUser> userContext)
-        {
-            _mediator = mediator;
-            _userContext = userContext;
-        }
+    [HttpGet("{actorId:guid}/contact")]
+    [AuthorizeUser(PermissionId.ActorMasterDataManage)]
+    public async Task<ActionResult<IEnumerable<ActorContactDto>>> ListAllAsync(Guid actorId)
+    {
+        var getOrganizationsCommand = new GetActorContactsCommand(actorId);
 
-        [HttpGet("{actorId:guid}/contact")]
-        [AuthorizeUser(PermissionId.ActorMasterDataManage)]
-        public async Task<ActionResult<IEnumerable<ActorContactDto>>> ListAllAsync(Guid actorId)
-        {
-            var getOrganizationsCommand = new GetActorContactsCommand(actorId);
+        var response = await _mediator
+            .Send(getOrganizationsCommand)
+            .ConfigureAwait(false);
 
-            var response = await _mediator
-                .Send(getOrganizationsCommand)
-                .ConfigureAwait(false);
+        return Ok(response.Contacts);
+    }
 
-            return Ok(response.Contacts);
-        }
+    [HttpPost("{actorId:guid}/contact")]
+    [AuthorizeUser(PermissionId.ActorMasterDataManage)]
+    public async Task<ActionResult<Guid>> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
+    {
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-        [HttpPost("{actorId:guid}/contact")]
-        [AuthorizeUser(PermissionId.ActorMasterDataManage)]
-        public async Task<ActionResult<Guid>> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
-        {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
+        var createContactCommand = new CreateActorContactCommand(actorId, contactDto);
 
-            var createContactCommand = new CreateActorContactCommand(actorId, contactDto);
+        var response = await _mediator
+            .Send(createContactCommand)
+            .ConfigureAwait(false);
 
-            var response = await _mediator
-                .Send(createContactCommand)
-                .ConfigureAwait(false);
+        return Ok(response.ContactId);
+    }
 
-            return Ok(response.ContactId);
-        }
+    [HttpDelete("{actorId:guid}/contact/{contactId:guid}")]
+    [AuthorizeUser(PermissionId.ActorMasterDataManage)]
+    public async Task<ActionResult> DeleteContactAsync(Guid actorId, Guid contactId)
+    {
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-        [HttpDelete("{actorId:guid}/contact/{contactId:guid}")]
-        [AuthorizeUser(PermissionId.ActorMasterDataManage)]
-        public async Task<ActionResult> DeleteContactAsync(Guid actorId, Guid contactId)
-        {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
+        var deleteContactCommand = new DeleteActorContactCommand(actorId, contactId);
 
-            var deleteContactCommand = new DeleteActorContactCommand(actorId, contactId);
+        await _mediator
+            .Send(deleteContactCommand)
+            .ConfigureAwait(false);
 
-            await _mediator
-                .Send(deleteContactCommand)
-                .ConfigureAwait(false);
-
-            return Ok();
-        }
+        return Ok();
     }
 }

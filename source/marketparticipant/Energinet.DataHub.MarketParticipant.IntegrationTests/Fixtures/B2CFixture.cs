@@ -21,54 +21,52 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Graph;
 using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
-{
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 #pragma warning disable CA1001
-    public sealed class B2CFixture : IAsyncLifetime
+public sealed class B2CFixture : IAsyncLifetime
 #pragma warning restore CA1001
+{
+    private GraphServiceClient? _graphClient;
+
+    public IActiveDirectoryB2CService B2CService { get; private set; } = null!;
+
+    public Task InitializeAsync()
     {
-        private GraphServiceClient? _graphClient;
+        var integrationTestConfig = new IntegrationTestConfiguration();
 
-        public IActiveDirectoryB2CService B2CService { get; private set; } = null!;
+        // Graph Service Client
+        var clientSecretCredential = new ClientSecretCredential(
+            integrationTestConfig.B2CSettings.Tenant,
+            integrationTestConfig.B2CSettings.ServicePrincipalId,
+            integrationTestConfig.B2CSettings.ServicePrincipalSecret);
 
-        public Task InitializeAsync()
-        {
-            var integrationTestConfig = new IntegrationTestConfiguration();
+        _graphClient = new GraphServiceClient(
+            clientSecretCredential,
+            new[]
+            {
+                "https://graph.microsoft.com/.default"
+            });
 
-            // Graph Service Client
-            var clientSecretCredential = new ClientSecretCredential(
-                integrationTestConfig.B2CSettings.Tenant,
-                integrationTestConfig.B2CSettings.ServicePrincipalId,
-                integrationTestConfig.B2CSettings.ServicePrincipalSecret);
+        // Azure AD Config
+        var config = new AzureAdConfig(
+            integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
+            integrationTestConfig.B2CSettings.BackendAppId);
 
-            _graphClient = new GraphServiceClient(
-                clientSecretCredential,
-                new[]
-                {
-                    "https://graph.microsoft.com/.default"
-                });
+        // Active Directory Roles
+        var activeDirectoryB2CRoles =
+            new ActiveDirectoryB2BRolesProvider(_graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
 
-            // Azure AD Config
-            var config = new AzureAdConfig(
-                integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
-                integrationTestConfig.B2CSettings.BackendAppId);
+        B2CService = new ActiveDirectoryB2CService(
+            _graphClient,
+            config,
+            activeDirectoryB2CRoles);
 
-            // Active Directory Roles
-            var activeDirectoryB2CRoles =
-                new ActiveDirectoryB2BRolesProvider(_graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
+        return Task.CompletedTask;
+    }
 
-            B2CService = new ActiveDirectoryB2CService(
-                _graphClient,
-                config,
-                activeDirectoryB2CRoles);
-
-            return Task.CompletedTask;
-        }
-
-        public Task DisposeAsync()
-        {
-            _graphClient?.Dispose();
-            return Task.CompletedTask;
-        }
+    public Task DisposeAsync()
+    {
+        _graphClient?.Dispose();
+        return Task.CompletedTask;
     }
 }

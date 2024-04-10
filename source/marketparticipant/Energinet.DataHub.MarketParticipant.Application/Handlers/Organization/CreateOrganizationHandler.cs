@@ -20,35 +20,34 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
+
+public sealed class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, CreateOrganizationResponse>
 {
-    public sealed class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, CreateOrganizationResponse>
+    private readonly IOrganizationFactoryService _organizationFactoryService;
+
+    public CreateOrganizationHandler(IOrganizationFactoryService organizationFactoryService)
     {
-        private readonly IOrganizationFactoryService _organizationFactoryService;
+        _organizationFactoryService = organizationFactoryService;
+    }
 
-        public CreateOrganizationHandler(IOrganizationFactoryService organizationFactoryService)
-        {
-            _organizationFactoryService = organizationFactoryService;
-        }
+    public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+        var address = new Address(
+            request.Organization.Address.StreetName,
+            request.Organization.Address.Number,
+            request.Organization.Address.ZipCode,
+            request.Organization.Address.City,
+            request.Organization.Address.Country);
+        var domain = new OrganizationDomain(request.Organization.Domain);
+        var cvr = new BusinessRegisterIdentifier(request.Organization.BusinessRegisterIdentifier);
 
-            var address = new Address(
-                request.Organization.Address.StreetName,
-                request.Organization.Address.Number,
-                request.Organization.Address.ZipCode,
-                request.Organization.Address.City,
-                request.Organization.Address.Country);
-            var domain = new OrganizationDomain(request.Organization.Domain);
-            var cvr = new BusinessRegisterIdentifier(request.Organization.BusinessRegisterIdentifier);
+        var organization = await _organizationFactoryService
+            .CreateAsync(request.Organization.Name, cvr, address, domain)
+            .ConfigureAwait(false);
 
-            var organization = await _organizationFactoryService
-                .CreateAsync(request.Organization.Name, cvr, address, domain)
-                .ConfigureAwait(false);
-
-            return new CreateOrganizationResponse(organization.Id.Value);
-        }
+        return new CreateOrganizationResponse(organization.Id.Value);
     }
 }

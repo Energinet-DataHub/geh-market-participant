@@ -81,7 +81,7 @@ public sealed class GetUserPermissionsHandler
         return new GetUserPermissionsResponse(user.Id.Value, isFas, permissions.Select(permission => permission.Claim));
     }
 
-    private async Task ValidateOrClearLogonRequirementsAsync(Domain.Model.Users.User user)
+    private async Task ValidateOrClearLogonRequirementsAsync(User user)
     {
         if (!user.ValidLogonRequirements)
         {

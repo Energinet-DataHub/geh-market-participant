@@ -27,224 +27,223 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
+
+[ApiController]
+[Route("actor")]
+public class ActorController : ControllerBase
 {
-    [ApiController]
-    [Route("actor")]
-    public class ActorController : ControllerBase
+    private readonly IMediator _mediator;
+    private readonly IUserContext<FrontendUser> _userContext;
+
+    public ActorController(IMediator mediator, IUserContext<FrontendUser> userContext)
     {
-        private readonly IMediator _mediator;
-        private readonly IUserContext<FrontendUser> _userContext;
+        _mediator = mediator;
+        _userContext = userContext;
+    }
 
-        public ActorController(IMediator mediator, IUserContext<FrontendUser> userContext)
-        {
-            _mediator = mediator;
-            _userContext = userContext;
-        }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ActorDto>>> GetActorsAsync()
+    {
+        var getAllActorsCommand = new GetAllActorsCommand();
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ActorDto>>> GetActorsAsync()
-        {
-            var getAllActorsCommand = new GetAllActorsCommand();
+        var response = await _mediator
+            .Send(getAllActorsCommand)
+            .ConfigureAwait(false);
 
-            var response = await _mediator
-                .Send(getAllActorsCommand)
-                .ConfigureAwait(false);
+        return Ok(response.Actors);
+    }
 
-            return Ok(response.Actors);
-        }
+    [HttpGet("{actorId:guid}")]
+    public async Task<ActionResult<ActorDto>> GetSingleActorAsync(Guid actorId)
+    {
+        var getSingleActorCommand = new GetSingleActorCommand(actorId);
 
-        [HttpGet("{actorId:guid}")]
-        public async Task<ActionResult<ActorDto>> GetSingleActorAsync(Guid actorId)
-        {
-            var getSingleActorCommand = new GetSingleActorCommand(actorId);
+        var response = await _mediator
+            .Send(getSingleActorCommand)
+            .ConfigureAwait(false);
 
-            var response = await _mediator
-                .Send(getSingleActorCommand)
-                .ConfigureAwait(false);
+        return Ok(response.Actor);
+    }
 
-            return Ok(response.Actor);
-        }
+    [HttpPost]
+    [AuthorizeUser(PermissionId.ActorsManage)]
+    public async Task<ActionResult<Guid>> CreateActorAsync(CreateActorDto actorDto)
+    {
+        if (!_userContext.CurrentUser.IsFas)
+            return Unauthorized();
 
-        [HttpPost]
-        [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<ActionResult<Guid>> CreateActorAsync(CreateActorDto actorDto)
-        {
-            if (!_userContext.CurrentUser.IsFas)
-                return Unauthorized();
+        var createActorCommand = new CreateActorCommand(actorDto);
 
-            var createActorCommand = new CreateActorCommand(actorDto);
+        var response = await _mediator
+            .Send(createActorCommand)
+            .ConfigureAwait(false);
 
-            var response = await _mediator
-                .Send(createActorCommand)
-                .ConfigureAwait(false);
+        return Ok(response.ActorId);
+    }
 
-            return Ok(response.ActorId);
-        }
+    [HttpPut("{actorId:guid}")]
+    [AuthorizeUser(PermissionId.ActorsManage)]
+    public async Task<ActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
+    {
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-        [HttpPut("{actorId:guid}")]
-        [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<ActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
-        {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
+        var updateActorCommand = new UpdateActorCommand(actorId, changeActor);
 
-            var updateActorCommand = new UpdateActorCommand(actorId, changeActor);
+        await _mediator
+            .Send(updateActorCommand)
+            .ConfigureAwait(false);
 
-            await _mediator
-                .Send(updateActorCommand)
-                .ConfigureAwait(false);
+        return Ok();
+    }
 
-            return Ok();
-        }
+    [HttpPut("{actorId:guid}/name")]
+    [AuthorizeUser(PermissionId.ActorMasterDataManage)]
+    public async Task<ActionResult> UpdateActorNameAsync(Guid actorId, ActorNameDto actorNameDto)
+    {
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-        [HttpPut("{actorId:guid}/name")]
-        [AuthorizeUser(PermissionId.ActorMasterDataManage)]
-        public async Task<ActionResult> UpdateActorNameAsync(Guid actorId, ActorNameDto actorNameDto)
-        {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
+        var updateActorNameCommand = new UpdateActorNameCommand(actorId, actorNameDto);
 
-            var updateActorNameCommand = new UpdateActorNameCommand(actorId, actorNameDto);
+        await _mediator
+            .Send(updateActorNameCommand)
+            .ConfigureAwait(false);
 
-            await _mediator
-                .Send(updateActorNameCommand)
-                .ConfigureAwait(false);
+        return Ok();
+    }
 
-            return Ok();
-        }
+    [HttpGet("{actorId:guid}/credentials")]
+    [AuthorizeUser(PermissionId.ActorCredentialsManage)]
+    public async Task<ActionResult<ActorCredentialsDto>> GetActorCredentialsAsync(Guid actorId)
+    {
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-        [HttpGet("{actorId:guid}/credentials")]
-        [AuthorizeUser(PermissionId.ActorCredentialsManage)]
-        public async Task<ActionResult<ActorCredentialsDto>> GetActorCredentialsAsync(Guid actorId)
-        {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
+        var command = new GetActorCredentialsCommand(actorId);
 
-            var command = new GetActorCredentialsCommand(actorId);
+        var result = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-            var result = await _mediator
-                .Send(command)
-                .ConfigureAwait(false);
+        return result is not null
+            ? Ok(result.CredentialsDto)
+            : NotFound();
+    }
 
-            return result is not null
-                ? Ok(result.CredentialsDto)
-                : NotFound();
-        }
+    [HttpPost("{actorId:guid}/credentials/certificate")]
+    [AuthorizeUser(PermissionId.ActorCredentialsManage)]
+    [RequestSizeLimit(10485760)]
+    public async Task<ActionResult> AssignActorCredentialsAsync(Guid actorId, IFormFile certificate)
+    {
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-        [HttpPost("{actorId:guid}/credentials/certificate")]
-        [AuthorizeUser(PermissionId.ActorCredentialsManage)]
-        [RequestSizeLimit(10485760)]
-        public async Task<ActionResult> AssignActorCredentialsAsync(Guid actorId, IFormFile certificate)
-        {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
+        ArgumentNullException.ThrowIfNull(certificate);
 
-            ArgumentNullException.ThrowIfNull(certificate);
+        var command = new AssignActorCertificateCommand(actorId, certificate.OpenReadStream());
 
-            var command = new AssignActorCertificateCommand(actorId, certificate.OpenReadStream());
+        await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-            await _mediator
-                .Send(command)
-                .ConfigureAwait(false);
+        return Ok();
+    }
 
-            return Ok();
-        }
+    [HttpDelete("{actorId:guid}/credentials")]
+    [AuthorizeUser(PermissionId.ActorCredentialsManage)]
+    public async Task<ActionResult> RemoveActorCredentialsAsync(Guid actorId)
+    {
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-        [HttpDelete("{actorId:guid}/credentials")]
-        [AuthorizeUser(PermissionId.ActorCredentialsManage)]
-        public async Task<ActionResult> RemoveActorCredentialsAsync(Guid actorId)
-        {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
+        var command = new RemoveActorCredentialsCommand(actorId);
 
-            var command = new RemoveActorCredentialsCommand(actorId);
+        await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-            await _mediator
-                .Send(command)
-                .ConfigureAwait(false);
+        return Ok();
+    }
 
-            return Ok();
-        }
+    [HttpPost("{actorId:guid}/credentials/secret")]
+    [AuthorizeUser(PermissionId.ActorCredentialsManage)]
+    public async Task<ActionResult<ActorClientSecretDto>> ActorRequestSecretAsync(Guid actorId)
+    {
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-        [HttpPost("{actorId:guid}/credentials/secret")]
-        [AuthorizeUser(PermissionId.ActorCredentialsManage)]
-        public async Task<ActionResult<ActorClientSecretDto>> ActorRequestSecretAsync(Guid actorId)
-        {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
+        var command = new ActorRequestSecretCommand(actorId);
 
-            var command = new ActorRequestSecretCommand(actorId);
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-            var response = await _mediator
-                .Send(command)
-                .ConfigureAwait(false);
+        return Ok(new ActorClientSecretDto(response.SecretText));
+    }
 
-            return Ok(new ActorClientSecretDto(response.SecretText));
-        }
+    [HttpGet("{actorId:guid}/audit")]
+    [AuthorizeUser(PermissionId.ActorsManage)]
+    public async Task<ActionResult<IEnumerable<AuditLogDto<ActorAuditedChange>>>> GetAuditAsync(Guid actorId)
+    {
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-        [HttpGet("{actorId:guid}/audit")]
-        [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<ActionResult<IEnumerable<AuditLogDto<ActorAuditedChange>>>> GetAuditAsync(Guid actorId)
-        {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
+        var command = new GetActorAuditLogsCommand(actorId);
 
-            var command = new GetActorAuditLogsCommand(actorId);
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-            var response = await _mediator
-                .Send(command)
-                .ConfigureAwait(false);
+        return Ok(response.AuditLogs);
+    }
 
-            return Ok(response.AuditLogs);
-        }
+    [HttpGet("{actorId:guid}/delegation")]
+    [AuthorizeUser(PermissionId.DelegationView)]
+    public async Task<ActionResult<GetDelegationsForActorResponse>> GetDelegationsForActorAsync(Guid actorId)
+    {
+        ArgumentNullException.ThrowIfNull(actorId);
 
-        [HttpGet("{actorId:guid}/delegation")]
-        [AuthorizeUser(PermissionId.DelegationView)]
-        public async Task<ActionResult<GetDelegationsForActorResponse>> GetDelegationsForActorAsync(Guid actorId)
-        {
-            ArgumentNullException.ThrowIfNull(actorId);
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
+        var result = await _mediator
+            .Send(new GetDelegationsForActorCommand(actorId))
+            .ConfigureAwait(false);
 
-            var result = await _mediator
-                .Send(new GetDelegationsForActorCommand(actorId))
-                .ConfigureAwait(false);
+        return Ok(result);
+    }
 
-            return Ok(result);
-        }
+    [HttpPost("delegation")]
+    [AuthorizeUser(PermissionId.DelegationManage)]
+    public async Task<ActionResult> CreateDelegationAsync([FromBody]CreateProcessDelegationsDto delegationDto)
+    {
+        if (!_userContext.CurrentUser.IsFas)
+            return Unauthorized();
 
-        [HttpPost("delegation")]
-        [AuthorizeUser(PermissionId.DelegationManage)]
-        public async Task<ActionResult> CreateDelegationAsync([FromBody]CreateProcessDelegationsDto delegationDto)
-        {
-            if (!_userContext.CurrentUser.IsFas)
-                return Unauthorized();
+        var createDelegationCommand = new CreateProcessDelegationCommand(delegationDto);
 
-            var createDelegationCommand = new CreateProcessDelegationCommand(delegationDto);
+        await _mediator
+            .Send(createDelegationCommand)
+            .ConfigureAwait(false);
 
-            await _mediator
-                .Send(createDelegationCommand)
-                .ConfigureAwait(false);
+        return Ok();
+    }
 
-            return Ok();
-        }
+    [HttpPut("delegation")]
+    [AuthorizeUser(PermissionId.DelegationManage)]
+    public async Task<ActionResult> StopDelegationAsync([FromBody] StopProcessDelegationDto delegationDto)
+    {
+        if (!_userContext.CurrentUser.IsFas)
+            return Unauthorized();
 
-        [HttpPut("delegation")]
-        [AuthorizeUser(PermissionId.DelegationManage)]
-        public async Task<ActionResult> StopDelegationAsync([FromBody] StopProcessDelegationDto delegationDto)
-        {
-            if (!_userContext.CurrentUser.IsFas)
-                return Unauthorized();
+        var stopMessageDelegationCommand = new StopProcessDelegationCommand(delegationDto);
 
-            var stopMessageDelegationCommand = new StopProcessDelegationCommand(delegationDto);
+        await _mediator
+            .Send(stopMessageDelegationCommand)
+            .ConfigureAwait(false);
 
-            await _mediator
-                .Send(stopMessageDelegationCommand)
-                .ConfigureAwait(false);
-
-            return Ok();
-        }
+        return Ok();
     }
 }

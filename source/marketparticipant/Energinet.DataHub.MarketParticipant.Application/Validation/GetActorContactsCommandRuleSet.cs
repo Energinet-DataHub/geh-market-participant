@@ -15,14 +15,13 @@
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetActorContactsCommandRuleSet : AbstractValidator<GetActorContactsCommand>
 {
-    public sealed class GetActorContactsCommandRuleSet : AbstractValidator<GetActorContactsCommand>
+    public GetActorContactsCommandRuleSet()
     {
-        public GetActorContactsCommandRuleSet()
-        {
-            RuleFor(command => command.ActorId)
-                .NotEmpty();
-        }
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
     }
 }

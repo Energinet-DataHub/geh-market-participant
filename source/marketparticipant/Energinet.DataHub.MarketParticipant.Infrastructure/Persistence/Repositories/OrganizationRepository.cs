@@ -23,89 +23,88 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+
+public sealed class OrganizationRepository : IOrganizationRepository
 {
-    public sealed class OrganizationRepository : IOrganizationRepository
+    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+
+    public OrganizationRepository(
+        IMarketParticipantDbContext marketParticipantDbContext)
     {
-        private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+        _marketParticipantDbContext = marketParticipantDbContext;
+    }
 
-        public OrganizationRepository(
-            IMarketParticipantDbContext marketParticipantDbContext)
+    public async Task<Result<OrganizationId, OrganizationError>> AddOrUpdateAsync(Organization organization)
+    {
+        ArgumentNullException.ThrowIfNull(organization, nameof(organization));
+
+        OrganizationEntity destination;
+
+        if (organization.Id.Value == default)
         {
-            _marketParticipantDbContext = marketParticipantDbContext;
+            destination = new OrganizationEntity();
         }
-
-        public async Task<Result<OrganizationId, OrganizationError>> AddOrUpdateAsync(Organization organization)
+        else
         {
-            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
-
-            OrganizationEntity destination;
-
-            if (organization.Id.Value == default)
-            {
-                destination = new OrganizationEntity();
-            }
-            else
-            {
-                destination = await _marketParticipantDbContext
-                    .Organizations
-                    .FirstAsync(x => x.Id == organization.Id.Value)
-                    .ConfigureAwait(false);
-            }
-
-            OrganizationMapper.MapToEntity(organization, destination);
-            _marketParticipantDbContext.Organizations.Update(destination);
-
-            try
-            {
-                await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-            }
-            catch (DbUpdateException ex) when (
-                ex.InnerException is SqlException inner &&
-                inner.Message.Contains("UQ_Organization_Domain", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return new(OrganizationError.DomainConflict);
-            }
-
-            return new(new OrganizationId(destination.Id));
-        }
-
-        public async Task<Organization?> GetAsync(OrganizationId id)
-        {
-            ArgumentNullException.ThrowIfNull(id, nameof(id));
-
-            var org = await _marketParticipantDbContext
+            destination = await _marketParticipantDbContext
                 .Organizations
-                .FirstOrDefaultAsync(x => x.Id == id.Value)
+                .FirstAsync(x => x.Id == organization.Id.Value)
                 .ConfigureAwait(false);
-
-            return org is not null ? OrganizationMapper.MapFromEntity(org) : null;
         }
 
-        public async Task<IEnumerable<Organization>> GetAsync()
+        OrganizationMapper.MapToEntity(organization, destination);
+        _marketParticipantDbContext.Organizations.Update(destination);
+
+        try
         {
-            var entities = await _marketParticipantDbContext
-                .Organizations
-                .OrderBy(x => x.Name)
-                .ToListAsync()
-                .ConfigureAwait(false);
-
-            return entities.Select(OrganizationMapper.MapFromEntity);
+            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
-
-        public async Task<IEnumerable<Organization>> GetAsync(ActorNumber actorNumber)
+        catch (DbUpdateException ex) when (
+            ex.InnerException is SqlException inner &&
+            inner.Message.Contains("UQ_Organization_Domain", StringComparison.InvariantCultureIgnoreCase))
         {
-            ArgumentNullException.ThrowIfNull(actorNumber, nameof(actorNumber));
-
-            var query =
-                from actor in _marketParticipantDbContext.Actors
-                join organization in _marketParticipantDbContext.Organizations
-                    on actor.OrganizationId equals organization.Id
-                where actor.ActorNumber == actorNumber.Value
-                select organization;
-
-            var organizations = await query.ToListAsync().ConfigureAwait(false);
-            return organizations.Select(OrganizationMapper.MapFromEntity);
+            return new(OrganizationError.DomainConflict);
         }
+
+        return new(new OrganizationId(destination.Id));
+    }
+
+    public async Task<Organization?> GetAsync(OrganizationId id)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+        var org = await _marketParticipantDbContext
+            .Organizations
+            .FirstOrDefaultAsync(x => x.Id == id.Value)
+            .ConfigureAwait(false);
+
+        return org is not null ? OrganizationMapper.MapFromEntity(org) : null;
+    }
+
+    public async Task<IEnumerable<Organization>> GetAsync()
+    {
+        var entities = await _marketParticipantDbContext
+            .Organizations
+            .OrderBy(x => x.Name)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return entities.Select(OrganizationMapper.MapFromEntity);
+    }
+
+    public async Task<IEnumerable<Organization>> GetAsync(ActorNumber actorNumber)
+    {
+        ArgumentNullException.ThrowIfNull(actorNumber, nameof(actorNumber));
+
+        var query =
+            from actor in _marketParticipantDbContext.Actors
+            join organization in _marketParticipantDbContext.Organizations
+                on actor.OrganizationId equals organization.Id
+            where actor.ActorNumber == actorNumber.Value
+            select organization;
+
+        var organizations = await query.ToListAsync().ConfigureAwait(false);
+        return organizations.Select(OrganizationMapper.MapFromEntity);
     }
 }

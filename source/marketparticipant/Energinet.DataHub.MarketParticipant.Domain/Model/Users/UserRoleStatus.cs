@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+
+public enum UserRoleStatus
 {
-    public enum UserRoleStatus
-    {
-        Active = 1,
-        Inactive = 2
-    }
+    Active = 1,
+    Inactive = 2
 }
