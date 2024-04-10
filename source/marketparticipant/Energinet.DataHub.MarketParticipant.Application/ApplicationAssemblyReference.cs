@@ -14,6 +14,4 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application;
 
-public sealed class ApplicationAssemblyReference
-{
-}
+public sealed class ApplicationAssemblyReference;

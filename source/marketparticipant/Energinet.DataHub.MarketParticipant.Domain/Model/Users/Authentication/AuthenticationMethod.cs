@@ -22,7 +22,5 @@ public abstract class AuthenticationMethod
     /// </summary>
     public static AuthenticationMethod Undetermined { get; } = new UndeterminedAuthenticationMethod();
 
-    private sealed class UndeterminedAuthenticationMethod : AuthenticationMethod
-    {
-    }
+    private sealed class UndeterminedAuthenticationMethod : AuthenticationMethod;
 }

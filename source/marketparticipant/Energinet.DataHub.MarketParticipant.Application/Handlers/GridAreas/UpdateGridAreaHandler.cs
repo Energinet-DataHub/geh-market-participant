@@ -55,7 +55,7 @@ public sealed class UpdateGridAreaHandler : IRequestHandler<UpdateGridAreaComman
             // update and send events
             if (nameChanged)
             {
-                var updatedGridArea = new Domain.Model.GridArea(
+                var updatedGridArea = new GridArea(
                     gridArea.Id,
                     new GridAreaName(request.GridAreaDto.Name),
                     gridArea.Code,

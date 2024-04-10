@@ -80,7 +80,7 @@ public sealed class UpdateActorHandler : IRequestHandler<UpdateActorCommand>
         }
     }
 
-    private static void UpdateAggregate(Domain.Model.Actor actor, ChangeActorDto changes)
+    private static void UpdateAggregate(Actor actor, ChangeActorDto changes)
     {
         if (actor.Status == ActorStatus.New)
         {
@@ -111,7 +111,7 @@ public sealed class UpdateActorHandler : IRequestHandler<UpdateActorCommand>
         actor.Status = Enum.Parse<ActorStatus>(changes.Status, true);
     }
 
-    private async Task ValidateAggregateAsync(Domain.Model.Actor actor)
+    private async Task ValidateAggregateAsync(Actor actor)
     {
         await _uniqueMarketRoleGridAreaRuleService
             .ValidateAndReserveAsync(actor)

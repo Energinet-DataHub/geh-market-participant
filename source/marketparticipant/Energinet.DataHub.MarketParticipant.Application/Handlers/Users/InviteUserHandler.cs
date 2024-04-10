@@ -73,7 +73,7 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
             .ConfigureAwait(false);
     }
 
-    private async Task<Domain.Model.Actor> GetActorAsync(Guid actorId)
+    private async Task<Actor> GetActorAsync(Guid actorId)
     {
         var actor = await _actorRepository
             .GetAsync(new ActorId(actorId))

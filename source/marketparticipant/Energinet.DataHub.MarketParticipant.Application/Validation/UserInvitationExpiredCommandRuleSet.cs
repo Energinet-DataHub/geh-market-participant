@@ -17,6 +17,4 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class UserInvitationExpiredCommandRuleSet : AbstractValidator<UserInvitationExpiredCommand>
-{
-}
+public sealed class UserInvitationExpiredCommandRuleSet : AbstractValidator<UserInvitationExpiredCommand>;
