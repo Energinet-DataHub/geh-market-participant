@@ -252,6 +252,28 @@ public sealed class ProcessDelegationTests
     }
 
     [Fact]
+    public void StopDelegation_Cancelled_ThrowsException()
+    {
+        // Arrange
+        var testData = CreateTestBasicTestData();
+        var processDelegation = new ProcessDelegation(testData.ActorFrom, DelegatedProcess.ReceiveWholesaleResults);
+
+        var initialStartsAt = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow);
+        var initialStopsAt = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow).Plus(Duration.FromDays(-5));
+        var attemptedStopsAt = Instant.FromDateTimeOffset(DateTimeOffset.UtcNow).Plus(Duration.FromDays(15));
+
+        processDelegation.DelegateTo(testData.ActorTo.Id, testData.GridArea.Id, initialStartsAt);
+        processDelegation.StopDelegation(processDelegation.Delegations.Single(), initialStopsAt);
+
+        // Act + Assert
+        var exception = Assert.Throws<ValidationException>(() =>
+            processDelegation.StopDelegation(processDelegation.Delegations.Single(), attemptedStopsAt));
+
+        // Assert
+        Assert.Equal("process_delegation.cancelled", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
+    }
+
+    [Fact]
     public void StopDelegation_StopPeriod_PublishesEvents()
     {
         // Arrange

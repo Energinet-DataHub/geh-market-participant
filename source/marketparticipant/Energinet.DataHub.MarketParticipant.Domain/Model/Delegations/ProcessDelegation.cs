@@ -107,9 +107,15 @@ public sealed class ProcessDelegation : IPublishDomainEvents
             throw new InvalidOperationException("Provided existing delegation period was not in collection.");
         }
 
+        if (existingPeriod.IsCancelled)
+        {
+            throw new ValidationException("Cannot stop a cancelled delegation.")
+                .WithErrorCode("process_delegation.cancelled");
+        }
+
         if (IsThereDelegationPeriodOverlap(existingPeriod.StartsAt, existingPeriod.GridAreaId, stopsAt))
         {
-            throw new ValidationException("Delegation already exists for the given grid area and time period")
+            throw new ValidationException("Delegation already exists for the given grid area and time period.")
                 .WithErrorCode("process_delegation.overlap");
         }
 
