@@ -16,77 +16,76 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Model
+namespace Energinet.DataHub.MarketParticipant.Tests.Model;
+
+[UnitTest]
+public sealed class GlnActorNumberTests
 {
-    [UnitTest]
-    public sealed class GlnActorNumberTests
+    [Fact]
+    public void Type_ReturnsGln()
     {
-        [Fact]
-        public void Type_ReturnsGln()
-        {
-            // arrange, act
-            var actual = ActorNumber.Create("6790000555559");
+        // arrange, act
+        var actual = ActorNumber.Create("6790000555559");
 
-            // assert
-            Assert.Equal(ActorNumberType.Gln, actual.Type);
-        }
+        // assert
+        Assert.Equal(ActorNumberType.Gln, actual.Type);
+    }
 
-        [Theory]
-        [InlineData("")]
-        [InlineData("  ")]
-        public void Validate_InvalidGln_ReturnsFalse(string value)
-        {
-            // arrange, act
-            var result = GlnActorNumber.IsValid(value);
+    [Theory]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void Validate_InvalidGln_ReturnsFalse(string value)
+    {
+        // arrange, act
+        var result = GlnActorNumber.IsValid(value);
 
-            // assert
-            Assert.False(result);
-        }
+        // assert
+        Assert.False(result);
+    }
 
-        [Theory]
-        [InlineData("790000555550")]
-        [InlineData("05790000555550")]
-        public void Validate_InvalidLengthGln_ReturnsFalse(string value)
-        {
-            // arrange, act
-            var result = GlnActorNumber.IsValid(value);
+    [Theory]
+    [InlineData("790000555550")]
+    [InlineData("05790000555550")]
+    public void Validate_InvalidLengthGln_ReturnsFalse(string value)
+    {
+        // arrange, act
+        var result = GlnActorNumber.IsValid(value);
 
-            // assert
-            Assert.False(result);
-        }
+        // assert
+        Assert.False(result);
+    }
 
-        [Theory]
-        [InlineData("579000A555550")]
-        public void Validate_InvalidNaNGln_ReturnsFalse(string value)
-        {
-            // arrange, act
-            var result = GlnActorNumber.IsValid(value);
+    [Theory]
+    [InlineData("579000A555550")]
+    public void Validate_InvalidNaNGln_ReturnsFalse(string value)
+    {
+        // arrange, act
+        var result = GlnActorNumber.IsValid(value);
 
-            // assert
-            Assert.False(result);
-        }
+        // assert
+        Assert.False(result);
+    }
 
-        [Theory]
-        [InlineData("5790000555551")]
-        public void Validate_InvalidChecksumGln_ReturnsFalse(string value)
-        {
-            // arrange, act
-            var result = GlnActorNumber.IsValid(value);
+    [Theory]
+    [InlineData("5790000555551")]
+    public void Validate_InvalidChecksumGln_ReturnsFalse(string value)
+    {
+        // arrange, act
+        var result = GlnActorNumber.IsValid(value);
 
-            // assert
-            Assert.False(result);
-        }
+        // assert
+        Assert.False(result);
+    }
 
-        [Theory]
-        [InlineData("5790000555550")]
-        [InlineData("6790000555559")]
-        public void Validate_ValidGln_ReturnsTrue(string value)
-        {
-            // arrange, act
-            var result = GlnActorNumber.IsValid(value);
+    [Theory]
+    [InlineData("5790000555550")]
+    [InlineData("6790000555559")]
+    public void Validate_ValidGln_ReturnsTrue(string value)
+    {
+        // arrange, act
+        var result = GlnActorNumber.IsValid(value);
 
-            // assert
-            Assert.True(result);
-        }
+        // assert
+        Assert.True(result);
     }
 }

@@ -16,13 +16,12 @@ using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.MarketParticipant.Common
+namespace Energinet.DataHub.MarketParticipant.Common;
+
+internal static class UnitOfWorkRegistrations
 {
-    internal static class UnitOfWorkRegistrations
+    public static void AddUnitOfWorkProvider(this IServiceCollection services)
     {
-        public static void AddUnitOfWorkProvider(this IServiceCollection services)
-        {
-            services.AddScoped<IUnitOfWorkProvider, UnitOfWorkProvider>();
-        }
+        services.AddScoped<IUnitOfWorkProvider, UnitOfWorkProvider>();
     }
 }

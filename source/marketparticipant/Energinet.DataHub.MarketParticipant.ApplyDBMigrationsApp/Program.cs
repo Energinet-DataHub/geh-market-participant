@@ -16,21 +16,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 
-namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp
+namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp;
+
+public static class Program
 {
-    public static class Program
+    public static async Task<int> Main(string[] args)
     {
-        public static async Task<int> Main(string[] args)
-        {
-            var connectionString = ConnectionStringFactory.GetConnectionString(args);
-            var filter = EnvironmentFilter.GetFilter(args);
-            var isDryRun = args.Contains("dryRun");
+        var connectionString = ConnectionStringFactory.GetConnectionString(args);
+        var filter = EnvironmentFilter.GetFilter(args);
+        var isDryRun = args.Contains("dryRun");
 
-            var upgradeEngine = await UpgradeFactory.GetUpgradeEngineAsync(connectionString, filter, isDryRun).ConfigureAwait(false);
+        var upgradeEngine = await UpgradeFactory.GetUpgradeEngineAsync(connectionString, filter, isDryRun).ConfigureAwait(false);
 
-            var result = upgradeEngine.PerformUpgrade();
+        var result = upgradeEngine.PerformUpgrade();
 
-            return ResultReporter.ReportResult(result);
-        }
+        return ResultReporter.ReportResult(result);
     }
 }

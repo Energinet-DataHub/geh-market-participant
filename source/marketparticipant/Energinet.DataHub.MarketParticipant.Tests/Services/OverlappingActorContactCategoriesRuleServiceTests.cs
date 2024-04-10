@@ -20,51 +20,50 @@ using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Services
+namespace Energinet.DataHub.MarketParticipant.Tests.Services;
+
+[UnitTest]
+public sealed class OverlappingActorContactCategoriesRuleServiceTests
 {
-    [UnitTest]
-    public sealed class OverlappingActorContactCategoriesRuleServiceTests
+    [Fact]
+    public void ValidateCategoriesAcrossContacts_CategoriesAreNotUnique_ThrowsException()
     {
-        [Fact]
-        public void ValidateCategoriesAcrossContacts_CategoriesAreNotUnique_ThrowsException()
-        {
-            // Arrange
-            var target = new OverlappingActorContactCategoriesRuleService();
+        // Arrange
+        var target = new OverlappingActorContactCategoriesRuleService();
 
-            // Act + Assert
-            Assert.Throws<ValidationException>(() => target.ValidateCategoriesAcrossContacts(
-                new[]
-                {
-                    CreateTestContact(ContactCategory.Charges),
-                    CreateTestContact(ContactCategory.ChargeLinks),
-                    CreateTestContact(ContactCategory.Charges)
-                }));
-        }
+        // Act + Assert
+        Assert.Throws<ValidationException>(() => target.ValidateCategoriesAcrossContacts(
+            new[]
+            {
+                CreateTestContact(ContactCategory.Charges),
+                CreateTestContact(ContactCategory.ChargeLinks),
+                CreateTestContact(ContactCategory.Charges)
+            }));
+    }
 
-        [Fact]
-        public void ValidateRolesAcrossActors_ValidRoles_DoesNothing()
-        {
-            // Arrange
-            var target = new OverlappingActorContactCategoriesRuleService();
+    [Fact]
+    public void ValidateRolesAcrossActors_ValidRoles_DoesNothing()
+    {
+        // Arrange
+        var target = new OverlappingActorContactCategoriesRuleService();
 
-            // Act + Assert
-            target.ValidateCategoriesAcrossContacts(
-                new[]
-                {
-                    CreateTestContact(ContactCategory.Charges),
-                    CreateTestContact(ContactCategory.ChargeLinks),
-                    CreateTestContact(ContactCategory.ElectricalHeating)
-                });
-        }
+        // Act + Assert
+        target.ValidateCategoriesAcrossContacts(
+            new[]
+            {
+                CreateTestContact(ContactCategory.Charges),
+                CreateTestContact(ContactCategory.ChargeLinks),
+                CreateTestContact(ContactCategory.ElectricalHeating)
+            });
+    }
 
-        private static ActorContact CreateTestContact(ContactCategory category)
-        {
-            return new ActorContact(
-                new ActorId(Guid.NewGuid()),
-                "fake_value",
-                category,
-                new RandomlyGeneratedEmailAddress(),
-                null);
-        }
+    private static ActorContact CreateTestContact(ContactCategory category)
+    {
+        return new ActorContact(
+            new ActorId(Guid.NewGuid()),
+            "fake_value",
+            category,
+            new RandomlyGeneratedEmailAddress(),
+            null);
     }
 }

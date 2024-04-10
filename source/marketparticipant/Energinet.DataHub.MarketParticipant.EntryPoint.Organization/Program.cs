@@ -17,24 +17,23 @@ using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Microsoft.Extensions.Hosting;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
+
+public static class Program
 {
-    public static class Program
+    public static async Task Main()
     {
-        public static async Task Main()
-        {
-            var startup = new Startup();
+        var startup = new Startup();
 
-            var host = new HostBuilder()
-                .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
-                .ConfigureServices((context, services) =>
-                {
-                    startup.Initialize(context.Configuration, services);
-                    services.AddApplicationInsights();
-                })
-                .Build();
+        var host = new HostBuilder()
+            .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
+            .ConfigureServices((context, services) =>
+            {
+                startup.Initialize(context.Configuration, services);
+                services.AddApplicationInsights();
+            })
+            .Build();
 
-            await host.RunAsync().ConfigureAwait(false);
-        }
+        await host.RunAsync().ConfigureAwait(false);
     }
 }

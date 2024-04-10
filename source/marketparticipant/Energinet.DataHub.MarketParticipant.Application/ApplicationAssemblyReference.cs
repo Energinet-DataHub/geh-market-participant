@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application
-{
-    public sealed class ApplicationAssemblyReference
-    {
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Application;
+
+public sealed class ApplicationAssemblyReference;

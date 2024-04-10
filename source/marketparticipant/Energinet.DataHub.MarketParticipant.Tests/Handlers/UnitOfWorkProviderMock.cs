@@ -15,15 +15,14 @@
 using Energinet.DataHub.MarketParticipant.Domain;
 using Moq;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+internal static class UnitOfWorkProviderMock
 {
-    internal static class UnitOfWorkProviderMock
+    public static IUnitOfWorkProvider Create()
     {
-        public static IUnitOfWorkProvider Create()
-        {
-            var uowp = new Mock<IUnitOfWorkProvider>();
-            uowp.Setup(x => x.NewUnitOfWorkAsync()).ReturnsAsync(new Mock<IUnitOfWork>().Object);
-            return uowp.Object;
-        }
+        var uowp = new Mock<IUnitOfWorkProvider>();
+        uowp.Setup(x => x.NewUnitOfWorkAsync()).ReturnsAsync(new Mock<IUnitOfWork>().Object);
+        return uowp.Object;
     }
 }

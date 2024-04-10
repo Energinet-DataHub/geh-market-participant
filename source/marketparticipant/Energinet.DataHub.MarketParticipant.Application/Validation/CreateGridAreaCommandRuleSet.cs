@@ -13,36 +13,35 @@
 // limitations under the License.
 
 using System.Globalization;
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class CreateGridAreaCommandRuleSet : AbstractValidator<CreateGridAreaCommand>
 {
-    public sealed class CreateGridAreaCommandRuleSet : AbstractValidator<CreateGridAreaCommand>
+    public CreateGridAreaCommandRuleSet()
     {
-        public CreateGridAreaCommandRuleSet()
-        {
-            RuleFor(command => command.GridArea)
-                .NotNull()
-                .ChildRules(validator =>
-                {
-                    validator
-                        .RuleFor(gridArea => gridArea.Name)
-                        .NotEmpty()
-                        .Length(1, 50);
+        RuleFor(command => command.GridArea)
+            .NotNull()
+            .ChildRules(validator =>
+            {
+                validator
+                    .RuleFor(gridArea => gridArea.Name)
+                    .NotEmpty()
+                    .Length(1, 50);
 
-                    validator
-                        .RuleFor(gridArea => gridArea.Code)
-                        .NotEmpty()
-                        .Length(1, 3)
-                        .Must(code => int.TryParse(code, NumberStyles.None, CultureInfo.InvariantCulture, out _));
+                validator
+                    .RuleFor(gridArea => gridArea.Code)
+                    .NotEmpty()
+                    .Length(1, 3)
+                    .Must(code => int.TryParse(code, NumberStyles.None, CultureInfo.InvariantCulture, out _));
 
-                    validator
-                        .RuleFor(gridArea => gridArea.PriceAreaCode)
-                        .NotNull()
-                        .IsEnumName(typeof(PriceAreaCode), false);
-                });
-        }
+                validator
+                    .RuleFor(gridArea => gridArea.PriceAreaCode)
+                    .NotNull()
+                    .IsEnumName(typeof(PriceAreaCode), false);
+            });
     }
 }

@@ -14,47 +14,46 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed class ActorContact
 {
-    public sealed class ActorContact
+    public ActorContact(
+        ActorId actorId,
+        string name,
+        ContactCategory category,
+        EmailAddress email,
+        PhoneNumber? phone)
     {
-        public ActorContact(
-            ActorId actorId,
-            string name,
-            ContactCategory category,
-            EmailAddress email,
-            PhoneNumber? phone)
-        {
-            Id = new ContactId(Guid.Empty);
-            ActorId = actorId;
-            Name = name;
-            Category = category;
-            Email = email;
-            Phone = phone;
-        }
-
-        public ActorContact(
-            ContactId id,
-            ActorId actorId,
-            string name,
-            ContactCategory category,
-            EmailAddress email,
-            PhoneNumber? phone)
-        {
-            Id = id;
-            ActorId = actorId;
-            Name = name;
-            Category = category;
-            Email = email;
-            Phone = phone;
-        }
-
-        public ContactId Id { get; }
-        public ActorId ActorId { get; }
-
-        public string Name { get; }
-        public ContactCategory Category { get; }
-        public EmailAddress Email { get; }
-        public PhoneNumber? Phone { get; }
+        Id = new ContactId(Guid.Empty);
+        ActorId = actorId;
+        Name = name;
+        Category = category;
+        Email = email;
+        Phone = phone;
     }
+
+    public ActorContact(
+        ContactId id,
+        ActorId actorId,
+        string name,
+        ContactCategory category,
+        EmailAddress email,
+        PhoneNumber? phone)
+    {
+        Id = id;
+        ActorId = actorId;
+        Name = name;
+        Category = category;
+        Email = email;
+        Phone = phone;
+    }
+
+    public ContactId Id { get; }
+    public ActorId ActorId { get; }
+
+    public string Name { get; }
+    public ContactCategory Category { get; }
+    public EmailAddress Email { get; }
+    public PhoneNumber? Phone { get; }
 }

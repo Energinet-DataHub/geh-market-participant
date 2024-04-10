@@ -15,39 +15,38 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.GridAreas;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class GetGridAreaHandlerTests
 {
-    [UnitTest]
-    public sealed class GetGridAreaHandlerTests
+    [Fact]
+    public async Task Handle_Command_CallsRepository()
     {
-        [Fact]
-        public async Task Handle_Command_CallsRepository()
-        {
-            // arrange
-            var repositoryMock = new Mock<IGridAreaRepository>();
-            repositoryMock
-                .Setup(x => x.GetAsync(It.IsAny<GridAreaId>()))
-                .ReturnsAsync(new GridArea(
-                    new GridAreaName("name"),
-                    new GridAreaCode("101"),
-                    PriceAreaCode.Dk1,
-                    DateTimeOffset.MinValue,
-                    null));
+        // arrange
+        var repositoryMock = new Mock<IGridAreaRepository>();
+        repositoryMock
+            .Setup(x => x.GetAsync(It.IsAny<GridAreaId>()))
+            .ReturnsAsync(new GridArea(
+                new GridAreaName("name"),
+                new GridAreaCode("101"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null));
 
-            var target = new GetGridAreaHandler(repositoryMock.Object);
+        var target = new GetGridAreaHandler(repositoryMock.Object);
 
-            // act
-            var actual = await target.Handle(new Application.Commands.GridArea.GetGridAreaCommand(Guid.NewGuid()), CancellationToken.None);
+        // act
+        var actual = await target.Handle(new Application.Commands.GridAreas.GetGridAreaCommand(Guid.NewGuid()), CancellationToken.None);
 
-            // assert
-            Assert.NotNull(actual.GridArea);
-        }
+        // assert
+        Assert.NotNull(actual.GridArea);
     }
 }

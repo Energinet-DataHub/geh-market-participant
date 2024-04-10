@@ -24,80 +24,79 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+
+public sealed class EmailEventRepository : IEmailEventRepository
 {
-    public sealed class EmailEventRepository : IEmailEventRepository
+    private readonly IMarketParticipantDbContext _context;
+
+    public EmailEventRepository(IMarketParticipantDbContext context)
     {
-        private readonly IMarketParticipantDbContext _context;
+        _context = context;
+    }
 
-        public EmailEventRepository(IMarketParticipantDbContext context)
+    public Task InsertAsync(EmailEvent emailEvent)
+    {
+        ArgumentNullException.ThrowIfNull(emailEvent);
+
+        var emailEventEntity = new EmailEventEntity
         {
-            _context = context;
-        }
+            Email = emailEvent.Email.Address,
+            Created = DateTimeOffset.UtcNow,
+            TemplateId = (int)emailEvent.EmailTemplate.TemplateId,
+            TemplateParameters = JsonSerializer.Serialize(emailEvent.EmailTemplate.TemplateParameters),
+        };
 
-        public Task InsertAsync(EmailEvent emailEvent)
+        _context.EmailEventEntries.Add(emailEventEntity);
+
+        return _context.SaveChangesAsync();
+    }
+
+    public Task MarkAsSentAsync(EmailEvent emailEvent)
+    {
+        ArgumentNullException.ThrowIfNull(emailEvent);
+
+        var emailEventToUpdate = _context.EmailEventEntries.FirstOrDefault(e => e.Id == emailEvent.Id);
+
+        if (emailEventToUpdate != null)
         {
-            ArgumentNullException.ThrowIfNull(emailEvent);
-
-            var emailEventEntity = new EmailEventEntity
-            {
-                Email = emailEvent.Email.Address,
-                Created = DateTimeOffset.UtcNow,
-                TemplateId = (int)emailEvent.EmailTemplate.TemplateId,
-                TemplateParameters = JsonSerializer.Serialize(emailEvent.EmailTemplate.TemplateParameters),
-            };
-
-            _context.EmailEventEntries.Add(emailEventEntity);
-
+            emailEventToUpdate.Sent = DateTimeOffset.UtcNow;
             return _context.SaveChangesAsync();
         }
 
-        public Task MarkAsSentAsync(EmailEvent emailEvent)
+        throw new NotFoundException($"Email event with id {emailEvent.Id} was not found");
+    }
+
+    public async Task<IEnumerable<EmailEvent>> GetAllPendingEmailEventsAsync()
+    {
+        var emailToBeSent = await _context.EmailEventEntries
+            .Where(e => e.Sent == null)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return emailToBeSent.Select(MapTo);
+    }
+
+    private static EmailEvent MapTo(EmailEventEntity emailEventEntity)
+    {
+        var templateParameters = JsonSerializer.Deserialize<Dictionary<string, string>>(emailEventEntity.TemplateParameters);
+        if (templateParameters == null)
+            throw new InvalidOperationException($"Template parameters for event {emailEventEntity.Id} are invalid.");
+
+        EmailTemplate mailTemplate = (EmailTemplateId)emailEventEntity.TemplateId switch
         {
-            ArgumentNullException.ThrowIfNull(emailEvent);
+            EmailTemplateId.UserInvite => new UserInviteEmailTemplate(templateParameters),
+            EmailTemplateId.UserAssignedToActor => new UserAssignedToActorEmailTemplate(templateParameters),
+            EmailTemplateId.OrganizationIdentityChanged => new OrganizationIdentityChangedEmailTemplate(templateParameters),
+            EmailTemplateId.BalanceResponsiblePartiesChanged => new BalanceResponsiblePartiesChangedEmailTemplate(templateParameters),
+            _ => throw new InvalidOperationException($"Template id for event {emailEventEntity.Id} is invalid.")
+        };
 
-            var emailEventToUpdate = _context.EmailEventEntries.FirstOrDefault(e => e.Id == emailEvent.Id);
-
-            if (emailEventToUpdate != null)
-            {
-                emailEventToUpdate.Sent = DateTimeOffset.UtcNow;
-                return _context.SaveChangesAsync();
-            }
-
-            throw new NotFoundException($"Email event with id {emailEvent.Id} was not found");
-        }
-
-        public async Task<IEnumerable<EmailEvent>> GetAllPendingEmailEventsAsync()
-        {
-            var emailToBeSent = await _context.EmailEventEntries
-                .Where(e => e.Sent == null)
-                .ToListAsync()
-                .ConfigureAwait(false);
-
-            return emailToBeSent.Select(MapTo);
-        }
-
-        private static EmailEvent MapTo(EmailEventEntity emailEventEntity)
-        {
-            var templateParameters = JsonSerializer.Deserialize<Dictionary<string, string>>(emailEventEntity.TemplateParameters);
-            if (templateParameters == null)
-                throw new InvalidOperationException($"Template parameters for event {emailEventEntity.Id} are invalid.");
-
-            EmailTemplate mailTemplate = (EmailTemplateId)emailEventEntity.TemplateId switch
-            {
-                EmailTemplateId.UserInvite => new UserInviteEmailTemplate(templateParameters),
-                EmailTemplateId.UserAssignedToActor => new UserAssignedToActorEmailTemplate(templateParameters),
-                EmailTemplateId.OrganizationIdentityChanged => new OrganizationIdentityChangedEmailTemplate(templateParameters),
-                EmailTemplateId.BalanceResponsiblePartiesChanged => new BalanceResponsiblePartiesChangedEmailTemplate(templateParameters),
-                _ => throw new InvalidOperationException($"Template id for event {emailEventEntity.Id} is invalid.")
-            };
-
-            return new EmailEvent(
-                emailEventEntity.Id,
-                new EmailAddress(emailEventEntity.Email),
-                emailEventEntity.Created,
-                emailEventEntity.Sent,
-                mailTemplate);
-        }
+        return new EmailEvent(
+            emailEventEntity.Id,
+            new EmailAddress(emailEventEntity.Email),
+            emailEventEntity.Created,
+            emailEventEntity.Sent,
+            mailTemplate);
     }
 }

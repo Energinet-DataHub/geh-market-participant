@@ -17,34 +17,33 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class CreateUserRoleCommandRuleSet : AbstractValidator<CreateUserRoleCommand>
 {
-    public sealed class CreateUserRoleCommandRuleSet : AbstractValidator<CreateUserRoleCommand>
+    public CreateUserRoleCommandRuleSet()
     {
-        public CreateUserRoleCommandRuleSet()
-        {
-            RuleFor(command => command.UserRoleDto)
-                .NotNull()
-                .ChildRules(validator =>
-                {
-                    validator
-                        .RuleFor(role => role.Name)
-                        .NotEmpty()
-                        .Length(1, 250);
+        RuleFor(command => command.UserRoleDto)
+            .NotNull()
+            .ChildRules(validator =>
+            {
+                validator
+                    .RuleFor(role => role.Name)
+                    .NotEmpty()
+                    .Length(1, 250);
 
-                    validator
-                        .RuleFor(role => role.EicFunction)
-                        .IsInEnum();
+                validator
+                    .RuleFor(role => role.EicFunction)
+                    .IsInEnum();
 
-                    validator
-                        .RuleFor(role => role.Status)
-                        .IsInEnum();
+                validator
+                    .RuleFor(role => role.Status)
+                    .IsInEnum();
 
-                    validator
-                        .RuleForEach(role => role.Permissions)
-                        .NotEmpty()
-                        .Must(x => Enum.IsDefined((PermissionId)x));
-                });
-        }
+                validator
+                    .RuleForEach(role => role.Permissions)
+                    .NotEmpty()
+                    .Must(x => Enum.IsDefined((PermissionId)x));
+            });
     }
 }

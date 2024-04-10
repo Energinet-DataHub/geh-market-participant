@@ -22,189 +22,188 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
+
+[Collection(nameof(IntegrationTestCollectionFixture))]
+[IntegrationTest]
+public sealed class ActorContactRepositoryTests
 {
-    [Collection(nameof(IntegrationTestCollectionFixture))]
-    [IntegrationTest]
-    public sealed class ActorContactRepositoryTests
+    private readonly MarketParticipantDatabaseFixture _fixture;
+
+    public ActorContactRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
-        private readonly MarketParticipantDatabaseFixture _fixture;
+        _fixture = fixture;
+    }
 
-        public ActorContactRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    [Fact]
+    public async Task GetAsync_ContactNotExists_ReturnsNull()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var contactRepository = new ActorContactRepository(context);
+
+        // Act
+        var testContact = await contactRepository
+            .GetAsync(new ContactId(Guid.NewGuid()));
+
+        // Assert
+        Assert.Null(testContact);
+    }
+
+    [Fact]
+    public async Task GetAsync_ForAnOrganization_ReturnsNull()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var actor = await _fixture.PrepareActorAsync();
+        var contactRepository = new ActorContactRepository(context);
+        var categories = new[]
         {
-            _fixture = fixture;
+            ContactCategory.EndOfSupply,
+            ContactCategory.ChargeLinks,
+            ContactCategory.Notification,
+            ContactCategory.MeasurementData,
+            ContactCategory.Recon
+        };
+
+        for (var i = 0; i < 5; i++)
+        {
+            await contactRepository
+                .AddAsync(new ActorContact(
+                    new ActorId(actor.Id),
+                    "fake_value",
+                    categories[i],
+                    new RandomlyGeneratedEmailAddress(),
+                    new PhoneNumber("1234567")));
         }
 
-        [Fact]
-        public async Task GetAsync_ContactNotExists_ReturnsNull()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var contactRepository = new ActorContactRepository(context);
+        // Act
+        var testContacts = await contactRepository.GetAsync(new ActorId(actor.Id));
 
-            // Act
-            var testContact = await contactRepository
-                .GetAsync(new ContactId(Guid.NewGuid()));
+        // Assert
+        Assert.Equal(5, testContacts.Count());
+    }
 
-            // Assert
-            Assert.Null(testContact);
-        }
+    [Fact]
+    public async Task AddAsync_OneContact_CanReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        [Fact]
-        public async Task GetAsync_ForAnOrganization_ReturnsNull()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var actor = await _fixture.PrepareActorAsync();
+        var contactRepository = new ActorContactRepository(context);
 
-            var actor = await _fixture.PrepareActorAsync();
-            var contactRepository = new ActorContactRepository(context);
-            var categories = new[]
-            {
-                ContactCategory.EndOfSupply,
-                ContactCategory.ChargeLinks,
-                ContactCategory.Notification,
-                ContactCategory.MeasurementData,
-                ContactCategory.Recon
-            };
+        var testContact = new ActorContact(
+            new ActorId(actor.Id),
+            "fake_value",
+            ContactCategory.Charges,
+            new RandomlyGeneratedEmailAddress(),
+            new PhoneNumber("1234567"));
 
-            for (var i = 0; i < 5; i++)
-            {
-                await contactRepository
-                    .AddAsync(new ActorContact(
-                        new ActorId(actor.Id),
-                        "fake_value",
-                        categories[i],
-                        new RandomlyGeneratedEmailAddress(),
-                        new PhoneNumber("1234567")));
-            }
+        // Act
+        var contactId = await contactRepository.AddAsync(testContact);
+        var newContact = await contactRepository.GetAsync(contactId);
 
-            // Act
-            var testContacts = await contactRepository.GetAsync(new ActorId(actor.Id));
+        // Assert
+        Assert.NotNull(newContact);
+        Assert.NotEqual(Guid.Empty, newContact.Id.Value);
+        Assert.NotEqual(Guid.Empty, newContact.ActorId.Value);
+        Assert.Equal(testContact.Category, newContact.Category);
+        Assert.Equal(testContact.Email.Address, newContact.Email.Address);
+        Assert.Equal(testContact.Name, newContact.Name);
+        Assert.Equal(testContact.Phone?.Number, newContact.Phone?.Number);
+    }
 
-            // Assert
-            Assert.Equal(5, testContacts.Count());
-        }
+    [Fact]
+    public async Task RemoveAsync_OneContact_RemovesContact()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        [Fact]
-        public async Task AddAsync_OneContact_CanReadBack()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var actor = await _fixture.PrepareActorAsync();
+        var contactRepository = new ActorContactRepository(context);
 
-            var actor = await _fixture.PrepareActorAsync();
-            var contactRepository = new ActorContactRepository(context);
+        var testContact = new ActorContact(
+            new ActorId(actor.Id),
+            "fake_value",
+            ContactCategory.Charges,
+            new RandomlyGeneratedEmailAddress(),
+            new PhoneNumber("1234567"));
 
-            var testContact = new ActorContact(
-                new ActorId(actor.Id),
-                "fake_value",
-                ContactCategory.Charges,
-                new RandomlyGeneratedEmailAddress(),
-                new PhoneNumber("1234567"));
+        var contactId = await contactRepository.AddAsync(testContact);
+        var newContact = await contactRepository.GetAsync(contactId);
 
-            // Act
-            var contactId = await contactRepository.AddAsync(testContact);
-            var newContact = await contactRepository.GetAsync(contactId);
+        // Act
+        await contactRepository.RemoveAsync(newContact!);
 
-            // Assert
-            Assert.NotNull(newContact);
-            Assert.NotEqual(Guid.Empty, newContact.Id.Value);
-            Assert.NotEqual(Guid.Empty, newContact.ActorId.Value);
-            Assert.Equal(testContact.Category, newContact.Category);
-            Assert.Equal(testContact.Email.Address, newContact.Email.Address);
-            Assert.Equal(testContact.Name, newContact.Name);
-            Assert.Equal(testContact.Phone?.Number, newContact.Phone?.Number);
-        }
+        // Assert
+        await using var contextReadBack = _fixture.DatabaseManager.CreateDbContext();
+        var contactRepositoryReadBack = new ActorContactRepository(contextReadBack);
+        var deletedContact = await contactRepositoryReadBack.GetAsync(contactId);
 
-        [Fact]
-        public async Task RemoveAsync_OneContact_RemovesContact()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
+        Assert.Null(deletedContact);
+    }
 
-            var actor = await _fixture.PrepareActorAsync();
-            var contactRepository = new ActorContactRepository(context);
+    [Fact]
+    public async Task RemoveAsync_NonExistentContact_DoesNothing()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var contactRepository = new ActorContactRepository(context);
 
-            var testContact = new ActorContact(
-                new ActorId(actor.Id),
-                "fake_value",
-                ContactCategory.Charges,
-                new RandomlyGeneratedEmailAddress(),
-                new PhoneNumber("1234567"));
+        var testContact = new ActorContact(
+            new ContactId(Guid.NewGuid()),
+            new ActorId(Guid.NewGuid()),
+            "fake_value",
+            ContactCategory.Charges,
+            new RandomlyGeneratedEmailAddress(),
+            new PhoneNumber("1234567"));
 
-            var contactId = await contactRepository.AddAsync(testContact);
-            var newContact = await contactRepository.GetAsync(contactId);
+        // Act + Assert
+        await contactRepository.RemoveAsync(testContact);
+    }
 
-            // Act
-            await contactRepository.RemoveAsync(newContact!);
+    [Fact]
+    public async Task GetAsync_DifferentContexts_CanReadBack()
+    {
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            // Assert
-            await using var contextReadBack = _fixture.DatabaseManager.CreateDbContext();
-            var contactRepositoryReadBack = new ActorContactRepository(contextReadBack);
-            var deletedContact = await contactRepositoryReadBack.GetAsync(contactId);
+        var actor = await _fixture.PrepareActorAsync();
 
-            Assert.Null(deletedContact);
-        }
+        await using var contextReadback = _fixture.DatabaseManager.CreateDbContext();
+        var contactRepository = new ActorContactRepository(context);
+        var contactRepositoryReadback = new ActorContactRepository(contextReadback);
 
-        [Fact]
-        public async Task RemoveAsync_NonExistentContact_DoesNothing()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var contactRepository = new ActorContactRepository(context);
+        var testContact = new ActorContact(
+            new ActorId(actor.Id),
+            "fake_value",
+            ContactCategory.Charges,
+            new RandomlyGeneratedEmailAddress(),
+            new PhoneNumber("1234567"));
 
-            var testContact = new ActorContact(
-                new ContactId(Guid.NewGuid()),
-                new ActorId(Guid.NewGuid()),
-                "fake_value",
-                ContactCategory.Charges,
-                new RandomlyGeneratedEmailAddress(),
-                new PhoneNumber("1234567"));
+        // Act
+        var contactId = await contactRepository.AddAsync(testContact);
+        var newContact = await contactRepositoryReadback.GetAsync(contactId);
 
-            // Act + Assert
-            await contactRepository.RemoveAsync(testContact);
-        }
-
-        [Fact]
-        public async Task GetAsync_DifferentContexts_CanReadBack()
-        {
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-
-            var actor = await _fixture.PrepareActorAsync();
-
-            await using var contextReadback = _fixture.DatabaseManager.CreateDbContext();
-            var contactRepository = new ActorContactRepository(context);
-            var contactRepositoryReadback = new ActorContactRepository(contextReadback);
-
-            var testContact = new ActorContact(
-                new ActorId(actor.Id),
-                "fake_value",
-                ContactCategory.Charges,
-                new RandomlyGeneratedEmailAddress(),
-                new PhoneNumber("1234567"));
-
-            // Act
-            var contactId = await contactRepository.AddAsync(testContact);
-            var newContact = await contactRepositoryReadback.GetAsync(contactId);
-
-            // Assert
-            Assert.NotNull(newContact);
-            Assert.NotEqual(Guid.Empty, newContact.Id.Value);
-            Assert.Equal(testContact.Category, newContact.Category);
-            Assert.Equal(testContact.Email.Address, newContact.Email.Address);
-            Assert.Equal(testContact.Name, newContact.Name);
-            Assert.Equal(testContact.Phone?.Number, newContact.Phone?.Number);
-        }
+        // Assert
+        Assert.NotNull(newContact);
+        Assert.NotEqual(Guid.Empty, newContact.Id.Value);
+        Assert.Equal(testContact.Category, newContact.Category);
+        Assert.Equal(testContact.Email.Address, newContact.Email.Address);
+        Assert.Equal(testContact.Name, newContact.Name);
+        Assert.Equal(testContact.Phone?.Number, newContact.Phone?.Number);
     }
 }

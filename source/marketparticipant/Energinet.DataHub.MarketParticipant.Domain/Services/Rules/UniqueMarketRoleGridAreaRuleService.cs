@@ -21,46 +21,45 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+
+public sealed class UniqueMarketRoleGridAreaRuleService : IUniqueMarketRoleGridAreaRuleService
 {
-    public sealed class UniqueMarketRoleGridAreaRuleService : IUniqueMarketRoleGridAreaRuleService
+    private static readonly IReadOnlySet<EicFunction> _marketRoleSet = new HashSet<EicFunction>
     {
-        private static readonly IReadOnlySet<EicFunction> _marketRoleSet = new HashSet<EicFunction>
+        EicFunction.GridAccessProvider
+    };
+
+    private readonly IMarketRoleAndGridAreaForActorReservationService _marketRoleAndGridAreaForActorReservationService;
+
+    public UniqueMarketRoleGridAreaRuleService(IMarketRoleAndGridAreaForActorReservationService marketRoleAndGridAreaForActorReservationService)
+    {
+        _marketRoleAndGridAreaForActorReservationService = marketRoleAndGridAreaForActorReservationService;
+    }
+
+    public async Task ValidateAndReserveAsync(Actor actor)
+    {
+        ArgumentNullException.ThrowIfNull(actor, nameof(actor));
+
+        var actorMarketRoles = actor.MarketRoles.Where(x => _marketRoleSet.Contains(x.Function));
+
+        await _marketRoleAndGridAreaForActorReservationService
+            .RemoveAllReservationsAsync(actor.Id)
+            .ConfigureAwait(false);
+
+        foreach (var actorMarketRole in actorMarketRoles)
         {
-            EicFunction.GridAccessProvider
-        };
-
-        private readonly IMarketRoleAndGridAreaForActorReservationService _marketRoleAndGridAreaForActorReservationService;
-
-        public UniqueMarketRoleGridAreaRuleService(IMarketRoleAndGridAreaForActorReservationService marketRoleAndGridAreaForActorReservationService)
-        {
-            _marketRoleAndGridAreaForActorReservationService = marketRoleAndGridAreaForActorReservationService;
-        }
-
-        public async Task ValidateAndReserveAsync(Actor actor)
-        {
-            ArgumentNullException.ThrowIfNull(actor, nameof(actor));
-
-            var actorMarketRoles = actor.MarketRoles.Where(x => _marketRoleSet.Contains(x.Function));
-
-            await _marketRoleAndGridAreaForActorReservationService
-                .RemoveAllReservationsAsync(actor.Id)
-                .ConfigureAwait(false);
-
-            foreach (var actorMarketRole in actorMarketRoles)
+            foreach (var gridArea in actorMarketRole.GridAreas)
             {
-                foreach (var gridArea in actorMarketRole.GridAreas)
-                {
-                    var couldReserve = await _marketRoleAndGridAreaForActorReservationService
-                        .TryReserveAsync(actor.Id, actorMarketRole.Function, gridArea.Id)
-                        .ConfigureAwait(false);
+                var couldReserve = await _marketRoleAndGridAreaForActorReservationService
+                    .TryReserveAsync(actor.Id, actorMarketRole.Function, gridArea.Id)
+                    .ConfigureAwait(false);
 
-                    if (!couldReserve)
-                    {
-                        throw new ValidationException($"Another actor is already assigned the role of '{actorMarketRole.Function}' for the chosen grid area.")
-                            .WithErrorCode("actor.grid_area.reserved")
-                            .WithArgs(("market_role", actorMarketRole.Function), ("grid_area_id", gridArea.Id));
-                    }
+                if (!couldReserve)
+                {
+                    throw new ValidationException($"Another actor is already assigned the role of '{actorMarketRole.Function}' for the chosen grid area.")
+                        .WithErrorCode("actor.grid_area.reserved")
+                        .WithArgs(("market_role", actorMarketRole.Function), ("grid_area_id", gridArea.Id));
                 }
             }
         }

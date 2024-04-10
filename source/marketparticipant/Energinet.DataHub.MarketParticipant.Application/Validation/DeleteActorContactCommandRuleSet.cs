@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
-{
-    public sealed class DeleteActorContactCommandRuleSet : AbstractValidator<DeleteActorContactCommand>
-    {
-        public DeleteActorContactCommandRuleSet()
-        {
-            RuleFor(command => command.ActorId)
-                .NotEmpty();
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-            RuleFor(command => command.ContactId)
-                .NotEmpty();
-        }
+public sealed class DeleteActorContactCommandRuleSet : AbstractValidator<DeleteActorContactCommand>
+{
+    public DeleteActorContactCommandRuleSet()
+    {
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
+
+        RuleFor(command => command.ContactId)
+            .NotEmpty();
     }
 }

@@ -15,18 +15,17 @@
 using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+
+/// <summary>
+/// Ensures that there is only one contact per category within an organization.
+/// </summary>
+public interface IOverlappingActorContactCategoriesRuleService
 {
     /// <summary>
-    /// Ensures that there is only one contact per category within an organization.
+    /// Ensures that the given contacts have unique categories and can exist in the same organization.
+    /// Throws an exception, if the contacts are invalid.
     /// </summary>
-    public interface IOverlappingActorContactCategoriesRuleService
-    {
-        /// <summary>
-        /// Ensures that the given contacts have unique categories and can exist in the same organization.
-        /// Throws an exception, if the contacts are invalid.
-        /// </summary>
-        /// <param name="contacts">The list of contacts in an organization.</param>
-        void ValidateCategoriesAcrossContacts(IEnumerable<ActorContact> contacts);
-    }
+    /// <param name="contacts">The list of contacts in an organization.</param>
+    void ValidateCategoriesAcrossContacts(IEnumerable<ActorContact> contacts);
 }

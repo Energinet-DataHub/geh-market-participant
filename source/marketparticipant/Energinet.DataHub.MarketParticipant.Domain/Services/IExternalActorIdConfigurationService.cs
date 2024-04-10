@@ -15,17 +15,16 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+/// <summary>
+/// Manages actor B2C information in Azure.
+/// </summary>
+public interface IExternalActorIdConfigurationService
 {
     /// <summary>
-    /// Manages actor B2C information in Azure.
+    /// Ensure that the B2C configuration matches the state of the actor.
     /// </summary>
-    public interface IExternalActorIdConfigurationService
-    {
-        /// <summary>
-        /// Ensure that the B2C configuration matches the state of the actor.
-        /// </summary>
-        /// <param name="actor">The actor to configure B2C for.</param>
-        public Task AssignExternalActorIdAsync(Actor actor);
-    }
+    /// <param name="actor">The actor to configure B2C for.</param>
+    public Task AssignExternalActorIdAsync(Actor actor);
 }

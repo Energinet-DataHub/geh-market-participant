@@ -14,23 +14,22 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed class GridAreaLink
 {
-    public sealed class GridAreaLink
+    public GridAreaLink(GridAreaId gridAreaId)
     {
-        public GridAreaLink(GridAreaId gridAreaId)
-        {
-            Id = new GridAreaLinkId(Guid.Empty);
-            GridAreaId = gridAreaId;
-        }
-
-        public GridAreaLink(GridAreaLinkId id, GridAreaId gridAreaId)
-        {
-            Id = id;
-            GridAreaId = gridAreaId;
-        }
-
-        public GridAreaLinkId Id { get; init; }
-        public GridAreaId GridAreaId { get; init; }
+        Id = new GridAreaLinkId(Guid.Empty);
+        GridAreaId = gridAreaId;
     }
+
+    public GridAreaLink(GridAreaLinkId id, GridAreaId gridAreaId)
+    {
+        Id = id;
+        GridAreaId = gridAreaId;
+    }
+
+    public GridAreaLinkId Id { get; init; }
+    public GridAreaId GridAreaId { get; init; }
 }

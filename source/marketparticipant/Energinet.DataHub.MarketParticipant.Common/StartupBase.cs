@@ -19,35 +19,34 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.MarketParticipant.Common
+namespace Energinet.DataHub.MarketParticipant.Common;
+
+public abstract class StartupBase
 {
-    public abstract class StartupBase
+    public void Initialize(IConfiguration configuration, IServiceCollection services)
     {
-        public void Initialize(IConfiguration configuration, IServiceCollection services)
+        services.AddDbContexts();
+        services.AddLogging();
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>));
+        services.AddMediatR(config =>
         {
-            services.AddDbContexts();
-            services.AddLogging();
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>));
-            services.AddMediatR(config =>
-            {
-                config.RegisterServicesFromAssemblyContaining<ApplicationAssemblyReference>();
-            });
+            config.RegisterServicesFromAssemblyContaining<ApplicationAssemblyReference>();
+        });
 
-            Configure(configuration, services);
+        Configure(configuration, services);
 
-            services.AddApplicationServices();
-            services.AddInfrastructureServices();
-            services.AddRepositories();
-            services.AddDomainServices();
-            services.AddUnitOfWorkProvider();
-            services.AddAzureAdConfiguration();
-            services.AddGraphServiceClient();
-            services.AddActiveDirectoryRoles();
-            services.AddSendGridEmailSenderClient();
-            services.AddEmailConfigRegistration();
-            services.AddCvrRegisterConfiguration();
-        }
-
-        protected abstract void Configure(IConfiguration configuration, IServiceCollection services);
+        services.AddApplicationServices();
+        services.AddInfrastructureServices();
+        services.AddRepositories();
+        services.AddDomainServices();
+        services.AddUnitOfWorkProvider();
+        services.AddAzureAdConfiguration();
+        services.AddGraphServiceClient();
+        services.AddActiveDirectoryRoles();
+        services.AddSendGridEmailSenderClient();
+        services.AddEmailConfigRegistration();
+        services.AddCvrRegisterConfiguration();
     }
+
+    protected abstract void Configure(IConfiguration configuration, IServiceCollection services);
 }

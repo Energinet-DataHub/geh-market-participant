@@ -17,66 +17,65 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record EicActorNumber : ActorNumber
 {
-    public sealed record EicActorNumber : ActorNumber
+    [Browsable(false)]
+    public EicActorNumber(string value)
+        : base(value)
     {
-        [Browsable(false)]
-        public EicActorNumber(string value)
-            : base(value)
-        {
-            if (!IsValid(value))
-                throw new ArgumentException($"The provided EIC '{value}' is not valid.", nameof(value));
-        }
+        if (!IsValid(value))
+            throw new ArgumentException($"The provided EIC '{value}' is not valid.", nameof(value));
+    }
 
-        public override ActorNumberType Type => ActorNumberType.Eic;
+    public override ActorNumberType Type => ActorNumberType.Eic;
 
-        public static bool IsValid(string eic)
-        {
-            ArgumentNullException.ThrowIfNull(eic);
+    public static bool IsValid(string eic)
+    {
+        ArgumentNullException.ThrowIfNull(eic);
 
-            return LengthIsValid(eic)
-                   && ValidateTwoCharacterIssuingNumber(eic)
-                   && ValidateObjectTypeCharacter(eic)
-                   && ValidateTwelveDigitsUpperCaseCharacters(eic)
-                   && ValidateCheckCharacter(eic);
-        }
+        return LengthIsValid(eic)
+               && ValidateTwoCharacterIssuingNumber(eic)
+               && ValidateObjectTypeCharacter(eic)
+               && ValidateTwelveDigitsUpperCaseCharacters(eic)
+               && ValidateCheckCharacter(eic);
+    }
 
-        internal static bool TryCreate(string value, [NotNullWhen(true)] out EicActorNumber? eicActorNumber)
-        {
-            var valid = IsValid(value);
-            eicActorNumber = valid ? new EicActorNumber(value) : null;
-            return valid;
-        }
+    internal static bool TryCreate(string value, [NotNullWhen(true)] out EicActorNumber? eicActorNumber)
+    {
+        var valid = IsValid(value);
+        eicActorNumber = valid ? new EicActorNumber(value) : null;
+        return valid;
+    }
 
-        private static bool LengthIsValid(string energyIdentificationCode)
-        {
-            return energyIdentificationCode.Length == 16;
-        }
+    private static bool LengthIsValid(string energyIdentificationCode)
+    {
+        return energyIdentificationCode.Length == 16;
+    }
 
-        private static bool ValidateTwoCharacterIssuingNumber(string energyIdentificationCode)
-        {
-            return energyIdentificationCode[..2].All(char.IsNumber);
-        }
+    private static bool ValidateTwoCharacterIssuingNumber(string energyIdentificationCode)
+    {
+        return energyIdentificationCode[..2].All(char.IsNumber);
+    }
 
-        private static bool ValidateObjectTypeCharacter(string energyIdentificationCode)
-        {
-            return energyIdentificationCode.Substring(2, 1).All(char.IsLetter);
-        }
+    private static bool ValidateObjectTypeCharacter(string energyIdentificationCode)
+    {
+        return energyIdentificationCode.Substring(2, 1).All(char.IsLetter);
+    }
 
-        private static bool ValidateTwelveDigitsUpperCaseCharacters(string energyIdentificationCode)
-        {
-            return energyIdentificationCode
-                .Substring(3, 12)
-                .All(c =>
-                    c is '-'
-                    || char.IsDigit(c)
-                    || (char.IsLetterOrDigit(c) && char.IsUpper(c)));
-        }
+    private static bool ValidateTwelveDigitsUpperCaseCharacters(string energyIdentificationCode)
+    {
+        return energyIdentificationCode
+            .Substring(3, 12)
+            .All(c =>
+                c is '-'
+                || char.IsDigit(c)
+                || (char.IsLetterOrDigit(c) && char.IsUpper(c)));
+    }
 
-        private static bool ValidateCheckCharacter(string energyIdentificationCode)
-        {
-            return char.IsLetterOrDigit(energyIdentificationCode[^1]);
-        }
+    private static bool ValidateCheckCharacter(string energyIdentificationCode)
+    {
+        return char.IsLetterOrDigit(energyIdentificationCode[^1]);
     }
 }

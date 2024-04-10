@@ -15,51 +15,50 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Validation
+namespace Energinet.DataHub.MarketParticipant.Tests.Validation;
+
+[UnitTest]
+public sealed class DeleteActorContactCommandRuleSetTests
 {
-    [UnitTest]
-    public sealed class DeleteActorContactCommandRuleSetTests
+    private static readonly Guid _validActorId = Guid.NewGuid();
+    private static readonly Guid _validContactId = Guid.NewGuid();
+
+    [Fact]
+    public async Task Validate_ActorId_ValidatesProperty()
     {
-        private static readonly Guid _validActorId = Guid.NewGuid();
-        private static readonly Guid _validContactId = Guid.NewGuid();
+        // Arrange
+        const string propertyName = nameof(DeleteActorContactCommand.ActorId);
 
-        [Fact]
-        public async Task Validate_ActorId_ValidatesProperty()
-        {
-            // Arrange
-            const string propertyName = nameof(DeleteActorContactCommand.ActorId);
+        var target = new DeleteActorContactCommandRuleSet();
+        var command = new DeleteActorContactCommand(Guid.Empty, _validContactId);
 
-            var target = new DeleteActorContactCommandRuleSet();
-            var command = new DeleteActorContactCommand(Guid.Empty, _validContactId);
+        // Act
+        var result = await target.ValidateAsync(command);
 
-            // Act
-            var result = await target.ValidateAsync(command);
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+    }
 
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
+    [Fact]
+    public async Task Validate_ContactId_ValidatesProperty()
+    {
+        // Arrange
+        const string propertyName = nameof(DeleteActorContactCommand.ContactId);
 
-        [Fact]
-        public async Task Validate_ContactId_ValidatesProperty()
-        {
-            // Arrange
-            const string propertyName = nameof(DeleteActorContactCommand.ContactId);
+        var target = new DeleteActorContactCommandRuleSet();
+        var command = new DeleteActorContactCommand(_validActorId, Guid.Empty);
 
-            var target = new DeleteActorContactCommandRuleSet();
-            var command = new DeleteActorContactCommand(_validActorId, Guid.Empty);
+        // Act
+        var result = await target.ValidateAsync(command);
 
-            // Act
-            var result = await target.ValidateAsync(command);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
     }
 }

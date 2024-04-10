@@ -12,41 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class CreateActorContactCommandRuleSet : AbstractValidator<CreateActorContactCommand>
 {
-    public sealed class CreateActorContactCommandRuleSet : AbstractValidator<CreateActorContactCommand>
+    public CreateActorContactCommandRuleSet()
     {
-        public CreateActorContactCommandRuleSet()
-        {
-            RuleFor(command => command.ActorId)
-                .NotEmpty();
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
 
-            RuleFor(command => command.Contact)
-                .NotNull()
-                .ChildRules(validator =>
-                {
-                    validator
-                        .RuleFor(contact => contact.Name)
-                        .NotEmpty()
-                        .Length(1, 250);
+        RuleFor(command => command.Contact)
+            .NotNull()
+            .ChildRules(validator =>
+            {
+                validator
+                    .RuleFor(contact => contact.Name)
+                    .NotEmpty()
+                    .Length(1, 250);
 
-                    validator
-                        .RuleFor(contact => contact.Category)
-                        .IsInEnum();
+                validator
+                    .RuleFor(contact => contact.Category)
+                    .IsInEnum();
 
-                    validator
-                        .RuleFor(contact => contact.Email)
-                        .NotEmpty()
-                        .Length(1, 254);
+                validator
+                    .RuleFor(contact => contact.Email)
+                    .NotEmpty()
+                    .Length(1, 254);
 
-                    validator
-                        .RuleFor(contact => contact.Phone)
-                        .Length(1, 15)
-                        .When(contact => contact.Phone != null);
-                });
-        }
+                validator
+                    .RuleFor(contact => contact.Phone)
+                    .Length(1, 15)
+                    .When(contact => contact.Phone != null);
+            });
     }
 }

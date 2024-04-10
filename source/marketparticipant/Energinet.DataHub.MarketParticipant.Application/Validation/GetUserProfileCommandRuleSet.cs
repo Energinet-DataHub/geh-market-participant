@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetUserProfileCommandRuleSet : AbstractValidator<GetUserProfileCommand>
 {
-    public sealed class GetUserProfileCommandRuleSet : AbstractValidator<GetUserProfileCommand>
+    public GetUserProfileCommandRuleSet()
     {
-        public GetUserProfileCommandRuleSet()
-        {
-            RuleFor(command => command.UserId)
-                .NotEmpty();
-        }
+        RuleFor(command => command.UserId)
+            .NotEmpty();
     }
 }

@@ -22,83 +22,82 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
+
+public sealed class SendGridEmailSender : IEmailSender
 {
-    public sealed class SendGridEmailSender : IEmailSender
+    private readonly EmailRecipientConfig _config;
+    private readonly ILogger<SendGridEmailSender> _logger;
+    private readonly ISendGridClient _client;
+    private readonly IEmailContentGenerator _emailContentGenerator;
+
+    public SendGridEmailSender(
+        EmailRecipientConfig config,
+        ISendGridClient sendGridClient,
+        IEmailContentGenerator emailContentGenerator,
+        ILogger<SendGridEmailSender> logger)
     {
-        private readonly EmailRecipientConfig _config;
-        private readonly ILogger<SendGridEmailSender> _logger;
-        private readonly ISendGridClient _client;
-        private readonly IEmailContentGenerator _emailContentGenerator;
+        _config = config;
+        _logger = logger;
+        _client = sendGridClient;
+        _emailContentGenerator = emailContentGenerator;
+    }
 
-        public SendGridEmailSender(
-            EmailRecipientConfig config,
-            ISendGridClient sendGridClient,
-            IEmailContentGenerator emailContentGenerator,
-            ILogger<SendGridEmailSender> logger)
-        {
-            _config = config;
-            _logger = logger;
-            _client = sendGridClient;
-            _emailContentGenerator = emailContentGenerator;
-        }
+    public async Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent)
+    {
+        ArgumentNullException.ThrowIfNull(emailAddress);
+        ArgumentNullException.ThrowIfNull(emailEvent);
 
-        public async Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent)
-        {
-            ArgumentNullException.ThrowIfNull(emailAddress);
-            ArgumentNullException.ThrowIfNull(emailEvent);
+        var generatedEmail = await _emailContentGenerator
+            .GenerateAsync(emailEvent.EmailTemplate, GatherTemplateParameters())
+            .ConfigureAwait(false);
 
-            var generatedEmail = await _emailContentGenerator
-                .GenerateAsync(emailEvent.EmailTemplate, GatherTemplateParameters())
-                .ConfigureAwait(false);
-
-            return await SendAsync(
+        return await SendAsync(
                 new SendGrid.Helpers.Mail.EmailAddress(_config.SenderEmail),
                 new SendGrid.Helpers.Mail.EmailAddress(emailAddress.Address),
                 generatedEmail.Subject,
                 generatedEmail.HtmlContent)
-                .ConfigureAwait(false);
-        }
+            .ConfigureAwait(false);
+    }
 
-        private IReadOnlyDictionary<string, string> GatherTemplateParameters()
+    private IReadOnlyDictionary<string, string> GatherTemplateParameters()
+    {
+        var environmentShort = string.Empty;
+        var environmentLong = string.Empty;
+
+        if (_config.EnvironmentDescription != null)
         {
-            var environmentShort = string.Empty;
-            var environmentLong = string.Empty;
-
-            if (_config.EnvironmentDescription != null)
-            {
-                environmentShort = $"({_config.EnvironmentDescription})";
-                environmentLong = $"(Miljø: {_config.EnvironmentDescription})";
-            }
-
-            return new Dictionary<string, string>
-            {
-                { "environment_short", environmentShort },
-                { "environment_long", environmentLong },
-                { "invite_link", _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge" },
-            };
+            environmentShort = $"({_config.EnvironmentDescription})";
+            environmentLong = $"(Miljø: {_config.EnvironmentDescription})";
         }
 
-        private async Task<bool> SendAsync(
-            SendGrid.Helpers.Mail.EmailAddress from,
-            SendGrid.Helpers.Mail.EmailAddress to,
-            string subject,
-            string htmlContent)
+        return new Dictionary<string, string>
         {
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
-            msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.BccEmail));
+            { "environment_short", environmentShort },
+            { "environment_long", environmentLong },
+            { "invite_link", _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge" },
+        };
+    }
 
-            var response = await _client.SendEmailAsync(msg).ConfigureAwait(false);
-            if (response.IsSuccessStatusCode)
-            {
-                _logger.LogInformation("Email sent successfully to {Address}.", to.Email);
-            }
-            else
-            {
-                throw new NotSupportedException("Email failed with error code: " + response.StatusCode);
-            }
+    private async Task<bool> SendAsync(
+        SendGrid.Helpers.Mail.EmailAddress from,
+        SendGrid.Helpers.Mail.EmailAddress to,
+        string subject,
+        string htmlContent)
+    {
+        var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
+        msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.BccEmail));
 
-            return response.IsSuccessStatusCode;
+        var response = await _client.SendEmailAsync(msg).ConfigureAwait(false);
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Email sent successfully to {Address}.", to.Email);
         }
+        else
+        {
+            throw new NotSupportedException("Email failed with error code: " + response.StatusCode);
+        }
+
+        return response.IsSuccessStatusCode;
     }
 }

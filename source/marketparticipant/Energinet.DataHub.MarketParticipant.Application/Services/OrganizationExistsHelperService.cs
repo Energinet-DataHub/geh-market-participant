@@ -18,24 +18,23 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
+
+public sealed class OrganizationExistsHelperService : IOrganizationExistsHelperService
 {
-    public sealed class OrganizationExistsHelperService : IOrganizationExistsHelperService
+    private readonly IOrganizationRepository _organizationRepository;
+
+    public OrganizationExistsHelperService(IOrganizationRepository organizationRepository)
     {
-        private readonly IOrganizationRepository _organizationRepository;
+        _organizationRepository = organizationRepository;
+    }
 
-        public OrganizationExistsHelperService(IOrganizationRepository organizationRepository)
-        {
-            _organizationRepository = organizationRepository;
-        }
+    public async Task<Organization> EnsureOrganizationExistsAsync(Guid organizationId)
+    {
+        var organization = await _organizationRepository
+            .GetAsync(new OrganizationId(organizationId))
+            .ConfigureAwait(false);
 
-        public async Task<Organization> EnsureOrganizationExistsAsync(Guid organizationId)
-        {
-            var organization = await _organizationRepository
-                .GetAsync(new OrganizationId(organizationId))
-                .ConfigureAwait(false);
-
-            return organization ?? throw new NotFoundValidationException(organizationId);
-        }
+        return organization ?? throw new NotFoundValidationException(organizationId);
     }
 }

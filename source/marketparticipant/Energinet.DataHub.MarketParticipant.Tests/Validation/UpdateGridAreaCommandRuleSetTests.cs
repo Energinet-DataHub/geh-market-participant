@@ -15,49 +15,48 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Validation
+namespace Energinet.DataHub.MarketParticipant.Tests.Validation;
+
+[UnitTest]
+public sealed class UpdateGridAreaCommandRuleSetTests
 {
-    [UnitTest]
-    public sealed class UpdateGridAreaCommandRuleSetTests
+    [Theory]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    [InlineData("  ", false)]
+    [InlineData("ValidName", true)]
+    [InlineData("Valid Name", true)]
+    [InlineData("50aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true)]
+    [InlineData("51aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaX", false)]
+    public async Task Validate_Name_ValidatesProperty(string? newName, bool isValid)
     {
-        [Theory]
-        [InlineData("", false)]
-        [InlineData(null, false)]
-        [InlineData("  ", false)]
-        [InlineData("ValidName", true)]
-        [InlineData("Valid Name", true)]
-        [InlineData("50aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true)]
-        [InlineData("51aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaX", false)]
-        public async Task Validate_Name_ValidatesProperty(string? newName, bool isValid)
+        // Arrange
+        var propertyName = $"{nameof(UpdateGridAreaCommand.GridAreaDto)}.{nameof(ChangeGridAreaDto.Name)}";
+        var gridAreaId = Guid.NewGuid();
+
+        var updateGridAreaDto = new ChangeGridAreaDto(gridAreaId, newName!);
+
+        var target = new UpdateGridAreaCommandRuleSet();
+        var command = new UpdateGridAreaCommand(gridAreaId, updateGridAreaDto);
+
+        // Act
+        var result = await target.ValidateAsync(command);
+
+        // Assert
+        if (isValid)
         {
-            // Arrange
-            var propertyName = $"{nameof(UpdateGridAreaCommand.GridAreaDto)}.{nameof(ChangeGridAreaDto.Name)}";
-            var gridAreaId = Guid.NewGuid();
-
-            var updateGridAreaDto = new ChangeGridAreaDto(gridAreaId, newName!);
-
-            var target = new UpdateGridAreaCommandRuleSet();
-            var command = new UpdateGridAreaCommand(gridAreaId, updateGridAreaDto);
-
-            // Act
-            var result = await target.ValidateAsync(command);
-
-            // Assert
-            if (isValid)
-            {
-                Assert.True(result.IsValid);
-                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
-            }
-            else
-            {
-                Assert.False(result.IsValid);
-                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-            }
+            Assert.True(result.IsValid);
+            Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+        }
+        else
+        {
+            Assert.False(result.IsValid);
+            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
         }
     }
 }

@@ -15,31 +15,30 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Validation
+namespace Energinet.DataHub.MarketParticipant.Tests.Validation;
+
+[UnitTest]
+public sealed class GetActorCommandRuleSetTests
 {
-    [UnitTest]
-    public sealed class GetActorCommandRuleSetTests
+    [Fact]
+    public async Task Validate_ActorId_ValidatesProperty()
     {
-        [Fact]
-        public async Task Validate_ActorId_ValidatesProperty()
-        {
-            // Arrange
-            const string propertyName = nameof(GetSingleActorCommand.ActorId);
+        // Arrange
+        const string propertyName = nameof(GetSingleActorCommand.ActorId);
 
-            var target = new GetSingleActorCommandRuleSet();
-            var command = new GetSingleActorCommand(Guid.Empty);
+        var target = new GetSingleActorCommandRuleSet();
+        var command = new GetSingleActorCommand(Guid.Empty);
 
-            // Act
-            var result = await target.ValidateAsync(command);
+        // Act
+        var result = await target.ValidateAsync(command);
 
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
     }
 }

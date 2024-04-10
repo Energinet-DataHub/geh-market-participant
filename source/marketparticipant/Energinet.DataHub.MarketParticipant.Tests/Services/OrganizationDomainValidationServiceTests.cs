@@ -22,99 +22,98 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Services
+namespace Energinet.DataHub.MarketParticipant.Tests.Services;
+
+[UnitTest]
+public sealed class OrganizationDomainValidationServiceTests
 {
-    [UnitTest]
-    public sealed class OrganizationDomainValidationServiceTests
+    [Fact]
+    public async Task ValidationDomain_EmailAndOrganizationMatch()
     {
-        [Fact]
-        public async Task ValidationDomain_EmailAndOrganizationMatch()
-        {
-            // Arrange
-            var organizationRepositoryMock = new Mock<IOrganizationRepository>();
+        // Arrange
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
 
-            var actor = TestPreparationModels.MockedActor();
-            var actorEmail = new EmailAddress("newuser@testdomain.dk");
-            var orgDomainToTest = new OrganizationDomain("testdomain.dk");
+        var actor = TestPreparationModels.MockedActor();
+        var actorEmail = new EmailAddress("newuser@testdomain.dk");
+        var orgDomainToTest = new OrganizationDomain("testdomain.dk");
 
-            SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
+        SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
 
-            var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object);
+        var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object);
 
-            // Act + Assert
-            await organizationDomainValidationService
-                .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail);
-        }
+        // Act + Assert
+        await organizationDomainValidationService
+            .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail);
+    }
 
-        [Fact]
-        public async Task ValidationDomain_EmailDomain_IsWrong()
-        {
-            // Arrange
-            var organizationRepositoryMock = new Mock<IOrganizationRepository>();
+    [Fact]
+    public async Task ValidationDomain_EmailDomain_IsWrong()
+    {
+        // Arrange
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
 
-            var actor = TestPreparationModels.MockedActor();
-            var actorEmail = new EmailAddress("newuser@wrongdomain.dk");
-            var orgDomainToTest = new OrganizationDomain("testdomain.dk");
+        var actor = TestPreparationModels.MockedActor();
+        var actorEmail = new EmailAddress("newuser@wrongdomain.dk");
+        var orgDomainToTest = new OrganizationDomain("testdomain.dk");
 
-            SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
+        SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
 
-            var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object);
+        var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
-                .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
+            .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail));
+    }
 
-        [Fact]
-        public async Task ValidationDomain_OrganizationDomain_IsWrong()
-        {
-            // Arrange
-            var organizationRepositoryMock = new Mock<IOrganizationRepository>();
+    [Fact]
+    public async Task ValidationDomain_OrganizationDomain_IsWrong()
+    {
+        // Arrange
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
 
-            var actor = TestPreparationModels.MockedActor();
-            var actorEmail = new EmailAddress("newuser@testdomain.dk");
-            var orgDomainToTest = new OrganizationDomain("test2domain.dk");
+        var actor = TestPreparationModels.MockedActor();
+        var actorEmail = new EmailAddress("newuser@testdomain.dk");
+        var orgDomainToTest = new OrganizationDomain("test2domain.dk");
 
-            SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
+        SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
 
-            var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object);
+        var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
-                    .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
+            .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail));
+    }
 
-        [Fact]
-        public async Task ValidationDomain_SpecialTest_ExceptionExpected()
-        {
-            // Arrange
-            var organizationRepositoryMock = new Mock<IOrganizationRepository>();
+    [Fact]
+    public async Task ValidationDomain_SpecialTest_ExceptionExpected()
+    {
+        // Arrange
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
 
-            var actor = TestPreparationModels.MockedActor();
-            var actorEmail = new EmailAddress("newuser@shouldfail-testdomain.dk");
-            var orgDomainToTest = new OrganizationDomain("testdomain.dk");
+        var actor = TestPreparationModels.MockedActor();
+        var actorEmail = new EmailAddress("newuser@shouldfail-testdomain.dk");
+        var orgDomainToTest = new OrganizationDomain("testdomain.dk");
 
-            SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
-            var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object);
+        SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
+        var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
-                    .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
+            .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail));
+    }
 
-        private static void SetupOrganizationMock(
-            OrganizationDomain orgDomainToTest,
-            Mock<IOrganizationRepository> organizationRepositoryMock)
-        {
-            var organization = new Organization(
-                "TestOrg",
-                new BusinessRegisterIdentifier("identifier"),
-                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
-                orgDomainToTest);
+    private static void SetupOrganizationMock(
+        OrganizationDomain orgDomainToTest,
+        Mock<IOrganizationRepository> organizationRepositoryMock)
+    {
+        var organization = new Organization(
+            "TestOrg",
+            new BusinessRegisterIdentifier("identifier"),
+            new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+            orgDomainToTest);
 
-            organizationRepositoryMock
-                .Setup(o => o.GetAsync(It.IsAny<OrganizationId>()))
-                .ReturnsAsync(organization);
-        }
+        organizationRepositoryMock
+            .Setup(o => o.GetAsync(It.IsAny<OrganizationId>()))
+            .ReturnsAsync(organization);
     }
 }

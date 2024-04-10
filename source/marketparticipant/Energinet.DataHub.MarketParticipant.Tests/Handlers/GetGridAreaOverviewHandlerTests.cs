@@ -15,29 +15,29 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.GridAreas;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class GetGridAreaOverviewHandlerTests
 {
-    [UnitTest]
-    public sealed class GetGridAreaOverviewHandlerTests
+    [Fact]
+    public async Task Handle_Command_CallsRepository()
     {
-        [Fact]
-        public async Task Handle_Command_CallsRepository()
-        {
-            // arrange
-            var repositoryMock = new Mock<IGridAreaOverviewRepository>();
-            repositoryMock
-                .Setup(x => x.GetAsync())
-                .ReturnsAsync(new[]
-                {
-                    new GridAreaOverviewItem(
+        // arrange
+        var repositoryMock = new Mock<IGridAreaOverviewRepository>();
+        repositoryMock
+            .Setup(x => x.GetAsync())
+            .ReturnsAsync(new[]
+            {
+                new GridAreaOverviewItem(
                     new GridAreaId(Guid.NewGuid()),
                     new GridAreaName("name"),
                     new GridAreaCode("code"),
@@ -48,15 +48,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                     null,
                     null,
                     null)
-                });
+            });
 
-            var target = new GetGridAreaOverviewHandler(repositoryMock.Object);
+        var target = new GetGridAreaOverviewHandler(repositoryMock.Object);
 
-            // act
-            var actual = await target.Handle(new GetGridAreaOverviewCommand(), CancellationToken.None);
+        // act
+        var actual = await target.Handle(new GetGridAreaOverviewCommand(), CancellationToken.None);
 
-            // assert
-            Assert.NotEmpty(actual.GridAreas);
-        }
+        // assert
+        Assert.NotEmpty(actual.GridAreas);
     }
 }

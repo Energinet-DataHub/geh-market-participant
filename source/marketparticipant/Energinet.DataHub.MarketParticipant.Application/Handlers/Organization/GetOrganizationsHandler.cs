@@ -16,49 +16,48 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
+
+public sealed class GetOrganizationsHandler : IRequestHandler<GetOrganizationsCommand, GetOrganizationsResponse>
 {
-    public sealed class GetOrganizationsHandler : IRequestHandler<GetOrganizationsCommand, GetOrganizationsResponse>
+    private readonly IOrganizationRepository _organizationRepository;
+
+    public GetOrganizationsHandler(IOrganizationRepository organizationRepository)
     {
-        private readonly IOrganizationRepository _organizationRepository;
+        _organizationRepository = organizationRepository;
+    }
 
-        public GetOrganizationsHandler(IOrganizationRepository organizationRepository)
+    public async Task<GetOrganizationsResponse> Handle(
+        GetOrganizationsCommand request,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        if (request.OrganizationId.HasValue)
         {
-            _organizationRepository = organizationRepository;
-        }
-
-        public async Task<GetOrganizationsResponse> Handle(
-            GetOrganizationsCommand request,
-            CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request);
-
-            if (request.OrganizationId.HasValue)
-            {
-                var organization = await _organizationRepository
-                    .GetAsync(new OrganizationId(request.OrganizationId.Value))
-                    .ConfigureAwait(false);
-
-                return organization == null
-                    ? new GetOrganizationsResponse(Enumerable.Empty<OrganizationDto>())
-                    : new GetOrganizationsResponse(new[] { OrganizationMapper.Map(organization) });
-            }
-
-            var organizations = await _organizationRepository
-                .GetAsync()
+            var organization = await _organizationRepository
+                .GetAsync(new OrganizationId(request.OrganizationId.Value))
                 .ConfigureAwait(false);
 
-            var mapped = organizations
-                .Select(OrganizationMapper.Map)
-                .ToList();
-
-            return new GetOrganizationsResponse(mapped);
+            return organization == null
+                ? new GetOrganizationsResponse(Enumerable.Empty<OrganizationDto>())
+                : new GetOrganizationsResponse(new[] { OrganizationMapper.Map(organization) });
         }
+
+        var organizations = await _organizationRepository
+            .GetAsync()
+            .ConfigureAwait(false);
+
+        var mapped = organizations
+            .Select(OrganizationMapper.Map)
+            .ToList();
+
+        return new GetOrganizationsResponse(mapped);
     }
 }

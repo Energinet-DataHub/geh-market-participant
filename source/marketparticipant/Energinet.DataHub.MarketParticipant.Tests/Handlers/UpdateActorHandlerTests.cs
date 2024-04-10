@@ -15,8 +15,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -26,103 +26,102 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class UpdateActorHandlerTests
 {
-    [UnitTest]
-    public sealed class UpdateActorHandlerTests
+    [Fact]
+    public async Task Handle_NoActor_ThrowsNotFoundException()
     {
-        [Fact]
-        public async Task Handle_NoActor_ThrowsNotFoundException()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var target = new UpdateActorHandler(
-                actorRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IOverlappingEicFunctionsRuleService>().Object,
-                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
-                new Mock<IDomainEventRepository>().Object);
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var target = new UpdateActorHandler(
+            actorRepositoryMock.Object,
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IOverlappingEicFunctionsRuleService>().Object,
+            new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
+            new Mock<IDomainEventRepository>().Object);
 
-            var actorId = Guid.NewGuid();
+        var actorId = Guid.NewGuid();
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
-                .ReturnsAsync((Actor?)null);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
+            .ReturnsAsync((Actor?)null);
 
-            var command = new UpdateActorCommand(
-                actorId,
-                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
+        var command = new UpdateActorCommand(
+            actorId,
+            new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
-            // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
+    }
 
-        [Fact]
-        public async Task Handle_OverlappingRoles_AreValidated()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var overlappingEicFunctionsService = new Mock<IOverlappingEicFunctionsRuleService>();
-            var target = new UpdateActorHandler(
-                actorRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                overlappingEicFunctionsService.Object,
-                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
-                new Mock<IDomainEventRepository>().Object);
+    [Fact]
+    public async Task Handle_OverlappingRoles_AreValidated()
+    {
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var overlappingEicFunctionsService = new Mock<IOverlappingEicFunctionsRuleService>();
+        var target = new UpdateActorHandler(
+            actorRepositoryMock.Object,
+            UnitOfWorkProviderMock.Create(),
+            overlappingEicFunctionsService.Object,
+            new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
+            new Mock<IDomainEventRepository>().Object);
 
-            var actor = MockActor(actorRepositoryMock);
+        var actor = MockActor(actorRepositoryMock);
 
-            var command = new UpdateActorCommand(
-                actor.Id.Value,
-                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
+        var command = new UpdateActorCommand(
+            actor.Id.Value,
+            new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
-            // Act
-            await target.Handle(command, CancellationToken.None);
+        // Act
+        await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            overlappingEicFunctionsService.Verify(
-                x => x.ValidateEicFunctionsAcrossActorsAsync(It.Is<Actor>(a => a.Id == actor.Id)),
-                Times.Once);
-        }
+        // Assert
+        overlappingEicFunctionsService.Verify(
+            x => x.ValidateEicFunctionsAcrossActorsAsync(It.Is<Actor>(a => a.Id == actor.Id)),
+            Times.Once);
+    }
 
-        [Fact]
-        public async Task Handle_DomainEvents_ArePublished()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var domainEventRepository = new Mock<IDomainEventRepository>();
+    [Fact]
+    public async Task Handle_DomainEvents_ArePublished()
+    {
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var domainEventRepository = new Mock<IDomainEventRepository>();
 
-            var target = new UpdateActorHandler(
-                actorRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IOverlappingEicFunctionsRuleService>().Object,
-                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
-                domainEventRepository.Object);
+        var target = new UpdateActorHandler(
+            actorRepositoryMock.Object,
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IOverlappingEicFunctionsRuleService>().Object,
+            new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
+            domainEventRepository.Object);
 
-            var actor = MockActor(actorRepositoryMock);
+        var actor = MockActor(actorRepositoryMock);
 
-            var command = new UpdateActorCommand(
-                actor.Id.Value,
-                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
+        var command = new UpdateActorCommand(
+            actor.Id.Value,
+            new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
-            // Act
-            await target.Handle(command, CancellationToken.None);
+        // Act
+        await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            domainEventRepository.Verify(
-                x => x.EnqueueAsync(It.IsAny<Actor>()),
-                Times.Once);
-        }
+        // Assert
+        domainEventRepository.Verify(
+            x => x.EnqueueAsync(It.IsAny<Actor>()),
+            Times.Once);
+    }
 
-        private static Actor MockActor(Mock<IActorRepository> actorRepositoryMock)
-        {
-            var actor = TestPreparationModels.MockedActor();
+    private static Actor MockActor(Mock<IActorRepository> actorRepositoryMock)
+    {
+        var actor = TestPreparationModels.MockedActor();
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
-                .ReturnsAsync(actor);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+            .ReturnsAsync(actor);
 
-            return actor;
-        }
+        return actor;
     }
 }

@@ -17,29 +17,28 @@ using System.Threading.Tasks;
 using Microsoft.Graph;
 using Microsoft.Graph.Users.Item.Authentication;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
+
+/// <summary>
+/// Represents an authentication method in Active Directory.
+/// </summary>
+public interface IExternalAuthenticationMethod
 {
     /// <summary>
-    /// Represents an authentication method in Active Directory.
+    /// Assigns the current authentication method to the user configured in the provided builder.
     /// </summary>
-    public interface IExternalAuthenticationMethod
-    {
-        /// <summary>
-        /// Assigns the current authentication method to the user configured in the provided builder.
-        /// </summary>
-        /// <param name="authenticationBuilder">A configured authentication builder for the target user.</param>
-        Task AssignAsync(AuthenticationRequestBuilder authenticationBuilder);
+    /// <param name="authenticationBuilder">A configured authentication builder for the target user.</param>
+    Task AssignAsync(AuthenticationRequestBuilder authenticationBuilder);
 
-        /// <summary>
-        /// Verifies if the current authentication method is already applied to the user configured in the provided builder.
-        /// </summary>
-        /// <param name="client"><see cref="IBaseClient"/>.</param>
-        /// <param name="authenticationBuilder">A configured authentication builder for the target user.</param>
-        Task<bool> DoesAlreadyExistAsync(IBaseClient client, AuthenticationRequestBuilder authenticationBuilder);
+    /// <summary>
+    /// Verifies if the current authentication method is already applied to the user configured in the provided builder.
+    /// </summary>
+    /// <param name="client"><see cref="IBaseClient"/>.</param>
+    /// <param name="authenticationBuilder">A configured authentication builder for the target user.</param>
+    Task<bool> DoesAlreadyExistAsync(IBaseClient client, AuthenticationRequestBuilder authenticationBuilder);
 
-        /// <summary>
-        /// Ensures that no validation exception can be extrapolated. If one is, it is thrown.
-        /// </summary>
-        void EnsureNoValidationException(Exception exception);
-    }
+    /// <summary>
+    /// Ensures that no validation exception can be extrapolated. If one is, it is thrown.
+    /// </summary>
+    void EnsureNoValidationException(Exception exception);
 }

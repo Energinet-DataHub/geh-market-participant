@@ -25,95 +25,94 @@ using Microsoft.Graph.Models;
 using NodaTime;
 using NodaTime.Extensions;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
-{
-    public sealed class ActorClientSecretService : IActorClientSecretService
-    {
-        private const string SecretDisplayName = "B2C Login - Secret";
-        private readonly GraphServiceClient _graphClient;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
-        public ActorClientSecretService(GraphServiceClient graphClient)
+public sealed class ActorClientSecretService : IActorClientSecretService
+{
+    private const string SecretDisplayName = "B2C Login - Secret";
+    private readonly GraphServiceClient _graphClient;
+
+    public ActorClientSecretService(GraphServiceClient graphClient)
+    {
+        _graphClient = graphClient;
+    }
+
+    public async Task<(Guid ClientId, Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretForAppRegistrationAsync(Actor actor)
+    {
+        ArgumentNullException.ThrowIfNull(actor);
+        ArgumentNullException.ThrowIfNull(actor.ExternalActorId);
+
+        var foundApp = await GetApplicationRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false);
+        if (foundApp == null)
         {
-            _graphClient = graphClient;
+            throw new InvalidOperationException("Cannot add secret to B2C; application was not found.");
         }
 
-        public async Task<(Guid ClientId, Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretForAppRegistrationAsync(Actor actor)
+        var passwordCredential = new PasswordCredential
         {
-            ArgumentNullException.ThrowIfNull(actor);
-            ArgumentNullException.ThrowIfNull(actor.ExternalActorId);
+            DisplayName = SecretDisplayName,
+            StartDateTime = DateTimeOffset.UtcNow,
+            EndDateTime = DateTimeOffset.UtcNow.AddMonths(6),
+            KeyId = Guid.NewGuid(),
+        };
 
-            var foundApp = await GetApplicationRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false);
-            if (foundApp == null)
+        var secret = await _graphClient
+            .Applications[foundApp.Id]
+            .AddPassword
+            .PostAsync(new AddPasswordPostRequestBody
             {
-                throw new InvalidOperationException("Cannot add secret to B2C; application was not found.");
-            }
+                PasswordCredential = passwordCredential,
+            })
+            .ConfigureAwait(false);
 
-            var passwordCredential = new PasswordCredential
-            {
-                DisplayName = SecretDisplayName,
-                StartDateTime = DateTimeOffset.UtcNow,
-                EndDateTime = DateTimeOffset.UtcNow.AddMonths(6),
-                KeyId = Guid.NewGuid(),
-            };
+        if (secret is { SecretText: not null, KeyId: not null, EndDateTime: not null })
+        {
+            return (
+                actor.ExternalActorId.Value,
+                secret.KeyId.Value,
+                secret.SecretText,
+                secret.EndDateTime.Value.ToInstant());
+        }
 
-            var secret = await _graphClient
+        throw new InvalidOperationException($"Could not create secret in B2C for application {foundApp.AppId}");
+    }
+
+    public async Task RemoveSecretAsync(Actor actor)
+    {
+        ArgumentNullException.ThrowIfNull(actor);
+        ArgumentNullException.ThrowIfNull(actor.ExternalActorId);
+
+        var foundApp = await GetApplicationRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false);
+        if (foundApp == null)
+        {
+            throw new InvalidOperationException("Cannot delete secrets from B2C; Application was not found.");
+        }
+
+        foreach (var secret in foundApp.PasswordCredentials!)
+        {
+            await _graphClient
                 .Applications[foundApp.Id]
-                .AddPassword
-                .PostAsync(new AddPasswordPostRequestBody
+                .RemovePassword
+                .PostAsync(new RemovePasswordPostRequestBody
                 {
-                    PasswordCredential = passwordCredential,
+                    KeyId = secret.KeyId,
                 })
                 .ConfigureAwait(false);
-
-            if (secret is { SecretText: not null, KeyId: not null, EndDateTime: not null })
-            {
-                return (
-                    actor.ExternalActorId.Value,
-                    secret.KeyId.Value,
-                    secret.SecretText,
-                    secret.EndDateTime.Value.ToInstant());
-            }
-
-            throw new InvalidOperationException($"Could not create secret in B2C for application {foundApp.AppId}");
         }
+    }
 
-        public async Task RemoveSecretAsync(Actor actor)
-        {
-            ArgumentNullException.ThrowIfNull(actor);
-            ArgumentNullException.ThrowIfNull(actor.ExternalActorId);
+    private async Task<Microsoft.Graph.Models.Application?> GetApplicationRegistrationAsync(ExternalActorId externalActorId)
+    {
+        var appId = externalActorId.Value.ToString();
+        var applicationUsingAppId = await _graphClient
+            .Applications
+            .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
+            .ConfigureAwait(false);
 
-            var foundApp = await GetApplicationRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false);
-            if (foundApp == null)
-            {
-                throw new InvalidOperationException("Cannot delete secrets from B2C; Application was not found.");
-            }
+        var applications = await applicationUsingAppId!
+            .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
+            .ConfigureAwait(false);
 
-            foreach (var secret in foundApp.PasswordCredentials!)
-            {
-                await _graphClient
-                    .Applications[foundApp.Id]
-                    .RemovePassword
-                    .PostAsync(new RemovePasswordPostRequestBody
-                    {
-                        KeyId = secret.KeyId,
-                    })
-                    .ConfigureAwait(false);
-            }
-        }
-
-        private async Task<Microsoft.Graph.Models.Application?> GetApplicationRegistrationAsync(ExternalActorId externalActorId)
-        {
-            var appId = externalActorId.Value.ToString();
-            var applicationUsingAppId = await _graphClient
-                .Applications
-                .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
-                .ConfigureAwait(false);
-
-            var applications = await applicationUsingAppId!
-                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
-                .ConfigureAwait(false);
-
-            return applications.SingleOrDefault();
-        }
+        return applications.SingleOrDefault();
     }
 }

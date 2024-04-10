@@ -16,43 +16,42 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers;
+
+public sealed class GetActorContactsHandler : IRequestHandler<GetActorContactsCommand, GetActorContactsResponse>
 {
-    public sealed class GetActorContactsHandler : IRequestHandler<GetActorContactsCommand, GetActorContactsResponse>
+    private readonly IActorRepository _actorRepository;
+    private readonly IActorContactRepository _contactRepository;
+
+    public GetActorContactsHandler(
+        IActorRepository actorRepository,
+        IActorContactRepository contactRepository)
     {
-        private readonly IActorRepository _actorRepository;
-        private readonly IActorContactRepository _contactRepository;
+        _actorRepository = actorRepository;
+        _contactRepository = contactRepository;
+    }
 
-        public GetActorContactsHandler(
-            IActorRepository actorRepository,
-            IActorContactRepository contactRepository)
-        {
-            _actorRepository = actorRepository;
-            _contactRepository = contactRepository;
-        }
+    public async Task<GetActorContactsResponse> Handle(GetActorContactsCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        public async Task<GetActorContactsResponse> Handle(GetActorContactsCommand request, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+        var actor = await _actorRepository
+            .GetAsync(new ActorId(request.ActorId))
+            .ConfigureAwait(false);
 
-            var actor = await _actorRepository
-                .GetAsync(new ActorId(request.ActorId))
-                .ConfigureAwait(false);
+        NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
-            NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
+        var contacts = await _contactRepository
+            .GetAsync(actor.Id)
+            .ConfigureAwait(false);
 
-            var contacts = await _contactRepository
-                .GetAsync(actor.Id)
-                .ConfigureAwait(false);
-
-            return new GetActorContactsResponse(contacts.Select(ActorContactMapper.Map));
-        }
+        return new GetActorContactsResponse(contacts.Select(ActorContactMapper.Map));
     }
 }

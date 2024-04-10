@@ -14,54 +14,53 @@
 
 using System;
 using System.Linq;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Mappers
+namespace Energinet.DataHub.MarketParticipant.Application.Mappers;
+
+public static class OrganizationMapper
 {
-    public static class OrganizationMapper
+    public static OrganizationDto Map(Organization organization)
     {
-        public static OrganizationDto Map(Organization organization)
-        {
-            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
-            return new OrganizationDto(
-                organization.Id.Value,
-                organization.Name,
-                organization.BusinessRegisterIdentifier.Identifier,
-                organization.Domain.Value,
-                organization.Status.ToString(),
-                Map(organization.Address));
-        }
+        ArgumentNullException.ThrowIfNull(organization, nameof(organization));
+        return new OrganizationDto(
+            organization.Id.Value,
+            organization.Name,
+            organization.BusinessRegisterIdentifier.Identifier,
+            organization.Domain.Value,
+            organization.Status.ToString(),
+            Map(organization.Address));
+    }
 
-        public static ActorDto Map(Actor actor)
-        {
-            ArgumentNullException.ThrowIfNull(actor, nameof(actor));
-            return new ActorDto(
-                actor.Id.Value,
-                actor.OrganizationId.Value,
-                actor.Status.ToString(),
-                new ActorNumberDto(actor.ActorNumber.Value),
-                new ActorNameDto(actor.Name.Value),
-                actor.MarketRoles.Select(Map).ToList());
-        }
+    public static ActorDto Map(Actor actor)
+    {
+        ArgumentNullException.ThrowIfNull(actor, nameof(actor));
+        return new ActorDto(
+            actor.Id.Value,
+            actor.OrganizationId.Value,
+            actor.Status.ToString(),
+            new ActorNumberDto(actor.ActorNumber.Value),
+            new ActorNameDto(actor.Name.Value),
+            actor.MarketRoles.Select(Map).ToList());
+    }
 
-        private static AddressDto Map(Address address)
-        {
-            return new AddressDto(
-                address.StreetName,
-                address.Number,
-                address.ZipCode,
-                address.City,
-                address.Country);
-        }
+    private static AddressDto Map(Address address)
+    {
+        return new AddressDto(
+            address.StreetName,
+            address.Number,
+            address.ZipCode,
+            address.City,
+            address.Country);
+    }
 
-        private static ActorMarketRoleDto Map(ActorMarketRole marketRole)
-        {
-            return new ActorMarketRoleDto(
-                marketRole.Function,
-                marketRole.GridAreas.Select(e => new ActorGridAreaDto(e.Id.Value, e.MeteringPointTypes.Select(m => m.ToString()))),
-                marketRole.Comment);
-        }
+    private static ActorMarketRoleDto Map(ActorMarketRole marketRole)
+    {
+        return new ActorMarketRoleDto(
+            marketRole.Function,
+            marketRole.GridAreas.Select(e => new ActorGridAreaDto(e.Id.Value, e.MeteringPointTypes.Select(m => m.ToString()))),
+            marketRole.Comment);
     }
 }

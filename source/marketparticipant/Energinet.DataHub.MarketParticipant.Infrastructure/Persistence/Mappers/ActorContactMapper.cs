@@ -15,33 +15,32 @@
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
+
+internal sealed class ActorContactMapper
 {
-    internal sealed class ActorContactMapper
+    public static void MapToEntity(ActorContact from, ActorContactEntity to)
     {
-        public static void MapToEntity(ActorContact from, ActorContactEntity to)
-        {
-            to.Id = from.Id.Value;
-            to.ActorId = from.ActorId.Value;
-            to.Name = from.Name;
-            to.Category = from.Category;
-            to.Email = from.Email.Address;
-            to.Phone = from.Phone?.Number;
-        }
+        to.Id = from.Id.Value;
+        to.ActorId = from.ActorId.Value;
+        to.Name = from.Name;
+        to.Category = from.Category;
+        to.Email = from.Email.Address;
+        to.Phone = from.Phone?.Number;
+    }
 
-        public static ActorContact MapFromEntity(ActorContactEntity from)
-        {
-            var pn = from.Phone == null
-                ? null
-                : new PhoneNumber(from.Phone);
+    public static ActorContact MapFromEntity(ActorContactEntity from)
+    {
+        var pn = from.Phone == null
+            ? null
+            : new PhoneNumber(from.Phone);
 
-            return new ActorContact(
-                new ContactId(from.Id),
-                new ActorId(from.ActorId),
-                from.Name,
-                from.Category,
-                new EmailAddress(from.Email),
-                pn);
-        }
+        return new ActorContact(
+            new ContactId(from.Id),
+            new ActorId(from.ActorId),
+            from.Name,
+            from.Category,
+            new EmailAddress(from.Email),
+            pn);
     }
 }

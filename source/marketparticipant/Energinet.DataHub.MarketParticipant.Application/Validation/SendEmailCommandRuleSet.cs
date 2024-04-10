@@ -15,9 +15,6 @@
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
-{
-    public sealed class SendEmailCommandRuleSet : AbstractValidator<SendEmailCommand>
-    {
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class SendEmailCommandRuleSet : AbstractValidator<SendEmailCommand>;

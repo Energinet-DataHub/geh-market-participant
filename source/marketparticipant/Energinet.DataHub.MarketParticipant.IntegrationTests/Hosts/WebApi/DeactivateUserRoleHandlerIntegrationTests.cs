@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -90,6 +90,43 @@ public sealed class DeactivateUserRoleHandlerIntegrationTests
         var assignedRoles = await mediator.Send(new GetUserRolesCommand(actor.Id, user.Id));
         Assert.Single(assignedRoles.Roles);
         Assert.Single(assignedRoles.Roles, r => r.Id == userRoleB.Id);
+    }
+
+    [Fact]
+    public async Task DeactivateUserRole_MultipleActors_UserRoleIsRemoved()
+    {
+        // Create context user
+        var frontendUser = await _fixture.PrepareUserAsync();
+
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var user = await _fixture.PrepareUserAsync();
+        var actorA = await _fixture.PrepareActorAsync();
+        var actorB = await _fixture.PrepareActorAsync();
+        var userRoleA = await _fixture.PrepareUserRoleAsync();
+        var userRoleB = await _fixture.PrepareUserRoleAsync();
+
+        await _fixture.AssignUserRoleAsync(user.Id, actorA.Id, userRoleA.Id);
+        await _fixture.AssignUserRoleAsync(user.Id, actorB.Id, userRoleA.Id);
+        await _fixture.AssignUserRoleAsync(user.Id, actorA.Id, userRoleB.Id);
+
+        var deactivateUserCommand = new DeactivateUserRoleCommand(userRoleA.Id, frontendUser.Id);
+
+        // Act
+        await mediator.Send(deactivateUserCommand);
+
+        // Assert
+        var assignedARoles = await mediator.Send(new GetUserRolesCommand(actorA.Id, user.Id));
+        Assert.Single(assignedARoles.Roles);
+        Assert.Single(assignedARoles.Roles, r => r.Id == userRoleB.Id);
+
+        var assignedBRoles = await mediator.Send(new GetUserRolesCommand(actorB.Id, user.Id));
+        Assert.Empty(assignedBRoles.Roles);
     }
 
     [Fact]

@@ -15,52 +15,51 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
+
+public sealed class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationCommand>
 {
-    public sealed class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationCommand>
+    private readonly IOrganizationRepository _organizationRepository;
+    private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+    private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
+
+    public UpdateOrganizationHandler(
+        IOrganizationRepository organizationRepository,
+        IOrganizationExistsHelperService organizationExistsHelperService,
+        IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService)
     {
-        private readonly IOrganizationRepository _organizationRepository;
-        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
-        private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
+        _organizationRepository = organizationRepository;
+        _organizationExistsHelperService = organizationExistsHelperService;
+        _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
+    }
 
-        public UpdateOrganizationHandler(
-            IOrganizationRepository organizationRepository,
-            IOrganizationExistsHelperService organizationExistsHelperService,
-            IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService)
-        {
-            _organizationRepository = organizationRepository;
-            _organizationExistsHelperService = organizationExistsHelperService;
-            _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
-        }
+    public async Task Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        public async Task Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+        var organization = await _organizationExistsHelperService
+            .EnsureOrganizationExistsAsync(request.OrganizationId)
+            .ConfigureAwait(false);
 
-            var organization = await _organizationExistsHelperService
-                .EnsureOrganizationExistsAsync(request.OrganizationId)
-                .ConfigureAwait(false);
+        organization.Name = request.Organization.Name;
+        organization.Status = Enum.Parse<OrganizationStatus>(request.Organization.Status, true);
+        organization.Domain = new OrganizationDomain(request.Organization.Domain);
 
-            organization.Name = request.Organization.Name;
-            organization.Status = Enum.Parse<OrganizationStatus>(request.Organization.Status, true);
-            organization.Domain = new OrganizationDomain(request.Organization.Domain);
+        await _uniqueOrganizationBusinessRegisterIdentifierService
+            .EnsureUniqueBusinessRegisterIdentifierAsync(organization)
+            .ConfigureAwait(false);
 
-            await _uniqueOrganizationBusinessRegisterIdentifierService
-                .EnsureUniqueBusinessRegisterIdentifierAsync(organization)
-                .ConfigureAwait(false);
+        var result = await _organizationRepository
+            .AddOrUpdateAsync(organization)
+            .ConfigureAwait(false);
 
-            var result = await _organizationRepository
-                .AddOrUpdateAsync(organization)
-                .ConfigureAwait(false);
-
-            result.ThrowOnError(OrganizationErrorHandler.HandleOrganizationError);
-        }
+        result.ThrowOnError(OrganizationErrorHandler.HandleOrganizationError);
     }
 }

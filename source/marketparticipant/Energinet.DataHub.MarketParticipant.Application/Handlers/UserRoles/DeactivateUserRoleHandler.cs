@@ -68,13 +68,7 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
         {
             foreach (var user in users)
             {
-                var role = user.RoleAssignments.Single(x => x.UserRoleId == userRoleId);
-                user.RoleAssignments.Remove(role);
-
-                await _userRoleAssignmentAuditLogRepository
-                    .AuditDeactivationAsync(user.Id, _auditIdentityProvider.IdentityId, role)
-                    .ConfigureAwait(false);
-
+                await DeactivateUserRoleForUserAsync(user, userRoleId).ConfigureAwait(false);
                 await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
             }
 
@@ -82,6 +76,18 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
             await _userRoleRepository.UpdateAsync(userRole).ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
+        }
+    }
+
+    private async Task DeactivateUserRoleForUserAsync(User user, UserRoleId userRoleId)
+    {
+        foreach (var roleAssignment in user.RoleAssignments.Where(x => x.UserRoleId == userRoleId))
+        {
+            user.RoleAssignments.Remove(roleAssignment);
+
+            await _userRoleAssignmentAuditLogRepository
+                .AuditDeactivationAsync(user.Id, _auditIdentityProvider.IdentityId, roleAssignment)
+                .ConfigureAwait(false);
         }
     }
 }

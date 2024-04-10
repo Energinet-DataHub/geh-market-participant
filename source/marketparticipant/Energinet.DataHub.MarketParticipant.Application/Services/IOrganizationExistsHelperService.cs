@@ -16,18 +16,17 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
+
+/// <summary>
+/// A helper service for getting an organization; or throwing NotFoundValidationException.
+/// </summary>
+public interface IOrganizationExistsHelperService
 {
     /// <summary>
-    /// A helper service for getting an organization; or throwing NotFoundValidationException.
+    /// Gets the organization with the speciifed id; or throws NotFoundValidationException.
     /// </summary>
-    public interface IOrganizationExistsHelperService
-    {
-        /// <summary>
-        /// Gets the organization with the speciifed id; or throws NotFoundValidationException.
-        /// </summary>
-        /// <param name="organizationId">The id of the organization to get.</param>
-        /// <returns>The organization with the specified id.</returns>
-        Task<Organization> EnsureOrganizationExistsAsync(Guid organizationId);
-    }
+    /// <param name="organizationId">The id of the organization to get.</param>
+    /// <returns>The organization with the specified id.</returns>
+    Task<Organization> EnsureOrganizationExistsAsync(Guid organizationId);
 }

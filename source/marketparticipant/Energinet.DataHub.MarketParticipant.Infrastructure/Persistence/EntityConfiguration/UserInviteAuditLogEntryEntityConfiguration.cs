@@ -17,21 +17,20 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
-{
-    public class UserInviteAuditLogEntryEntityConfiguration : IEntityTypeConfiguration<UserInviteAuditLogEntryEntity>
-    {
-        public void Configure(EntityTypeBuilder<UserInviteAuditLogEntryEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 
-            builder.ToTable("UserInviteAuditLogEntry");
-            builder.HasKey(x => x.Id);
-            builder.Property(p => p.Id).ValueGeneratedOnAdd();
-            builder.Property(x => x.UserId);
-            builder.Property(x => x.ActorId);
-            builder.Property(x => x.ChangedByUserId);
-            builder.Property(x => x.Timestamp);
-        }
+public class UserInviteAuditLogEntryEntityConfiguration : IEntityTypeConfiguration<UserInviteAuditLogEntryEntity>
+{
+    public void Configure(EntityTypeBuilder<UserInviteAuditLogEntryEntity> builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+
+        builder.ToTable("UserInviteAuditLogEntry");
+        builder.HasKey(x => x.Id);
+        builder.Property(p => p.Id).ValueGeneratedOnAdd();
+        builder.Property(x => x.UserId);
+        builder.Property(x => x.ActorId);
+        builder.Property(x => x.ChangedByUserId);
+        builder.Property(x => x.Timestamp);
     }
 }

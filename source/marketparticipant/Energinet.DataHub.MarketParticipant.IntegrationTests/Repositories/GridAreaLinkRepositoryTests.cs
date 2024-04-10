@@ -20,62 +20,61 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
+
+[Collection(nameof(IntegrationTestCollectionFixture))]
+[IntegrationTest]
+public sealed class GridAreaLinkRepositoryTests
 {
-    [Collection(nameof(IntegrationTestCollectionFixture))]
-    [IntegrationTest]
-    public sealed class GridAreaLinkRepositoryTests
+    private readonly MarketParticipantDatabaseFixture _fixture;
+
+    public GridAreaLinkRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
-        private readonly MarketParticipantDatabaseFixture _fixture;
+        _fixture = fixture;
+    }
 
-        public GridAreaLinkRepositoryTests(MarketParticipantDatabaseFixture fixture)
-        {
-            _fixture = fixture;
-        }
+    [Fact]
+    public async Task AddOrUpdateAsync_GridNotExists_ReturnsNull()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var linkRepository = new GridAreaLinkRepository(context);
 
-        [Fact]
-        public async Task AddOrUpdateAsync_GridNotExists_ReturnsNull()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var linkRepository = new GridAreaLinkRepository(context);
+        // Act
+        var testOrg = await linkRepository
+            .GetAsync(new GridAreaLinkId(Guid.NewGuid()));
 
-            // Act
-            var testOrg = await linkRepository
-                .GetAsync(new GridAreaLinkId(Guid.NewGuid()));
+        // Assert
+        Assert.Null(testOrg);
+    }
 
-            // Assert
-            Assert.Null(testOrg);
-        }
+    [Fact]
+    public async Task AddOrUpdateAsync_GridAreaLink_CanReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var linkRepository = new GridAreaLinkRepository(context);
+        var gridRepository = new GridAreaRepository(context);
+        var testGrid = new GridArea(
+            new GridAreaName("Test Grid Area"),
+            new GridAreaCode("801"),
+            PriceAreaCode.Dk1,
+            DateTimeOffset.MinValue,
+            null);
 
-        [Fact]
-        public async Task AddOrUpdateAsync_GridAreaLink_CanReadBack()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var linkRepository = new GridAreaLinkRepository(context);
-            var gridRepository = new GridAreaRepository(context);
-            var testGrid = new GridArea(
-                new GridAreaName("Test Grid Area"),
-                new GridAreaCode("801"),
-                PriceAreaCode.Dk1,
-                DateTimeOffset.MinValue,
-                null);
+        // Act
+        var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
+        var testLink = new GridAreaLink(gridId);
+        var gridLinkId = await linkRepository.AddOrUpdateAsync(testLink);
+        var gridLink = await linkRepository.GetAsync(gridLinkId);
 
-            // Act
-            var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
-            var testLink = new GridAreaLink(gridId);
-            var gridLinkId = await linkRepository.AddOrUpdateAsync(testLink);
-            var gridLink = await linkRepository.GetAsync(gridLinkId);
-
-            // Assert
-            Assert.NotNull(gridLink);
-            Assert.NotEqual(Guid.Empty, gridLink.Id.Value);
-            Assert.Equal(gridId.Value, gridLink.GridAreaId.Value);
-        }
+        // Assert
+        Assert.NotNull(gridLink);
+        Assert.NotEqual(Guid.Empty, gridLink.Id.Value);
+        Assert.Equal(gridId.Value, gridLink.GridAreaId.Value);
     }
 }

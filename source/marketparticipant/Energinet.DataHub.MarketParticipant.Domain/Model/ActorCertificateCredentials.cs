@@ -14,22 +14,21 @@
 
 using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
-{
-    public class ActorCertificateCredentials : ActorCredentials
-    {
-        public ActorCertificateCredentials(
-            string certificateThumbprint,
-            string keyVaultSecretIdentifier,
-            Instant expirationDate)
-        {
-            CertificateThumbprint = certificateThumbprint;
-            KeyVaultSecretIdentifier = keyVaultSecretIdentifier;
-            ExpirationDate = expirationDate;
-        }
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-        public string CertificateThumbprint { get; }
-        public string KeyVaultSecretIdentifier { get; }
-        public Instant ExpirationDate { get; }
+public class ActorCertificateCredentials : ActorCredentials
+{
+    public ActorCertificateCredentials(
+        string certificateThumbprint,
+        string keyVaultSecretIdentifier,
+        Instant expirationDate)
+    {
+        CertificateThumbprint = certificateThumbprint;
+        KeyVaultSecretIdentifier = keyVaultSecretIdentifier;
+        ExpirationDate = expirationDate;
     }
+
+    public string CertificateThumbprint { get; }
+    public string KeyVaultSecretIdentifier { get; }
+    public Instant ExpirationDate { get; }
 }

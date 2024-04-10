@@ -16,8 +16,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
@@ -25,74 +25,73 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class GetActorsHandlerTests
 {
-    [UnitTest]
-    public sealed class GetActorsHandlerTests
+    [Fact]
+    public async Task Handle_NoActors_ReturnsEmptyList()
     {
-        [Fact]
-        public async Task Handle_NoActors_ReturnsEmptyList()
-        {
-            // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var target = new GetActorsHandler(
-                new Mock<IActorRepository>().Object,
-                organizationExistsHelperService.Object);
+        // Arrange
+        var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+        var target = new GetActorsHandler(
+            new Mock<IActorRepository>().Object,
+            organizationExistsHelperService.Object);
 
-            var organization = TestPreparationModels.MockedOrganization();
+        var organization = TestPreparationModels.MockedOrganization();
 
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
-                .ReturnsAsync(organization);
+        organizationExistsHelperService
+            .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
+            .ReturnsAsync(organization);
 
-            var command = new GetActorsCommand(organization.Id.Value);
+        var command = new GetActorsCommand(organization.Id.Value);
 
-            // Act + Assert
-            var actual = await target.Handle(command, CancellationToken.None);
-            Assert.NotNull(actual.Actors);
-            Assert.Empty(actual.Actors);
-        }
+        // Act + Assert
+        var actual = await target.Handle(command, CancellationToken.None);
+        Assert.NotNull(actual.Actors);
+        Assert.Empty(actual.Actors);
+    }
 
-        [Fact]
-        public async Task Handle_HasActors_ReturnsActors()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var target = new GetActorsHandler(
-                actorRepositoryMock.Object,
-                organizationExistsHelperService.Object);
+    [Fact]
+    public async Task Handle_HasActors_ReturnsActors()
+    {
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+        var target = new GetActorsHandler(
+            actorRepositoryMock.Object,
+            organizationExistsHelperService.Object);
 
-            var orgId = Guid.NewGuid();
-            var actorId = Guid.NewGuid();
-            var actorId2 = Guid.NewGuid();
+        var orgId = Guid.NewGuid();
+        var actorId = Guid.NewGuid();
+        var actorId2 = Guid.NewGuid();
 
-            var actor = TestPreparationModels.MockedActor(actorId, orgId);
-            var actor2 = TestPreparationModels.MockedActor(actorId2, orgId);
-            var organization = TestPreparationModels.MockedOrganization(orgId);
+        var actor = TestPreparationModels.MockedActor(actorId, orgId);
+        var actor2 = TestPreparationModels.MockedActor(actorId2, orgId);
+        var organization = TestPreparationModels.MockedOrganization(orgId);
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetActorsAsync(organization.Id))
-                .ReturnsAsync(new[] { actor, actor2 });
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetActorsAsync(organization.Id))
+            .ReturnsAsync(new[] { actor, actor2 });
 
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
-                .ReturnsAsync(organization);
+        organizationExistsHelperService
+            .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
+            .ReturnsAsync(organization);
 
-            var command = new GetActorsCommand(orgId);
+        var command = new GetActorsCommand(orgId);
 
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            Assert.NotEmpty(response.Actors);
-            Assert.Equal(2, response.Actors.Count());
+        // Assert
+        Assert.NotEmpty(response.Actors);
+        Assert.Equal(2, response.Actors.Count());
 
-            var firstActor = response.Actors.First();
-            var secondActor = response.Actors.Skip(1).First();
+        var firstActor = response.Actors.First();
+        var secondActor = response.Actors.Skip(1).First();
 
-            Assert.Equal(actor.Id.Value, firstActor.ActorId);
-            Assert.Equal(actor2.Id.Value, secondActor.ActorId);
-        }
+        Assert.Equal(actor.Id.Value, firstActor.ActorId);
+        Assert.Equal(actor2.Id.Value, secondActor.ActorId);
     }
 }
