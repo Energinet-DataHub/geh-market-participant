@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using FluentValidation;
 
@@ -21,9 +22,21 @@ public sealed class StopProcessDelegationCommandRuleSet : AbstractValidator<Stop
 {
     public StopProcessDelegationCommandRuleSet()
     {
-        RuleFor(command => command.StopProcessDelegation.Id)
-            .NotEmpty();
-        RuleFor(command => command.StopProcessDelegation.PeriodId)
-            .NotEmpty();
+        RuleFor(command => command.StopProcessDelegation)
+            .NotEmpty()
+            .ChildRules(validator =>
+            {
+                validator
+                    .RuleFor(delegation => delegation.Id)
+                    .NotEmpty();
+
+                validator
+                    .RuleFor(delegation => delegation.PeriodId)
+                    .NotEmpty();
+
+                validator
+                    .RuleFor(delegation => delegation.StopsAt)
+                    .GreaterThanOrEqualTo(_ => DateTimeOffset.UtcNow.Date);
+            });
     }
 }

@@ -185,4 +185,48 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
             Assert.False(result.IsValid);
         }
     }
+
+    [Fact]
+    public async Task Validate_StartsAt_ValidatesProperty()
+    {
+        var dateTimeOffset = DateTimeOffset.UtcNow.Date;
+        var cases = new[]
+        {
+            new { Time = dateTimeOffset, IsValid = true },
+            new { Time = dateTimeOffset.AddDays(5), IsValid = true },
+            new { Time = dateTimeOffset.AddDays(-1), IsValid = false },
+        };
+
+        foreach (var testCase in cases)
+        {
+            // Arrange
+            const string propertyName = $"{nameof(CreateProcessDelegationCommand.CreateDelegation)}.{nameof(CreateProcessDelegationsDto.StartsAt)}";
+            var gridAreaList = new List<Guid> { Guid.NewGuid() };
+            var messageTypeList = new List<DelegatedProcess> { DelegatedProcess.RequestEnergyResults };
+            var delegationDto = new CreateProcessDelegationsDto(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                gridAreaList,
+                messageTypeList,
+                testCase.Time);
+
+            var target = new CreateProcessDelegationCommandRuleSet();
+            var command = new CreateProcessDelegationCommand(delegationDto);
+
+            // Act
+            var result = await target.ValidateAsync(command);
+
+            // Assert
+            if (testCase.IsValid)
+            {
+                Assert.DoesNotContain(result.Errors, x => x.PropertyName.StartsWith(propertyName, StringComparison.OrdinalIgnoreCase));
+                Assert.True(result.IsValid);
+            }
+            else
+            {
+                Assert.Contains(result.Errors, x => x.PropertyName.StartsWith(propertyName, StringComparison.OrdinalIgnoreCase));
+                Assert.False(result.IsValid);
+            }
+        }
+    }
 }

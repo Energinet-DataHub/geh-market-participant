@@ -50,6 +50,10 @@ public sealed class CreateProcessDelegationCommandRuleSet : AbstractValidator<Cr
                     .RuleForEach(delegation => delegation.DelegatedProcesses)
                     .NotEmpty()
                     .Must(Enum.IsDefined);
+
+                validator
+                    .RuleFor(delegation => delegation.StartsAt)
+                    .GreaterThanOrEqualTo(_ => DateTimeOffset.UtcNow.Date);
             });
     }
 }
