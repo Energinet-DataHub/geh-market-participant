@@ -33,7 +33,7 @@ jobs:
       structurizr_workspace_filename: views
       included_model_filename: model
     secrets:
-      dh3serviceaccount_privatekey: ${{ secrets.dh3serviceaccount_privatekey }}
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   #
   # Branch policy status check
