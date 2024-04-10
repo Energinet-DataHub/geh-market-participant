@@ -14,34 +14,32 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi
-{
-    public static class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            var host = Host
-                .CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(builder =>
-                {
-                    builder
-                        .UseStartup<NoAuthStartup>()
-                        .ConfigureServices(s =>
-                        {
-                            WebApi.Startup.EnableIntegrationTestKeys = true;
-                            s.RemoveAll<IUserIdentityRepository>();
-                            s.AddScoped<IUserIdentityRepository, InMemoryUserIdentityRepository>();
-                        });
-                })
-                .Build();
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 
-            await host.RunAsync().ConfigureAwait(false);
-        }
+public static class Program
+{
+    public static async Task Main(string[] args)
+    {
+        var host = Host
+            .CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(builder =>
+            {
+                builder
+                    .UseStartup<NoAuthStartup>()
+                    .ConfigureServices(s =>
+                    {
+                        WebApi.Startup.EnableIntegrationTestKeys = true;
+                        s.RemoveAll<IUserIdentityRepository>();
+                        s.AddScoped<IUserIdentityRepository, InMemoryUserIdentityRepository>();
+                    });
+            })
+            .Build();
+
+        await host.RunAsync().ConfigureAwait(false);
     }
 }

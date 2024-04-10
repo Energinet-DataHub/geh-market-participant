@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetOrganizationIdentityCommandRuleSet : AbstractValidator<GetOrganizationIdentityCommand>
 {
-    public sealed class GetOrganizationIdentityCommandRuleSet : AbstractValidator<GetOrganizationIdentityCommand>
+    public GetOrganizationIdentityCommandRuleSet()
     {
-        public GetOrganizationIdentityCommandRuleSet()
-        {
-               RuleFor(command => command.BusinessRegisterIdentifier)
-                    .NotEmpty();
-        }
+        RuleFor(command => command.BusinessRegisterIdentifier)
+            .NotEmpty();
     }
 }

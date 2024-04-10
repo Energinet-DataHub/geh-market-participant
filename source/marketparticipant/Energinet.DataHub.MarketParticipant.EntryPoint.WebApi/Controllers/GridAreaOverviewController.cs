@@ -14,29 +14,28 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public sealed class GridAreaOverviewController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public sealed class GridAreaOverviewController : ControllerBase
+    private readonly IMediator _mediator;
+
+    public GridAreaOverviewController(IMediator mediator)
     {
-        private readonly IMediator _mediator;
+        _mediator = mediator;
+    }
 
-        public GridAreaOverviewController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GridAreaOverviewItemDto>>> GetGridAreaOverviewAsync()
-        {
-            var command = new GetGridAreaOverviewCommand();
-            var response = await _mediator.Send(command).ConfigureAwait(false);
-            return Ok(response.GridAreas);
-        }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<GridAreaOverviewItemDto>>> GetGridAreaOverviewAsync()
+    {
+        var command = new GetGridAreaOverviewCommand();
+        var response = await _mediator.Send(command).ConfigureAwait(false);
+        return Ok(response.GridAreas);
     }
 }

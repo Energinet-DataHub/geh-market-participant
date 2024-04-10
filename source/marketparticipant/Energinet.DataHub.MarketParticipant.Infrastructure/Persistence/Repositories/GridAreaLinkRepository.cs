@@ -21,68 +21,67 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+
+public sealed class GridAreaLinkRepository : IGridAreaLinkRepository
 {
-    public sealed class GridAreaLinkRepository : IGridAreaLinkRepository
+    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+
+    public GridAreaLinkRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
-        private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+        _marketParticipantDbContext = marketParticipantDbContext;
+    }
 
-        public GridAreaLinkRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public async Task<GridAreaLinkId> AddOrUpdateAsync(GridAreaLink gridAreaLink)
+    {
+        ArgumentNullException.ThrowIfNull(gridAreaLink, nameof(gridAreaLink));
+
+        GridAreaLinkEntity destination;
+        if (gridAreaLink.Id.Value == default)
         {
-            _marketParticipantDbContext = marketParticipantDbContext;
+            destination = new GridAreaLinkEntity();
+        }
+        else
+        {
+            destination = await _marketParticipantDbContext
+                              .GridAreaLinks
+                              .FindAsync(gridAreaLink.Id.Value)
+                              .ConfigureAwait(false)
+                          ?? throw new InvalidOperationException($"GridAreaLink with id {gridAreaLink.Id.Value} is missing, even though it cannot be deleted.");
         }
 
-        public async Task<GridAreaLinkId> AddOrUpdateAsync(GridAreaLink gridAreaLink)
-        {
-            ArgumentNullException.ThrowIfNull(gridAreaLink, nameof(gridAreaLink));
+        GridAreaLinkMapper.MapToEntity(gridAreaLink, destination);
+        _marketParticipantDbContext.GridAreaLinks.Update(destination);
 
-            GridAreaLinkEntity destination;
-            if (gridAreaLink.Id.Value == default)
-            {
-                destination = new GridAreaLinkEntity();
-            }
-            else
-            {
-                destination = await _marketParticipantDbContext
-                    .GridAreaLinks
-                    .FindAsync(gridAreaLink.Id.Value)
-                    .ConfigureAwait(false)
-                        ?? throw new InvalidOperationException($"GridAreaLink with id {gridAreaLink.Id.Value} is missing, even though it cannot be deleted.");
-            }
+        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
 
-            GridAreaLinkMapper.MapToEntity(gridAreaLink, destination);
-            _marketParticipantDbContext.GridAreaLinks.Update(destination);
+        return new GridAreaLinkId(destination.Id);
+    }
 
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+    public async Task<GridAreaLink?> GetAsync(GridAreaLinkId id)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
 
-            return new GridAreaLinkId(destination.Id);
-        }
+        var gridAreaLink = await _marketParticipantDbContext.GridAreaLinks
+            .FindAsync(id.Value)
+            .ConfigureAwait(false);
 
-        public async Task<GridAreaLink?> GetAsync(GridAreaLinkId id)
-        {
-            ArgumentNullException.ThrowIfNull(id, nameof(id));
+        return gridAreaLink is null ? null : GridAreaLinkMapper.MapFromEntity(gridAreaLink);
+    }
 
-            var gridAreaLink = await _marketParticipantDbContext.GridAreaLinks
-                .FindAsync(id.Value)
-                .ConfigureAwait(false);
+    public async Task<GridAreaLink?> GetAsync(GridAreaId id)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
 
-            return gridAreaLink is null ? null : GridAreaLinkMapper.MapFromEntity(gridAreaLink);
-        }
+        var query =
+            from link in _marketParticipantDbContext.GridAreaLinks
+            where link.GridAreaId == id.Value
+            select link;
 
-        public async Task<GridAreaLink?> GetAsync(GridAreaId id)
-        {
-            ArgumentNullException.ThrowIfNull(id, nameof(id));
+        var gridAreaLink = await query
+            .SingleOrDefaultAsync()
+            .ConfigureAwait(false);
 
-            var query =
-                from link in _marketParticipantDbContext.GridAreaLinks
-                where link.GridAreaId == id.Value
-                select link;
-
-            var gridAreaLink = await query
-                .SingleOrDefaultAsync()
-                .ConfigureAwait(false);
-
-            return gridAreaLink is null ? null : GridAreaLinkMapper.MapFromEntity(gridAreaLink);
-        }
+        return gridAreaLink is null ? null : GridAreaLinkMapper.MapFromEntity(gridAreaLink);
     }
 }

@@ -15,23 +15,22 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+/// <summary>
+/// Service for accessing Azure AD.
+/// </summary>
+public interface IActiveDirectoryB2CService
 {
     /// <summary>
-    /// Service for accessing Azure AD.
+    /// Assigns an application registration to the given actor.
     /// </summary>
-    public interface IActiveDirectoryB2CService
-    {
-        /// <summary>
-        /// Assigns an application registration to the given actor.
-        /// </summary>
-        /// <param name="actor">The actor for which to create an app and service principal.</param>
-        Task AssignApplicationRegistrationAsync(Actor actor);
+    /// <param name="actor">The actor for which to create an app and service principal.</param>
+    Task AssignApplicationRegistrationAsync(Actor actor);
 
-        /// <summary>
-        /// Deletes the app and service prinicipal, for the given actor, from active directory.
-        /// </summary>
-        /// <param name="actor">The actor for which to remove the app and service principal.</param>
-        Task DeleteAppRegistrationAsync(Actor actor);
-    }
+    /// <summary>
+    /// Deletes the app and service prinicipal, for the given actor, from active directory.
+    /// </summary>
+    /// <param name="actor">The actor for which to remove the app and service principal.</param>
+    Task DeleteAppRegistrationAsync(Actor actor);
 }

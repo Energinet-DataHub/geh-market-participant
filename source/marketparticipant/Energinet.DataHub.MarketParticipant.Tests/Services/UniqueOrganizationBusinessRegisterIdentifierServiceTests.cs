@@ -21,67 +21,66 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Services
+namespace Energinet.DataHub.MarketParticipant.Tests.Services;
+
+public sealed class UniqueOrganizationBusinessRegisterIdentifierServiceTests
 {
-    public sealed class UniqueOrganizationBusinessRegisterIdentifierServiceTests
+    [Fact]
+    public async Task Ensure_BusinessRegisterIdentifierNotUnique_Throws()
     {
-        [Fact]
-        public async Task Ensure_BusinessRegisterIdentifierNotUnique_Throws()
-        {
-            // arrange
-            var currentOrganizationToUpdate = new Organization(
-                new OrganizationId(Guid.Parse("3710F53D-9EF8-4EF1-B941-C9C14B443FEC")),
-                "org1Name",
-                new BusinessRegisterIdentifier("same_value"),
-                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
-                new OrganizationDomain("energinet.dk"),
-                OrganizationStatus.Active);
+        // arrange
+        var currentOrganizationToUpdate = new Organization(
+            new OrganizationId(Guid.Parse("3710F53D-9EF8-4EF1-B941-C9C14B443FEC")),
+            "org1Name",
+            new BusinessRegisterIdentifier("same_value"),
+            new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+            new OrganizationDomain("energinet.dk"),
+            OrganizationStatus.Active);
 
-            var anotherOrganizationToUpdateWithSameIdentifier = new Organization(
-                new OrganizationId(Guid.Parse("4444F53D-9EF8-4EF1-B941-C9C14B443FEC")),
-                "org2Name",
-                new BusinessRegisterIdentifier("same_value"),
-                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
-                new OrganizationDomain("energinet.dk"),
-                OrganizationStatus.Active);
+        var anotherOrganizationToUpdateWithSameIdentifier = new Organization(
+            new OrganizationId(Guid.Parse("4444F53D-9EF8-4EF1-B941-C9C14B443FEC")),
+            "org2Name",
+            new BusinessRegisterIdentifier("same_value"),
+            new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+            new OrganizationDomain("energinet.dk"),
+            OrganizationStatus.Active);
 
-            var repository = new Mock<IOrganizationRepository>();
-            repository.Setup(x => x.GetAsync()).ReturnsAsync(new[] { currentOrganizationToUpdate, anotherOrganizationToUpdateWithSameIdentifier });
+        var repository = new Mock<IOrganizationRepository>();
+        repository.Setup(x => x.GetAsync()).ReturnsAsync(new[] { currentOrganizationToUpdate, anotherOrganizationToUpdateWithSameIdentifier });
 
-            var target = new UniqueOrganizationBusinessRegisterIdentifierService(repository.Object);
+        var target = new UniqueOrganizationBusinessRegisterIdentifierService(repository.Object);
 
-            // act + assert
-            await Assert.ThrowsAsync<ValidationException>(
-                () => target.EnsureUniqueBusinessRegisterIdentifierAsync(currentOrganizationToUpdate));
-        }
+        // act + assert
+        await Assert.ThrowsAsync<ValidationException>(
+            () => target.EnsureUniqueBusinessRegisterIdentifierAsync(currentOrganizationToUpdate));
+    }
 
-        [Fact]
-        public async Task Ensure_BusinessRegisterIdentifierUnique_DoesNotThrow()
-        {
-            // arrange
-            var existingOrganisation = new Organization(
-                new OrganizationId(Guid.Parse("3710F53D-9EF8-4EF1-B941-C9C14B443FEC")),
-                "org1Name",
-                new BusinessRegisterIdentifier("fake_value"),
-                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
-                new OrganizationDomain("energinet.dk"),
-                OrganizationStatus.Active);
+    [Fact]
+    public async Task Ensure_BusinessRegisterIdentifierUnique_DoesNotThrow()
+    {
+        // arrange
+        var existingOrganisation = new Organization(
+            new OrganizationId(Guid.Parse("3710F53D-9EF8-4EF1-B941-C9C14B443FEC")),
+            "org1Name",
+            new BusinessRegisterIdentifier("fake_value"),
+            new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+            new OrganizationDomain("energinet.dk"),
+            OrganizationStatus.Active);
 
-            var repository = new Mock<IOrganizationRepository>();
-            repository.Setup(x => x.GetAsync()).ReturnsAsync(new[] { existingOrganisation });
+        var repository = new Mock<IOrganizationRepository>();
+        repository.Setup(x => x.GetAsync()).ReturnsAsync(new[] { existingOrganisation });
 
-            var organization = new Organization(
-                new OrganizationId(Guid.Parse("4444F53D-9EF8-4EF1-B941-C9C14B443FEC")),
-                "org1Name",
-                new BusinessRegisterIdentifier("unique"),
-                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
-                new OrganizationDomain("energinet.dk"),
-                OrganizationStatus.Active);
+        var organization = new Organization(
+            new OrganizationId(Guid.Parse("4444F53D-9EF8-4EF1-B941-C9C14B443FEC")),
+            "org1Name",
+            new BusinessRegisterIdentifier("unique"),
+            new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+            new OrganizationDomain("energinet.dk"),
+            OrganizationStatus.Active);
 
-            var target = new UniqueOrganizationBusinessRegisterIdentifierService(repository.Object);
+        var target = new UniqueOrganizationBusinessRegisterIdentifierService(repository.Object);
 
-            // act + assert
-            await target.EnsureUniqueBusinessRegisterIdentifierAsync(organization);
-        }
+        // act + assert
+        await target.EnsureUniqueBusinessRegisterIdentifierAsync(organization);
     }
 }

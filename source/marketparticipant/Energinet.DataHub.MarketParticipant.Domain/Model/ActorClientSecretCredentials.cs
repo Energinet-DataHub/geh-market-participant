@@ -15,19 +15,18 @@
 using System;
 using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
-{
-    public class ActorClientSecretCredentials : ActorCredentials
-    {
-        public ActorClientSecretCredentials(Guid clientId, Guid secretIdentifier, Instant expirationDate)
-        {
-            ClientId = clientId;
-            SecretIdentifier = secretIdentifier;
-            ExpirationDate = expirationDate;
-        }
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-        public Guid ClientId { get; }
-        public Guid SecretIdentifier { get; }
-        public Instant ExpirationDate { get; }
+public class ActorClientSecretCredentials : ActorCredentials
+{
+    public ActorClientSecretCredentials(Guid clientId, Guid secretIdentifier, Instant expirationDate)
+    {
+        ClientId = clientId;
+        SecretIdentifier = secretIdentifier;
+        ExpirationDate = expirationDate;
     }
+
+    public Guid ClientId { get; }
+    public Guid SecretIdentifier { get; }
+    public Instant ExpirationDate { get; }
 }

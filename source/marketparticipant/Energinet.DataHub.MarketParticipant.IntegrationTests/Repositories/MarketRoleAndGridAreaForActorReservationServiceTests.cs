@@ -24,106 +24,105 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
+
+[Collection(nameof(IntegrationTestCollectionFixture))]
+[IntegrationTest]
+public sealed class MarketRoleAndGridAreaForActorReservationServiceTests
 {
-    [Collection(nameof(IntegrationTestCollectionFixture))]
-    [IntegrationTest]
-    public sealed class MarketRoleAndGridAreaForActorReservationServiceTests
+    private readonly MarketParticipantDatabaseFixture _fixture;
+
+    public MarketRoleAndGridAreaForActorReservationServiceTests(MarketParticipantDatabaseFixture fixture)
     {
-        private readonly MarketParticipantDatabaseFixture _fixture;
+        _fixture = fixture;
+    }
 
-        public MarketRoleAndGridAreaForActorReservationServiceTests(MarketParticipantDatabaseFixture fixture)
-        {
-            _fixture = fixture;
-        }
+    [Fact]
+    public async Task TryAdd_NoGridAreaAssociatedWithMarketRole_ReturnsTrue()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        [Fact]
-        public async Task TryAdd_NoGridAreaAssociatedWithMarketRole_ReturnsTrue()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var gridArea = await CreateGridAreaAsync(context);
+        var actor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
 
-            var gridArea = await CreateGridAreaAsync(context);
-            var actor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
+        var target = new MarketRoleAndGridAreaForActorReservationService(context);
 
-            var target = new MarketRoleAndGridAreaForActorReservationService(context);
+        // Act
+        var actual = await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
 
-            // Act
-            var actual = await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
+        // Assert
+        Assert.True(actual);
+    }
 
-            // Assert
-            Assert.True(actual);
-        }
+    [Fact]
+    public async Task TryAdd_ExistingGridAreaAssociatedWithMarketRole_ReturnsFalse()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        [Fact]
-        public async Task TryAdd_ExistingGridAreaAssociatedWithMarketRole_ReturnsFalse()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var gridArea = await CreateGridAreaAsync(context);
+        var actor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
 
-            var gridArea = await CreateGridAreaAsync(context);
-            var actor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
+        var target = new MarketRoleAndGridAreaForActorReservationService(context);
+        await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
 
-            var target = new MarketRoleAndGridAreaForActorReservationService(context);
-            await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
+        var newActor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
 
-            var newActor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
+        // Act
+        var actual = await target.TryReserveAsync(newActor.Id, EicFunction.EnergySupplier, gridArea.Id);
 
-            // Act
-            var actual = await target.TryReserveAsync(newActor.Id, EicFunction.EnergySupplier, gridArea.Id);
+        // Assert
+        Assert.False(actual);
+    }
 
-            // Assert
-            Assert.False(actual);
-        }
+    [Fact]
+    public async Task Remove_RemovesAssociationsFromActor()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        [Fact]
-        public async Task Remove_RemovesAssociationsFromActor()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var gridArea = await CreateGridAreaAsync(context);
+        var actor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
 
-            var gridArea = await CreateGridAreaAsync(context);
-            var actor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
+        var target = new MarketRoleAndGridAreaForActorReservationService(context);
 
-            var target = new MarketRoleAndGridAreaForActorReservationService(context);
+        // Act
+        var firstAddResult = await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
+        var secondAddResult = await target.TryReserveAsync(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id);
+        await target.RemoveAllReservationsAsync(actor.Id);
+        await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
+        await target.TryReserveAsync(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id);
 
-            // Act
-            var firstAddResult = await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
-            var secondAddResult = await target.TryReserveAsync(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id);
-            await target.RemoveAllReservationsAsync(actor.Id);
-            await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
-            await target.TryReserveAsync(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id);
+        // Assert
+        Assert.True(firstAddResult);
+        Assert.True(secondAddResult);
+    }
 
-            // Assert
-            Assert.True(firstAddResult);
-            Assert.True(secondAddResult);
-        }
+    private static async Task<Actor> CreateActorUnderNewOrganizationAsync(MarketParticipantDatabaseFixture fixture, MarketParticipantDbContext context)
+    {
+        var actor = await fixture.PrepareActorAsync();
+        var repository = new ActorRepository(context, new Mock<IEntityLock>().Object);
+        return (await repository.GetAsync(new ActorId(actor.Id)))!;
+    }
 
-        private static async Task<Actor> CreateActorUnderNewOrganizationAsync(MarketParticipantDatabaseFixture fixture, MarketParticipantDbContext context)
-        {
-            var actor = await fixture.PrepareActorAsync();
-            var repository = new ActorRepository(context, new Mock<IEntityLock>().Object);
-            return (await repository.GetAsync(new ActorId(actor.Id)))!;
-        }
+    private static async Task<GridArea> CreateGridAreaAsync(MarketParticipantDbContext context)
+    {
+        var domain = new GridArea(
+            new GridAreaName("fake_value"),
+            new GridAreaCode("123"),
+            PriceAreaCode.Dk1,
+            DateTimeOffset.MinValue,
+            null);
 
-        private static async Task<GridArea> CreateGridAreaAsync(MarketParticipantDbContext context)
-        {
-            var domain = new GridArea(
-                new GridAreaName("fake_value"),
-                new GridAreaCode("123"),
-                PriceAreaCode.Dk1,
-                DateTimeOffset.MinValue,
-                null);
-
-            var repository = new GridAreaRepository(context);
-            var id = await repository.AddOrUpdateAsync(domain);
-            return (await repository.GetAsync(id))!;
-        }
+        var repository = new GridAreaRepository(context);
+        var id = await repository.AddOrUpdateAsync(domain);
+        return (await repository.GetAsync(id))!;
     }
 }

@@ -18,34 +18,33 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
+
+public class ActorEntityConfiguration : AuditedEntityTypeConfiguration<ActorEntity>
 {
-    public class ActorEntityConfiguration : AuditedEntityTypeConfiguration<ActorEntity>
+    protected override void ConfigureEntity(EntityTypeBuilder<ActorEntity> builder)
     {
-        protected override void ConfigureEntity(EntityTypeBuilder<ActorEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("Actor");
-            builder.HasKey(actor => actor.Id);
-            builder.Property(actor => actor.Id).ValueGeneratedOnAdd();
-            builder
-                .HasMany(actor => actor.MarketRoles)
-                .WithOne()
-                .HasForeignKey(marketRole => marketRole.ActorId);
-            builder
-                .HasOne(actor => actor.CertificateCredential)
-                .WithOne()
-                .HasForeignKey<ActorCertificateCredentialsEntity>(cred => cred.ActorId);
-            builder
-                .HasOne(actor => actor.ClientSecretCredential)
-                .WithOne()
-                .HasForeignKey<ActorClientSecretCredentialsEntity>(cred => cred.ActorId);
-            builder.Navigation(actor => actor.CertificateCredential).AutoInclude();
-            builder.Navigation(actor => actor.ClientSecretCredential).AutoInclude();
-            builder
-                .HasMany(actor => actor.UsedActorCertificates)
-                .WithOne()
-                .HasForeignKey(usedCert => usedCert.ActorId);
-        }
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        builder.ToTable("Actor");
+        builder.HasKey(actor => actor.Id);
+        builder.Property(actor => actor.Id).ValueGeneratedOnAdd();
+        builder
+            .HasMany(actor => actor.MarketRoles)
+            .WithOne()
+            .HasForeignKey(marketRole => marketRole.ActorId);
+        builder
+            .HasOne(actor => actor.CertificateCredential)
+            .WithOne()
+            .HasForeignKey<ActorCertificateCredentialsEntity>(cred => cred.ActorId);
+        builder
+            .HasOne(actor => actor.ClientSecretCredential)
+            .WithOne()
+            .HasForeignKey<ActorClientSecretCredentialsEntity>(cred => cred.ActorId);
+        builder.Navigation(actor => actor.CertificateCredential).AutoInclude();
+        builder.Navigation(actor => actor.ClientSecretCredential).AutoInclude();
+        builder
+            .HasMany(actor => actor.UsedActorCertificates)
+            .WithOne()
+            .HasForeignKey(usedCert => usedCert.ActorId);
     }
 }

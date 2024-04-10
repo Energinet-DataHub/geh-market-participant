@@ -23,27 +23,26 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class GetPermissionsHandlerTests
 {
-    [UnitTest]
-    public sealed class GetPermissionsHandlerTests
+    [Fact]
+    public async Task HandleCommandCallsRepositoryAsync()
     {
-        [Fact]
-        public async Task HandleCommandCallsRepositoryAsync()
-        {
-            // arrange
-            var repositoryMock = new Mock<IPermissionRepository>();
-            repositoryMock
-                .Setup(x => x.GetAllAsync())
-                .ReturnsAsync(Array.Empty<Permission>());
+        // arrange
+        var repositoryMock = new Mock<IPermissionRepository>();
+        repositoryMock
+            .Setup(x => x.GetAllAsync())
+            .ReturnsAsync(Array.Empty<Permission>());
 
-            var target = new GetPermissionsHandler(repositoryMock.Object);
+        var target = new GetPermissionsHandler(repositoryMock.Object);
 
-            // act
-            var actual = await target.Handle(new GetPermissionsCommand(), CancellationToken.None);
+        // act
+        var actual = await target.Handle(new GetPermissionsCommand(), CancellationToken.None);
 
-            // assert
-            Assert.NotNull(actual.Permissions);
-        }
+        // assert
+        Assert.NotNull(actual.Permissions);
     }
 }

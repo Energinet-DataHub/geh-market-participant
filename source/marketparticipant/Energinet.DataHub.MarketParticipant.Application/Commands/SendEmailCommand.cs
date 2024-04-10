@@ -14,7 +14,6 @@
 
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
-{
-    public sealed record SendEmailCommand : IRequest<Unit>;
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands;
+
+public sealed record SendEmailCommand : IRequest<Unit>;

@@ -14,8 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;

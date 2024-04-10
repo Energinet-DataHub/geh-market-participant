@@ -15,7 +15,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
@@ -23,34 +23,33 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class GetOrganizationsHandlerTests
 {
-    [UnitTest]
-    public sealed class GetOrganizationsHandlerTests
+    [Fact]
+    public async Task Handle_HasOrganization_ReturnsOrganization()
     {
-        [Fact]
-        public async Task Handle_HasOrganization_ReturnsOrganization()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new GetOrganizationsHandler(organizationRepository.Object);
+        // Arrange
+        var organizationRepository = new Mock<IOrganizationRepository>();
+        var target = new GetOrganizationsHandler(organizationRepository.Object);
 
-            var organization = TestPreparationModels.MockedOrganization();
+        var organization = TestPreparationModels.MockedOrganization();
 
-            organizationRepository
-                .Setup(x => x.GetAsync())
-                .ReturnsAsync(new[] { organization });
+        organizationRepository
+            .Setup(x => x.GetAsync())
+            .ReturnsAsync(new[] { organization });
 
-            var command = new GetOrganizationsCommand(null);
+        var command = new GetOrganizationsCommand(null);
 
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            Assert.NotEmpty(response.Organizations);
+        // Assert
+        Assert.NotEmpty(response.Organizations);
 
-            var actualOrganization = response.Organizations.Single();
-            Assert.Equal(organization.Id.Value, actualOrganization.OrganizationId);
-        }
+        var actualOrganization = response.Organizations.Single();
+        Assert.Equal(organization.Id.Value, actualOrganization.OrganizationId);
     }
 }

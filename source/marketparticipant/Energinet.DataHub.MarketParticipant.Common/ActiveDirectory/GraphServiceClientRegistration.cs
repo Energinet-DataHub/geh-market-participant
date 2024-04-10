@@ -19,27 +19,26 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 
-namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
+namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
+
+internal static class GraphServiceClientRegistration
 {
-    internal static class GraphServiceClientRegistration
+    public static void AddGraphServiceClient(this IServiceCollection services)
     {
-        public static void AddGraphServiceClient(this IServiceCollection services)
+        services.AddSingleton(provider =>
         {
-            services.AddSingleton(provider =>
-            {
-                var configuration = provider.GetRequiredService<IConfiguration>();
+            var configuration = provider.GetRequiredService<IConfiguration>();
 
-                var azureB2CTenant = configuration.GetSetting(Settings.B2CTenant);
-                var azureB2CSpnId = configuration.GetSetting(Settings.B2CServicePrincipalId);
-                var azureB2CSpnSecret = configuration.GetSetting(Settings.B2CServicePrincipalSecret);
+            var azureB2CTenant = configuration.GetSetting(Settings.B2CTenant);
+            var azureB2CSpnId = configuration.GetSetting(Settings.B2CServicePrincipalId);
+            var azureB2CSpnSecret = configuration.GetSetting(Settings.B2CServicePrincipalSecret);
 
-                var clientSecretCredential = new ClientSecretCredential(
-                    azureB2CTenant,
-                    azureB2CSpnId,
-                    azureB2CSpnSecret);
+            var clientSecretCredential = new ClientSecretCredential(
+                azureB2CTenant,
+                azureB2CSpnId,
+                azureB2CSpnSecret);
 
-                return new GraphServiceClient(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
-            });
-        }
+            return new GraphServiceClient(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
+        });
     }
 }

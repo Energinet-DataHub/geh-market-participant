@@ -15,7 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -24,43 +24,42 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class CreateOrganizationHandlerTests
 {
-    [UnitTest]
-    public sealed class CreateOrganizationHandlerTests
+    [Fact]
+    public async Task Handle_NewOrganization_ReturnsOrganizationId()
     {
-        [Fact]
-        public async Task Handle_NewOrganization_ReturnsOrganizationId()
-        {
-            // Arrange
-            var orgFactory = new Mock<IOrganizationFactoryService>();
-            var target = new CreateOrganizationHandler(orgFactory.Object);
-            var validAddressDto = new AddressDto(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "DK");
-            const string validCvr = "123";
-            const string orgName = "fake_value";
+        // Arrange
+        var orgFactory = new Mock<IOrganizationFactoryService>();
+        var target = new CreateOrganizationHandler(orgFactory.Object);
+        var validAddressDto = new AddressDto(
+            "test Street",
+            "1",
+            "1111",
+            "Test City",
+            "DK");
+        const string validCvr = "123";
+        const string orgName = "fake_value";
 
-            var organization = TestPreparationModels.MockedOrganization();
+        var organization = TestPreparationModels.MockedOrganization();
 
-            orgFactory
-                .Setup(x => x.CreateAsync(
-                    It.IsAny<string>(),
-                    It.Is<BusinessRegisterIdentifier>(y => y.Identifier == validCvr),
-                    It.IsAny<Address>(),
-                    It.IsAny<OrganizationDomain>()))
-                .ReturnsAsync(organization);
+        orgFactory
+            .Setup(x => x.CreateAsync(
+                It.IsAny<string>(),
+                It.Is<BusinessRegisterIdentifier>(y => y.Identifier == validCvr),
+                It.IsAny<Address>(),
+                It.IsAny<OrganizationDomain>()))
+            .ReturnsAsync(organization);
 
-            var command = new CreateOrganizationCommand(new CreateOrganizationDto(orgName, validCvr, validAddressDto, "energinet.dk"));
+        var command = new CreateOrganizationCommand(new CreateOrganizationDto(orgName, validCvr, validAddressDto, "energinet.dk"));
 
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            Assert.NotEqual(Guid.Empty, response.OrganizationId);
-        }
+        // Assert
+        Assert.NotEqual(Guid.Empty, response.OrganizationId);
     }
 }

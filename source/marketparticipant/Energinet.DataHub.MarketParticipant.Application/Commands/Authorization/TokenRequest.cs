@@ -14,7 +14,6 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization
-{
-    public record TokenRequest(Guid ActorId, string ExternalToken);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+
+public record TokenRequest(Guid ActorId, string ExternalToken);

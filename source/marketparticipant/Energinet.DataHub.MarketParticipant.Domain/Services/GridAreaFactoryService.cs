@@ -17,70 +17,69 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+public sealed class GridAreaFactoryService : IGridAreaFactoryService
 {
-    public sealed class GridAreaFactoryService : IGridAreaFactoryService
+    private readonly IGridAreaLinkRepository _gridAreaLinkRepository;
+    private readonly IGridAreaRepository _gridAreaRepository;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+
+    public GridAreaFactoryService(
+        IGridAreaLinkRepository gridAreaLinkRepository,
+        IGridAreaRepository gridAreaRepository,
+        IUnitOfWorkProvider unitOfWorkProvider)
     {
-        private readonly IGridAreaLinkRepository _gridAreaLinkRepository;
-        private readonly IGridAreaRepository _gridAreaRepository;
-        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+        _gridAreaLinkRepository = gridAreaLinkRepository;
+        _gridAreaRepository = gridAreaRepository;
+        _unitOfWorkProvider = unitOfWorkProvider;
+    }
 
-        public GridAreaFactoryService(
-            IGridAreaLinkRepository gridAreaLinkRepository,
-            IGridAreaRepository gridAreaRepository,
-            IUnitOfWorkProvider unitOfWorkProvider)
-        {
-            _gridAreaLinkRepository = gridAreaLinkRepository;
-            _gridAreaRepository = gridAreaRepository;
-            _unitOfWorkProvider = unitOfWorkProvider;
-        }
+    public async Task<GridArea> CreateAsync(GridAreaCode code, GridAreaName name, PriceAreaCode priceAreaCode, DateTimeOffset validFrom, DateTimeOffset? validTo)
+    {
+        ArgumentNullException.ThrowIfNull(code, nameof(code));
+        ArgumentNullException.ThrowIfNull(name, nameof(name));
+        ArgumentNullException.ThrowIfNull(priceAreaCode, nameof(priceAreaCode));
 
-        public async Task<GridArea> CreateAsync(GridAreaCode code, GridAreaName name, PriceAreaCode priceAreaCode, DateTimeOffset validFrom, DateTimeOffset? validTo)
-        {
-            ArgumentNullException.ThrowIfNull(code, nameof(code));
-            ArgumentNullException.ThrowIfNull(name, nameof(name));
-            ArgumentNullException.ThrowIfNull(priceAreaCode, nameof(priceAreaCode));
+        var newGridArea = new GridArea(
+            name,
+            code,
+            priceAreaCode,
+            validFrom,
+            validTo);
 
-            var newGridArea = new GridArea(
-                name,
-                code,
-                priceAreaCode,
-                validFrom,
-                validTo);
+        var uow = await _unitOfWorkProvider
+            .NewUnitOfWorkAsync()
+            .ConfigureAwait(false);
 
-            var uow = await _unitOfWorkProvider
-                .NewUnitOfWorkAsync()
-                .ConfigureAwait(false);
+        var savedGridArea = await SaveGridAreaAsync(newGridArea).ConfigureAwait(false);
 
-            var savedGridArea = await SaveGridAreaAsync(newGridArea).ConfigureAwait(false);
+        var newGridAreaLink = new GridAreaLink(savedGridArea.Id);
 
-            var newGridAreaLink = new GridAreaLink(savedGridArea.Id);
+        await SaveGridAreaLinkAsync(newGridAreaLink).ConfigureAwait(false);
 
-            await SaveGridAreaLinkAsync(newGridAreaLink).ConfigureAwait(false);
+        await uow.CommitAsync().ConfigureAwait(false);
 
-            await uow.CommitAsync().ConfigureAwait(false);
+        return savedGridArea;
+    }
 
-            return savedGridArea;
-        }
+    private async Task<GridArea> SaveGridAreaAsync(GridArea gridArea)
+    {
+        var orgId = await _gridAreaRepository
+            .AddOrUpdateAsync(gridArea)
+            .ConfigureAwait(false);
 
-        private async Task<GridArea> SaveGridAreaAsync(GridArea gridArea)
-        {
-            var orgId = await _gridAreaRepository
-                .AddOrUpdateAsync(gridArea)
-                .ConfigureAwait(false);
+        var savedGridArea = await _gridAreaRepository
+            .GetAsync(orgId)
+            .ConfigureAwait(false);
 
-            var savedGridArea = await _gridAreaRepository
-                .GetAsync(orgId)
-                .ConfigureAwait(false);
+        return savedGridArea!;
+    }
 
-            return savedGridArea!;
-        }
-
-        private async Task SaveGridAreaLinkAsync(GridAreaLink gridAreaLink)
-        {
-            await _gridAreaLinkRepository
-                .AddOrUpdateAsync(gridAreaLink)
-                .ConfigureAwait(false);
-        }
+    private async Task SaveGridAreaLinkAsync(GridAreaLink gridAreaLink)
+    {
+        await _gridAreaLinkRepository
+            .AddOrUpdateAsync(gridAreaLink)
+            .ConfigureAwait(false);
     }
 }

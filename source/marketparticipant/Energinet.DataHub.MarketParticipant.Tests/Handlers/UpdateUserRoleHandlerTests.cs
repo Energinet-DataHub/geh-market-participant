@@ -29,102 +29,101 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class UpdateUserRoleHandlerTests
 {
-    [UnitTest]
-    public sealed class UpdateUserRoleHandlerTests
+    private const int ValidPermission = (int)PermissionId.ActorsManage;
+
+    [Fact]
+    public async Task Handle_UpdateUserRole_UserRoleNotFound()
     {
-        private const int ValidPermission = (int)PermissionId.ActorsManage;
+        // Arrange
+        var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
+        var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object);
+        var roleId = Guid.NewGuid();
+        userRoleRepositoryMock
+            .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
+            .ReturnsAsync((UserRole?)null);
 
-        [Fact]
-        public async Task Handle_UpdateUserRole_UserRoleNotFound()
-        {
-            // Arrange
-            var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object);
-            var roleId = Guid.NewGuid();
-            userRoleRepositoryMock
-                .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
-                .ReturnsAsync((UserRole?)null);
+        var updateUserRoleCommand = new UpdateUserRoleCommand(roleId, new UpdateUserRoleDto(
+            "newName",
+            "newDescription",
+            UserRoleStatus.Active,
+            new Collection<int> { ValidPermission }));
 
-            var updateUserRoleCommand = new UpdateUserRoleCommand(roleId, new UpdateUserRoleDto(
-                "newName",
-                "newDescription",
-                UserRoleStatus.Active,
-                new Collection<int> { ValidPermission }));
+        // Act + Assert
+        await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(updateUserRoleCommand, CancellationToken.None));
+    }
 
-            // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(updateUserRoleCommand, CancellationToken.None));
-        }
+    [Fact]
+    public async Task Handle_UpdateUserRole_UserRoleWithSameNameExists()
+    {
+        // Arrange
+        var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
+        var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object);
 
-        [Fact]
-        public async Task Handle_UpdateUserRole_UserRoleWithSameNameExists()
-        {
-            // Arrange
-            var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object);
+        var existingUserRoleWithSameName = new UserRole(
+            new UserRoleId(Guid.NewGuid()),
+            "UserRoleNameNew",
+            "fake_value",
+            UserRoleStatus.Active,
+            new List<PermissionId>(),
+            EicFunction.BillingAgent);
 
-            var existingUserRoleWithSameName = new UserRole(
-                new UserRoleId(Guid.NewGuid()),
-                "UserRoleNameNew",
-                "fake_value",
-                UserRoleStatus.Active,
-                new List<PermissionId>(),
-                EicFunction.BillingAgent);
+        userRoleRepositoryMock
+            .Setup(x => x.GetByNameInMarketRoleAsync(It.IsAny<string>(), existingUserRoleWithSameName.EicFunction))
+            .ReturnsAsync(existingUserRoleWithSameName);
 
-            userRoleRepositoryMock
-                .Setup(x => x.GetByNameInMarketRoleAsync(It.IsAny<string>(), existingUserRoleWithSameName.EicFunction))
-                .ReturnsAsync(existingUserRoleWithSameName);
+        var userRoleToUpdate = new UserRole(
+            new UserRoleId(Guid.NewGuid()),
+            "UserRoleName",
+            "fake_value",
+            UserRoleStatus.Active,
+            new List<PermissionId>(),
+            EicFunction.BillingAgent);
 
-            var userRoleToUpdate = new UserRole(
-                new UserRoleId(Guid.NewGuid()),
-                "UserRoleName",
-                "fake_value",
-                UserRoleStatus.Active,
-                new List<PermissionId>(),
-                EicFunction.BillingAgent);
+        var updateUserRoleCommand = new UpdateUserRoleCommand(userRoleToUpdate.Id.Value, new UpdateUserRoleDto(
+            "UserRoleNameNew",
+            "fake_value",
+            UserRoleStatus.Active,
+            new Collection<int> { ValidPermission }));
 
-            var updateUserRoleCommand = new UpdateUserRoleCommand(userRoleToUpdate.Id.Value, new UpdateUserRoleDto(
-                "UserRoleNameNew",
-                "fake_value",
-                UserRoleStatus.Active,
-                new Collection<int> { ValidPermission }));
+        userRoleRepositoryMock
+            .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
+            .ReturnsAsync(userRoleToUpdate);
 
-            userRoleRepositoryMock
-                .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
-                .ReturnsAsync(userRoleToUpdate);
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => target.Handle(updateUserRoleCommand, CancellationToken.None));
+    }
 
-            // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() => target.Handle(updateUserRoleCommand, CancellationToken.None));
-        }
+    [Fact]
+    public async Task Handle_UpdateUserRole_UserRoleDeactivated()
+    {
+        // Arrange
+        var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
+        var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object);
+        var roleId = Guid.NewGuid();
+        var existingUserRoleWithSameName = new UserRole(
+            new UserRoleId(Guid.NewGuid()),
+            "UserRoleNameNew",
+            "fake_value",
+            UserRoleStatus.Inactive,
+            new List<PermissionId>(),
+            EicFunction.BillingAgent);
 
-        [Fact]
-        public async Task Handle_UpdateUserRole_UserRoleDeactivated()
-        {
-            // Arrange
-            var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object);
-            var roleId = Guid.NewGuid();
-            var existingUserRoleWithSameName = new UserRole(
-                new UserRoleId(Guid.NewGuid()),
-                "UserRoleNameNew",
-                "fake_value",
-                UserRoleStatus.Inactive,
-                new List<PermissionId>(),
-                EicFunction.BillingAgent);
+        userRoleRepositoryMock
+            .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
+            .ReturnsAsync(existingUserRoleWithSameName);
 
-            userRoleRepositoryMock
-                .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
-                .ReturnsAsync(existingUserRoleWithSameName);
+        var updateUserRoleCommand = new UpdateUserRoleCommand(roleId, new UpdateUserRoleDto(
+            "newName",
+            "newDescription",
+            UserRoleStatus.Active,
+            new Collection<int> { ValidPermission }));
 
-            var updateUserRoleCommand = new UpdateUserRoleCommand(roleId, new UpdateUserRoleDto(
-                "newName",
-                "newDescription",
-                UserRoleStatus.Active,
-                new Collection<int> { ValidPermission }));
-
-            // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() => target.Handle(updateUserRoleCommand, CancellationToken.None));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => target.Handle(updateUserRoleCommand, CancellationToken.None));
     }
 }

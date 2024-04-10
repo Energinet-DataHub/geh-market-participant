@@ -24,75 +24,74 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests;
+
+public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
 {
-    public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
+    private readonly Startup _startup;
+
+    private OrganizationIntegrationTestHost()
     {
-        private readonly Startup _startup;
+        _startup = new Startup();
+    }
 
-        private OrganizationIntegrationTestHost()
+    public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
+
+    public static Task<OrganizationIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture)
+    {
+        ArgumentNullException.ThrowIfNull(databaseFixture);
+
+        var configuration = BuildConfig(databaseFixture.DatabaseManager.ConnectionString);
+
+        var host = new OrganizationIntegrationTestHost();
+        host.ServiceCollection.AddSingleton(configuration);
+        host._startup.Initialize(configuration, host.ServiceCollection);
+        InitEmailSender(host.ServiceCollection);
+
+        return Task.FromResult(host);
+    }
+
+    public AsyncServiceScope BeginScope()
+    {
+        var serviceProvider = ServiceCollection.BuildServiceProvider();
+        return serviceProvider.CreateAsyncScope();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
+
+    private static IConfiguration BuildConfig(string dbConnectionString)
+    {
+        KeyValuePair<string, string?>[] keyValuePairs =
         {
-            _startup = new Startup();
-        }
+            new(Settings.SqlDbConnectionString.Key, dbConnectionString),
+            new(Settings.B2CBackendServicePrincipalNameObjectId.Key, Guid.Empty.ToString()),
+            new(Settings.B2CBackendId.Key, Guid.Empty.ToString()),
+            new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
+            new(Settings.SendGridApiKey.Key, "fake_value"),
+            new(Settings.SenderEmail.Key, "fake_value"),
+            new(Settings.BccEmail.Key, "fake_value"),
+            new(Settings.OrganizationIdentityUpdateNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
+            new(Settings.BalanceResponsiblePartiesChangedNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
+            new(Settings.UserInviteFlow.Key, "fake_value"),
+            new(Settings.EnvironmentDescription.Key, "fake_value"),
+            new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
+            new(Settings.ServiceBusTopicName.Key, "fake_value"),
+            new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.ConnectionString)}", "fake_value"),
+            new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.SharedIntegrationEventTopic)}", "fake_value"),
+        };
 
-        public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
+        return new ConfigurationBuilder()
+            .AddInMemoryCollection(keyValuePairs)
+            .AddEnvironmentVariables()
+            .Build();
+    }
 
-        public static Task<OrganizationIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture)
-        {
-            ArgumentNullException.ThrowIfNull(databaseFixture);
-
-            var configuration = BuildConfig(databaseFixture.DatabaseManager.ConnectionString);
-
-            var host = new OrganizationIntegrationTestHost();
-            host.ServiceCollection.AddSingleton(configuration);
-            host._startup.Initialize(configuration, host.ServiceCollection);
-            InitEmailSender(host.ServiceCollection);
-
-            return Task.FromResult(host);
-        }
-
-        public AsyncServiceScope BeginScope()
-        {
-            var serviceProvider = ServiceCollection.BuildServiceProvider();
-            return serviceProvider.CreateAsyncScope();
-        }
-
-        public ValueTask DisposeAsync()
-        {
-            return ValueTask.CompletedTask;
-        }
-
-        private static IConfiguration BuildConfig(string dbConnectionString)
-        {
-            KeyValuePair<string, string?>[] keyValuePairs =
-            {
-                new(Settings.SqlDbConnectionString.Key, dbConnectionString),
-                new(Settings.B2CBackendServicePrincipalNameObjectId.Key, Guid.Empty.ToString()),
-                new(Settings.B2CBackendId.Key, Guid.Empty.ToString()),
-                new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
-                new(Settings.SendGridApiKey.Key, "fake_value"),
-                new(Settings.SenderEmail.Key, "fake_value"),
-                new(Settings.BccEmail.Key, "fake_value"),
-                new(Settings.OrganizationIdentityUpdateNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
-                new(Settings.BalanceResponsiblePartiesChangedNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
-                new(Settings.UserInviteFlow.Key, "fake_value"),
-                new(Settings.EnvironmentDescription.Key, "fake_value"),
-                new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
-                new(Settings.ServiceBusTopicName.Key, "fake_value"),
-                new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.ConnectionString)}", "fake_value"),
-                new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.SharedIntegrationEventTopic)}", "fake_value"),
-            };
-
-            return new ConfigurationBuilder()
-                .AddInMemoryCollection(keyValuePairs)
-                .AddEnvironmentVariables()
-                .Build();
-        }
-
-        private static void InitEmailSender(IServiceCollection services)
-        {
-            var emailSender = new Mock<IEmailSender>();
-            services.AddScoped(_ => emailSender.Object);
-        }
+    private static void InitEmailSender(IServiceCollection services)
+    {
+        var emailSender = new Mock<IEmailSender>();
+        services.AddScoped(_ => emailSender.Object);
     }
 }

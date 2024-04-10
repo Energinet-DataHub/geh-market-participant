@@ -15,8 +15,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -28,107 +28,106 @@ using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class RemoveActorCredentialsHandlerTests
 {
-    [UnitTest]
-    public sealed class RemoveActorCredentialsHandlerTests
+    [Fact]
+    public async Task Handle_NoActor_ThrowsNotFoundException()
     {
-        [Fact]
-        public async Task Handle_NoActor_ThrowsNotFoundException()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var certificateServiceMock = new Mock<ICertificateService>();
-            var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
-            var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
-            var target = new RemoveActorCredentialsHandler(
-                actorRepositoryMock.Object,
-                certificateServiceMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                domainEventRepositoryMock.Object,
-                actorClientSecretServiceMock.Object);
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var certificateServiceMock = new Mock<ICertificateService>();
+        var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
+        var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+        var target = new RemoveActorCredentialsHandler(
+            actorRepositoryMock.Object,
+            certificateServiceMock.Object,
+            UnitOfWorkProviderMock.Create(),
+            domainEventRepositoryMock.Object,
+            actorClientSecretServiceMock.Object);
 
-            var actorId = Guid.NewGuid();
+        var actorId = Guid.NewGuid();
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
-                .ReturnsAsync((Actor?)null);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
+            .ReturnsAsync((Actor?)null);
 
-            var command = new RemoveActorCredentialsCommand(actorId);
+        var command = new RemoveActorCredentialsCommand(actorId);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
+    }
 
-        [Fact]
-        public async Task Handle_ActorHasNoCertificateCredentials_ReturnsOk()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var certificateServiceMock = new Mock<ICertificateService>();
-            var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
-            var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
-            var target = new RemoveActorCredentialsHandler(
-                actorRepositoryMock.Object,
-                certificateServiceMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                domainEventRepositoryMock.Object,
-                actorClientSecretServiceMock.Object);
+    [Fact]
+    public async Task Handle_ActorHasNoCertificateCredentials_ReturnsOk()
+    {
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var certificateServiceMock = new Mock<ICertificateService>();
+        var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
+        var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+        var target = new RemoveActorCredentialsHandler(
+            actorRepositoryMock.Object,
+            certificateServiceMock.Object,
+            UnitOfWorkProviderMock.Create(),
+            domainEventRepositoryMock.Object,
+            actorClientSecretServiceMock.Object);
 
-            var actorId = Guid.NewGuid();
-            var actor = TestPreparationModels.MockedActor(actorId);
+        var actorId = Guid.NewGuid();
+        var actor = TestPreparationModels.MockedActor(actorId);
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
-                .ReturnsAsync(actor);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+            .ReturnsAsync(actor);
 
-            var command = new RemoveActorCredentialsCommand(actorId);
+        var command = new RemoveActorCredentialsCommand(actorId);
 
-            // Act
-            var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
+        // Act
+        var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
 
-            // Assert
-            Assert.Null(exception);
-        }
+        // Assert
+        Assert.Null(exception);
+    }
 
-        [Fact]
-        public async Task Handle_ActorHasValidCertificateCredentials_ReturnsOk()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var certificateServiceMock = new Mock<ICertificateService>();
-            var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
-            var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
-            var target = new RemoveActorCredentialsHandler(
-                actorRepositoryMock.Object,
-                certificateServiceMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                domainEventRepositoryMock.Object,
-                actorClientSecretServiceMock.Object);
+    [Fact]
+    public async Task Handle_ActorHasValidCertificateCredentials_ReturnsOk()
+    {
+        // Arrange
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var certificateServiceMock = new Mock<ICertificateService>();
+        var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
+        var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+        var target = new RemoveActorCredentialsHandler(
+            actorRepositoryMock.Object,
+            certificateServiceMock.Object,
+            UnitOfWorkProviderMock.Create(),
+            domainEventRepositoryMock.Object,
+            actorClientSecretServiceMock.Object);
 
-            var actorId = Guid.NewGuid();
-            var actor = TestPreparationModels.MockedActor(actorId);
-            actor.Credentials = new ActorCertificateCredentials(
-                "mocked",
-                "mocked",
-                DateTime.UtcNow.AddYears(1).ToInstant());
+        var actorId = Guid.NewGuid();
+        var actor = TestPreparationModels.MockedActor(actorId);
+        actor.Credentials = new ActorCertificateCredentials(
+            "mocked",
+            "mocked",
+            DateTime.UtcNow.AddYears(1).ToInstant());
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
-                .ReturnsAsync(actor);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+            .ReturnsAsync(actor);
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.AddOrUpdateAsync(actor))
-                .ReturnsAsync(new Result<ActorId, ActorError>(actor.Id));
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.AddOrUpdateAsync(actor))
+            .ReturnsAsync(new Result<ActorId, ActorError>(actor.Id));
 
-            var command = new RemoveActorCredentialsCommand(actorId);
+        var command = new RemoveActorCredentialsCommand(actorId);
 
-            // Act
-            var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
+        // Act
+        var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
 
-            // Assert
-            Assert.Null(exception);
-            Assert.Null(actor.Credentials);
-        }
+        // Assert
+        Assert.Null(exception);
+        Assert.Null(actor.Credentials);
     }
 }

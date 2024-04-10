@@ -14,14 +14,13 @@
 
 using System.ComponentModel;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
-{
-    public sealed record UnknownActorNumber : ActorNumber
-    {
-        [Browsable(false)]
-        public UnknownActorNumber(string value)
-            : base(value) { }
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-        public override ActorNumberType Type => ActorNumberType.Unknown;
-    }
+public sealed record UnknownActorNumber : ActorNumber
+{
+    [Browsable(false)]
+    public UnknownActorNumber(string value)
+        : base(value) { }
+
+    public override ActorNumberType Type => ActorNumberType.Unknown;
 }

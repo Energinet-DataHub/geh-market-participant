@@ -18,37 +18,36 @@ using Energinet.DataHub.MarketParticipant.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+
+public sealed class UnitOfWork : IUnitOfWork
 {
-    public sealed class UnitOfWork : IUnitOfWork
+    private readonly DbContext _context;
+    private IDbContextTransaction? _transaction;
+
+    public UnitOfWork(DbContext context)
     {
-        private readonly DbContext _context;
-        private IDbContextTransaction? _transaction;
+        _context = context;
+    }
 
-        public UnitOfWork(DbContext context)
-        {
-            _context = context;
-        }
+    public async Task InitializeAsync()
+    {
+        _transaction = await _context.Database.BeginTransactionAsync().ConfigureAwait(false);
+    }
 
-        public async Task InitializeAsync()
-        {
-            _transaction = await _context.Database.BeginTransactionAsync().ConfigureAwait(false);
-        }
+    public Task CommitAsync()
+    {
+        if (_transaction == null)
+            throw new InvalidOperationException($"{nameof(UnitOfWork)} has not been initialized");
 
-        public Task CommitAsync()
-        {
-            if (_transaction == null)
-                throw new InvalidOperationException($"{nameof(UnitOfWork)} has not been initialized");
+        return _transaction.CommitAsync();
+    }
 
-            return _transaction.CommitAsync();
-        }
+    public ValueTask DisposeAsync()
+    {
+        if (_transaction == null)
+            return ValueTask.CompletedTask;
 
-        public ValueTask DisposeAsync()
-        {
-            if (_transaction == null)
-                return ValueTask.CompletedTask;
-
-            return _transaction.DisposeAsync();
-        }
+        return _transaction.DisposeAsync();
     }
 }

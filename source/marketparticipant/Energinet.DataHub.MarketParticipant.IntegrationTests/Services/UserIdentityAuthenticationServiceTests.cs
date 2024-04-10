@@ -191,7 +191,5 @@ public sealed class UserIdentityAuthenticationServiceTests
         await Assert.ThrowsAsync<ValidationException>(() => target.AddAuthenticationAsync(externalUserId, smsAuthMethod));
     }
 
-    private sealed class UnknownAuthenticationMethod : AuthenticationMethod
-    {
-    }
+    private sealed class UnknownAuthenticationMethod : AuthenticationMethod;
 }

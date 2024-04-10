@@ -14,11 +14,10 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory
-{
-    public sealed record ActiveDirectoryAppInformation(
-        string AppId,
-        string AppObjectId,
-        string AppName,
-        IEnumerable<ActiveDirectoryRole> AppRoles);
-}
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
+
+public sealed record ActiveDirectoryAppInformation(
+    string AppId,
+    string AppObjectId,
+    string AppName,
+    IEnumerable<ActiveDirectoryRole> AppRoles);

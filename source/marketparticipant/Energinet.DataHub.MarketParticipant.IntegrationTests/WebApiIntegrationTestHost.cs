@@ -19,7 +19,6 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -54,7 +53,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
         if (b2CFixture != null)
         {
-            host.ServiceCollection.Replace(ServiceDescriptor.Scoped<IActiveDirectoryB2CService>(_ => b2CFixture.B2CService));
+            host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => b2CFixture.B2CService));
         }
 
         if (certificateFixture != null)

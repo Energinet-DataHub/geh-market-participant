@@ -15,7 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
@@ -23,35 +23,34 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class GetSingleOrganizationHandlerTests
 {
-    [UnitTest]
-    public sealed class GetSingleOrganizationHandlerTests
+    [Fact]
+    public async Task Handle_HasOrganization_ReturnsOrganization()
     {
-        [Fact]
-        public async Task Handle_HasOrganization_ReturnsOrganization()
-        {
-            // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var target = new GetSingleOrganizationHandler(organizationExistsHelperService.Object);
+        // Arrange
+        var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+        var target = new GetSingleOrganizationHandler(organizationExistsHelperService.Object);
 
-            var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
-            var organization = TestPreparationModels.MockedOrganization(orgId);
+        var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
+        var organization = TestPreparationModels.MockedOrganization(orgId);
 
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
-                .ReturnsAsync(organization);
+        organizationExistsHelperService
+            .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
+            .ReturnsAsync(organization);
 
-            var command = new GetSingleOrganizationCommand(orgId);
+        var command = new GetSingleOrganizationCommand(orgId);
 
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            Assert.NotNull(response.Organization);
+        // Assert
+        Assert.NotNull(response.Organization);
 
-            var actualOrganization = response.Organization;
-            Assert.Equal(organization.Id.Value, actualOrganization.OrganizationId);
-        }
+        var actualOrganization = response.Organization;
+        Assert.Equal(organization.Id.Value, actualOrganization.OrganizationId);
     }
 }

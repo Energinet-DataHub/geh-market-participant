@@ -15,17 +15,16 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+/// <summary>
+/// Ensures business register identifier for an organization is unique
+/// </summary>
+public interface IUniqueOrganizationBusinessRegisterIdentifierService
 {
     /// <summary>
-    /// Ensures business register identifier for an organization is unique
+    /// Ensures business register identifier for an organization is unique; throws ValidationException if it is not unique
     /// </summary>
-    public interface IUniqueOrganizationBusinessRegisterIdentifierService
-    {
-        /// <summary>
-        /// Ensures business register identifier for an organization is unique; throws ValidationException if it is not unique
-        /// </summary>
-        /// <param name="organization">Organization</param>
-        Task EnsureUniqueBusinessRegisterIdentifierAsync(Organization organization);
-    }
+    /// <param name="organization">Organization</param>
+    Task EnsureUniqueBusinessRegisterIdentifierAsync(Organization organization);
 }

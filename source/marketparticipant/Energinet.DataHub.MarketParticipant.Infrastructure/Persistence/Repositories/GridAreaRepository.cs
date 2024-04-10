@@ -22,63 +22,62 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+
+public class GridAreaRepository : IGridAreaRepository
 {
-    public class GridAreaRepository : IGridAreaRepository
+    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+
+    public GridAreaRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
-        private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+        _marketParticipantDbContext = marketParticipantDbContext;
+    }
 
-        public GridAreaRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public async Task<GridAreaId> AddOrUpdateAsync(GridArea gridArea)
+    {
+        ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
+
+        GridAreaEntity destination;
+        if (gridArea.Id.Value == default)
         {
-            _marketParticipantDbContext = marketParticipantDbContext;
+            destination = new GridAreaEntity();
         }
-
-        public async Task<GridAreaId> AddOrUpdateAsync(GridArea gridArea)
+        else
         {
-            ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
-
-            GridAreaEntity destination;
-            if (gridArea.Id.Value == default)
-            {
-                destination = new GridAreaEntity();
-            }
-            else
-            {
-                destination = await _marketParticipantDbContext
-                    .GridAreas
-                    .FindAsync(gridArea.Id.Value)
-                    .ConfigureAwait(false) ?? throw new InvalidOperationException($"GridArea with id {gridArea.Id.Value} is missing, even though it cannot be deleted.");
-            }
-
-            GridAreaMapper.MapToEntity(gridArea, destination);
-            _marketParticipantDbContext.GridAreas.Update(destination);
-
-            await _marketParticipantDbContext
-                .SaveChangesAsync()
-                .ConfigureAwait(false);
-
-            return new GridAreaId(destination.Id);
-        }
-
-        public async Task<GridArea?> GetAsync(GridAreaId id)
-        {
-            ArgumentNullException.ThrowIfNull(id, nameof(id));
-
-            var gridArea = await _marketParticipantDbContext.GridAreas
-                .FindAsync(id.Value)
-                .ConfigureAwait(false);
-
-            return gridArea is null ? null : GridAreaMapper.MapFromEntity(gridArea);
-        }
-
-        public async Task<IEnumerable<GridArea>> GetAsync()
-        {
-            var entities = await _marketParticipantDbContext
+            destination = await _marketParticipantDbContext
                 .GridAreas
-                .ToListAsync()
-                .ConfigureAwait(false);
-
-            return entities.Select(GridAreaMapper.MapFromEntity);
+                .FindAsync(gridArea.Id.Value)
+                .ConfigureAwait(false) ?? throw new InvalidOperationException($"GridArea with id {gridArea.Id.Value} is missing, even though it cannot be deleted.");
         }
+
+        GridAreaMapper.MapToEntity(gridArea, destination);
+        _marketParticipantDbContext.GridAreas.Update(destination);
+
+        await _marketParticipantDbContext
+            .SaveChangesAsync()
+            .ConfigureAwait(false);
+
+        return new GridAreaId(destination.Id);
+    }
+
+    public async Task<GridArea?> GetAsync(GridAreaId id)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+        var gridArea = await _marketParticipantDbContext.GridAreas
+            .FindAsync(id.Value)
+            .ConfigureAwait(false);
+
+        return gridArea is null ? null : GridAreaMapper.MapFromEntity(gridArea);
+    }
+
+    public async Task<IEnumerable<GridArea>> GetAsync()
+    {
+        var entities = await _marketParticipantDbContext
+            .GridAreas
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return entities.Select(GridAreaMapper.MapFromEntity);
     }
 }

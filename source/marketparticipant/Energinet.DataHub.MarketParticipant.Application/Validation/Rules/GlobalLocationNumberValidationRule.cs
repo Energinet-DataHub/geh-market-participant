@@ -12,25 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 using FluentValidation.Validators;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
+namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
+
+public sealed class GlobalLocationNumberValidationRule<T> : PropertyValidator<T, ActorNumberDto?>
 {
-    public sealed class GlobalLocationNumberValidationRule<T> : PropertyValidator<T, ActorNumberDto?>
+    public override string Name => "GlobalLocationNumberValidation";
+
+    public override bool IsValid(ValidationContext<T> context, ActorNumberDto? value)
     {
-        public override string Name => "GlobalLocationNumberValidation";
+        return !string.IsNullOrEmpty(value?.Value) && GlnActorNumber.IsValid(value.Value);
+    }
 
-        public override bool IsValid(ValidationContext<T> context, ActorNumberDto? value)
-        {
-            return !string.IsNullOrEmpty(value?.Value) && GlnActorNumber.IsValid(value.Value);
-        }
-
-        protected override string GetDefaultMessageTemplate(string errorCode)
-        {
-            return "'{PropertyName}' must be a valid GLN or EIC.";
-        }
+    protected override string GetDefaultMessageTemplate(string errorCode)
+    {
+        return "'{PropertyName}' must be a valid GLN or EIC.";
     }
 }

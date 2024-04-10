@@ -15,15 +15,14 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
-{
-    public static class ConnectionStringFactory
-    {
-        private const string DefaultConnectionString = "Server=(local); Database=MeteringPointData; Trusted_connection=true";
+namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 
-        public static string GetConnectionString(IEnumerable<string> args)
-        {
-            return args.FirstOrDefault() ?? DefaultConnectionString;
-        }
+public static class ConnectionStringFactory
+{
+    private const string DefaultConnectionString = "Server=(local); Database=MeteringPointData; Trusted_connection=true";
+
+    public static string GetConnectionString(IEnumerable<string> args)
+    {
+        return args.FirstOrDefault() ?? DefaultConnectionString;
     }
 }

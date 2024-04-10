@@ -14,7 +14,6 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
-{
-    public sealed record ContactId(Guid Value);
-}
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record ContactId(Guid Value);

@@ -27,111 +27,110 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class UpdateUserRolesCommandHandlerTests
 {
-    [UnitTest]
-    public sealed class UpdateUserRolesCommandHandlerTests
+    [Fact]
+    public async Task Handle_UserRoleAssignment_AddDeactivatedRole_ThrowsException()
     {
-        [Fact]
-        public async Task Handle_UserRoleAssignment_AddDeactivatedRole_ThrowsException()
+        // Arrange
+        var userRepositoryMock = new Mock<IUserRepository>();
+        var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
+        var externalUserId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var actorId = Guid.NewGuid();
+        var deactivatedUserRoleId = new UserRoleId(Guid.NewGuid());
+        var userRoleAssignments = new List<UserRoleAssignment>
         {
-            // Arrange
-            var userRepositoryMock = new Mock<IUserRepository>();
-            var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var externalUserId = Guid.NewGuid();
-            var userId = Guid.NewGuid();
-            var actorId = Guid.NewGuid();
-            var deactivatedUserRoleId = new UserRoleId(Guid.NewGuid());
-            var userRoleAssignments = new List<UserRoleAssignment>
-            {
-                new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())),
-                new(new ActorId(actorId), new UserRoleId(Guid.NewGuid()))
-            };
-            var user = new User(
-                new UserId(userId),
-                new ActorId(actorId),
-                new ExternalUserId(externalUserId),
-                userRoleAssignments,
-                null,
-                null);
+            new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())),
+            new(new ActorId(actorId), new UserRoleId(Guid.NewGuid()))
+        };
+        var user = new User(
+            new UserId(userId),
+            new ActorId(actorId),
+            new ExternalUserId(externalUserId),
+            userRoleAssignments,
+            null,
+            null);
 
-            var deactivatedUserRole = new UserRole(
-                deactivatedUserRoleId,
-                "test",
-                "test",
-                UserRoleStatus.Inactive,
-                new List<PermissionId>(),
-                EicFunction.BillingAgent);
+        var deactivatedUserRole = new UserRole(
+            deactivatedUserRoleId,
+            "test",
+            "test",
+            UserRoleStatus.Inactive,
+            new List<PermissionId>(),
+            EicFunction.BillingAgent);
 
-            userRepositoryMock.Setup(x => x.GetAsync(user.Id)).ReturnsAsync(user);
-            userRoleRepositoryMock.Setup(x => x.GetAsync(deactivatedUserRoleId)).ReturnsAsync(deactivatedUserRole);
+        userRepositoryMock.Setup(x => x.GetAsync(user.Id)).ReturnsAsync(user);
+        userRoleRepositoryMock.Setup(x => x.GetAsync(deactivatedUserRoleId)).ReturnsAsync(deactivatedUserRole);
 
-            var target = new UpdateUserRolesHandler(
-                userRepositoryMock.Object,
-                userRoleRepositoryMock.Object);
+        var target = new UpdateUserRolesHandler(
+            userRepositoryMock.Object,
+            userRoleRepositoryMock.Object);
 
-            var updatedRoleAssignments = new List<Guid> { deactivatedUserRoleId.Value, Guid.NewGuid() };
+        var updatedRoleAssignments = new List<Guid> { deactivatedUserRoleId.Value, Guid.NewGuid() };
 
-            var command = new UpdateUserRoleAssignmentsCommand(
-                actorId,
-                userId,
-                new UpdateUserRoleAssignmentsDto(updatedRoleAssignments, new[] { userRoleAssignments[1].UserRoleId.Value }));
+        var command = new UpdateUserRoleAssignmentsCommand(
+            actorId,
+            userId,
+            new UpdateUserRoleAssignmentsDto(updatedRoleAssignments, new[] { userRoleAssignments[1].UserRoleId.Value }));
 
-            // Act + Assert
-            var ex = await Assert.ThrowsAsync<ValidationException>(() =>
-                target.Handle(command, CancellationToken.None));
-            Assert.Contains("is not in active status and can't be added as a role", ex.Message, StringComparison.OrdinalIgnoreCase);
-        }
+        // Act + Assert
+        var ex = await Assert.ThrowsAsync<ValidationException>(() =>
+            target.Handle(command, CancellationToken.None));
+        Assert.Contains("is not in active status and can't be added as a role", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
 
-        [Fact]
-        public async Task Handle_UserRoleAssignment_AddUnknownStatusRole_ThrowsException()
+    [Fact]
+    public async Task Handle_UserRoleAssignment_AddUnknownStatusRole_ThrowsException()
+    {
+        // Arrange
+        var userRepositoryMock = new Mock<IUserRepository>();
+        var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
+        var externalUserId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var actorId = Guid.NewGuid();
+        var deactivatedUserRoleId = new UserRoleId(Guid.NewGuid());
+        var userRoleAssignments = new List<UserRoleAssignment>
         {
-            // Arrange
-            var userRepositoryMock = new Mock<IUserRepository>();
-            var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var externalUserId = Guid.NewGuid();
-            var userId = Guid.NewGuid();
-            var actorId = Guid.NewGuid();
-            var deactivatedUserRoleId = new UserRoleId(Guid.NewGuid());
-            var userRoleAssignments = new List<UserRoleAssignment>
-            {
-                new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())),
-                new(new ActorId(actorId), new UserRoleId(Guid.NewGuid()))
-            };
-            var user = new User(
-                new UserId(userId),
-                new ActorId(actorId),
-                new ExternalUserId(externalUserId),
-                userRoleAssignments,
-                null,
-                null);
+            new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())),
+            new(new ActorId(actorId), new UserRoleId(Guid.NewGuid()))
+        };
+        var user = new User(
+            new UserId(userId),
+            new ActorId(actorId),
+            new ExternalUserId(externalUserId),
+            userRoleAssignments,
+            null,
+            null);
 
-            var deactivatedUserRole = new UserRole(
-                deactivatedUserRoleId,
-                "test",
-                "test",
-                (UserRoleStatus)255,
-                new List<PermissionId>(),
-                EicFunction.BillingAgent);
+        var deactivatedUserRole = new UserRole(
+            deactivatedUserRoleId,
+            "test",
+            "test",
+            (UserRoleStatus)255,
+            new List<PermissionId>(),
+            EicFunction.BillingAgent);
 
-            userRepositoryMock.Setup(x => x.GetAsync(user.Id)).ReturnsAsync(user);
-            userRoleRepositoryMock.Setup(x => x.GetAsync(deactivatedUserRoleId)).ReturnsAsync(deactivatedUserRole);
+        userRepositoryMock.Setup(x => x.GetAsync(user.Id)).ReturnsAsync(user);
+        userRoleRepositoryMock.Setup(x => x.GetAsync(deactivatedUserRoleId)).ReturnsAsync(deactivatedUserRole);
 
-            var target = new UpdateUserRolesHandler(
-                userRepositoryMock.Object,
-                userRoleRepositoryMock.Object);
+        var target = new UpdateUserRolesHandler(
+            userRepositoryMock.Object,
+            userRoleRepositoryMock.Object);
 
-            var updatedRoleAssignments = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+        var updatedRoleAssignments = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
 
-            var command = new UpdateUserRoleAssignmentsCommand(
-                actorId,
-                userId,
-                new UpdateUserRoleAssignmentsDto(updatedRoleAssignments, new[] { userRoleAssignments[1].UserRoleId.Value }));
+        var command = new UpdateUserRoleAssignmentsCommand(
+            actorId,
+            userId,
+            new UpdateUserRoleAssignmentsDto(updatedRoleAssignments, new[] { userRoleAssignments[1].UserRoleId.Value }));
 
-            // Act + Assert
-            var ex = await Assert.ThrowsAsync<ValidationException>(() =>
-                target.Handle(command, CancellationToken.None));
-            Assert.Contains("does not exist and can't be added as a role", ex.Message, StringComparison.OrdinalIgnoreCase);
-        }
+        // Act + Assert
+        var ex = await Assert.ThrowsAsync<ValidationException>(() =>
+            target.Handle(command, CancellationToken.None));
+        Assert.Contains("does not exist and can't be added as a role", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 }

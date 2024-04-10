@@ -15,29 +15,28 @@
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
-{
-    internal sealed class GridAreaMapper
-    {
-        public static void MapToEntity(GridArea from, GridAreaEntity to)
-        {
-            to.Code = from.Code.Value;
-            to.Id = from.Id.Value;
-            to.Name = from.Name.Value;
-            to.PriceAreaCode = from.PriceAreaCode;
-            to.ValidFrom = from.ValidFrom;
-            to.ValidTo = from.ValidTo;
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 
-        public static GridArea MapFromEntity(GridAreaEntity from)
-        {
-            return new GridArea(
-                new GridAreaId(from.Id),
-                new GridAreaName(from.Name),
-                new GridAreaCode(from.Code),
-                from.PriceAreaCode,
-                from.ValidFrom,
-                from.ValidTo);
-        }
+internal sealed class GridAreaMapper
+{
+    public static void MapToEntity(GridArea from, GridAreaEntity to)
+    {
+        to.Code = from.Code.Value;
+        to.Id = from.Id.Value;
+        to.Name = from.Name.Value;
+        to.PriceAreaCode = from.PriceAreaCode;
+        to.ValidFrom = from.ValidFrom;
+        to.ValidTo = from.ValidTo;
+    }
+
+    public static GridArea MapFromEntity(GridAreaEntity from)
+    {
+        return new GridArea(
+            new GridAreaId(from.Id),
+            new GridAreaName(from.Name),
+            new GridAreaCode(from.Code),
+            from.PriceAreaCode,
+            from.ValidFrom,
+            from.ValidTo);
     }
 }

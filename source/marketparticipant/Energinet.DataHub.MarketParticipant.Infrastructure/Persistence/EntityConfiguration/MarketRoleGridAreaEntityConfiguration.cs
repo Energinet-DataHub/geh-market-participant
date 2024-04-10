@@ -17,28 +17,27 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
-{
-    public sealed class MarketRoleGridAreaEntityConfiguration : IEntityTypeConfiguration<MarketRoleGridAreaEntity>
-    {
-        public void Configure(EntityTypeBuilder<MarketRoleGridAreaEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("MarketRoleGridArea");
-            builder.HasKey(rg => rg.Id);
-            builder.Property(rg => rg.Id).ValueGeneratedOnAdd();
-            builder.Property(p => p.GridAreaId);
-            builder.OwnsMany(role => role.MeteringPointTypes, ConfigureMeteringTypes);
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 
-        private static void ConfigureMeteringTypes(
-            OwnedNavigationBuilder<MarketRoleGridAreaEntity, MeteringPointTypeEntity> meteringPointTypeBuilder)
-        {
-            meteringPointTypeBuilder.WithOwner().HasForeignKey("MarketRoleGridAreaId");
-            meteringPointTypeBuilder.ToTable("GridAreaMeteringPointType");
-            meteringPointTypeBuilder.Property<Guid>("Id").ValueGeneratedOnAdd();
-            meteringPointTypeBuilder.Property(p => p.MarketRoleGridAreaId).HasColumnName("MarketRoleGridAreaId");
-            meteringPointTypeBuilder.Property(p => p.MeteringTypeId).HasColumnName("MeteringPointTypeId");
-        }
+public sealed class MarketRoleGridAreaEntityConfiguration : IEntityTypeConfiguration<MarketRoleGridAreaEntity>
+{
+    public void Configure(EntityTypeBuilder<MarketRoleGridAreaEntity> builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        builder.ToTable("MarketRoleGridArea");
+        builder.HasKey(rg => rg.Id);
+        builder.Property(rg => rg.Id).ValueGeneratedOnAdd();
+        builder.Property(p => p.GridAreaId);
+        builder.OwnsMany(role => role.MeteringPointTypes, ConfigureMeteringTypes);
+    }
+
+    private static void ConfigureMeteringTypes(
+        OwnedNavigationBuilder<MarketRoleGridAreaEntity, MeteringPointTypeEntity> meteringPointTypeBuilder)
+    {
+        meteringPointTypeBuilder.WithOwner().HasForeignKey("MarketRoleGridAreaId");
+        meteringPointTypeBuilder.ToTable("GridAreaMeteringPointType");
+        meteringPointTypeBuilder.Property<Guid>("Id").ValueGeneratedOnAdd();
+        meteringPointTypeBuilder.Property(p => p.MarketRoleGridAreaId).HasColumnName("MarketRoleGridAreaId");
+        meteringPointTypeBuilder.Property(p => p.MeteringTypeId).HasColumnName("MeteringPointTypeId");
     }
 }

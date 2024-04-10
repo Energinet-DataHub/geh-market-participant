@@ -19,34 +19,33 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Email
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Email;
+
+public sealed class SendEmailHandler : IRequestHandler<SendEmailCommand, Unit>
 {
-    public sealed class SendEmailHandler : IRequestHandler<SendEmailCommand, Unit>
+    private readonly IEmailEventRepository _emailEventRepository;
+    private readonly IEmailSender _emailSender;
+
+    public SendEmailHandler(
+        IEmailEventRepository emailEventRepository,
+        IEmailSender emailSender)
     {
-        private readonly IEmailEventRepository _emailEventRepository;
-        private readonly IEmailSender _emailSender;
+        _emailEventRepository = emailEventRepository;
+        _emailSender = emailSender;
+    }
 
-        public SendEmailHandler(
-            IEmailEventRepository emailEventRepository,
-            IEmailSender emailSender)
+    public async Task<Unit> Handle(SendEmailCommand request, CancellationToken cancellationToken)
+    {
+        var emailEvents = await _emailEventRepository
+            .GetAllPendingEmailEventsAsync()
+            .ConfigureAwait(false);
+
+        foreach (var emailEvent in emailEvents)
         {
-            _emailEventRepository = emailEventRepository;
-            _emailSender = emailSender;
+            await _emailSender.SendEmailAsync(emailEvent.Email, emailEvent).ConfigureAwait(false);
+            await _emailEventRepository.MarkAsSentAsync(emailEvent).ConfigureAwait(false);
         }
 
-        public async Task<Unit> Handle(SendEmailCommand request, CancellationToken cancellationToken)
-        {
-            var emailEvents = await _emailEventRepository
-                .GetAllPendingEmailEventsAsync()
-                .ConfigureAwait(false);
-
-            foreach (var emailEvent in emailEvents)
-            {
-                await _emailSender.SendEmailAsync(emailEvent.Email, emailEvent).ConfigureAwait(false);
-                await _emailEventRepository.MarkAsSentAsync(emailEvent).ConfigureAwait(false);
-            }
-
-            return Unit.Value;
-        }
+        return Unit.Value;
     }
 }

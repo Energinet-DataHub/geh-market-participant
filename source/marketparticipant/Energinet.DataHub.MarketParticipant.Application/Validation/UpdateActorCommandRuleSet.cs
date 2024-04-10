@@ -15,84 +15,83 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class UpdateActorCommandRuleSet : AbstractValidator<UpdateActorCommand>
 {
-    public sealed class UpdateActorCommandRuleSet : AbstractValidator<UpdateActorCommand>
+    public UpdateActorCommandRuleSet()
     {
-        public UpdateActorCommandRuleSet()
-        {
-            RuleFor(command => command.ActorId)
-                .NotEmpty();
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
 
-            RuleFor(actor => actor.ChangeActor)
-                .NotNull()
-                .ChildRules(changeActorValidator =>
-                {
-                    changeActorValidator
-                        .RuleFor(x => x.Status)
+        RuleFor(actor => actor.ChangeActor)
+            .NotNull()
+            .ChildRules(changeActorValidator =>
+            {
+                changeActorValidator
+                    .RuleFor(x => x.Status)
+                    .NotEmpty()
+                    .IsEnumName(typeof(ActorStatus), false);
+
+                changeActorValidator
+                    .RuleFor(actor => actor.MarketRoles)
+                    .Cascade(CascadeMode.Stop)
+                    .NotEmpty()
+                    .Must(marketRoles => marketRoles
+                        .Where(r => (ActorMarketRoleDto?)r != null)
+                        .Select(r => r.EicFunction)
+                        .All(new HashSet<EicFunction>().Add))
+                    .WithMessage("Multiple market roles have the same EIC function.");
+
+                changeActorValidator
+                    .RuleForEach(actor => actor.MarketRoles)
+                    .ChildRules(gridAreaValidator => gridAreaValidator
+                        .RuleFor(x => x.GridAreas)
                         .NotEmpty()
-                        .IsEnumName(typeof(ActorStatus), false);
+                        .When(marketRole => marketRole.EicFunction == EicFunction.GridAccessProvider));
 
-                    changeActorValidator
-                        .RuleFor(actor => actor.MarketRoles)
-                        .Cascade(CascadeMode.Stop)
-                        .NotEmpty()
-                        .Must(marketRoles => marketRoles
-                            .Where(r => (ActorMarketRoleDto?)r != null)
-                            .Select(r => r.EicFunction)
-                            .All(new HashSet<EicFunction>().Add))
-                        .WithMessage("Multiple market roles have the same EIC function.");
+                changeActorValidator
+                    .RuleFor(x => x.MarketRoles)
+                    .NotEmpty()
+                    .When(x => Enum.TryParse(
+                                   typeof(ActorStatus),
+                                   x.Status,
+                                   true,
+                                   out var result) &&
+                               result is ActorStatus actorStatus && actorStatus != ActorStatus.New)
+                    .ChildRules(rolesValidator =>
+                        rolesValidator
+                            .RuleForEach(x => x)
+                            .NotNull()
+                            .ChildRules(roleValidator =>
+                            {
+                                roleValidator
+                                    .RuleFor(x => x.EicFunction)
+                                    .NotEmpty()
+                                    .IsInEnum();
+                            }));
 
-                    changeActorValidator
-                        .RuleForEach(actor => actor.MarketRoles)
-                        .ChildRules(gridAreaValidator => gridAreaValidator
-                            .RuleFor(x => x.GridAreas)
-                            .NotEmpty()
-                            .When(marketRole => marketRole.EicFunction == EicFunction.GridAccessProvider));
-
-                    changeActorValidator
-                        .RuleFor(x => x.MarketRoles)
-                        .NotEmpty()
-                        .When(x => Enum.TryParse(
-                                       typeof(ActorStatus),
-                                       x.Status,
-                                       true,
-                                       out var result) &&
-                                   result is ActorStatus actorStatus && actorStatus != ActorStatus.New)
-                        .ChildRules(rolesValidator =>
-                            rolesValidator
-                                .RuleForEach(x => x)
-                                .NotNull()
-                                .ChildRules(roleValidator =>
-                                {
-                                    roleValidator
-                                        .RuleFor(x => x.EicFunction)
+                changeActorValidator
+                    .RuleForEach(actor => actor.MarketRoles)
+                    .ChildRules(inlineValidator =>
+                    {
+                        inlineValidator
+                            .RuleForEach(m => m.GridAreas)
+                            .ChildRules(validationRules =>
+                            {
+                                validationRules
+                                    .RuleFor(r => r.MeteringPointTypes)
+                                    .NotNull()
+                                    .ChildRules(v => v
+                                        .RuleForEach(r => r)
                                         .NotEmpty()
-                                        .IsInEnum();
-                                }));
-
-                    changeActorValidator
-                        .RuleForEach(actor => actor.MarketRoles)
-                        .ChildRules(inlineValidator =>
-                        {
-                            inlineValidator
-                                .RuleForEach(m => m.GridAreas)
-                                .ChildRules(validationRules =>
-                                {
-                                    validationRules
-                                        .RuleFor(r => r.MeteringPointTypes)
-                                        .NotNull()
-                                        .ChildRules(v => v
-                                            .RuleForEach(r => r)
-                                            .NotEmpty()
-                                            .Must(x => Enum.TryParse<MeteringPointType>(x, true, out _)));
-                                });
-                        });
-                });
-        }
+                                        .Must(x => Enum.TryParse<MeteringPointType>(x, true, out _)));
+                            });
+                    });
+            });
     }
 }
