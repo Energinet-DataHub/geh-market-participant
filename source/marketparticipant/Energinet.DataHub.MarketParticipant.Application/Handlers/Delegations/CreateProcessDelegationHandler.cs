@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
@@ -73,6 +74,28 @@ public sealed class CreateProcessDelegationHandler : IRequestHandler<CreateProce
         {
             throw new ValidationException("Actors to delegate from/to must both be active to delegate messages.")
                 .WithErrorCode("process_delegation.actors_from_or_to_inactive");
+        }
+
+        var currentDelegations = await _processDelegationRepository
+            .GetForActorAsync(actorDelegatedTo.Id)
+            .ConfigureAwait(false);
+
+        var currentDelegationsToFromActor = await _processDelegationRepository
+            .GetDelegatedToActorAsync(actor.Id)
+            .ConfigureAwait(false);
+
+        if (currentDelegations.Any(delegation =>
+                request.CreateDelegation.DelegatedProcesses.Contains(delegation.Process)))
+        {
+            throw new ValidationException("Trying to delegate to an actor that already has a delegation for the same process to another actor.")
+                .WithErrorCode("process_delegation.actor_to_already_has_delegated_process");
+        }
+
+        if (currentDelegationsToFromActor.Any(delegation =>
+                request.CreateDelegation.DelegatedProcesses.Contains(delegation.Process)))
+        {
+            throw new ValidationException("Trying to delegate from an actor that already has a delegation for the same process to assigned.")
+                .WithErrorCode("process_delegation.actor_from_already_has_delegated_process");
         }
 
         var uow = await _unitOfWorkProvider
