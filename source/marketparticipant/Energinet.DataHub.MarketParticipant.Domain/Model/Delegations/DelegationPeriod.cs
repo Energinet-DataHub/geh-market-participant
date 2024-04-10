@@ -33,4 +33,6 @@ public sealed record DelegationPeriod(ActorId DelegatedTo, GridAreaId GridAreaId
 
     public DelegationPeriodId Id { get; } = new(Guid.Empty);
     public Instant? StopsAt { get; init; }
+
+    public bool IsCancelled => StopsAt < StartsAt;
 }
