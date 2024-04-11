@@ -159,9 +159,4 @@ public sealed class InMemoryUserIdentityRepository : IUserIdentityRepository
         _identities.Add(newIdentity);
         return Task.CompletedTask;
     }
-
-    public Task RemoveMitIdAsync(ExternalUserId externalUserId)
-    {
-        throw new NotImplementedException();
-    }
 }
