@@ -36,6 +36,7 @@ public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFacto
         ArgumentNullException.ThrowIfNull(builder);
 
         builder.UseSetting(Settings.SqlDbConnectionString.Key, _marketParticipantDatabaseFixture.DatabaseManager.ConnectionString);
+        builder.UseSetting(Settings.MitIdExternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.ExternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.InternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.BackendBffAppId.Key, TestBackendAppId);
