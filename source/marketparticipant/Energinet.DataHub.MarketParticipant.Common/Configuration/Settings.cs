@@ -36,6 +36,8 @@ public static class Settings
     public static Setting<string> B2CServicePrincipalSecret { get; }
         = new("AZURE_B2C_SPN_SECRET");
 
+    public static Setting<string> MitIdExternalOpenIdUrl { get; }
+        = new("MITID_EXTERNAL_OPEN_ID_URL");
     public static Setting<string> ExternalOpenIdUrl { get; }
         = new("EXTERNAL_OPEN_ID_URL");
     public static Setting<string> InternalOpenIdUrl { get; }
