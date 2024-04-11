@@ -2,7 +2,7 @@
   "SQL_MP_DB_CONNECTION_STRING": "Connection string to 'mssqldb-registry-markpart-<environment>' database.",
 
   "INTERNAL_OPEN_ID_URL": "The OpenId configuration endpoint for internal token. When testing locally, use for example https://localhost:6001/.well-known/openid-configuration",
-  "MITID_EXTERNAL_OPEN_ID_URL": "The MitID configuration endpoint.",
+  "MITID_EXTERNAL_OPEN_ID_URL": "The MitId OpenId configuration endpoint for external Azure token, formatted as https://<tentant-id>.b2clogin.com/<tentant-id>.onmicrosoft.com/<sign-in-user-flow>/v2.0/.well-known/openid-configuration",
   "EXTERNAL_OPEN_ID_URL": "The OpenId configuration endpoint for external Azure token, formatted as https://<tentant-id>.b2clogin.com/<tentant-id>.onmicrosoft.com/<sign-in-user-flow>/v2.0/.well-known/openid-configuration",
   "BACKEND_BFF_APP_ID": "The client id of the 'backend-bff-app' application registration.",
 
