@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Delegations;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -40,13 +42,15 @@ public sealed class CreateProcessDelegationHandlerTests
         // Arrange
         var actorRepo = new Mock<IActorRepository>();
         var processDelegationRepository = new Mock<IProcessDelegationRepository>();
+        var processDelegationHelperService = new Mock<IProcessDelegationHelperService>();
         var target = new CreateProcessDelegationHandler(
             actorRepo.Object,
             processDelegationRepository.Object,
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
-            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object,
+            processDelegationHelperService.Object);
 
         var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
         var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
@@ -84,7 +88,8 @@ public sealed class CreateProcessDelegationHandlerTests
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
-            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object,
+            new Mock<IProcessDelegationHelperService>().Object);
 
         var actorFrom = TestPreparationModels.MockedActor(Guid.NewGuid(), Guid.NewGuid());
         var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
@@ -126,7 +131,8 @@ public sealed class CreateProcessDelegationHandlerTests
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
-            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object,
+            new Mock<IProcessDelegationHelperService>().Object);
 
         var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
         var actorTo = TestPreparationModels.MockedActor(Guid.NewGuid(), Guid.NewGuid());
@@ -168,7 +174,8 @@ public sealed class CreateProcessDelegationHandlerTests
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
-            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object,
+            new Mock<IProcessDelegationHelperService>().Object);
 
         var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
         var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
@@ -207,7 +214,8 @@ public sealed class CreateProcessDelegationHandlerTests
             new Mock<IDomainEventRepository>().Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
-            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object,
+            new Mock<IProcessDelegationHelperService>().Object);
 
         var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
         var actorTo = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());
@@ -248,7 +256,8 @@ public sealed class CreateProcessDelegationHandlerTests
             domainEventRepository.Object,
             UnitOfWorkProviderMock.Create(),
             new Mock<IEntityLock>().Object,
-            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
+            new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object,
+            new Mock<IProcessDelegationHelperService>().Object);
 
         var processDelegationId = new ProcessDelegationId(Guid.NewGuid());
         var actorFrom = TestPreparationModels.MockedActiveActor(Guid.NewGuid(), Guid.NewGuid());

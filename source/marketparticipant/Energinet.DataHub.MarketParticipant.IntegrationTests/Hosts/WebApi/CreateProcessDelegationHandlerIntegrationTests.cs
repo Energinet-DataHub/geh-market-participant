@@ -112,4 +112,104 @@ public sealed class CreateProcessDelegationHandlerIntegrationTests(MarketPartici
         // Assert
         Assert.Equal("process_delegation.grid_area_not_allowed", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
     }
+
+    [Fact]
+    public async Task CreateProcessDelegation_ActorToAlreadyHasDelegations_ThrowsException()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
+        await using var scope = host.BeginScope();
+
+        var allowedGridArea = await fixture.PrepareGridAreaAsync();
+        var allowedGridArea2 = await fixture.PrepareGridAreaAsync();
+        var inputMarketRoles = new MarketRoleEntity
+        {
+            Function = EicFunction.GridAccessProvider,
+            GridAreas = { new MarketRoleGridAreaEntity { GridAreaId = allowedGridArea.Id } }
+        };
+        var inputMarketRoles2 = new MarketRoleEntity
+        {
+            Function = EicFunction.GridAccessProvider,
+            GridAreas = { new MarketRoleGridAreaEntity { GridAreaId = allowedGridArea2.Id } }
+        };
+
+        var actorFrom = await fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActiveActor,
+            inputMarketRoles);
+        var actorFrom2 = await fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActiveActor,
+            inputMarketRoles2);
+
+        var actorTo = await fixture.PrepareActiveActorAsync();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var processDelegationDto = new CreateProcessDelegationsDto(
+            actorFrom.Id,
+            actorTo.Id,
+            [allowedGridArea.Id],
+            [DelegatedProcess.RequestEnergyResults],
+            DateTimeOffset.UtcNow);
+
+        await mediator.Send(new CreateProcessDelegationCommand(processDelegationDto));
+
+        processDelegationDto = processDelegationDto with { DelegatedFrom = actorFrom2.Id, DelegatedTo = actorFrom.Id };
+
+        // Act
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(new CreateProcessDelegationCommand(processDelegationDto)));
+
+        // Assert
+        Assert.Equal("process_delegation.actor_to_already_has_delegations", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
+    }
+
+    [Fact]
+    public async Task CreateProcessDelegation_ActorFromAlreadyHasDelegations_ThrowsException()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
+        await using var scope = host.BeginScope();
+
+        var allowedGridArea = await fixture.PrepareGridAreaAsync();
+        var allowedGridArea2 = await fixture.PrepareGridAreaAsync();
+        var inputMarketRoles = new MarketRoleEntity
+        {
+            Function = EicFunction.GridAccessProvider,
+            GridAreas = { new MarketRoleGridAreaEntity { GridAreaId = allowedGridArea.Id } }
+        };
+        var inputMarketRoles2 = new MarketRoleEntity
+        {
+            Function = EicFunction.GridAccessProvider,
+            GridAreas = { new MarketRoleGridAreaEntity { GridAreaId = allowedGridArea2.Id } }
+        };
+
+        var actorFrom = await fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActiveActor,
+            inputMarketRoles);
+        var actorFrom2 = await fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActiveActor,
+            inputMarketRoles2);
+
+        var actorTo = await fixture.PrepareActiveActorAsync();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var processDelegationDto = new CreateProcessDelegationsDto(
+            actorFrom.Id,
+            actorTo.Id,
+            [allowedGridArea.Id],
+            [DelegatedProcess.RequestEnergyResults],
+            DateTimeOffset.UtcNow);
+
+        await mediator.Send(new CreateProcessDelegationCommand(processDelegationDto));
+
+        processDelegationDto = processDelegationDto with { DelegatedFrom = actorTo.Id, DelegatedTo = actorFrom2.Id };
+
+        // Act
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(new CreateProcessDelegationCommand(processDelegationDto)));
+
+        // Assert
+        Assert.Equal("process_delegation.actor_from_already_has_delegations", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
+    }
 }
