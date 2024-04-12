@@ -17,6 +17,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -36,6 +37,7 @@ public sealed class CreateProcessDelegationHandler : IRequestHandler<CreateProce
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IEntityLock _entityLock;
     private readonly IAllowedMarketRoleCombinationsForDelegationRuleService _allowedMarketRoleCombinationsForDelegationRuleService;
+    private readonly IProcessDelegationHelperService _processDelegationHelperService;
 
     public CreateProcessDelegationHandler(
         IActorRepository actorRepository,
@@ -43,7 +45,8 @@ public sealed class CreateProcessDelegationHandler : IRequestHandler<CreateProce
         IDomainEventRepository domainEventRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IEntityLock entityLock,
-        IAllowedMarketRoleCombinationsForDelegationRuleService allowedMarketRoleCombinationsForDelegationRuleService)
+        IAllowedMarketRoleCombinationsForDelegationRuleService allowedMarketRoleCombinationsForDelegationRuleService,
+        IProcessDelegationHelperService processDelegationHelperService)
     {
         _actorRepository = actorRepository;
         _processDelegationRepository = processDelegationRepository;
@@ -51,6 +54,7 @@ public sealed class CreateProcessDelegationHandler : IRequestHandler<CreateProce
         _unitOfWorkProvider = unitOfWorkProvider;
         _entityLock = entityLock;
         _allowedMarketRoleCombinationsForDelegationRuleService = allowedMarketRoleCombinationsForDelegationRuleService;
+        _processDelegationHelperService = processDelegationHelperService;
     }
 
     public async Task Handle(CreateProcessDelegationCommand request, CancellationToken cancellationToken)
@@ -83,6 +87,14 @@ public sealed class CreateProcessDelegationHandler : IRequestHandler<CreateProce
         {
             await _entityLock
                 .LockAsync(LockableEntity.Actor)
+                .ConfigureAwait(false);
+
+            await _processDelegationHelperService
+                .VerifyValidActorsForProcessDelegationAsync(
+                    actor,
+                    actorDelegatedTo,
+                    request.CreateDelegation.DelegatedProcesses,
+                    request.CreateDelegation.GridAreas)
                 .ConfigureAwait(false);
 
             foreach (var process in request.CreateDelegation.DelegatedProcesses)
