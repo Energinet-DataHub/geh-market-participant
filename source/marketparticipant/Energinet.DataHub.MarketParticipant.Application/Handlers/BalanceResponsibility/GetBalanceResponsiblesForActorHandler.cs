@@ -50,15 +50,15 @@ public sealed class GetBalanceResponsibilityAgreementsHandler : IRequestHandler<
 
         if (actor.MarketRoles.Any(mr => mr.Function == EicFunction.EnergySupplier))
         {
-            var brpAgreements = await _balanceResponsibilityAgreementsRepository
+            var contractors = await _balanceResponsibilityAgreementsRepository
                 .GetForEnergySupplierAsync(actor.Id)
                 .ConfigureAwait(false);
 
-            return new GetBalanceResponsibilityAgreementsResponse(brpAgreements
+            return new GetBalanceResponsibilityAgreementsResponse(contractors
                 .SelectMany(agreements => agreements
                     .Agreements
-                    .Where(r => r.EnergySupplier == actor.Id)
-                    .Select(r => Map(agreements.BalanceResponsibleParty, r))));
+                    .Where(agreement => agreement.EnergySupplier == actor.Id)
+                    .Select(agreement => Map(agreements.BalanceResponsibleParty, agreement))));
         }
 
         if (actor.MarketRoles.Any(mr => mr.Function == EicFunction.BalanceResponsibleParty))
@@ -69,7 +69,7 @@ public sealed class GetBalanceResponsibilityAgreementsHandler : IRequestHandler<
 
             return new GetBalanceResponsibilityAgreementsResponse(agreements
                 .Agreements
-                .Select(r => Map(agreements.BalanceResponsibleParty, r)));
+                .Select(agreement => Map(agreements.BalanceResponsibleParty, agreement)));
         }
 
         throw new ValidationException("The specified actor does not support balance responsibility agreements.")
