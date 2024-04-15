@@ -50,6 +50,8 @@ public sealed class BalanceResponsiblePartiesChangedEventHandler(
 
             await BuildAndSendEmailAsync(balanceResponsibilityRequest)
                 .ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
         }
     }
 
