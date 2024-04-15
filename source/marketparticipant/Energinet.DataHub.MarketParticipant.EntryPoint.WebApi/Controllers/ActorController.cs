@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsible;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -245,5 +246,21 @@ public class ActorController : ControllerBase
             .ConfigureAwait(false);
 
         return Ok();
+    }
+
+    [HttpGet("{actorId:guid}/BalanceResponsibles")]
+    [AuthorizeUser(PermissionId.ActorsManage)]
+    public async Task<ActionResult<GetBalanceResponsiblesForActorResponse>> GetBalanceResponsiblesForActorAsync(Guid actorId)
+    {
+        ArgumentNullException.ThrowIfNull(actorId);
+
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
+
+        var result = await _mediator
+            .Send(new GetBalanceResponsiblesForActorCommand(actorId))
+            .ConfigureAwait(false);
+
+        return Ok(result);
     }
 }
