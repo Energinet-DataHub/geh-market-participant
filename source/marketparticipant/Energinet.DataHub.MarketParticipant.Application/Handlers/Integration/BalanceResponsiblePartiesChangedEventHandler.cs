@@ -14,42 +14,69 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using NodaTime.Serialization.Protobuf;
+using MeteringPointType = Energinet.DataHub.MarketParticipant.Application.Contracts.MeteringPointType;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 
 #pragma warning disable CA1711
 public sealed class BalanceResponsiblePartiesChangedEventHandler(
 #pragma warning restore CA1711
+    IBalanceResponsibilityRequestRepository balanceResponsibilityRequestRepository,
     IEmailEventRepository emailEventRepository,
+    IUnitOfWorkProvider unitOfWorkProvider,
     EmailRecipientConfig emailRecipientConfig)
     : IBalanceResponsiblePartiesChangedEventHandler
 {
-    public Task HandleAsync(Contracts.BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
+    public async Task HandleAsync(Contracts.BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
     {
         ArgumentNullException.ThrowIfNull(balanceResponsiblePartiesChanged);
-        return BuildAndSendEmailAsync(Map(balanceResponsiblePartiesChanged));
+
+        var uow = await unitOfWorkProvider
+            .NewUnitOfWorkAsync()
+            .ConfigureAwait(false);
+
+        await using (uow.ConfigureAwait(false))
+        {
+            var balanceResponsibilityRequest = Map(balanceResponsiblePartiesChanged);
+
+            await balanceResponsibilityRequestRepository
+                .EnqueueAsync(balanceResponsibilityRequest)
+                .ConfigureAwait(false);
+
+            await BuildAndSendEmailAsync(balanceResponsibilityRequest)
+                .ConfigureAwait(false);
+        }
     }
 
-    private static BalanceResponsiblePartiesChanged Map(Contracts.BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
+    private static BalanceResponsibilityRequest Map(Contracts.BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
     {
-        return new BalanceResponsiblePartiesChanged(
+        var meteringPointType = balanceResponsiblePartiesChanged.MeteringPointType switch
+        {
+            MeteringPointType.Mgaexchange => Domain.Model.MeteringPointType.E20Exchange,
+            MeteringPointType.Production => Domain.Model.MeteringPointType.E18Production,
+            MeteringPointType.Consumption => Domain.Model.MeteringPointType.E17Consumption,
+            _ => throw new InvalidOperationException("Unexpected MeteringPointType in BalanceResponsiblePartiesChanged event.")
+        };
+
+        return new BalanceResponsibilityRequest(
             ActorNumber.Create(balanceResponsiblePartiesChanged.EnergySupplierId),
             ActorNumber.Create(balanceResponsiblePartiesChanged.BalanceResponsibleId),
             new GridAreaCode(balanceResponsiblePartiesChanged.GridAreaCode),
-            balanceResponsiblePartiesChanged.Received.ToInstant(),
+            meteringPointType,
             balanceResponsiblePartiesChanged.ValidFrom.ToInstant(),
             balanceResponsiblePartiesChanged.ValidTo?.ToInstant());
     }
 
-    private Task BuildAndSendEmailAsync(BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
+    private Task BuildAndSendEmailAsync(BalanceResponsibilityRequest balanceResponsibilityRequest)
     {
         return emailEventRepository.InsertAsync(
             new EmailEvent(
                 new EmailAddress(emailRecipientConfig.BalanceResponsibleChangedNotificationToEmail),
-                new BalanceResponsiblePartiesChangedEmailTemplate(balanceResponsiblePartiesChanged)));
+                new BalanceResponsiblePartiesChangedEmailTemplate(balanceResponsibilityRequest)));
     }
 }

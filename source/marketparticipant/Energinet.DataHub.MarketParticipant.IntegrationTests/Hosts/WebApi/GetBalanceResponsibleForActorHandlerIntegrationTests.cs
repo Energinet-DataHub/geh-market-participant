@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsible;
+using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -25,22 +27,27 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class GetBalanceResponsibleForActorHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
+public sealed class GetBalanceResponsibilityAgreementsHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
 {
     [Fact]
-    public async Task GetBalanceResponsibleForActor_InitTest()
+    public async Task GetBalanceResponsibility_NoAgreements_ReturnsEmptyList()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var actor = await fixture.PrepareActiveActorAsync();
+        var actor = await fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor,
+            new MarketRoleEntity { Function = EicFunction.EnergySupplier });
 
-        var createCommand = new GetBalanceResponsiblesForActorCommand(actor.Id);
+        var createCommand = new GetBalanceResponsibilityAgreementsCommand(actor.Id);
 
-        // Act + Assert
+        // Act
         var response = await mediator.Send(createCommand);
+
+        // Assert
         Assert.NotNull(response);
-        Assert.Empty(response.BalanceResponsibles);
+        Assert.Empty(response.Agreements);
     }
 }
