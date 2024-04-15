@@ -148,5 +148,11 @@ public static class KnownPermissions
         {
             EicFunction.DataHubAdministrator
         }),
+        new(PermissionId.BalanceResponsibilityView, "balance-responsibility:view", InstantPattern.ExtendedIso.Parse("2024-04-15T00:00:00Z").Value, new[]
+        {
+            EicFunction.DataHubAdministrator,
+            EicFunction.EnergySupplier,
+            EicFunction.BalanceResponsibleParty
+        }),
     };
 }

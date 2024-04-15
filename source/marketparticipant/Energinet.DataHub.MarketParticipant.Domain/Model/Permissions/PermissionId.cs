@@ -31,4 +31,5 @@ public enum PermissionId
     DelegationView = 15,
     DelegationManage = 16,
     UsersReActivate = 17,
+    BalanceResponsibilityView = 18,
 }

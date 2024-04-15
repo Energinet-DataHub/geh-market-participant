@@ -39,7 +39,7 @@ public class BalanceResponsibilityAgreementsController : ControllerBase
     }
 
     [HttpGet("{actorId:guid}")]
-    [AuthorizeUser(PermissionId.ActorsManage)]
+    [AuthorizeUser(PermissionId.BalanceResponsibilityView)]
     public async Task<ActionResult<IEnumerable<BalanceResponsibilityAgreementDto>>> GetBalanceResponsibilityAgreementsAsync(Guid actorId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
