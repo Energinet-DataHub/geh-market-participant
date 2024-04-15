@@ -55,10 +55,10 @@ public sealed class GetBalanceResponsibilityAgreementsHandler : IRequestHandler<
                 .ConfigureAwait(false);
 
             return new GetBalanceResponsibilityAgreementsResponse(contractors
-                .SelectMany(agreements => agreements
+                .SelectMany(contractor => contractor
                     .Agreements
                     .Where(agreement => agreement.EnergySupplier == actor.Id)
-                    .Select(agreement => Map(agreements.BalanceResponsibleParty, agreement))));
+                    .Select(agreement => Map(contractor.BalanceResponsibleParty, agreement))));
         }
 
         if (actor.MarketRoles.Any(mr => mr.Function == EicFunction.BalanceResponsibleParty))
