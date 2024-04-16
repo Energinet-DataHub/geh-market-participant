@@ -15,12 +15,13 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using FluentValidation;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
 public sealed class CreateProcessDelegationCommandRuleSet : AbstractValidator<CreateProcessDelegationCommand>
 {
-    public CreateProcessDelegationCommandRuleSet()
+    public CreateProcessDelegationCommandRuleSet(IClock clock)
     {
         RuleFor(command => command.CreateDelegation)
             .NotNull()
@@ -53,7 +54,12 @@ public sealed class CreateProcessDelegationCommandRuleSet : AbstractValidator<Cr
 
                 validator
                     .RuleFor(delegation => delegation.StartsAt)
-                    .GreaterThanOrEqualTo(_ => DateTimeOffset.UtcNow.Date);
+                    .GreaterThanOrEqualTo(_ => clock
+                        .GetCurrentInstant()
+                        .InZone(Domain.Model.TimeZone.Dk)
+                        .Date
+                        .AtStartOfDayInZone(Domain.Model.TimeZone.Dk)
+                        .ToDateTimeOffset());
             });
     }
 }

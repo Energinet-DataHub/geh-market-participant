@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Xunit;
 using Xunit.Categories;
@@ -32,7 +33,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
         // Arrange
         const string propertyName = nameof(CreateProcessDelegationCommand.CreateDelegation);
 
-        var target = new CreateProcessDelegationCommandRuleSet();
+        var target = new CreateProcessDelegationCommandRuleSet(new Clock());
         var command = new CreateProcessDelegationCommand(null!);
 
         // Act
@@ -59,7 +60,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
             messageTypeList,
             DateTimeOffset.UtcNow);
 
-        var target = new CreateProcessDelegationCommandRuleSet();
+        var target = new CreateProcessDelegationCommandRuleSet(new Clock());
         var command = new CreateProcessDelegationCommand(delegationDto);
 
         // Act
@@ -94,7 +95,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
             messageTypeList,
             DateTimeOffset.UtcNow);
 
-        var target = new CreateProcessDelegationCommandRuleSet();
+        var target = new CreateProcessDelegationCommandRuleSet(new Clock());
         var command = new CreateProcessDelegationCommand(delegationDto);
 
         // Act
@@ -131,7 +132,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
             messageTypeList,
             DateTimeOffset.UtcNow);
 
-        var target = new CreateProcessDelegationCommandRuleSet();
+        var target = new CreateProcessDelegationCommandRuleSet(new Clock());
         var command = new CreateProcessDelegationCommand(delegationDto);
 
         // Act
@@ -167,7 +168,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
             messageTypeList,
             DateTimeOffset.UtcNow);
 
-        var target = new CreateProcessDelegationCommandRuleSet();
+        var target = new CreateProcessDelegationCommandRuleSet(new Clock());
         var command = new CreateProcessDelegationCommand(delegationDto);
 
         // Act
@@ -189,12 +190,16 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
     [Fact]
     public async Task Validate_StartsAt_ValidatesProperty()
     {
-        var dateTimeOffset = DateTimeOffset.UtcNow.Date;
+        var todayInDk = Clock.Instance.GetCurrentInstant().InZone(Domain.Model.TimeZone.Dk).Date;
+        var todayInUtc = todayInDk.AtStartOfDayInZone(Domain.Model.TimeZone.Dk).ToDateTimeOffset();
+
+        var dateTimeOffset = (DateTimeOffset)DateTime.UtcNow.Date;
         var cases = new[]
         {
             new { Time = dateTimeOffset, IsValid = true },
+            new { Time = todayInUtc, IsValid = true },
             new { Time = dateTimeOffset.AddDays(5), IsValid = true },
-            new { Time = dateTimeOffset.AddDays(-1), IsValid = false },
+            new { Time = dateTimeOffset.AddDays(-1), IsValid = false }
         };
 
         foreach (var testCase in cases)
@@ -210,7 +215,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
                 messageTypeList,
                 testCase.Time);
 
-            var target = new CreateProcessDelegationCommandRuleSet();
+            var target = new CreateProcessDelegationCommandRuleSet(new Clock());
             var command = new CreateProcessDelegationCommand(delegationDto);
 
             // Act

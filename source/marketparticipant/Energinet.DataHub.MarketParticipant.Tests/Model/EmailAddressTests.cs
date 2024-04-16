@@ -14,6 +14,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Google.Protobuf.WellKnownTypes;
 using Xunit;
 using Xunit.Categories;
 
@@ -66,5 +67,17 @@ public sealed class EmailAddressTests
 
         // Act + Assert
         Assert.Equal(value, new EmailAddress(value).Address);
+    }
+
+    [Theory]
+    [InlineData("a@a.dk", "b@a.dk", false)]
+    [InlineData("a@a.dk", "a@a.dk", true)]
+    [InlineData("a@ab.dk", "a@ac.dk", false)]
+    [InlineData("A@ab.dk", "a@ab.dk", true)]
+    [InlineData("a@ab.dk", "A@ab.dk", true)]
+    [InlineData("a@aB.dk", "A@aB.dk", true)]
+    public void Equals_DifferentStrings_AreCompared(string a, string b, bool isEqual)
+    {
+        Assert.Equal(isEqual, new EmailAddress(a) == new EmailAddress(b));
     }
 }
