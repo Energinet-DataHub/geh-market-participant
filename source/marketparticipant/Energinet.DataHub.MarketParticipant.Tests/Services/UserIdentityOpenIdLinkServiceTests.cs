@@ -181,7 +181,7 @@ public sealed class UserIdentityOpenIdLinkServiceTests
     }
 
     [Fact]
-    public async Task UnlinkOpenIdAsync_OpenIdSetupExpired_Throws()
+    public async Task UnlinkOpenIdAsync_UserLinked_NoLongerHasOpenId()
     {
         // Arrange
         var externalUserId = new ExternalUserId(Guid.NewGuid());
