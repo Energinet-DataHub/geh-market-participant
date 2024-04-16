@@ -12,24 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using NodaTime;
 
-public enum PermissionId
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record BalanceResponsibilityAgreement(ActorId EnergySupplier, GridAreaId GridArea, MeteringPointType MeteringPointType, Instant ValidFrom)
 {
-    GridAreasManage = 3,
-    ActorsManage = 4,
-    UsersManage = 5,
-    UsersView = 6,
-    UserRolesManage = 7,
-    ImbalancePricesManage = 8,
-    CalculationsManage = 9,
-    SettlementReportsManage = 10,
-    ESettExchangeManage = 11,
-    RequestAggregatedMeasureData = 12,
-    ActorCredentialsManage = 13,
-    ActorMasterDataManage = 14,
-    DelegationView = 15,
-    DelegationManage = 16,
-    UsersReActivate = 17,
-    BalanceResponsibilityView = 18,
+    public BalanceResponsibilityAgreement(
+        ActorId energySupplier,
+        GridAreaId gridArea,
+        MeteringPointType meteringPointType,
+        Instant validFrom,
+        Instant? validTo)
+            : this(energySupplier, gridArea, meteringPointType, validFrom)
+    {
+        ValidTo = validTo;
+    }
+
+    public Instant? ValidTo { get; init; }
 }

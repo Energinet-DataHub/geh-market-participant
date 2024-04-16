@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsible;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed record GetBalanceResponsiblesForActorCommand(Guid ActorId) : IRequest<GetBalanceResponsiblesForActorResponse>;
+public sealed class GetBalanceResponsibilityAgreementsCommandRuleSet : AbstractValidator<GetBalanceResponsibilityAgreementsCommand>
+{
+    public GetBalanceResponsibilityAgreementsCommandRuleSet()
+    {
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
+    }
+}
