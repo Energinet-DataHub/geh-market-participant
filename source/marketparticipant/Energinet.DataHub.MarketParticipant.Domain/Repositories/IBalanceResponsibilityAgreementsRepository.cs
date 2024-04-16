@@ -12,24 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public enum PermissionId
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+public interface IBalanceResponsibilityAgreementsRepository
 {
-    GridAreasManage = 3,
-    ActorsManage = 4,
-    UsersManage = 5,
-    UsersView = 6,
-    UserRolesManage = 7,
-    ImbalancePricesManage = 8,
-    CalculationsManage = 9,
-    SettlementReportsManage = 10,
-    ESettExchangeManage = 11,
-    RequestAggregatedMeasureData = 12,
-    ActorCredentialsManage = 13,
-    ActorMasterDataManage = 14,
-    DelegationView = 15,
-    DelegationManage = 16,
-    UsersReActivate = 17,
-    BalanceResponsibilityView = 18,
+    Task<BalanceResponsibilityContractor> GetForBalanceResponsiblePartyAsync(ActorId balanceResponsibleParty);
+    Task<IEnumerable<BalanceResponsibilityContractor>> GetForEnergySupplierAsync(ActorId energySupplier);
 }

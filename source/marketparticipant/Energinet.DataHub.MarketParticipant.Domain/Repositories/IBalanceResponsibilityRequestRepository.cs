@@ -12,8 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsible;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-public sealed record GetBalanceResponsiblesForActorResponse(IEnumerable<BalanceResponsibleDto> BalanceResponsibles);
+public interface IBalanceResponsibilityRequestRepository
+{
+    Task EnqueueAsync(BalanceResponsibilityRequest balanceResponsibilityRequest);
+    Task<BalanceResponsibilityRequest?> DequeueRequestAsync(ActorId affectedActorId);
+}

@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
-using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsible;
+using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
@@ -105,7 +105,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<CreateProcessDelegationCommand>, CreateProcessDelegationCommandRuleSet>();
         services.AddScoped<IValidator<StopProcessDelegationCommand>, StopProcessDelegationCommandRuleSet>();
         services.AddScoped<IValidator<ReActivateUserCommand>, ReActivateUserCommandRuleSet>();
-        services.AddScoped<IValidator<GetBalanceResponsiblesForActorCommand>, GetBalanceResponsiblesForActorCommandRuleSet>();
+        services.AddScoped<IValidator<GetBalanceResponsibilityAgreementsCommand>, GetBalanceResponsibilityAgreementsCommandRuleSet>();
 
         services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
         services.AddScoped<IActorClientSecretService, ActorClientSecretService>();

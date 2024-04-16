@@ -12,15 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsible;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 
-public sealed record BalanceResponsibleDto(
-    Guid EnergySupplierId,
-    Guid BalanceResponsibleId,
-    string GridAreaCode,
-    int MeteringPointType,
-    DateTimeOffset Received,
-    DateTimeOffset ValidFrom,
-    DateTimeOffset ValidTo);
+public sealed record GetBalanceResponsibilityAgreementsResponse(IEnumerable<BalanceResponsibilityAgreementDto> Agreements);
