@@ -257,6 +257,8 @@ public sealed class TokenPartsControllerIntegrationTests :
         using var client = CreateClient();
 
         using var response = await client.PostAsync(new Uri(target, UriKind.Relative), httpContent);
+        response.EnsureSuccessStatusCode();
+
         var responseJson = await response.Content.ReadAsStringAsync();
 
         var internalTokenJson = JsonSerializer.Deserialize<TokenResponse>(
