@@ -189,6 +189,18 @@ public class UserController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("reset-mitid")]
+    public async Task<ActionResult> ResetMitIdAsync()
+    {
+        var command = new ResetMitIdCommand(_userContext.CurrentUser.UserId);
+
+        await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok();
+    }
+
     [HttpPut("{userId:guid}/deactivate")]
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<ActionResult> DeactivateAsync(Guid userId)

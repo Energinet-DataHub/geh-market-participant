@@ -85,6 +85,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<DeactivateUserRoleCommand>, DeactivateUserRoleCommandRuleSet>();
         services.AddScoped<IValidator<UpdateUserIdentityCommand>, UpdateUserIdentityCommandRuleSet>();
         services.AddScoped<IValidator<InitiateMitIdSignupCommand>, InitiateMitIdSignupCommandRuleSet>();
+        services.AddScoped<IValidator<ResetMitIdCommand>, ResetMitIdCommandRuleSet>();
         services.AddScoped<IValidator<DeactivateUserCommand>, DeactivateUserCommandRuleSet>();
         services.AddScoped<IValidator<UserInvitationExpiredCommand>, UserInvitationExpiredCommandRuleSet>();
         services.AddScoped<IValidator<GetAuditIdentityCommand>, GetAuditIdentityCommandRuleSet>();

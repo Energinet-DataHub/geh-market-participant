@@ -180,6 +180,29 @@ public sealed class UserIdentityOpenIdLinkServiceTests
         userRepository.Verify(e => e.GetAsync(userToReturnFromService.Id));
     }
 
+    [Fact]
+    public async Task UnlinkOpenIdAsync_OpenIdSetupExpired_Throws()
+    {
+        // Arrange
+        var externalUserId = new ExternalUserId(Guid.NewGuid());
+        var email = new RandomlyGeneratedEmailAddress();
+        var userIdentity = GetUserIdentity(externalUserId, email, "federated");
+
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        var userRepository = new Mock<IUserRepository>();
+
+        var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
+            userRepository.Object,
+            userIdentityRepository.Object);
+
+        // Act
+        await userIdentityOpenIdLinkService.UnlinkOpenIdAsync(userIdentity);
+
+        // Assert
+        Assert.Empty(userIdentity.LoginIdentities);
+        userIdentityRepository.Verify(repo => repo.AssignUserLoginIdentitiesAsync(userIdentity), Times.Once);
+    }
+
     private static UserIdentity GetUserIdentity(ExternalUserId externalUserId, RandomlyGeneratedEmailAddress email, string signInType)
     {
         return new UserIdentity(
@@ -191,7 +214,7 @@ public sealed class UserIdentityOpenIdLinkServiceTests
             null,
             DateTime.UtcNow,
             AuthenticationMethod.Undetermined,
-            new List<LoginIdentity>() { new(signInType, "issuer", "issuerAssignedId") });
+            [new LoginIdentity(signInType, "issuer", "issuerAssignedId")]);
     }
 
     private static User GetUser(ExternalUserId externalUserId, DateTimeOffset mitIdInitiatedAt)
