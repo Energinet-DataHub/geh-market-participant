@@ -33,7 +33,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
         // Arrange
         const string propertyName = nameof(CreateProcessDelegationCommand.CreateDelegation);
 
-        var target = new CreateProcessDelegationCommandRuleSet(new Clock());
+        var target = new CreateProcessDelegationCommandRuleSet();
         var command = new CreateProcessDelegationCommand(null!);
 
         // Act
@@ -60,7 +60,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
             messageTypeList,
             DateTimeOffset.UtcNow);
 
-        var target = new CreateProcessDelegationCommandRuleSet(new Clock());
+        var target = new CreateProcessDelegationCommandRuleSet();
         var command = new CreateProcessDelegationCommand(delegationDto);
 
         // Act
@@ -95,7 +95,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
             messageTypeList,
             DateTimeOffset.UtcNow);
 
-        var target = new CreateProcessDelegationCommandRuleSet(new Clock());
+        var target = new CreateProcessDelegationCommandRuleSet();
         var command = new CreateProcessDelegationCommand(delegationDto);
 
         // Act
@@ -132,7 +132,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
             messageTypeList,
             DateTimeOffset.UtcNow);
 
-        var target = new CreateProcessDelegationCommandRuleSet(new Clock());
+        var target = new CreateProcessDelegationCommandRuleSet();
         var command = new CreateProcessDelegationCommand(delegationDto);
 
         // Act
@@ -168,7 +168,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
             messageTypeList,
             DateTimeOffset.UtcNow);
 
-        var target = new CreateProcessDelegationCommandRuleSet(new Clock());
+        var target = new CreateProcessDelegationCommandRuleSet();
         var command = new CreateProcessDelegationCommand(delegationDto);
 
         // Act
@@ -193,13 +193,11 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
         var todayInDk = Clock.Instance.GetCurrentInstant().InZone(Domain.Model.TimeZone.Dk).Date;
         var todayInUtc = todayInDk.AtStartOfDayInZone(Domain.Model.TimeZone.Dk).ToDateTimeOffset();
 
-        var dateTimeOffset = (DateTimeOffset)DateTime.UtcNow.Date;
         var cases = new[]
         {
-            new { Time = dateTimeOffset, IsValid = true },
             new { Time = todayInUtc, IsValid = true },
-            new { Time = dateTimeOffset.AddDays(5), IsValid = true },
-            new { Time = dateTimeOffset.AddDays(-1), IsValid = false }
+            new { Time = todayInUtc.AddDays(5), IsValid = true },
+            new { Time = todayInUtc.AddDays(-1), IsValid = false }
         };
 
         foreach (var testCase in cases)
@@ -215,7 +213,7 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
                 messageTypeList,
                 testCase.Time);
 
-            var target = new CreateProcessDelegationCommandRuleSet(new Clock());
+            var target = new CreateProcessDelegationCommandRuleSet();
             var command = new CreateProcessDelegationCommand(delegationDto);
 
             // Act
