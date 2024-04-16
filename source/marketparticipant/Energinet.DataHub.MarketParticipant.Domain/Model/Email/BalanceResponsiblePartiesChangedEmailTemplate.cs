@@ -19,8 +19,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 
 public sealed class BalanceResponsiblePartiesChangedEmailTemplate : EmailTemplate
 {
-    public BalanceResponsiblePartiesChangedEmailTemplate(BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
-        : base(EmailTemplateId.BalanceResponsiblePartiesChanged, PrepareParameters(balanceResponsiblePartiesChanged))
+    public BalanceResponsiblePartiesChangedEmailTemplate(BalanceResponsibilityRequest balanceResponsibilityRequest)
+        : base(EmailTemplateId.BalanceResponsiblePartiesChanged, PrepareParameters(balanceResponsibilityRequest))
     {
     }
 
@@ -29,17 +29,17 @@ public sealed class BalanceResponsiblePartiesChangedEmailTemplate : EmailTemplat
     {
     }
 
-    private static Dictionary<string, string> PrepareParameters(BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
+    private static Dictionary<string, string> PrepareParameters(BalanceResponsibilityRequest balanceResponsibilityRequest)
     {
-        ArgumentNullException.ThrowIfNull(balanceResponsiblePartiesChanged);
+        ArgumentNullException.ThrowIfNull(balanceResponsibilityRequest);
 
         return new Dictionary<string, string>
         {
-            { "actor_balance_responsible", balanceResponsiblePartiesChanged.BalanceResponsibleParty.Value },
-            { "actor_supplier", balanceResponsiblePartiesChanged.ElectricalSupplier.Value },
-            { "grid_area_code", balanceResponsiblePartiesChanged.GridAreaCode.Value },
-            { "valid_from", balanceResponsiblePartiesChanged.ValidFrom.ToDateTimeOffset().ToString("u") },
-            { "valid_to", balanceResponsiblePartiesChanged.ValidTo?.ToDateTimeOffset().ToString("u") ?? string.Empty },
+            { "actor_balance_responsible", balanceResponsibilityRequest.BalanceResponsibleParty.Value },
+            { "actor_supplier", balanceResponsibilityRequest.EnergySupplier.Value },
+            { "grid_area_code", balanceResponsibilityRequest.GridAreaCode.Value },
+            { "valid_from", balanceResponsibilityRequest.ValidFrom.ToDateTimeOffset().ToString("u") },
+            { "valid_to", balanceResponsibilityRequest.ValidTo?.ToDateTimeOffset().ToString("u") ?? string.Empty },
         };
     }
 }

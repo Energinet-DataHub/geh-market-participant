@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public sealed class BalanceResponsiblePartiesChanged(
-    ActorNumber electricalSupplier,
-    ActorNumber balanceResponsibleParty,
-    GridAreaCode gridAreaCode,
-    Instant received,
-    Instant validFrom,
-    Instant? validTo)
+public sealed class BalanceResponsibilityContractor
 {
-    public ActorNumber ElectricalSupplier { get; } = electricalSupplier;
-    public ActorNumber BalanceResponsibleParty { get; } = balanceResponsibleParty;
-    public GridAreaCode GridAreaCode { get; } = gridAreaCode;
-    public Instant Received { get; } = received;
-    public Instant ValidFrom { get; } = validFrom;
-    public Instant? ValidTo { get; } = validTo;
+    private readonly List<BalanceResponsibilityAgreement> _agreements = [];
+
+    public BalanceResponsibilityContractor(
+        ActorId balanceResponsibleParty,
+        IEnumerable<BalanceResponsibilityAgreement> agreements)
+    {
+        BalanceResponsibleParty = balanceResponsibleParty;
+        _agreements.AddRange(agreements);
+    }
+
+    public ActorId BalanceResponsibleParty { get; }
+    public IReadOnlyCollection<BalanceResponsibilityAgreement> Agreements => _agreements;
 }
