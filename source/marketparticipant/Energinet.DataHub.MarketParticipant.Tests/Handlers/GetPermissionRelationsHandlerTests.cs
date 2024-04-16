@@ -86,7 +86,7 @@ public class GetPermissionRelationsHandlerTests
         }
 
         Assert.Equal("PermissionName;MarketRole;UserRole", header);
-        Assert.Equal(30, lines.Count);
+        Assert.Equal(31, lines.Count);
 
         var filteredLines = lines.Where(e =>
             !e.Contains("GridAccessProvider", StringComparison.InvariantCulture) &&
