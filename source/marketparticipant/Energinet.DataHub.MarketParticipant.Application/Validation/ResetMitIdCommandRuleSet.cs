@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public interface IUserIdentityOpenIdLinkService
+public sealed class ResetMitIdCommandRuleSet : AbstractValidator<ResetMitIdCommand>
 {
-    Task<UserIdentity> ValidateAndSetupOpenIdAsync(ExternalUserId requestExternalUserId);
-    Task UnlinkOpenIdAsync(UserIdentity userIdentity);
+    public ResetMitIdCommandRuleSet()
+    {
+        RuleFor(command => command.UserId)
+            .NotEmpty();
+    }
 }

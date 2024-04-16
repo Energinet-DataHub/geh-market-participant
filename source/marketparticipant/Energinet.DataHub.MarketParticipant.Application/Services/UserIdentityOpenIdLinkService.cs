@@ -75,6 +75,17 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
         return userIdentityInvitedOnEmail;
     }
 
+    public async Task UnlinkOpenIdAsync(UserIdentity userIdentity)
+    {
+        ArgumentNullException.ThrowIfNull(userIdentity);
+
+        userIdentity.UnlinkOpenId();
+
+        await _userIdentityRepository
+            .AssignUserLoginIdentitiesAsync(userIdentity)
+            .ConfigureAwait(false);
+    }
+
     private Task DeleteOpenIdUserAsync(ExternalUserId externalUserId)
     {
         return _userIdentityRepository.DeleteAsync(externalUserId);
