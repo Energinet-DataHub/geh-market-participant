@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 
-public interface IUserIdentityOpenIdLinkService
-{
-    Task<UserIdentity> ValidateAndSetupOpenIdAsync(ExternalUserId requestExternalUserId);
-    Task UnlinkOpenIdAsync(UserIdentity userIdentity);
-}
+public sealed record ResetMitIdCommand(Guid UserId) : IRequest;

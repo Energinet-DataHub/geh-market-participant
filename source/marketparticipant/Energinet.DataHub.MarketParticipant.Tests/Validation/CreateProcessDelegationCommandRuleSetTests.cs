@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Xunit;
 using Xunit.Categories;
@@ -189,12 +190,14 @@ public sealed class CreateProcessDelegationCommandRuleSetTests
     [Fact]
     public async Task Validate_StartsAt_ValidatesProperty()
     {
-        var dateTimeOffset = DateTimeOffset.UtcNow.Date;
+        var todayInDk = Clock.Instance.GetCurrentInstant().InZone(Domain.Model.TimeZone.Dk).Date;
+        var todayInUtc = todayInDk.AtStartOfDayInZone(Domain.Model.TimeZone.Dk).ToDateTimeOffset();
+
         var cases = new[]
         {
-            new { Time = dateTimeOffset, IsValid = true },
-            new { Time = dateTimeOffset.AddDays(5), IsValid = true },
-            new { Time = dateTimeOffset.AddDays(-1), IsValid = false },
+            new { Time = todayInUtc, IsValid = true },
+            new { Time = todayInUtc.AddDays(5), IsValid = true },
+            new { Time = todayInUtc.AddDays(-1), IsValid = false }
         };
 
         foreach (var testCase in cases)
