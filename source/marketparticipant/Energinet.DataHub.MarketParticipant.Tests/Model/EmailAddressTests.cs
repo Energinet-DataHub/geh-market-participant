@@ -14,7 +14,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Google.Protobuf.WellKnownTypes;
 using Xunit;
 using Xunit.Categories;
 
