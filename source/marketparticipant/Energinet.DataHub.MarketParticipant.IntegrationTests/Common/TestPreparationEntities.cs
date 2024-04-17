@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
 internal static class TestPreparationEntities
 {
-    private static int _gridAreaCount = 0;
+    private static int _gridAreaCount;
 
     public static OrganizationEntity ValidOrganization => new()
     {

@@ -207,4 +207,57 @@ public sealed class GetBalanceResponsibilityAgreementsHandlerIntegrationTests(Ma
             agreement.ValidFrom == balanceResponsibilityRequestA.ValidFrom.ToDateTimeOffset() &&
             agreement.ValidTo == null);
     }
+
+    [Fact]
+    public async Task GetBalanceResponsibility_ForBrpWithMultipleEnergySuppliers_ReturnsBothEnergySuppliers()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        var gridArea = await fixture.PrepareGridAreaAsync();
+
+        var actorA = await fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor,
+            new MarketRoleEntity { Function = EicFunction.EnergySupplier });
+
+        var actorB = await fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor,
+            new MarketRoleEntity { Function = EicFunction.EnergySupplier });
+
+        var actorC = await fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor,
+            new MarketRoleEntity { Function = EicFunction.BalanceResponsibleParty });
+
+        var balanceResponsibilityRequestA = new BalanceResponsibilityRequest(
+            ActorNumber.Create(actorA.ActorNumber),
+            ActorNumber.Create(actorC.ActorNumber),
+            new GridAreaCode(gridArea.Code),
+            MeteringPointType.E18Production,
+            new DateTime(2020, 1, 1).ToDateTimeOffset().ToInstant(),
+            null);
+
+        var balanceResponsibilityRequestB = new BalanceResponsibilityRequest(
+            ActorNumber.Create(actorB.ActorNumber),
+            ActorNumber.Create(actorC.ActorNumber),
+            new GridAreaCode(gridArea.Code),
+            MeteringPointType.E18Production,
+            new DateTime(2020, 1, 1).ToDateTimeOffset().ToInstant(),
+            null);
+
+        var balanceResponsibilityRequestRepository = scope.ServiceProvider.GetRequiredService<IBalanceResponsibilityRequestRepository>();
+        await balanceResponsibilityRequestRepository.EnqueueAsync(balanceResponsibilityRequestA);
+        await balanceResponsibilityRequestRepository.EnqueueAsync(balanceResponsibilityRequestB);
+
+        var createCommand = new GetBalanceResponsibilityAgreementsCommand(actorC.Id);
+
+        // Act
+        var response = await mediator.Send(createCommand);
+
+        // Assert
+        Assert.Equal(2, response.Agreements.Count());
+    }
 }
