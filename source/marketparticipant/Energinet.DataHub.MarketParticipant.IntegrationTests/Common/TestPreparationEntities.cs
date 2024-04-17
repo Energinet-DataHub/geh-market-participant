@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -23,6 +24,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
 internal static class TestPreparationEntities
 {
+    private static int _gridAreaCount = 0;
+
     public static OrganizationEntity ValidOrganization => new()
     {
         Name = "Test Organization Name",
@@ -100,7 +103,7 @@ internal static class TestPreparationEntities
     public static GridAreaEntity ValidGridArea => new()
     {
         Id = Guid.NewGuid(),
-        Code = "100",
+        Code = (_gridAreaCount++ % 1000).ToString(CultureInfo.InvariantCulture).PadLeft(3, '0'),
         Name = "Test Grid Area Name",
         PriceAreaCode = PriceAreaCode.Dk1,
         ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value
