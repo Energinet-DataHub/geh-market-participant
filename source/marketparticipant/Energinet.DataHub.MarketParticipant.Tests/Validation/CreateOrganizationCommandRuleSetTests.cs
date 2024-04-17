@@ -49,43 +49,20 @@ public sealed class CreateOrganizationCommandRuleSetTests
     [InlineData(null, false)]
     [InlineData("  ", false)]
     [InlineData("Some Name", true)]
-    [InlineData("Maximum looooooooooooooooooooooooooooooooooooooong", true)]
-    [InlineData("Toooooo loooooooooooooooooooooooooooooooooooooooong", false)]
-    public async Task Validate_OrganizationName_ValidatesProperty(string? value, bool isValid)
+    public async Task Validate_OrganizationName_ValidatesPropertyIsSet(string? value, bool isValid)
     {
         // Arrange
-        var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Name)}";
-        const string validCvr = "123";
-        var validAddress = new AddressDto(
-            "test Street",
-            "1",
-            "1111",
-            "Test City",
-            "Test Country");
+        await ValidateNameProperty(value, isValid);
+    }
 
-        var organizationDto = new CreateOrganizationDto(
-            value!,
-            validCvr,
-            validAddress,
-            "energinet.dk");
-
-        var target = new CreateOrganizationCommandRuleSet();
-        var command = new CreateOrganizationCommand(organizationDto);
-
-        // Act
-        var result = await target.ValidateAsync(command);
-
-        // Assert
-        if (isValid)
-        {
-            Assert.True(result.IsValid);
-            Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
-        else
-        {
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
+    [Theory]
+    [InlineData(1, true)]
+    [InlineData(512, true)]
+    [InlineData(513, false)]
+    public async Task Validate_OrganizationName_ValidatesLength(int nameLength, bool isValid)
+    {
+        // Arrange
+        await ValidateNameProperty(string.Join(string.Empty, new int[nameLength].Select(_ => 'a')), isValid);
     }
 
     [Theory]
@@ -314,6 +291,42 @@ public sealed class CreateOrganizationCommandRuleSetTests
                 value,
                 string.Empty,
                 "Denmark"),
+            "energinet.dk");
+
+        var target = new CreateOrganizationCommandRuleSet();
+        var command = new CreateOrganizationCommand(organizationDto);
+
+        // Act
+        var result = await target.ValidateAsync(command);
+
+        // Assert
+        if (isValid)
+        {
+            Assert.True(result.IsValid);
+            Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+        }
+        else
+        {
+            Assert.False(result.IsValid);
+            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+        }
+    }
+
+    private static async Task ValidateNameProperty(string? value, bool isValid)
+    {
+        var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Name)}";
+        const string validCvr = "123";
+        var validAddress = new AddressDto(
+            "test Street",
+            "1",
+            "1111",
+            "Test City",
+            "Test Country");
+
+        var organizationDto = new CreateOrganizationDto(
+            value!,
+            validCvr,
+            validAddress,
             "energinet.dk");
 
         var target = new CreateOrganizationCommandRuleSet();
