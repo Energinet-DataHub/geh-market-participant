@@ -29,7 +29,7 @@ public sealed class CreateOrganizationCommandRuleSet : AbstractValidator<CreateO
                 validator
                     .RuleFor(organization => organization.Name)
                     .NotEmpty()
-                    .Length(1, 50);
+                    .Length(1, 512);
 
                 validator
                     .RuleFor(organization => organization.BusinessRegisterIdentifier)
