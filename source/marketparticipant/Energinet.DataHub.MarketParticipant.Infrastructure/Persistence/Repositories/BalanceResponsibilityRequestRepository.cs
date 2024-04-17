@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -108,13 +110,68 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
             ValidTo = nextBalanceResponsibleRequest.balanceResponsibleRequest.ValidTo
         };
 
-        // Check if copy exists, but what about merge?
-        await _marketParticipantDbContext
-            .BalanceResponsibilityAgreements
-            .AddAsync(nextBalanceResponsibleAgreement)
+        await InsertAndHandleOverlapAsync(nextBalanceResponsibleAgreement).ConfigureAwait(false);
+        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+
+        return true;
+    }
+
+    private async Task InsertAndHandleOverlapAsync(BalanceResponsibilityAgreementEntity entity)
+    {
+        var overlapQuery =
+            from agreement in _marketParticipantDbContext.BalanceResponsibilityAgreements
+            where
+                agreement.EnergySupplierId == entity.EnergySupplierId &&
+                agreement.BalanceResponsiblePartyId == entity.BalanceResponsiblePartyId &&
+                agreement.GridAreaId == entity.GridAreaId &&
+                agreement.MeteringPointType == entity.MeteringPointType &&
+                agreement.ValidFrom < (entity.ValidTo ?? DateTimeOffset.MaxValue) &&
+                entity.ValidFrom < (agreement.ValidTo ?? DateTimeOffset.MaxValue)
+            select agreement;
+
+        var overlappedAgreements = await overlapQuery
+            .ToListAsync()
             .ConfigureAwait(false);
 
-        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-        return true;
+        if (overlappedAgreements.Count > 1)
+        {
+            throw new ValidationException("Cannot process balance responsibility agreement, as the overlap is not supported.")
+                .WithErrorCode("balance_responsibility.unsupported_overlap")
+                .WithArgs(
+                    ("balanceResponsibleParty", entity.BalanceResponsiblePartyId),
+                    ("energySupplier", entity.EnergySupplierId),
+                    ("from", entity.ValidFrom),
+                    ("to", entity.ValidTo ?? DateTimeOffset.MaxValue));
+        }
+
+        if (overlappedAgreements.Count == 1)
+        {
+            var overlap = overlappedAgreements[0];
+
+            var supportedOverlapIdentical = overlap.ValidFrom == entity.ValidFrom && overlap.ValidTo == entity.ValidTo;
+            if (supportedOverlapIdentical)
+                return;
+
+            var supportedOverlapEndDateSet = overlap.ValidFrom == entity.ValidFrom && overlap.ValidTo == null;
+            if (supportedOverlapEndDateSet)
+            {
+                overlap.ValidTo = entity.ValidTo;
+                _marketParticipantDbContext.BalanceResponsibilityAgreements.Update(overlap);
+                return;
+            }
+
+            throw new ValidationException("Cannot process balance responsibility agreement, as the overlap is not supported.")
+                .WithErrorCode("balance_responsibility.unsupported_overlap")
+                .WithArgs(
+                    ("balanceResponsibleParty", entity.BalanceResponsiblePartyId),
+                    ("energySupplier", entity.EnergySupplierId),
+                    ("from", entity.ValidFrom),
+                    ("to", entity.ValidTo ?? DateTimeOffset.MaxValue));
+        }
+
+        await _marketParticipantDbContext
+            .BalanceResponsibilityAgreements
+            .AddAsync(entity)
+            .ConfigureAwait(false);
     }
 }
