@@ -63,12 +63,12 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
 
         while (await DequeueNextAsync(affectedActorId).ConfigureAwait(false) is { } next)
         {
-            await ProcessRequestAsync(next).ConfigureAwait(false);
+            await InsertAndHandleOverlapAsync(next).ConfigureAwait(false);
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 
-    private async Task<ProcessRequest?> DequeueNextAsync(ActorId affectedActorId)
+    private async Task<BalanceResponsibilityAgreementEntity?> DequeueNextAsync(ActorId affectedActorId)
     {
         ArgumentNullException.ThrowIfNull(affectedActorId);
 
@@ -88,35 +88,31 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
                 gridArea.Code
             where energySupplier.Id == affectedActorId.Value || balanceResponsibleParty.Id == affectedActorId.Value
             orderby balanceResponsibleRequest.Id
-            select new ProcessRequest { Request = balanceResponsibleRequest, Supplier = energySupplier.Id, BalanceResponsible = balanceResponsibleParty.Id, GridArea = gridArea.Id, };
+            select new { Request = balanceResponsibleRequest, SupplierId = energySupplier.Id, BalanceResponsibleId = balanceResponsibleParty.Id, GridAreaId = gridArea.Id, };
+
         var nextBalanceResponsibleRequest =
             await balanceResponsibleRequestQuery
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
 
-        if (nextBalanceResponsibleRequest != null)
+        if (nextBalanceResponsibleRequest == null)
         {
-            _marketParticipantDbContext
-                .BalanceResponsibilityRequests
-                .Remove(nextBalanceResponsibleRequest.Request);
+            return null;
         }
 
-        return nextBalanceResponsibleRequest;
-    }
+        _marketParticipantDbContext
+                .BalanceResponsibilityRequests
+                .Remove(nextBalanceResponsibleRequest.Request);
 
-    private async Task ProcessRequestAsync(ProcessRequest nextBalanceResponsibleRequest)
-    {
-        var nextBalanceResponsibleAgreement = new BalanceResponsibilityAgreementEntity
+        return new BalanceResponsibilityAgreementEntity
         {
-            EnergySupplierId = nextBalanceResponsibleRequest.Supplier,
-            BalanceResponsiblePartyId = nextBalanceResponsibleRequest.BalanceResponsible,
-            GridAreaId = nextBalanceResponsibleRequest.GridArea,
+            EnergySupplierId = nextBalanceResponsibleRequest.SupplierId,
+            BalanceResponsiblePartyId = nextBalanceResponsibleRequest.BalanceResponsibleId,
+            GridAreaId = nextBalanceResponsibleRequest.GridAreaId,
             MeteringPointType = nextBalanceResponsibleRequest.Request.MeteringPointType,
             ValidFrom = nextBalanceResponsibleRequest.Request.ValidFrom,
             ValidTo = nextBalanceResponsibleRequest.Request.ValidTo,
         };
-
-        await InsertAndHandleOverlapAsync(nextBalanceResponsibleAgreement).ConfigureAwait(false);
     }
 
     private async Task InsertAndHandleOverlapAsync(BalanceResponsibilityAgreementEntity entity)
@@ -176,13 +172,5 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
             .BalanceResponsibilityAgreements
             .AddAsync(entity)
             .ConfigureAwait(false);
-    }
-
-    private sealed class ProcessRequest
-    {
-        public BalanceResponsibilityRequestEntity Request { get; init; } = null!;
-        public Guid Supplier { get; init; }
-        public Guid BalanceResponsible { get; init; }
-        public Guid GridArea { get; init; }
     }
 }
