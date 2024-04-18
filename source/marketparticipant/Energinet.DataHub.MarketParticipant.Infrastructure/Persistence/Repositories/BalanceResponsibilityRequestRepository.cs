@@ -16,7 +16,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -45,7 +44,7 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
             GridAreaCode = balanceResponsibilityRequest.GridAreaCode.Value,
             MeteringPointType = (int)balanceResponsibilityRequest.MeteringPointType,
             ValidFrom = balanceResponsibilityRequest.ValidFrom.ToDateTimeOffset(),
-            ValidTo = balanceResponsibilityRequest.ValidTo?.ToDateTimeOffset()
+            ValidTo = balanceResponsibilityRequest.ValidTo?.ToDateTimeOffset(),
         };
 
         await _marketParticipantDbContext
@@ -62,14 +61,14 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
     {
         ArgumentNullException.ThrowIfNull(affectedActorId);
 
-        while (await DequeueNextAsync(affectedActorId).ConfigureAwait(false) is { HasValue: true } next)
+        while (await DequeueNextAsync(affectedActorId).ConfigureAwait(false) is { } next)
         {
-            await ProcessRequestAsync(next.Value).ConfigureAwait(false);
+            await ProcessRequestAsync(next).ConfigureAwait(false);
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 
-    private async Task<Maybe<ProcessRequest>> DequeueNextAsync(ActorId affectedActorId)
+    private async Task<ProcessRequest?> DequeueNextAsync(ActorId affectedActorId)
     {
         ArgumentNullException.ThrowIfNull(affectedActorId);
 
@@ -102,7 +101,7 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
                 .Remove(nextBalanceResponsibleRequest.Request);
         }
 
-        return new Maybe<ProcessRequest>(nextBalanceResponsibleRequest);
+        return nextBalanceResponsibleRequest;
     }
 
     private async Task ProcessRequestAsync(ProcessRequest nextBalanceResponsibleRequest)
