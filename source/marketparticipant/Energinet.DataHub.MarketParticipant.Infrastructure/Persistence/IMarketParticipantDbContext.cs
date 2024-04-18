@@ -141,6 +141,16 @@ public interface IMarketParticipantDbContext
     DbSet<DelegationPeriodEntity> DelegationPeriods { get; }
 
     /// <summary>
+    ///     Represent access to the BalanceResponsibilityRequest database table
+    /// </summary>
+    DbSet<BalanceResponsibilityRequestEntity> BalanceResponsibilityRequests { get; }
+
+    /// <summary>
+    ///     Represent access to the BalanceResponsibilityAgreements database table
+    /// </summary>
+    DbSet<BalanceResponsibilityAgreementEntity> BalanceResponsibilityAgreements { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();
