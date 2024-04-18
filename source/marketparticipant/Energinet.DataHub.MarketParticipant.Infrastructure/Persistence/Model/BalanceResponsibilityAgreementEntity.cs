@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public interface IBalanceResponsibilityRequestRepository
+public sealed class BalanceResponsibilityAgreementEntity
 {
-    Task EnqueueAsync(BalanceResponsibilityRequest balanceResponsibilityRequest);
-    Task ProcessNextRequestsAsync(ActorId affectedActorId);
+    public Guid Id { get; set; }
+    public Guid EnergySupplierId { get; set; }
+    public Guid BalanceResponsiblePartyId { get; set; }
+    public Guid GridAreaId { get; set; }
+    public int MeteringPointType { get; set; }
+    public DateTimeOffset ValidFrom { get; set; }
+    public DateTimeOffset? ValidTo { get; set; }
 }

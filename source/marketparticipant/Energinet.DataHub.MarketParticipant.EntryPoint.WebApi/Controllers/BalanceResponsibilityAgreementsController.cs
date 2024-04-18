@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
 [Route("balance-responsibility-agreements")]
-public class BalanceResponsibilityAgreementsController : ControllerBase
+public sealed class BalanceResponsibilityAgreementsController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IUserContext<FrontendUser> _userContext;

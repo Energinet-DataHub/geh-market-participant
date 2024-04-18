@@ -12,23 +12,77 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
 public sealed class BalanceResponsibilityAgreementsRepository : IBalanceResponsibilityAgreementsRepository
 {
-    public Task<BalanceResponsibilityContractor> GetForBalanceResponsiblePartyAsync(ActorId balanceResponsibleParty)
+    private readonly IBalanceResponsibilityRequestRepository _balanceResponsibilityRequestRepository;
+    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+
+    public BalanceResponsibilityAgreementsRepository(
+        IBalanceResponsibilityRequestRepository balanceResponsibilityRequestRepository,
+        IMarketParticipantDbContext marketParticipantDbContext)
     {
-        return Task.FromResult(new BalanceResponsibilityContractor(balanceResponsibleParty, Array.Empty<BalanceResponsibilityAgreement>()));
+        _balanceResponsibilityRequestRepository = balanceResponsibilityRequestRepository;
+        _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public Task<IEnumerable<BalanceResponsibilityContractor>> GetForEnergySupplierAsync(ActorId energySupplier)
+    public async Task<BalanceResponsibilityContractor> GetForBalanceResponsiblePartyAsync(ActorId balanceResponsibleParty)
     {
-        return Task.FromResult<IEnumerable<BalanceResponsibilityContractor>>(Array.Empty<BalanceResponsibilityContractor>());
+        await _balanceResponsibilityRequestRepository
+            .ProcessNextRequestsAsync(balanceResponsibleParty)
+            .ConfigureAwait(false);
+
+        var agreements = await _marketParticipantDbContext
+            .BalanceResponsibilityAgreements
+            .Where(agreement => agreement.BalanceResponsiblePartyId == balanceResponsibleParty.Value)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return new BalanceResponsibilityContractor(balanceResponsibleParty, agreements.Select(Map));
+    }
+
+    public async Task<IEnumerable<BalanceResponsibilityContractor>> GetForEnergySupplierAsync(ActorId energySupplier)
+    {
+        await _balanceResponsibilityRequestRepository
+            .ProcessNextRequestsAsync(energySupplier)
+            .ConfigureAwait(false);
+
+        var contractorsQuery = _marketParticipantDbContext
+            .BalanceResponsibilityAgreements
+            .Where(agreement => agreement.EnergySupplierId == energySupplier.Value)
+            .Select(agreement => agreement.BalanceResponsiblePartyId)
+            .Distinct();
+
+        var agreementGroups = await _marketParticipantDbContext
+            .BalanceResponsibilityAgreements
+            .Where(agreement => contractorsQuery.Contains(agreement.BalanceResponsiblePartyId))
+            .GroupBy(agreement => agreement.BalanceResponsiblePartyId)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return agreementGroups.Select(agreementGroup =>
+            new BalanceResponsibilityContractor(
+                new ActorId(agreementGroup.Key),
+                agreementGroup.Select(Map)));
+    }
+
+    private static BalanceResponsibilityAgreement Map(BalanceResponsibilityAgreementEntity agreement)
+    {
+        return new BalanceResponsibilityAgreement(
+            new ActorId(agreement.EnergySupplierId),
+            new GridAreaId(agreement.GridAreaId),
+            (MeteringPointType)agreement.MeteringPointType,
+            agreement.ValidFrom.ToInstant(),
+            agreement.ValidTo?.ToInstant());
     }
 }

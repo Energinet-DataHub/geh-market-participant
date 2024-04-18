@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Domain;
 
-public interface IBalanceResponsibilityRequestRepository
+public sealed record Maybe<T>
 {
-    Task EnqueueAsync(BalanceResponsibilityRequest balanceResponsibilityRequest);
-    Task ProcessNextRequestsAsync(ActorId affectedActorId);
+    public Maybe(T? value)
+    {
+        Value = value;
+    }
+
+    public T? Value { get; }
+
+    [MemberNotNullWhen(returnValue: true, nameof(Value))]
+    public bool HasValue => Value is not null;
 }
