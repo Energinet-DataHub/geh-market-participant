@@ -16,4 +16,4 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actors;
 
-public sealed record SelectionActorDto(Guid Id, string Gln, string ActorName, string OrganizationName);
+public sealed record SelectionActorDto(Guid Id, string Gln, string ActorName, string OrganizationName, string MarketRole);
