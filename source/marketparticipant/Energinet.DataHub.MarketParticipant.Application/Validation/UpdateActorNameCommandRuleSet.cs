@@ -30,7 +30,8 @@ public sealed class UpdateActorNameCommandRuleSet : AbstractValidator<UpdateActo
             {
                 changeActorValidator
                     .RuleFor(x => x.Value)
-                    .NotEmpty();
+                    .NotEmpty()
+                    .Length(1, 512);
             });
     }
 }
