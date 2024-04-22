@@ -39,7 +39,7 @@ public sealed class CreateActorCommandRuleSet : AbstractValidator<CreateActorCom
                         nameValidator
                             .RuleFor(actorNameDto => actorNameDto.Value)
                             .NotEmpty()
-                            .Length(1, 255);
+                            .Length(1, 512);
                     });
 
                 validator
