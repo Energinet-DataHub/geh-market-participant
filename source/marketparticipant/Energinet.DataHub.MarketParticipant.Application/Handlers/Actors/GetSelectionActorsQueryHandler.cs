@@ -86,7 +86,7 @@ public sealed class GetSelectionActorsQueryHandler
                 actor.ActorNumber.Value,
                 actor.Name.Value,
                 organization.Name,
-                actor.MarketRoles[0].Function.ToString()));
+                actor.MarketRoles[0].Function));
         }
 
         return new GetSelectionActorsQueryResponse(selectionActors);
