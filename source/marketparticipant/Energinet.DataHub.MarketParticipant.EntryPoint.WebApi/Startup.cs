@@ -39,7 +39,9 @@ public class Startup : Common.StartupBase
 
     protected override void Configure(IConfiguration configuration, IServiceCollection services)
     {
-        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services
+            .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
+            .AddScoped<IAuditIdentityProvider, FrontendUserAuditIdentityProvider>();
 
         services.AddSingleton<IExternalTokenValidator>(_ =>
         {

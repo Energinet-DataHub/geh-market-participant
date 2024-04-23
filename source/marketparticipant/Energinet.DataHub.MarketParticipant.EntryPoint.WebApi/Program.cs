@@ -42,7 +42,6 @@ builder.Services
     .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), subsystemName);
 
 builder.Services
-    .AddScoped<IAuditIdentityProvider, FrontendUserAuditIdentityProvider>()
     .AddUserAuthenticationForWebApp<FrontendUser, FrontendUserProvider>()
     .AddPermissionAuthorizationForWebApp();
 
