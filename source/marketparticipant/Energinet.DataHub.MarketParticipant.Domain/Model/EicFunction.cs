@@ -31,4 +31,5 @@ public enum EicFunction
     IndependentAggregator = 51,
     SerialEnergyTrader = 52,
     Delegated = 53,
+    ItSupplier = 54,
 }
