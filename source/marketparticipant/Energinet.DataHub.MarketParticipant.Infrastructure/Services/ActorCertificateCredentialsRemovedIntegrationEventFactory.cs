@@ -15,8 +15,8 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
@@ -34,25 +34,7 @@ public sealed class ActorCertificateCredentialsRemovedIntegrationEventFactory : 
             new Model.Contracts.ActorCertificateCredentialsRemoved
             {
                 ActorNumber = domainEvent.ActorNumber.Value,
-                ActorRole = domainEvent.ActorRole switch
-                {
-                    EicFunction.GridAccessProvider => Model.Contracts.EicFunction.GridAccessProvider,
-                    EicFunction.BalanceResponsibleParty => Model.Contracts.EicFunction.BalanceResponsibleParty,
-                    EicFunction.BillingAgent => Model.Contracts.EicFunction.BillingAgent,
-                    EicFunction.EnergySupplier => Model.Contracts.EicFunction.EnergySupplier,
-                    EicFunction.ImbalanceSettlementResponsible => Model.Contracts.EicFunction.ImbalanceSettlementResponsible,
-                    EicFunction.MeteredDataAdministrator => Model.Contracts.EicFunction.MeteredDataAdministrator,
-                    EicFunction.MeteredDataResponsible => Model.Contracts.EicFunction.MeteredDataResponsible,
-                    EicFunction.MeteringPointAdministrator => Model.Contracts.EicFunction.MeteringPointAdministrator,
-                    EicFunction.SystemOperator => Model.Contracts.EicFunction.SystemOperator,
-                    EicFunction.DanishEnergyAgency => Model.Contracts.EicFunction.DanishEnergyAgency,
-                    EicFunction.DataHubAdministrator => Model.Contracts.EicFunction.DatahubAdministrator,
-                    EicFunction.IndependentAggregator => Model.Contracts.EicFunction.IndependentAggregator,
-                    EicFunction.SerialEnergyTrader => Model.Contracts.EicFunction.SerialEnergyTrader,
-                    EicFunction.MeterOperator => Model.Contracts.EicFunction.MeterOperator,
-                    EicFunction.Delegated => Model.Contracts.EicFunction.Delegated,
-                    _ => throw new NotSupportedException($"Actor role {domainEvent.ActorRole} is not supported in integration event.")
-                },
+                ActorRole = domainEvent.ActorRole.MapToContract(),
                 CertificateThumbprint = domainEvent.CertificateThumbprint,
                 ValidFrom = domainEvent.ValidFrom.ToTimestamp(),
                 SequenceNumber = sequenceNumber
