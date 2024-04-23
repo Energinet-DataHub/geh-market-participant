@@ -17,9 +17,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using NodaTime.Serialization.Protobuf;
 using DelegatedProcess = Energinet.DataHub.MarketParticipant.Domain.Model.Delegations.DelegatedProcess;
-using EicFunction = Energinet.DataHub.MarketParticipant.Domain.Model.EicFunction;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
@@ -65,9 +65,9 @@ public sealed class ProcessDelegationConfiguredIntegrationEventFactory : IIntegr
             new Model.Contracts.ProcessDelegationConfigured
             {
                 DelegatedByActorNumber = delegatedByActorNumber,
-                DelegatedByActorRole = MapMarketRole(delegatedByMarketRole),
+                DelegatedByActorRole = delegatedByMarketRole.MapToContract(),
                 DelegatedToActorNumber = delegatedToActorNumber,
-                DelegatedToActorRole = MapMarketRole(delegatedToMarketRole),
+                DelegatedToActorRole = delegatedToMarketRole.MapToContract(),
                 GridAreaCode = gridArea!.Code.Value,
                 Process = domainEvent.Process switch
                 {
@@ -83,28 +83,5 @@ public sealed class ProcessDelegationConfiguredIntegrationEventFactory : IIntegr
             });
 
         return integrationEvent;
-    }
-
-    private static Model.Contracts.EicFunction MapMarketRole(EicFunction eicFunction)
-    {
-        return eicFunction switch
-        {
-            EicFunction.GridAccessProvider => Model.Contracts.EicFunction.GridAccessProvider,
-            EicFunction.BalanceResponsibleParty => Model.Contracts.EicFunction.BalanceResponsibleParty,
-            EicFunction.BillingAgent => Model.Contracts.EicFunction.BillingAgent,
-            EicFunction.EnergySupplier => Model.Contracts.EicFunction.EnergySupplier,
-            EicFunction.ImbalanceSettlementResponsible => Model.Contracts.EicFunction.ImbalanceSettlementResponsible,
-            EicFunction.MeteredDataAdministrator => Model.Contracts.EicFunction.MeteredDataAdministrator,
-            EicFunction.MeteredDataResponsible => Model.Contracts.EicFunction.MeteredDataResponsible,
-            EicFunction.MeteringPointAdministrator => Model.Contracts.EicFunction.MeteringPointAdministrator,
-            EicFunction.SystemOperator => Model.Contracts.EicFunction.SystemOperator,
-            EicFunction.DanishEnergyAgency => Model.Contracts.EicFunction.DanishEnergyAgency,
-            EicFunction.DataHubAdministrator => Model.Contracts.EicFunction.DatahubAdministrator,
-            EicFunction.IndependentAggregator => Model.Contracts.EicFunction.IndependentAggregator,
-            EicFunction.SerialEnergyTrader => Model.Contracts.EicFunction.SerialEnergyTrader,
-            EicFunction.MeterOperator => Model.Contracts.EicFunction.MeterOperator,
-            EicFunction.Delegated => Model.Contracts.EicFunction.Delegated,
-            _ => throw new NotSupportedException($"Market role {eicFunction} is not supported in integration event.")
-        };
     }
 }
