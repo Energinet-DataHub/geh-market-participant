@@ -66,7 +66,8 @@ public static class KnownPermissions
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader,
-            EicFunction.MeterOperator
+            EicFunction.MeterOperator,
+            EicFunction.ItSupplier,
         }),
         new(PermissionId.UserRolesManage, "user-roles:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
         {
