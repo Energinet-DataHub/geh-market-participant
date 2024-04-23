@@ -12,11 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+namespace Energinet.DataHub.MarketParticipant.Common.Configuration;
 
-public interface IExternalTokenValidator
+public sealed class UserAuthentication
 {
-    Task<bool> ValidateTokenAsync(string token);
+    [Required]
+    public Uri MitIdExternalMetadataAddress { get; set; } = null!;
+
+    [Required]
+    public Uri ExternalMetadataAddress { get; set; } = null!;
+
+    [Required]
+    public Uri InternalMetadataAddress { get; set; } = null!;
+
+    [Required]
+    public string BackendBffAppId { get; set; } = null!;
 }

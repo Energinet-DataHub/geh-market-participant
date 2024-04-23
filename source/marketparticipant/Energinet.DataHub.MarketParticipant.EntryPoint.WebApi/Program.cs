@@ -14,11 +14,11 @@
 
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Asp.Versioning;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.MarketParticipant.Application.Security;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Microsoft.AspNetCore.Builder;
@@ -39,6 +39,7 @@ builder.Services
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services
+    .AddApiVersioningForWebApp(new ApiVersion(1, 0))
     .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), subsystemName);
 
 builder.Services

@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
@@ -43,11 +44,15 @@ public class Startup : Common.StartupBase
             .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
             .AddScoped<IAuditIdentityProvider, FrontendUserAuditIdentityProvider>();
 
-        services.AddSingleton<IExternalTokenValidator>(_ =>
+        services.AddOptions();
+        services.AddOptions<UserAuthentication>().BindConfiguration(nameof(UserAuthentication)).ValidateDataAnnotations();
+
+        services.AddSingleton<IExternalTokenValidator>(sp =>
         {
-            var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
-            var backendAppId = configuration.GetSetting(Settings.BackendBffAppId);
-            return new ExternalTokenValidator(externalOpenIdUrl, backendAppId);
+            var authSettings = sp.GetRequiredService<IOptions<UserAuthentication>>().Value;
+            return new ExternalTokenValidator(
+                authSettings.ExternalMetadataAddress.ToString(),
+                authSettings.BackendBffAppId);
         });
 
         services.AddSingleton<ISigningKeyRing>(_ =>

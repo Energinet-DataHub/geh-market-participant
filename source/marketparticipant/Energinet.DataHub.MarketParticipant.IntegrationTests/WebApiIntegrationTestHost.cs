@@ -88,10 +88,10 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
         KeyValuePair<string, string?>[] keyValuePairs =
         {
             new(Settings.SqlDbConnectionString.Key, dbConnectionString),
-            new(Settings.MitIdExternalOpenIdUrl.Key, "fake_value"),
-            new(Settings.ExternalOpenIdUrl.Key, "fake_value"),
-            new(Settings.BackendBffAppId.Key, "fake_value"),
-            new(Settings.InternalOpenIdUrl.Key, "fake_value"),
+            new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.MitIdExternalMetadataAddress)}", "fake_value"),
+            new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.ExternalMetadataAddress)}", "fake_value"),
+            new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.InternalMetadataAddress)}", "fake_value"),
+            new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.BackendBffAppId)}", "fake_value"),
             new(Settings.CertificateKeyVault.Key, "fake_value"),
             new(Settings.B2CBackendServicePrincipalNameObjectId.Key, "fake_value"),
             new(Settings.B2CBackendId.Key, "fake_value"),
