@@ -19,13 +19,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 
-public sealed class BalanceResponsibilityAgreementEntityConfiguration : IEntityTypeConfiguration<BalanceResponsibilityAgreementEntity>
+public sealed class BalanceResponsibilityRelationEntityConfiguration : IEntityTypeConfiguration<BalanceResponsibilityRelationEntity>
 {
-    public void Configure(EntityTypeBuilder<BalanceResponsibilityAgreementEntity> builder)
+    public void Configure(EntityTypeBuilder<BalanceResponsibilityRelationEntity> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.ToTable("BalanceResponsibilityAgreement");
+        builder.ToTable("BalanceResponsibilityRelation");
         builder.HasKey(x => x.Id);
     }
 }

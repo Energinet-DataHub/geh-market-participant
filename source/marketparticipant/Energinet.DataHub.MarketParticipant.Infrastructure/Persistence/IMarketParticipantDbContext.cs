@@ -146,9 +146,9 @@ public interface IMarketParticipantDbContext
     DbSet<BalanceResponsibilityRequestEntity> BalanceResponsibilityRequests { get; }
 
     /// <summary>
-    ///     Represent access to the BalanceResponsibilityAgreements database table
+    ///     Represent access to the BalanceResponsibilityRelation database table
     /// </summary>
-    DbSet<BalanceResponsibilityAgreementEntity> BalanceResponsibilityAgreements { get; }
+    DbSet<BalanceResponsibilityRelationEntity> BalanceResponsibilityRelations { get; }
 
     /// <summary>
     ///     Saves changes to the database.
