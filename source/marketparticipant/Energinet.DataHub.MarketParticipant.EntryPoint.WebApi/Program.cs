@@ -12,27 +12,67 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+using System.Reflection;
+using System.Text.Json.Serialization;
+using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
+using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
+using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
+const string subsystemName = "mark-part";
 
-public static class Program
+var startup = new Startup();
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHttpLoggingScope(subsystemName);
+builder.Services.AddApplicationInsightsForWebApp(subsystemName);
+builder.Services.AddHealthChecksForWebApp();
+
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+builder.Services
+    .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), subsystemName);
+
+builder.Services
+    .AddScoped<IAuditIdentityProvider, FrontendUserAuditIdentityProvider>()
+    .AddUserAuthenticationForWebApp<FrontendUser, FrontendUserProvider>()
+    .AddPermissionAuthorizationForWebApp();
+
+startup.Initialize(builder.Configuration, builder.Services);
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
 {
-    public static async Task Main(string[] args)
-    {
-        var host = Host
-            .CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(builder =>
-            {
-                builder
-                    .UseStartup<Startup>()
-                    .ConfigureServices(s => s.AddApplicationInsightsTelemetry());
-            })
-            .Build();
-
-        await host.RunAsync().ConfigureAwait(false);
-    }
+    app.UseDeveloperExceptionPage();
 }
+
+app.UseRouting();
+app.UseSwaggerForWebApp();
+app.UseHttpsRedirection();
+app.UseCommonExceptionHandling(exceptionBuilder =>
+{
+    exceptionBuilder.Use(new FluentValidationExceptionHandler(subsystemName));
+    exceptionBuilder.Use(new NotFoundValidationExceptionHandler(subsystemName));
+    exceptionBuilder.Use(new DataValidationExceptionHandler(subsystemName));
+    exceptionBuilder.Use(new FallbackExceptionHandler(subsystemName));
+});
+
+app.UseLoggingScope();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseUserMiddlewareForWebApp<FrontendUser>();
+app.MapControllers().RequireAuthorization();
+
+app.MapLiveHealthChecks();
+app.MapReadyHealthChecks();
+
+app.Run();

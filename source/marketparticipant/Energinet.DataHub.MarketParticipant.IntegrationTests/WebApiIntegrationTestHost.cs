@@ -33,9 +33,9 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 {
     private readonly Startup _startup;
 
-    private WebApiIntegrationTestHost(IConfiguration configuration)
+    private WebApiIntegrationTestHost()
     {
-        _startup = new NoAuthStartup(configuration);
+        _startup = new NoAuthStartup();
     }
 
     public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
@@ -46,9 +46,9 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
         var configuration = BuildConfig(databaseFixture.DatabaseManager.ConnectionString);
 
-        var host = new WebApiIntegrationTestHost(configuration);
+        var host = new WebApiIntegrationTestHost();
         host.ServiceCollection.AddSingleton(configuration);
-        host._startup.ConfigureServices(host.ServiceCollection);
+        host._startup.Initialize(configuration, host.ServiceCollection);
         InitUserIdProvider(host.ServiceCollection);
 
         if (b2CFixture != null)

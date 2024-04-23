@@ -102,12 +102,10 @@ internal sealed class Startup : StartupBase
         var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
         var consumeEventsOptions = configuration.GetSection(nameof(ConsumeServiceBusSettings)).Get<ConsumeServiceBusSettings>()!;
 
-        services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
         services.AddScoped<HealthCheckEndpoint>();
 
         services
             .AddHealthChecks()
-            .AddLiveCheck()
             .AddDbContextCheck<MarketParticipantDbContext>()
             .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEventsAsync, name: "expired_events")
             .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEmailsAsync, name: "expired_emails")
