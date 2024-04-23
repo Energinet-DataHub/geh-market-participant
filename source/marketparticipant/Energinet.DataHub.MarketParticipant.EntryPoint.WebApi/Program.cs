@@ -60,10 +60,10 @@ app.UseSwaggerForWebApp();
 app.UseHttpsRedirection();
 app.UseCommonExceptionHandling(exceptionBuilder =>
 {
-    exceptionBuilder.Use(new FluentValidationExceptionHandler(subsystemName));
-    exceptionBuilder.Use(new NotFoundValidationExceptionHandler(subsystemName));
-    exceptionBuilder.Use(new DataValidationExceptionHandler(subsystemName));
-    exceptionBuilder.Use(new FallbackExceptionHandler(subsystemName));
+    exceptionBuilder.Use(new FluentValidationExceptionHandler("market_participant"));
+    exceptionBuilder.Use(new NotFoundValidationExceptionHandler("market_participant"));
+    exceptionBuilder.Use(new DataValidationExceptionHandler("market_participant"));
+    exceptionBuilder.Use(new FallbackExceptionHandler("market_participant"));
 });
 
 app.UseLoggingScope();
