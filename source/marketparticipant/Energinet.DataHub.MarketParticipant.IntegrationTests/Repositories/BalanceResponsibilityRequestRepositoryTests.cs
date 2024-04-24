@@ -230,13 +230,13 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
 
         // Assert
         var actual = await context
-            .BalanceResponsibilityAgreements
+            .BalanceResponsibilityRelations
             .Where(request => request.EnergySupplierId == actorA.Id)
             .ToListAsync();
 
         Assert.Equal(2, actual.Count);
-        Assert.Contains(actual, agreement => agreement.MeteringPointType == (int)MeteringPointType.E18Production);
-        Assert.Contains(actual, agreement => agreement.MeteringPointType == (int)MeteringPointType.E17Consumption);
+        Assert.Contains(actual, relation => relation.MeteringPointType == (int)MeteringPointType.E18Production);
+        Assert.Contains(actual, relation => relation.MeteringPointType == (int)MeteringPointType.E17Consumption);
 
         context
             .BalanceResponsibilityRequests
@@ -275,10 +275,10 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
 
         // Assert
         var actual = context
-            .BalanceResponsibilityAgreements
-            .Single(agreement =>
-                agreement.EnergySupplierId == actorA.Id &&
-                agreement.BalanceResponsiblePartyId == actorB.Id);
+            .BalanceResponsibilityRelations
+            .Single(relation =>
+                relation.EnergySupplierId == actorA.Id &&
+                relation.BalanceResponsiblePartyId == actorB.Id);
 
         Assert.Equal(balanceResponsibilityRequest.ValidFrom.ToDateTimeOffset(), actual.ValidFrom);
         Assert.Equal(balanceResponsibilityRequest.ValidTo?.ToDateTimeOffset(), actual.ValidTo);
@@ -323,10 +323,10 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
 
         // Assert
         var actual = context
-            .BalanceResponsibilityAgreements
-            .Single(agreement =>
-                agreement.EnergySupplierId == actorA.Id &&
-                agreement.BalanceResponsiblePartyId == actorB.Id);
+            .BalanceResponsibilityRelations
+            .Single(relation =>
+                relation.EnergySupplierId == actorA.Id &&
+                relation.BalanceResponsiblePartyId == actorB.Id);
 
         Assert.Equal(balanceResponsibilityRequestB.ValidFrom.ToDateTimeOffset(), actual.ValidFrom);
         Assert.Equal(balanceResponsibilityRequestB.ValidTo?.ToDateTimeOffset(), actual.ValidTo);

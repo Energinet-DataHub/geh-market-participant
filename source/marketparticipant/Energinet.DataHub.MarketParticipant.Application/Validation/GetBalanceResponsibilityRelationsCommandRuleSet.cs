@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed record BalanceResponsibilityAgreementDto(
-    Guid EnergySupplierId,
-    Guid BalanceResponsibleId,
-    Guid GridAreaId,
-    MeteringPointType MeteringPointType,
-    DateTimeOffset ValidFrom,
-    DateTimeOffset? ValidTo);
+public sealed class GetBalanceResponsibilityRelationsCommandRuleSet : AbstractValidator<GetBalanceResponsibilityRelationsCommand>
+{
+    public GetBalanceResponsibilityRelationsCommandRuleSet()
+    {
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
+    }
+}

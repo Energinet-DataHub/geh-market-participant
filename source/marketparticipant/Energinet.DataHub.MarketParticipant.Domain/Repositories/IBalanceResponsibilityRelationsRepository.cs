@@ -12,22 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-public sealed record BalanceResponsibilityAgreement(ActorId EnergySupplier, GridAreaId GridArea, MeteringPointType MeteringPointType, Instant ValidFrom)
+public interface IBalanceResponsibilityRelationsRepository
 {
-    public BalanceResponsibilityAgreement(
-        ActorId energySupplier,
-        GridAreaId gridArea,
-        MeteringPointType meteringPointType,
-        Instant validFrom,
-        Instant? validTo)
-            : this(energySupplier, gridArea, meteringPointType, validFrom)
-    {
-        ValidTo = validTo;
-    }
-
-    public Instant? ValidTo { get; init; }
+    Task<BalanceResponsibilityContractor> GetForBalanceResponsiblePartyAsync(ActorId balanceResponsibleParty);
+    Task<IEnumerable<BalanceResponsibilityContractor>> GetForEnergySupplierAsync(ActorId energySupplier);
 }
