@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Reflection;
 using System.Text.Json.Serialization;
-using Asp.Versioning;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
@@ -38,8 +36,7 @@ builder.Services
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services
-    .AddApiVersioningForWebApp(new ApiVersion(1, 0))
-    .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), subsystemName);
+    .AddTempSwaggerForWebApi();
 
 builder.Services
     .AddJwtBearerAuthenticationForWebApp(builder.Configuration)
@@ -57,7 +54,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-app.UseSwaggerForWebApp();
+app.UseTempSwaggerForWebApp();
 app.UseHttpsRedirection();
 app.UseCommonExceptionHandling(exceptionBuilder =>
 {
