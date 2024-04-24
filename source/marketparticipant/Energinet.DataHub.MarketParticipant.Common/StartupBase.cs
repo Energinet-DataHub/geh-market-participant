@@ -26,7 +26,6 @@ public abstract class StartupBase
     public void Initialize(IConfiguration configuration, IServiceCollection services)
     {
         services.AddDbContexts();
-        services.AddLogging();
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>));
         services.AddMediatR(config =>
         {

@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Extensions.DependencyInjection;
@@ -25,13 +24,9 @@ var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
     .ConfigureServices((context, services) =>
     {
-        services.AddApplicationInsights();
-
-        services
-            .AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>()
-            .AddScoped<HealthCheckEndpoint>()
-            .AddHealthChecks()
-            .AddLiveCheck();
+        services.AddApplicationInsightsForIsolatedWorker("mark-part");
+        services.AddHealthChecksForIsolatedWorker();
+        services.AddScoped<HealthCheckEndpoint>();
 
         services
             .AddLogging()
@@ -40,6 +35,11 @@ var host = new HostBuilder()
         services
             .AddHttpClient(context.Configuration)
             .AddCertificateStore(context.Configuration);
-    }).Build();
+    })
+    .ConfigureLogging((hostingContext, logging) =>
+    {
+        logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
+    })
+    .Build();
 
 host.Run();

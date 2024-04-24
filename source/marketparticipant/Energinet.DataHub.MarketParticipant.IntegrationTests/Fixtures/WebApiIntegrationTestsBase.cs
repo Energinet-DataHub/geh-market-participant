@@ -36,10 +36,10 @@ public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFacto
         ArgumentNullException.ThrowIfNull(builder);
 
         builder.UseSetting(Settings.SqlDbConnectionString.Key, _marketParticipantDatabaseFixture.DatabaseManager.ConnectionString);
-        builder.UseSetting(Settings.MitIdExternalOpenIdUrl.Key, "fake_value");
-        builder.UseSetting(Settings.ExternalOpenIdUrl.Key, "fake_value");
-        builder.UseSetting(Settings.InternalOpenIdUrl.Key, "fake_value");
-        builder.UseSetting(Settings.BackendBffAppId.Key, TestBackendAppId);
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.MitIdExternalMetadataAddress)}", "fake_value");
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.ExternalMetadataAddress)}", "fake_value");
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.InternalMetadataAddress)}", "fake_value");
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.BackendBffAppId)}", TestBackendAppId);
         builder.UseSetting(Settings.TokenKeyVault.Key, "fake_value");
         builder.UseSetting(Settings.TokenKeyName.Key, "fake_value");
         builder.UseSetting(Settings.CertificateKeyVault.Key, "fake_value");
