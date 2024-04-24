@@ -13,16 +13,15 @@
 // limitations under the License.
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 
-public class NoAuthStartup : WebApi.Startup
+internal static class NoAuthWebApiModuleExtensions
 {
-    protected override void SetupAuthentication(IConfiguration configuration, IServiceCollection services)
+    public static IServiceCollection AddNoAuthenticationForWebApp(this IServiceCollection services)
     {
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -31,6 +30,8 @@ public class NoAuthStartup : WebApi.Startup
                 var tokenValidationParameters = CreateValidationParameters();
                 options.TokenValidationParameters = tokenValidationParameters;
             });
+
+        return services;
     }
 
     private static TokenValidationParameters CreateValidationParameters()

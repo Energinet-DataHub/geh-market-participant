@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase<Startup>
+public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase<MarketParticipantWebApiAssembly>
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 

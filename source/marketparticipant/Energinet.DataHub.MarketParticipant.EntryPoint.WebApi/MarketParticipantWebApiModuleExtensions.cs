@@ -15,8 +15,8 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Secrets;
-using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -30,16 +30,12 @@ using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
-public class Startup : Common.StartupBase
+public static class MarketParticipantWebApiModuleExtensions
 {
-    /// <summary>
-    /// Disables validation of external token and CreatedOn limit for KeyVault keys.
-    /// This property is intended for testing purposes only.
-    /// </summary>
-    public static bool EnableIntegrationTestKeys { get; set; }
-
-    protected override void Configure(IConfiguration configuration, IServiceCollection services)
+    public static IServiceCollection AddMarketParticipantWebApiModule(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddMarketParticipantCore();
+
         services
             .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
             .AddScoped<IAuditIdentityProvider, FrontendUserAuditIdentityProvider>();
@@ -81,8 +77,6 @@ public class Startup : Common.StartupBase
             return new CertificateService(certificateClient, certificateValidation, logger);
         });
 
-        SetupAuthentication(configuration, services);
-
         // Health check
         services
             .AddHealthChecks()
@@ -90,10 +84,7 @@ public class Startup : Common.StartupBase
             .AddCheck<GraphApiHealthCheck>("Graph API Access")
             .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access")
             .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access");
-    }
 
-    protected virtual void SetupAuthentication(IConfiguration configuration, IServiceCollection services)
-    {
-        services.AddJwtBearerAuthenticationForWebApp(configuration);
+        return services;
     }
 }

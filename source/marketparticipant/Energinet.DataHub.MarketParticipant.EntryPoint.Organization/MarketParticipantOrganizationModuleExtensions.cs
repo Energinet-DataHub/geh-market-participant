@@ -15,8 +15,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
@@ -39,10 +37,12 @@ using SendGrid.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
 
-internal sealed class Startup : StartupBase
+internal static class MarketParticipantOrganizationModuleExtensions
 {
-    protected override void Configure(IConfiguration configuration, IServiceCollection services)
+    public static IServiceCollection AddMarketParticipantOrganizationModule(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddMarketParticipantCore();
+
         services.AddScoped<IAuditIdentityProvider>(_ => KnownAuditIdentityProvider.OrganizationBackgroundService);
         services.AddFeatureManagement();
 
@@ -73,6 +73,8 @@ internal sealed class Startup : StartupBase
         services.AddFunctionLoggingScope("mark-part");
 
         AddHealthChecks(configuration, services);
+
+        return services;
     }
 
     private static void AddHealthChecks(IConfiguration configuration, IServiceCollection services)

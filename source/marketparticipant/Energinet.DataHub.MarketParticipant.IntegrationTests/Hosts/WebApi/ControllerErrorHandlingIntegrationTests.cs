@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationTestsBase<NoAuthStartup>
+public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationTestsBase<MarketParticipantNoAuthWebApiAssembly>
 {
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
