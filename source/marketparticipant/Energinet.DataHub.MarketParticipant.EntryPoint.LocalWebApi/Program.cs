@@ -15,14 +15,13 @@
 using System.Text.Json.Serialization;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
-using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-var startup = new NoAuthStartup();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
@@ -30,10 +29,12 @@ builder.Services
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services
+    .AddNoAuthenticationForWebApp()
     .AddUserAuthenticationForWebApp<FrontendUser, FrontendUserProvider>()
     .AddPermissionAuthorizationForWebApp();
 
-startup.Initialize(builder.Configuration, builder.Services);
+builder.Services
+    .AddMarketParticipantWebApiModule(builder.Configuration);
 
 var app = builder.Build();
 

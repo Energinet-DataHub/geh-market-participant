@@ -27,7 +27,6 @@ using Microsoft.Extensions.Hosting;
 
 const string subsystemName = "mark-part";
 
-var startup = new Startup();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpLoggingScope(subsystemName);
@@ -43,10 +42,12 @@ builder.Services
     .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), subsystemName);
 
 builder.Services
+    .AddJwtBearerAuthenticationForWebApp(builder.Configuration)
     .AddUserAuthenticationForWebApp<FrontendUser, FrontendUserProvider>()
     .AddPermissionAuthorizationForWebApp();
 
-startup.Initialize(builder.Configuration, builder.Services);
+builder.Services
+    .AddMarketParticipantWebApiModule(builder.Configuration);
 
 var app = builder.Build();
 

@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 public sealed class ReActivateUserHandlerTests(
     MarketParticipantDatabaseFixture databaseFixture,
     GraphServiceClientFixture graphServiceClientFixture)
-    : WebApiIntegrationTestsBase<Startup>(databaseFixture)
+    : WebApiIntegrationTestsBase<MarketParticipantWebApiAssemblyForTesting>(databaseFixture)
 {
     private readonly MarketParticipantDatabaseFixture _databaseFixture = databaseFixture;
 

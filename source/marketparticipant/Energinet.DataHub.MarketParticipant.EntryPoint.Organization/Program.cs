@@ -20,8 +20,6 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-var startup = new Startup();
-
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
     .ConfigureServices((context, services) =>
@@ -34,7 +32,7 @@ var host = new HostBuilder()
             .AddLogging()
             .AddFunctionLoggingScope("mark-part");
 
-        startup.Initialize(context.Configuration, services);
+        services.AddMarketParticipantOrganizationModule(context.Configuration);
     })
     .ConfigureLogging((hostingContext, logging) =>
     {

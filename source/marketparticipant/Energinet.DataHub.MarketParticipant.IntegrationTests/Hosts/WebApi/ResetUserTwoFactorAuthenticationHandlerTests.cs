@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class ResetUserTwoFactorAuthenticationHandlerTests : WebApiIntegrationTestsBase<Startup>
+public sealed class ResetUserTwoFactorAuthenticationHandlerTests : WebApiIntegrationTestsBase<MarketParticipantWebApiAssemblyForTesting>
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
