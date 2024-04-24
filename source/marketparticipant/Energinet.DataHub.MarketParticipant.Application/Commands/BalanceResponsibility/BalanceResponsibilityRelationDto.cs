@@ -13,16 +13,14 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 
-public sealed class BalanceResponsibilityAgreementEntity
-{
-    public Guid Id { get; set; }
-    public Guid EnergySupplierId { get; set; }
-    public Guid BalanceResponsiblePartyId { get; set; }
-    public Guid GridAreaId { get; set; }
-    public int MeteringPointType { get; set; }
-    public DateTimeOffset ValidFrom { get; set; }
-    public DateTimeOffset? ValidTo { get; set; }
-}
+public sealed record BalanceResponsibilityRelationDto(
+    Guid EnergySupplierId,
+    Guid BalanceResponsibleId,
+    Guid GridAreaId,
+    MeteringPointType MeteringPointType,
+    DateTimeOffset ValidFrom,
+    DateTimeOffset? ValidTo);

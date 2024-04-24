@@ -32,10 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class GetBalanceResponsibilityAgreementsHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
+public sealed class GetBalanceResponsibilityRelationsHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
 {
     [Fact]
-    public async Task GetBalanceResponsibility_NoAgreements_ReturnsEmptyList()
+    public async Task GetBalanceResponsibility_NoRelations_ReturnsEmptyList()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
@@ -46,18 +46,18 @@ public sealed class GetBalanceResponsibilityAgreementsHandlerIntegrationTests(Ma
             TestPreparationEntities.ValidActor,
             new MarketRoleEntity { Function = EicFunction.EnergySupplier });
 
-        var createCommand = new GetBalanceResponsibilityAgreementsCommand(actor.Id);
+        var createCommand = new GetBalanceResponsibilityRelationsCommand(actor.Id);
 
         // Act
         var response = await mediator.Send(createCommand);
 
         // Assert
         Assert.NotNull(response);
-        Assert.Empty(response.Agreements);
+        Assert.Empty(response.Relations);
     }
 
     [Fact]
-    public async Task GetBalanceResponsibility_ForEnergySupplier_ReturnsAgreements()
+    public async Task GetBalanceResponsibility_ForEnergySupplier_ReturnsRelations()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
@@ -86,14 +86,14 @@ public sealed class GetBalanceResponsibilityAgreementsHandlerIntegrationTests(Ma
         var balanceResponsibilityRequestRepository = scope.ServiceProvider.GetRequiredService<IBalanceResponsibilityRequestRepository>();
         await balanceResponsibilityRequestRepository.EnqueueAsync(balanceResponsibilityRequest);
 
-        var createCommand = new GetBalanceResponsibilityAgreementsCommand(actorA.Id);
+        var createCommand = new GetBalanceResponsibilityRelationsCommand(actorA.Id);
 
         // Act
         var response = await mediator.Send(createCommand);
 
         // Assert
-        Assert.Single(response.Agreements);
-        var actual = response.Agreements.Single();
+        Assert.Single(response.Relations);
+        var actual = response.Relations.Single();
         Assert.Equal(actorA.Id, actual.EnergySupplierId);
         Assert.Equal(actorB.Id, actual.BalanceResponsibleId);
         Assert.Equal(gridArea.Id, actual.GridAreaId);
@@ -103,7 +103,7 @@ public sealed class GetBalanceResponsibilityAgreementsHandlerIntegrationTests(Ma
     }
 
     [Fact]
-    public async Task GetBalanceResponsibility_ForBalanceResponsibleParty_ReturnsAgreements()
+    public async Task GetBalanceResponsibility_ForBalanceResponsibleParty_ReturnsRelations()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
@@ -132,24 +132,24 @@ public sealed class GetBalanceResponsibilityAgreementsHandlerIntegrationTests(Ma
         var balanceResponsibilityRequestRepository = scope.ServiceProvider.GetRequiredService<IBalanceResponsibilityRequestRepository>();
         await balanceResponsibilityRequestRepository.EnqueueAsync(balanceResponsibilityRequest);
 
-        var createCommand = new GetBalanceResponsibilityAgreementsCommand(actorB.Id);
+        var createCommand = new GetBalanceResponsibilityRelationsCommand(actorB.Id);
 
         // Act
         var response = await mediator.Send(createCommand);
 
         // Assert
-        Assert.Single(response.Agreements);
-        Assert.Single(response.Agreements, agreement =>
-            agreement.EnergySupplierId == actorA.Id &&
-            agreement.BalanceResponsibleId == actorB.Id &&
-            agreement.GridAreaId == gridArea.Id &&
-            agreement.MeteringPointType == balanceResponsibilityRequest.MeteringPointType &&
-            agreement.ValidFrom == balanceResponsibilityRequest.ValidFrom.ToDateTimeOffset() &&
-            agreement.ValidTo == null);
+        Assert.Single(response.Relations);
+        Assert.Single(response.Relations, relation =>
+            relation.EnergySupplierId == actorA.Id &&
+            relation.BalanceResponsibleId == actorB.Id &&
+            relation.GridAreaId == gridArea.Id &&
+            relation.MeteringPointType == balanceResponsibilityRequest.MeteringPointType &&
+            relation.ValidFrom == balanceResponsibilityRequest.ValidFrom.ToDateTimeOffset() &&
+            relation.ValidTo == null);
     }
 
     [Fact]
-    public async Task GetBalanceResponsibility_ForEnergySupplierWithBrpOtherAgreements_ReturnsOnlyForEnergySupplier()
+    public async Task GetBalanceResponsibility_ForEnergySupplierWithBrpOtherRelations_ReturnsOnlyForEnergySupplier()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
@@ -192,20 +192,20 @@ public sealed class GetBalanceResponsibilityAgreementsHandlerIntegrationTests(Ma
         await balanceResponsibilityRequestRepository.EnqueueAsync(balanceResponsibilityRequestA);
         await balanceResponsibilityRequestRepository.EnqueueAsync(balanceResponsibilityRequestB);
 
-        var createCommand = new GetBalanceResponsibilityAgreementsCommand(actorA.Id);
+        var createCommand = new GetBalanceResponsibilityRelationsCommand(actorA.Id);
 
         // Act
         var response = await mediator.Send(createCommand);
 
         // Assert
-        Assert.Single(response.Agreements);
-        Assert.Single(response.Agreements, agreement =>
-            agreement.EnergySupplierId == actorA.Id &&
-            agreement.BalanceResponsibleId == actorC.Id &&
-            agreement.GridAreaId == gridArea.Id &&
-            agreement.MeteringPointType == balanceResponsibilityRequestA.MeteringPointType &&
-            agreement.ValidFrom == balanceResponsibilityRequestA.ValidFrom.ToDateTimeOffset() &&
-            agreement.ValidTo == null);
+        Assert.Single(response.Relations);
+        Assert.Single(response.Relations, relation =>
+            relation.EnergySupplierId == actorA.Id &&
+            relation.BalanceResponsibleId == actorC.Id &&
+            relation.GridAreaId == gridArea.Id &&
+            relation.MeteringPointType == balanceResponsibilityRequestA.MeteringPointType &&
+            relation.ValidFrom == balanceResponsibilityRequestA.ValidFrom.ToDateTimeOffset() &&
+            relation.ValidTo == null);
     }
 
     [Fact]
@@ -252,12 +252,12 @@ public sealed class GetBalanceResponsibilityAgreementsHandlerIntegrationTests(Ma
         await balanceResponsibilityRequestRepository.EnqueueAsync(balanceResponsibilityRequestA);
         await balanceResponsibilityRequestRepository.EnqueueAsync(balanceResponsibilityRequestB);
 
-        var createCommand = new GetBalanceResponsibilityAgreementsCommand(actorC.Id);
+        var createCommand = new GetBalanceResponsibilityRelationsCommand(actorC.Id);
 
         // Act
         var response = await mediator.Send(createCommand);
 
         // Assert
-        Assert.Equal(2, response.Agreements.Count());
+        Assert.Equal(2, response.Relations.Count());
     }
 }

@@ -25,20 +25,20 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.BalanceResponsibility;
 
-public sealed class GetBalanceResponsibilityAgreementsHandler : IRequestHandler<GetBalanceResponsibilityAgreementsCommand, GetBalanceResponsibilityAgreementsResponse>
+public sealed class GetBalanceResponsibilityRelationsHandler : IRequestHandler<GetBalanceResponsibilityRelationsCommand, GetBalanceResponsibilityRelationsResponse>
 {
     private readonly IActorRepository _actorRepository;
-    private readonly IBalanceResponsibilityAgreementsRepository _balanceResponsibilityAgreementsRepository;
+    private readonly IBalanceResponsibilityRelationsRepository _balanceResponsibilityRelationsRepository;
 
-    public GetBalanceResponsibilityAgreementsHandler(
+    public GetBalanceResponsibilityRelationsHandler(
         IActorRepository actorRepository,
-        IBalanceResponsibilityAgreementsRepository balanceResponsibilityAgreementsRepository)
+        IBalanceResponsibilityRelationsRepository balanceResponsibilityRelationsRepository)
     {
         _actorRepository = actorRepository;
-        _balanceResponsibilityAgreementsRepository = balanceResponsibilityAgreementsRepository;
+        _balanceResponsibilityRelationsRepository = balanceResponsibilityRelationsRepository;
     }
 
-    public async Task<GetBalanceResponsibilityAgreementsResponse> Handle(GetBalanceResponsibilityAgreementsCommand request, CancellationToken cancellationToken)
+    public async Task<GetBalanceResponsibilityRelationsResponse> Handle(GetBalanceResponsibilityRelationsCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -50,40 +50,40 @@ public sealed class GetBalanceResponsibilityAgreementsHandler : IRequestHandler<
 
         if (actor.MarketRoles.Any(mr => mr.Function == EicFunction.EnergySupplier))
         {
-            var contractors = await _balanceResponsibilityAgreementsRepository
+            var contractors = await _balanceResponsibilityRelationsRepository
                 .GetForEnergySupplierAsync(actor.Id)
                 .ConfigureAwait(false);
 
-            return new GetBalanceResponsibilityAgreementsResponse(contractors
+            return new GetBalanceResponsibilityRelationsResponse(contractors
                 .SelectMany(contractor => contractor
-                    .Agreements
-                    .Where(agreement => agreement.EnergySupplier == actor.Id)
-                    .Select(agreement => Map(contractor.BalanceResponsibleParty, agreement))));
+                    .Relations
+                    .Where(relation => relation.EnergySupplier == actor.Id)
+                    .Select(relation => Map(contractor.BalanceResponsibleParty, relation))));
         }
 
         if (actor.MarketRoles.Any(mr => mr.Function == EicFunction.BalanceResponsibleParty))
         {
-            var agreements = await _balanceResponsibilityAgreementsRepository
+            var relations = await _balanceResponsibilityRelationsRepository
                 .GetForBalanceResponsiblePartyAsync(actor.Id)
                 .ConfigureAwait(false);
 
-            return new GetBalanceResponsibilityAgreementsResponse(agreements
-                .Agreements
-                .Select(agreement => Map(agreements.BalanceResponsibleParty, agreement)));
+            return new GetBalanceResponsibilityRelationsResponse(relations
+                .Relations
+                .Select(relation => Map(relations.BalanceResponsibleParty, relation)));
         }
 
-        throw new ValidationException("The specified actor does not support balance responsibility agreements.")
+        throw new ValidationException("The specified actor does not support balance responsibility relations.")
             .WithErrorCode("balance_responsibility.unsupported_actor");
     }
 
-    private static BalanceResponsibilityAgreementDto Map(ActorId balanceResponsibleId, BalanceResponsibilityAgreement agreement)
+    private static BalanceResponsibilityRelationDto Map(ActorId balanceResponsibleId, BalanceResponsibilityRelation relation)
     {
-        return new BalanceResponsibilityAgreementDto(
-            agreement.EnergySupplier.Value,
+        return new BalanceResponsibilityRelationDto(
+            relation.EnergySupplier.Value,
             balanceResponsibleId.Value,
-            agreement.GridArea.Value,
-            agreement.MeteringPointType,
-            agreement.ValidFrom.ToDateTimeOffset(),
-            agreement.ValidTo?.ToDateTimeOffset());
+            relation.GridArea.Value,
+            relation.MeteringPointType,
+            relation.ValidFrom.ToDateTimeOffset(),
+            relation.ValidTo?.ToDateTimeOffset());
     }
 }

@@ -76,7 +76,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<ProcessDelegationEntity> ProcessDelegations { get; private set; } = null!;
     public DbSet<DelegationPeriodEntity> DelegationPeriods { get; private set; } = null!;
     public DbSet<BalanceResponsibilityRequestEntity> BalanceResponsibilityRequests { get; private set; } = null!;
-    public DbSet<BalanceResponsibilityAgreementEntity> BalanceResponsibilityAgreements { get; private set; } = null!;
+    public DbSet<BalanceResponsibilityRelationEntity> BalanceResponsibilityRelations { get; private set; } = null!;
 
     public async Task<int> SaveChangesAsync()
     {
@@ -144,7 +144,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new ProcessDelegationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new DelegationPeriodEntityConfiguration());
         modelBuilder.ApplyConfiguration(new BalanceResponsibilityRequestEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new BalanceResponsibilityAgreementEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new BalanceResponsibilityRelationEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 

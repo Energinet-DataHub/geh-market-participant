@@ -26,13 +26,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
-[Route("balance-responsibility-agreements")]
-public sealed class BalanceResponsibilityAgreementsController : ControllerBase
+[Route("balance-responsibility-relations")]
+public sealed class BalanceResponsibilityRelationsController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IUserContext<FrontendUser> _userContext;
 
-    public BalanceResponsibilityAgreementsController(IMediator mediator, IUserContext<FrontendUser> userContext)
+    public BalanceResponsibilityRelationsController(IMediator mediator, IUserContext<FrontendUser> userContext)
     {
         _mediator = mediator;
         _userContext = userContext;
@@ -40,15 +40,15 @@ public sealed class BalanceResponsibilityAgreementsController : ControllerBase
 
     [HttpGet("{actorId:guid}")]
     [AuthorizeUser(PermissionId.BalanceResponsibilityView)]
-    public async Task<ActionResult<IEnumerable<BalanceResponsibilityAgreementDto>>> GetBalanceResponsibilityAgreementsAsync(Guid actorId)
+    public async Task<ActionResult<IEnumerable<BalanceResponsibilityRelationDto>>> GetBalanceResponsibilityRelationsAsync(Guid actorId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
             return Unauthorized();
 
         var result = await _mediator
-            .Send(new GetBalanceResponsibilityAgreementsCommand(actorId))
+            .Send(new GetBalanceResponsibilityRelationsCommand(actorId))
             .ConfigureAwait(false);
 
-        return Ok(result.Agreements);
+        return Ok(result.Relations);
     }
 }

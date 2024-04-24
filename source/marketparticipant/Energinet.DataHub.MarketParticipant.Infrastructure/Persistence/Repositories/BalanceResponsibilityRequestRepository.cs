@@ -68,7 +68,7 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
         }
     }
 
-    private async Task<BalanceResponsibilityAgreementEntity?> DequeueNextAsync(ActorId affectedActorId)
+    private async Task<BalanceResponsibilityRelationEntity?> DequeueNextAsync(ActorId affectedActorId)
     {
         ArgumentNullException.ThrowIfNull(affectedActorId);
 
@@ -96,15 +96,13 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
                 .ConfigureAwait(false);
 
         if (nextBalanceResponsibleRequest == null)
-        {
             return null;
-        }
 
         _marketParticipantDbContext
-                .BalanceResponsibilityRequests
-                .Remove(nextBalanceResponsibleRequest.Request);
+            .BalanceResponsibilityRequests
+            .Remove(nextBalanceResponsibleRequest.Request);
 
-        return new BalanceResponsibilityAgreementEntity
+        return new BalanceResponsibilityRelationEntity
         {
             EnergySupplierId = nextBalanceResponsibleRequest.SupplierId,
             BalanceResponsiblePartyId = nextBalanceResponsibleRequest.BalanceResponsibleId,
@@ -115,26 +113,26 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
         };
     }
 
-    private async Task InsertAndHandleOverlapAsync(BalanceResponsibilityAgreementEntity entity)
+    private async Task InsertAndHandleOverlapAsync(BalanceResponsibilityRelationEntity entity)
     {
         var overlapQuery =
-            from agreement in _marketParticipantDbContext.BalanceResponsibilityAgreements
+            from relation in _marketParticipantDbContext.BalanceResponsibilityRelations
             where
-                agreement.EnergySupplierId == entity.EnergySupplierId &&
-                agreement.BalanceResponsiblePartyId == entity.BalanceResponsiblePartyId &&
-                agreement.GridAreaId == entity.GridAreaId &&
-                agreement.MeteringPointType == entity.MeteringPointType &&
-                agreement.ValidFrom < (entity.ValidTo ?? DateTimeOffset.MaxValue) &&
-                entity.ValidFrom < (agreement.ValidTo ?? DateTimeOffset.MaxValue)
-            select agreement;
+                relation.EnergySupplierId == entity.EnergySupplierId &&
+                relation.BalanceResponsiblePartyId == entity.BalanceResponsiblePartyId &&
+                relation.GridAreaId == entity.GridAreaId &&
+                relation.MeteringPointType == entity.MeteringPointType &&
+                relation.ValidFrom < (entity.ValidTo ?? DateTimeOffset.MaxValue) &&
+                entity.ValidFrom < (relation.ValidTo ?? DateTimeOffset.MaxValue)
+            select relation;
 
-        var overlappedAgreements = await overlapQuery
+        var overlappedRelations = await overlapQuery
             .ToListAsync()
             .ConfigureAwait(false);
 
-        if (overlappedAgreements.Count > 1)
+        if (overlappedRelations.Count > 1)
         {
-            throw new ValidationException("Cannot process balance responsibility agreement, as the overlap is not supported.")
+            throw new ValidationException("Cannot process balance responsibility relation, as the overlap is not supported.")
                 .WithErrorCode("balance_responsibility.unsupported_overlap")
                 .WithArgs(
                     ("balanceResponsibleParty", entity.BalanceResponsiblePartyId),
@@ -143,9 +141,9 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
                     ("to", entity.ValidTo ?? DateTimeOffset.MaxValue));
         }
 
-        if (overlappedAgreements.Count == 1)
+        if (overlappedRelations.Count == 1)
         {
-            var overlap = overlappedAgreements[0];
+            var overlap = overlappedRelations[0];
 
             var supportedOverlapIdentical = overlap.ValidFrom == entity.ValidFrom && overlap.ValidTo == entity.ValidTo;
             if (supportedOverlapIdentical)
@@ -155,11 +153,11 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
             if (supportedOverlapEndDateSet)
             {
                 overlap.ValidTo = entity.ValidTo;
-                _marketParticipantDbContext.BalanceResponsibilityAgreements.Update(overlap);
+                _marketParticipantDbContext.BalanceResponsibilityRelations.Update(overlap);
                 return;
             }
 
-            throw new ValidationException("Cannot process balance responsibility agreement, as the overlap is not supported.")
+            throw new ValidationException("Cannot process balance responsibility relation, as the overlap is not supported.")
                 .WithErrorCode("balance_responsibility.unsupported_overlap")
                 .WithArgs(
                     ("balanceResponsibleParty", entity.BalanceResponsiblePartyId),
@@ -169,7 +167,7 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
         }
 
         await _marketParticipantDbContext
-            .BalanceResponsibilityAgreements
+            .BalanceResponsibilityRelations
             .AddAsync(entity)
             .ConfigureAwait(false);
     }

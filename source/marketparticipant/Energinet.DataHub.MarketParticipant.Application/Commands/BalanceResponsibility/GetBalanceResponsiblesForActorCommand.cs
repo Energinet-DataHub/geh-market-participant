@@ -17,4 +17,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 
-public sealed record GetBalanceResponsibilityAgreementsCommand(Guid ActorId) : IRequest<GetBalanceResponsibilityAgreementsResponse>;
+public sealed record GetBalanceResponsibilityRelationsCommand(Guid ActorId) : IRequest<GetBalanceResponsibilityRelationsResponse>;
