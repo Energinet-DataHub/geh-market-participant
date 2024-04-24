@@ -16,4 +16,4 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 
-public sealed record GetBalanceResponsibilityAgreementsResponse(IEnumerable<BalanceResponsibilityAgreementDto> Agreements);
+public sealed record GetBalanceResponsibilityRelationsResponse(IEnumerable<BalanceResponsibilityRelationDto> Relations);

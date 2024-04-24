@@ -106,7 +106,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<CreateProcessDelegationCommand>, CreateProcessDelegationCommandRuleSet>();
         services.AddScoped<IValidator<StopProcessDelegationCommand>, StopProcessDelegationCommandRuleSet>();
         services.AddScoped<IValidator<ReActivateUserCommand>, ReActivateUserCommandRuleSet>();
-        services.AddScoped<IValidator<GetBalanceResponsibilityAgreementsCommand>, GetBalanceResponsibilityAgreementsCommandRuleSet>();
+        services.AddScoped<IValidator<GetBalanceResponsibilityRelationsCommand>, GetBalanceResponsibilityRelationsCommandRuleSet>();
 
         services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
         services.AddScoped<IActorClientSecretService, ActorClientSecretService>();

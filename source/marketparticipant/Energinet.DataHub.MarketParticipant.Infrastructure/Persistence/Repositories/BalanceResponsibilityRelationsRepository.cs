@@ -23,12 +23,12 @@ using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class BalanceResponsibilityAgreementsRepository : IBalanceResponsibilityAgreementsRepository
+public sealed class BalanceResponsibilityRelationsRepository : IBalanceResponsibilityRelationsRepository
 {
     private readonly IBalanceResponsibilityRequestRepository _balanceResponsibilityRequestRepository;
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
-    public BalanceResponsibilityAgreementsRepository(
+    public BalanceResponsibilityRelationsRepository(
         IBalanceResponsibilityRequestRepository balanceResponsibilityRequestRepository,
         IMarketParticipantDbContext marketParticipantDbContext)
     {
@@ -42,13 +42,13 @@ public sealed class BalanceResponsibilityAgreementsRepository : IBalanceResponsi
             .ProcessNextRequestsAsync(balanceResponsibleParty)
             .ConfigureAwait(false);
 
-        var agreements = await _marketParticipantDbContext
-            .BalanceResponsibilityAgreements
-            .Where(agreement => agreement.BalanceResponsiblePartyId == balanceResponsibleParty.Value)
+        var relations = await _marketParticipantDbContext
+            .BalanceResponsibilityRelations
+            .Where(relation => relation.BalanceResponsiblePartyId == balanceResponsibleParty.Value)
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return new BalanceResponsibilityContractor(balanceResponsibleParty, agreements.Select(Map));
+        return new BalanceResponsibilityContractor(balanceResponsibleParty, relations.Select(Map));
     }
 
     public async Task<IEnumerable<BalanceResponsibilityContractor>> GetForEnergySupplierAsync(ActorId energySupplier)
@@ -58,31 +58,31 @@ public sealed class BalanceResponsibilityAgreementsRepository : IBalanceResponsi
             .ConfigureAwait(false);
 
         var contractorsQuery = _marketParticipantDbContext
-            .BalanceResponsibilityAgreements
-            .Where(agreement => agreement.EnergySupplierId == energySupplier.Value)
-            .Select(agreement => agreement.BalanceResponsiblePartyId)
+            .BalanceResponsibilityRelations
+            .Where(relation => relation.EnergySupplierId == energySupplier.Value)
+            .Select(relation => relation.BalanceResponsiblePartyId)
             .Distinct();
 
-        var agreementGroups = await _marketParticipantDbContext
-            .BalanceResponsibilityAgreements
-            .Where(agreement => contractorsQuery.Contains(agreement.BalanceResponsiblePartyId))
-            .GroupBy(agreement => agreement.BalanceResponsiblePartyId)
+        var relationGroups = await _marketParticipantDbContext
+            .BalanceResponsibilityRelations
+            .Where(relation => contractorsQuery.Contains(relation.BalanceResponsiblePartyId))
+            .GroupBy(relation => relation.BalanceResponsiblePartyId)
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return agreementGroups.Select(agreementGroup =>
+        return relationGroups.Select(relationGroup =>
             new BalanceResponsibilityContractor(
-                new ActorId(agreementGroup.Key),
-                agreementGroup.Select(Map)));
+                new ActorId(relationGroup.Key),
+                relationGroup.Select(Map)));
     }
 
-    private static BalanceResponsibilityAgreement Map(BalanceResponsibilityAgreementEntity agreement)
+    private static BalanceResponsibilityRelation Map(BalanceResponsibilityRelationEntity relation)
     {
-        return new BalanceResponsibilityAgreement(
-            new ActorId(agreement.EnergySupplierId),
-            new GridAreaId(agreement.GridAreaId),
-            (MeteringPointType)agreement.MeteringPointType,
-            agreement.ValidFrom.ToInstant(),
-            agreement.ValidTo?.ToInstant());
+        return new BalanceResponsibilityRelation(
+            new ActorId(relation.EnergySupplierId),
+            new GridAreaId(relation.GridAreaId),
+            (MeteringPointType)relation.MeteringPointType,
+            relation.ValidFrom.ToInstant(),
+            relation.ValidTo?.ToInstant());
     }
 }
