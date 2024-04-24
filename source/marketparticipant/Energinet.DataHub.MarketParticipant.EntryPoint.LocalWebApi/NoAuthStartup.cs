@@ -22,11 +22,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 
 public class NoAuthStartup : WebApi.Startup
 {
-    public NoAuthStartup(IConfiguration configuration)
-        : base(configuration)
-    {
-    }
-
     protected override void SetupAuthentication(IConfiguration configuration, IServiceCollection services)
     {
         services
