@@ -16,23 +16,21 @@ using Energinet.DataHub.MarketParticipant.Application;
 using Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Common.Email;
 using MediatR;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.Common;
 
-public abstract class StartupBase
+public static class MarketParticipantRegistration
 {
-    public void Initialize(IConfiguration configuration, IServiceCollection services)
+    public static void AddMarketParticipantCore(this IServiceCollection services)
     {
         services.AddDbContexts();
+
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>));
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssemblyContaining<ApplicationAssemblyReference>();
         });
-
-        Configure(configuration, services);
 
         services.AddApplicationServices();
         services.AddInfrastructureServices();
@@ -46,6 +44,4 @@ public abstract class StartupBase
         services.AddEmailConfigRegistration();
         services.AddCvrRegisterConfiguration();
     }
-
-    protected abstract void Configure(IConfiguration configuration, IServiceCollection services);
 }

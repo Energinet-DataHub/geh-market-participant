@@ -28,13 +28,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests;
 
 public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
 {
-    private readonly Startup _startup;
-
-    private OrganizationIntegrationTestHost()
-    {
-        _startup = new Startup();
-    }
-
     public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
 
     public static Task<OrganizationIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture)
@@ -45,7 +38,7 @@ public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
 
         var host = new OrganizationIntegrationTestHost();
         host.ServiceCollection.AddSingleton(configuration);
-        host._startup.Initialize(configuration, host.ServiceCollection);
+        host.ServiceCollection.AddMarketParticipantOrganizationModule(configuration);
         InitEmailSender(host.ServiceCollection);
 
         return Task.FromResult(host);

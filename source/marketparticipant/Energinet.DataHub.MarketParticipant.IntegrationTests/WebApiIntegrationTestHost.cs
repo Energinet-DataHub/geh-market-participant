@@ -19,7 +19,6 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
@@ -31,13 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests;
 
 public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 {
-    private readonly Startup _startup;
-
-    private WebApiIntegrationTestHost()
-    {
-        _startup = new NoAuthStartup();
-    }
-
     public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
 
     public static Task<WebApiIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture, B2CFixture? b2CFixture = null, CertificateFixture? certificateFixture = null)
@@ -48,7 +40,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
         var host = new WebApiIntegrationTestHost();
         host.ServiceCollection.AddSingleton(configuration);
-        host._startup.Initialize(configuration, host.ServiceCollection);
+        host.ServiceCollection.AddMarketParticipantWebApiModule(configuration);
         InitUserIdProvider(host.ServiceCollection);
 
         if (b2CFixture != null)

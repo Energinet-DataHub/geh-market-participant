@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase<Startup>
+public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase<MarketParticipantWebApiAssembly>
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
@@ -82,9 +82,9 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase<
         using var client = CreateClient();
 
         // Act
-        Startup.EnableIntegrationTestKeys = true;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = true;
         var responseJson = await client.GetStringAsync(query);
-        Startup.EnableIntegrationTestKeys = false;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = false;
 
         // Assert
         var response = JsonSerializer.Deserialize<GetActorsAssociatedWithExternalUserIdResponse>(
@@ -115,9 +115,9 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase<
         using var client = CreateClient();
 
         // Act
-        Startup.EnableIntegrationTestKeys = true;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = true;
         var responseJson = await client.GetStringAsync(query);
-        Startup.EnableIntegrationTestKeys = false;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = false;
 
         // Assert
         var response = JsonSerializer.Deserialize<GetActorsAssociatedWithExternalUserIdResponse>(
