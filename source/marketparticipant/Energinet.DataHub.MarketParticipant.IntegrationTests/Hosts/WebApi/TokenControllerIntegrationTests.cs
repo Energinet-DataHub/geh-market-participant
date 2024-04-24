@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class TokenControllerIntegrationTests :
-    WebApiIntegrationTestsBase<MarketParticipantWebApiAssemblyForTesting>,
+    WebApiIntegrationTestsBase<MarketParticipantWebApiAssembly>,
     IClassFixture<KeyClientFixture>,
     IAsyncLifetime
 {
@@ -146,9 +146,9 @@ public sealed class TokenControllerIntegrationTests :
         using var client = CreateClient();
 
         // Act
-        MarketParticipantWebApiAssemblyForTesting.EnableIntegrationTestKeys = false;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = false;
         using var response = await client.PostAsync(new Uri(target, UriKind.Relative), httpContent);
-        MarketParticipantWebApiAssemblyForTesting.EnableIntegrationTestKeys = true;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = true;
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -363,7 +363,7 @@ public sealed class TokenControllerIntegrationTests :
         ArgumentNullException.ThrowIfNull(builder);
 
         base.ConfigureWebHost(builder);
-        MarketParticipantWebApiAssemblyForTesting.EnableIntegrationTestKeys = true;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = true;
 
         builder.UseSetting(Settings.TokenKeyVault.Key, _keyClientFixture.KeyClient.VaultUri.ToString());
         builder.UseSetting(Settings.TokenKeyName.Key, _keyClientFixture.KeyName);

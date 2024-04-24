@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class TokenPartsControllerIntegrationTests :
-    WebApiIntegrationTestsBase<MarketParticipantWebApiAssemblyForTesting>,
+    WebApiIntegrationTestsBase<MarketParticipantWebApiAssembly>,
     IClassFixture<KeyClientFixture>
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
@@ -216,7 +216,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         ArgumentNullException.ThrowIfNull(builder);
 
         base.ConfigureWebHost(builder);
-        MarketParticipantWebApiAssemblyForTesting.EnableIntegrationTestKeys = true;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = true;
 
         builder.UseSetting(Settings.TokenKeyVault.Key, _keyClientFixture.KeyClient.VaultUri.ToString());
         builder.UseSetting(Settings.TokenKeyName.Key, _keyClientFixture.KeyName);

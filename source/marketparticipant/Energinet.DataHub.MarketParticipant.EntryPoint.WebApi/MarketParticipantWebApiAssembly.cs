@@ -15,7 +15,7 @@
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
 // Used by integration tests to find the current assembly.
-public sealed class MarketParticipantWebApiAssemblyForTesting
+public sealed class MarketParticipantWebApiAssembly
 {
     /// <summary>
     /// Disables validation of external token and CreatedOn limit for KeyVault keys.

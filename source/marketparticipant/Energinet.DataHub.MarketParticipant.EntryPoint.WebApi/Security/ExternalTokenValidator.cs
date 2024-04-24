@@ -45,7 +45,7 @@ public sealed class ExternalTokenValidator : IExternalTokenValidator
 
     public async Task<bool> ValidateTokenAsync(string token)
     {
-        if (MarketParticipantWebApiAssemblyForTesting.EnableIntegrationTestKeys)
+        if (MarketParticipantWebApiAssembly.EnableIntegrationTestKeys)
             return true;
 
         var tokenHandler = new JwtSecurityTokenHandler();
