@@ -25,6 +25,11 @@ UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00
 UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '381'
 UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '384'
 UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '385'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '396'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '531'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '532'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '533'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '543'
 
 -- Insert missing grid areas, that are expired
 INSERT INTO [dbo].[GridArea] ([Id], [Code], [Name], [PriceAreaCode], [ValidFrom], [ValidTo], [FullFlexDate], [ChangedByIdentityId])
@@ -42,11 +47,18 @@ VALUES
     (NEWID(), '145', 'Dinel A/S - 145 (Galten)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2017 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '146', 'N1 A/S - 146 (Bjerringbro)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-12-2017 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '149', 'N1 A/S - 149 (ELRO)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-12-2017 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
-    (NEWID(), '152', 'N1 A/S - 152',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '28-02-2023 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '152', 'N1 A/S - 152',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '28-02-2023 23:00:00', 105), CONVERT(datetime, '30-11-2020 23:00:00', 105), '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '232', 'Dinel A/S - 232 (Østjysk)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2017 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '246', 'MES Net A/S',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '28-02-2018 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '248', 'VOS Net A/S',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-12-2017 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '353', 'N1 A/S - 353 (Vest)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-12-2017 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '359', 'RAH Net A/S - 359',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-10-2017 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '392', 'N1 A/S - 392 (Borris)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-12-2017 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '394', 'Kibæk Elværk Amba',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2019 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '397', 'N1 A/S - 397 (Sdr. Felding)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-12-2017 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '398', 'N1 A/S - 398',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-01-2024 23:00:00', 105), CONVERT(datetime, '30-11-2020 23:00:00', 105), '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '443', 'Ærø Elforsyning Net A/S',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-12-2017 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '512', 'Vores Elnet A/S - 512',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '28-02-2022 23:00:00', 105), CONVERT(datetime, '31-12-2019 23:00:00', 105), '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '552', 'Vores Elnet A/S - 552 (FFV)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '553', 'Vores Elnet A/S - 553 (Nyborg)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
 
