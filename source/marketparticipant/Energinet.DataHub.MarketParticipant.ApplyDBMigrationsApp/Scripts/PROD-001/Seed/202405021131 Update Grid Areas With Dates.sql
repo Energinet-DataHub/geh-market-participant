@@ -87,5 +87,5 @@ VALUES
     (NEWID(), '981', 'Vattenfall Produktionsnet',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-10-2015 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '982', 'Produktionsnet DK2',                 2, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '10-02-2013 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '983', 'EON Produktionsnet',                 2, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-01-2016 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
-    (NEWID(), '999', 'ENDK',                 2, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '10-02-2013 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '999', 'ENDK',                 2, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '10-02-2013 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000')
 
