@@ -1,6 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
-//
-// Licensed under the Apache License, Version 2.0 (the "License2");
+﻿// Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -85,8 +83,7 @@ public static class KnownPermissions
         {
             EicFunction.EnergySupplier,
             EicFunction.GridAccessProvider,
-            EicFunction.MeteredDataResponsible,
-            EicFunction.BalanceResponsibleParty,
+            EicFunction.SystemOperator,
             EicFunction.DataHubAdministrator
         }),
         new(PermissionId.ESettExchangeManage, "esett-exchange:manage", InstantPattern.ExtendedIso.Parse("2023-09-01T00:00:00Z").Value, new[]
