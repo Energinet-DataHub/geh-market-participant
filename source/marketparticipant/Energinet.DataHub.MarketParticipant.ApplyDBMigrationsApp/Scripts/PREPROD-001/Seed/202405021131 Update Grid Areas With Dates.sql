@@ -30,6 +30,15 @@ UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00
 UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '532'
 UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '533'
 UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '543'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '584'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '740'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '757'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '791'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '853'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '854'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '860'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '911'
+UPDATE [dbo].[GridArea] SET [ValidFrom] = CONVERT(datetime, '01-01-1900 00:00:00', 105) WHERE [Code] = '955'
 
 -- Insert missing grid areas, that are expired
 INSERT INTO [dbo].[GridArea] ([Id], [Code], [Name], [PriceAreaCode], [ValidFrom], [ValidTo], [FullFlexDate], [ChangedByIdentityId])
@@ -61,4 +70,22 @@ VALUES
     (NEWID(), '512', 'Vores Elnet A/S - 512',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '28-02-2022 23:00:00', 105), CONVERT(datetime, '31-12-2019 23:00:00', 105), '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '552', 'Vores Elnet A/S - 552 (FFV)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
     (NEWID(), '553', 'Vores Elnet A/S - 553 (Nyborg)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '554', 'Vores Elnet A/S - 554 (City)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '587', 'Vores Elnet A/S - 587 (Paarup)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '588', 'Vores Elnet A/S - 588 (Brenderup)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '589', 'Midtfyns Elforsyning A.m.b.A. (589)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '590', 'Vores Elnet A/S - 590 (Nr. Broby)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '591', 'Midtfyns Elforsyning A.m.b.A. (591)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '592', 'Vores Elnet  A/S - 592 (Rolfsted)',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '651', 'UDGÅET - Banestyrelsen',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '07-12-2017 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '652', 'UDGÅET - Banestyrelsen (Øst)',                 2, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '07-12-2017 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '755', 'Verdo Go Green A/S',                 2, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '28-02-2022 23:00:00', 105), CONVERT(datetime, '30-11-2020 23:00:00', 105), '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '856', 'Cerius A/S (Vordingborg)',                 2, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2020 22:00:00', 105), CONVERT(datetime, '30-06-2019 22:00:00', 105), '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '961', 'UDGÅET - Nettab Storebælt DK2',                 2, CONVERT(datetime, '01-01-1900 00:00:00', 105), null, null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '963', 'Nettab Kriegers Flak',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-08-2022 22:00:00', 105), CONVERT(datetime, '30-06-2019 22:00:00', 105), '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '980', 'DONG Produktionsnet',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-03-2016 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '981', 'Vattenfall Produktionsnet',                 1, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-10-2015 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '982', 'Produktionsnet DK2',                 2, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '10-02-2013 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '983', 'EON Produktionsnet',                 2, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '31-01-2016 22:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '999', 'ENDK',                 2, CONVERT(datetime, '01-01-1900 00:00:00', 105), CONVERT(datetime, '10-02-2013 23:00:00', 105), null, '00000000-FFFF-FFFF-FFFF-000000000000'),
 
