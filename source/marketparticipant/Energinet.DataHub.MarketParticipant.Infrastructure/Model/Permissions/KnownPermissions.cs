@@ -85,8 +85,7 @@ public static class KnownPermissions
         {
             EicFunction.EnergySupplier,
             EicFunction.GridAccessProvider,
-            EicFunction.MeteredDataResponsible,
-            EicFunction.BalanceResponsibleParty,
+            EicFunction.SystemOperator,
             EicFunction.DataHubAdministrator
         }),
         new(PermissionId.ESettExchangeManage, "esett-exchange:manage", InstantPattern.ExtendedIso.Parse("2023-09-01T00:00:00Z").Value, new[]
