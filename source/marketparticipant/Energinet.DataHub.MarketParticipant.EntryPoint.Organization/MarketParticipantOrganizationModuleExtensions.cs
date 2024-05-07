@@ -114,7 +114,7 @@ internal static class MarketParticipantOrganizationModuleExtensions
             .AddAzureServiceBusSubscription(
                 _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
                 _ => configuration.GetSetting(Settings.ServiceBusTopicName),
-                _ => "market-participant") // This is the name of the subscription in the infrastructure project
+                _ => consumeEventsOptions.IntegrationEventSubscription) // This is the name of the subscription in the infrastructure project
             .AddAzureServiceBusSubscription(
                 _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
                 _ => consumeEventsOptions.SharedIntegrationEventTopic,
