@@ -111,12 +111,14 @@ internal static class MarketParticipantOrganizationModuleExtensions
             .AddDbContextCheck<MarketParticipantDbContext>()
             .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEventsAsync, name: "expired_events")
             .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEmailsAsync, name: "expired_emails")
-            .AddAzureServiceBusTopic(
+            .AddAzureServiceBusSubscription(
                 _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
-                _ => configuration.GetSetting(Settings.ServiceBusTopicName))
-            .AddAzureServiceBusTopic(
+                _ => configuration.GetSetting(Settings.ServiceBusTopicName),
+                _ => "market-participant") // This is the name of the subscription in the infrastructure project
+            .AddAzureServiceBusSubscription(
                 _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
                 _ => consumeEventsOptions.SharedIntegrationEventTopic,
+                _ => consumeEventsOptions.IntegrationEventSubscription,
                 name: "integration event consumer")
             .AddSendGrid(sendGridApiKey)
             .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check");
