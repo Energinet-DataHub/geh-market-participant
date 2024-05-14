@@ -79,7 +79,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
     {
         KeyValuePair<string, string?>[] keyValuePairs =
         {
-            new(Settings.SqlDbConnectionString.Key, dbConnectionString),
+            new("Database:ConnectionString", dbConnectionString),
             new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.MitIdExternalMetadataAddress)}", "fake_value"),
             new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.ExternalMetadataAddress)}", "fake_value"),
             new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.InternalMetadataAddress)}", "fake_value"),
