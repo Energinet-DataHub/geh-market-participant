@@ -23,5 +23,7 @@
 
   "CVR_BASE_ADDRESS": "https://localhost",
   "CVR_USERNAME": "cvr-username",
-  "CVR_PASSWORD": "cvr-password"
+  "CVR_PASSWORD": "cvr-password",
+  
+  "Database:ConnectionString": ""
 }

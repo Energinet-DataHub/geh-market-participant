@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.MarketParticipant.Common;
 
@@ -25,11 +24,13 @@ internal static class DbContextRegistration
 {
     public static void AddDbContexts(this IServiceCollection services)
     {
+        services.AddOptions();
+        services.AddOptions<DatabaseOptions>().BindConfiguration(DatabaseOptions.SectionName).ValidateDataAnnotations();
+
         services.AddDbContext<IMarketParticipantDbContext, MarketParticipantDbContext>((provider, options) =>
         {
-            var config = provider.GetRequiredService<IConfiguration>();
-            var connectionString = config.GetSetting(Settings.SqlDbConnectionString);
-            options.UseSqlServer(connectionString);
+            var databaseOptions = provider.GetRequiredService<IOptions<DatabaseOptions>>();
+            options.UseSqlServer(databaseOptions.Value.ConnectionString);
         });
     }
 }

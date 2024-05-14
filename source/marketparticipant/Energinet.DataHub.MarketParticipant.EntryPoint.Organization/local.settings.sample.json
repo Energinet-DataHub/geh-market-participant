@@ -19,6 +19,8 @@
 
     "ConsumeServiceBusSettings:ConnectionString": "",
     "ConsumeServiceBusSettings:SharedIntegrationEventTopic": "",
-    "ConsumeServiceBusSettings:IntegrationEventSubscription": ""
+    "ConsumeServiceBusSettings:IntegrationEventSubscription": "",
+    
+    "Database:ConnectionString": ""
   }
 }
