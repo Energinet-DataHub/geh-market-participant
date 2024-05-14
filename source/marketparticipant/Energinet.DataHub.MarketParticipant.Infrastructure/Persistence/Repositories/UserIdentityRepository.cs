@@ -22,6 +22,8 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
@@ -36,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 public sealed class UserIdentityRepository : IUserIdentityRepository
 {
     private readonly GraphServiceClient _graphClient;
-    private readonly AzureIdentityConfig _azureIdentityConfig;
+    private readonly IOptions<AzureB2COptions> _options;
     private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
     private readonly IUserPasswordGenerator _passwordGenerator;
 
@@ -57,12 +59,12 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
     public UserIdentityRepository(
         GraphServiceClient graphClient,
-        AzureIdentityConfig azureIdentityConfig,
+        IOptions<AzureB2COptions> options,
         IUserIdentityAuthenticationService userIdentityAuthenticationService,
         IUserPasswordGenerator passwordGenerator)
     {
         _graphClient = graphClient;
-        _azureIdentityConfig = azureIdentityConfig;
+        _options = options;
         _userIdentityAuthenticationService = userIdentityAuthenticationService;
         _passwordGenerator = passwordGenerator;
     }
@@ -371,7 +373,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .GetAsync(x =>
             {
                 x.QueryParameters.Select = _selectors;
-                x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{_azureIdentityConfig.Issuer}' and id/issuerAssignedId eq '{email.Address}')";
+                x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{_options.Value.Tenant}' and id/issuerAssignedId eq '{email.Address}')";
             })
             .ConfigureAwait(false);
 
@@ -416,7 +418,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 new()
                 {
                     SignInType = "emailAddress",
-                    Issuer = _azureIdentityConfig.Issuer,
+                    Issuer = _options.Value.Tenant,
                     IssuerAssignedId = userIdentity.Email.Address
                 }
             }

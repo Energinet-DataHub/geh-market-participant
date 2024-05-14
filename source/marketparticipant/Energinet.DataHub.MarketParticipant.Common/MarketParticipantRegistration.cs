@@ -15,6 +15,7 @@
 using Energinet.DataHub.MarketParticipant.Application;
 using Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Common.Email;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,12 +33,14 @@ public static class MarketParticipantRegistration
             config.RegisterServicesFromAssemblyContaining<ApplicationAssemblyReference>();
         });
 
+        services.AddOptions();
+        services.AddOptions<AzureB2COptions>().BindConfiguration(AzureB2COptions.SectionName).ValidateDataAnnotations();
+
         services.AddApplicationServices();
         services.AddInfrastructureServices();
         services.AddRepositories();
         services.AddDomainServices();
         services.AddUnitOfWorkProvider();
-        services.AddAzureAdConfiguration();
         services.AddGraphServiceClient();
         services.AddActiveDirectoryRoles();
         services.AddSendGridEmailSenderClient();

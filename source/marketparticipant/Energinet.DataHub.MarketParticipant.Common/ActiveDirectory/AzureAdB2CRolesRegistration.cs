@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 
 namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
@@ -27,10 +26,9 @@ internal static class AzureAdB2CRolesRegistration
     {
         services.AddSingleton<IActiveDirectoryB2BRolesProvider>(provider =>
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
             var graphClient = provider.GetRequiredService<GraphServiceClient>();
-            var appObjectId = configuration.GetSetting(Settings.B2CBackendObjectId);
-            return new ActiveDirectoryB2BRolesProvider(graphClient, appObjectId);
+            var options = provider.GetRequiredService<IOptions<AzureB2COptions>>();
+            return new ActiveDirectoryB2BRolesProvider(graphClient, options.Value.BackendObjectId);
         });
     }
 }
