@@ -20,9 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.Common.Configuration;
 public static class Settings
 #pragma warning restore CA1724
 {
-    public static Setting<string> SqlDbConnectionString { get; }
-        = new("SQL_MP_DB_CONNECTION_STRING");
-
     public static Setting<string> B2CBackendObjectId { get; }
         = new("AZURE_B2C_BACKEND_OBJECT_ID");
     public static Setting<string> B2CBackendServicePrincipalNameObjectId { get; }
