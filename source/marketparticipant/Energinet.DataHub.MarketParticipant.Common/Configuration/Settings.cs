@@ -20,19 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.Common.Configuration;
 public static class Settings
 #pragma warning restore CA1724
 {
-    public static Setting<string> B2CBackendObjectId { get; }
-        = new("AZURE_B2C_BACKEND_OBJECT_ID");
-    public static Setting<string> B2CBackendServicePrincipalNameObjectId { get; }
-        = new("AZURE_B2C_BACKEND_SPN_OBJECT_ID");
-    public static Setting<string> B2CBackendId { get; }
-        = new("AZURE_B2C_BACKEND_ID");
-    public static Setting<string> B2CTenant { get; }
-        = new("AZURE_B2C_TENANT");
-    public static Setting<string> B2CServicePrincipalId { get; }
-        = new("AZURE_B2C_SPN_ID");
-    public static Setting<string> B2CServicePrincipalSecret { get; }
-        = new("AZURE_B2C_SPN_SECRET");
-
     public static Setting<Uri> TokenKeyVault { get; }
         = new("TOKEN_KEY_VAULT");
     public static Setting<string> TokenKeyName { get; }

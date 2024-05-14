@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using Azure.Identity;
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Common.Extensions;
-using Microsoft.Extensions.Configuration;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 
 namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
@@ -27,16 +26,12 @@ internal static class GraphServiceClientRegistration
     {
         services.AddSingleton(provider =>
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
-
-            var azureB2CTenant = configuration.GetSetting(Settings.B2CTenant);
-            var azureB2CSpnId = configuration.GetSetting(Settings.B2CServicePrincipalId);
-            var azureB2CSpnSecret = configuration.GetSetting(Settings.B2CServicePrincipalSecret);
+            var options = provider.GetRequiredService<IOptions<AzureB2COptions>>();
 
             var clientSecretCredential = new ClientSecretCredential(
-                azureB2CTenant,
-                azureB2CSpnId,
-                azureB2CSpnSecret);
+                options.Value.Tenant,
+                options.Value.SpnId,
+                options.Value.SpnSecret);
 
             return new GraphServiceClient(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
         });
