@@ -59,7 +59,7 @@ public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
     {
         KeyValuePair<string, string?>[] keyValuePairs =
         {
-            new(Settings.SqlDbConnectionString.Key, dbConnectionString),
+            new("Database:ConnectionString", dbConnectionString),
             new(Settings.B2CBackendServicePrincipalNameObjectId.Key, Guid.Empty.ToString()),
             new(Settings.B2CBackendId.Key, Guid.Empty.ToString()),
             new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
