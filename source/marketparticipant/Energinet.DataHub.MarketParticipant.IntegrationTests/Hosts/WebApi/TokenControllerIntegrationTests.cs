@@ -366,7 +366,7 @@ public sealed class TokenControllerIntegrationTests :
 
         builder.UseSetting("KeyVault:TokenSignKeyVault", _keyClientFixture.KeyClient.VaultUri.ToString());
         builder.UseSetting("KeyVault:TokenSignKeyName", _keyClientFixture.KeyName);
-        builder.UseSetting("KeyVault:CertificatesKeyVault", "fake_value");
+        builder.UseSetting("KeyVault:CertificatesKeyVault", "https://fake_value");
     }
 
     private static string CreateExternalTestToken(
