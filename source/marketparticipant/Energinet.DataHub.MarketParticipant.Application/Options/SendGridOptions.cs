@@ -12,10 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application;
+using System.ComponentModel.DataAnnotations;
 
-public sealed record EmailRecipientConfig(
-    string OrgUpdateNotificationToEmail,
-    string BalanceResponsibleChangedNotificationToEmail,
-    string UserInviteFlow,
-    string? EnvironmentDescription);
+namespace Energinet.DataHub.MarketParticipant.Application.Options;
+
+public sealed record SendGridOptions
+{
+    public const string SectionName = "SendGrid";
+
+    [Required]
+    public string ApiKey { get; set; } = null!;
+
+    [Required]
+    public string SenderEmail { get; set; } = null!;
+
+    [Required]
+    public string BccEmail { get; set; } = null!;
+}

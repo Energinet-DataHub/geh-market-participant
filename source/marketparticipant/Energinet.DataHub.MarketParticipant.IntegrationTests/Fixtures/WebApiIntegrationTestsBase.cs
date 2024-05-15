@@ -40,8 +40,8 @@ public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFacto
         builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.ExternalMetadataAddress)}", "fake_value");
         builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.InternalMetadataAddress)}", "fake_value");
         builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.BackendBffAppId)}", TestBackendAppId);
-        builder.UseSetting(Settings.TokenKeyVault.Key, "fake_value");
-        builder.UseSetting(Settings.TokenKeyName.Key, "fake_value");
-        builder.UseSetting(Settings.CertificateKeyVault.Key, "fake_value");
+        builder.UseSetting("KeyVault:TokenSignKeyVault", "fake_value");
+        builder.UseSetting("KeyVault:TokenSignKeyName", "fake_value");
+        builder.UseSetting("KeyVault:CertificatesKeyVault", "fake_value");
     }
 }

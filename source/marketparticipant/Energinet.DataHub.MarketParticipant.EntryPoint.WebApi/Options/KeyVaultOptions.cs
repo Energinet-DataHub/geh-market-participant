@@ -12,10 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application;
+using System.ComponentModel.DataAnnotations;
 
-public sealed record EmailRecipientConfig(
-    string OrgUpdateNotificationToEmail,
-    string BalanceResponsibleChangedNotificationToEmail,
-    string UserInviteFlow,
-    string? EnvironmentDescription);
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Options;
+
+public sealed record KeyVaultOptions
+{
+    public const string SectionName = "KeyVault";
+
+    [Required]
+    public string TokenSignKeyVault { get; set; } = null!;
+
+    [Required]
+    public string TokenSignKeyName { get; set; } = null!;
+
+    [Required]
+    public string CertificatesKeyVault { get; set; } = null!;
+}

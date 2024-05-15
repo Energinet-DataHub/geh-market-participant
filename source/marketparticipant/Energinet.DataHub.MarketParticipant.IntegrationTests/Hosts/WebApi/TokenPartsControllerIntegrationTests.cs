@@ -23,7 +23,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
@@ -218,8 +217,9 @@ public sealed class TokenPartsControllerIntegrationTests :
         base.ConfigureWebHost(builder);
         MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = true;
 
-        builder.UseSetting(Settings.TokenKeyVault.Key, _keyClientFixture.KeyClient.VaultUri.ToString());
-        builder.UseSetting(Settings.TokenKeyName.Key, _keyClientFixture.KeyName);
+        builder.UseSetting("KeyVault:TokenSignKeyVault", _keyClientFixture.KeyClient.VaultUri.ToString());
+        builder.UseSetting("KeyVault:TokenSignKeyName", _keyClientFixture.KeyName);
+        builder.UseSetting("KeyVault:CertificatesKeyVault", "fake_value");
     }
 
     private static string CreateExternalTestToken(
