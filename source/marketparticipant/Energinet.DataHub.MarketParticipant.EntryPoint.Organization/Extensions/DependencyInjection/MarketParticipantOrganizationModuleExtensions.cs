@@ -37,7 +37,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using SendGrid.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions.DependencyInjection;
 
 internal static class MarketParticipantOrganizationModuleExtensions
 {
@@ -108,7 +108,6 @@ internal static class MarketParticipantOrganizationModuleExtensions
             return !expiredEmails;
         }
 
-        var sendGridApiKey = configuration.GetValue<string>("SendGrid:ApiKey") ?? throw new InvalidOperationException("SendGrid API key is missing");
         var consumeEventsOptions = configuration.GetSection(nameof(ConsumeServiceBusSettings)).Get<ConsumeServiceBusSettings>()!;
 
         services.AddScoped<HealthCheckEndpoint>();
@@ -127,7 +126,7 @@ internal static class MarketParticipantOrganizationModuleExtensions
                 _ => consumeEventsOptions.SharedIntegrationEventTopic,
                 _ => consumeEventsOptions.IntegrationEventSubscription,
                 name: "integration event consumer")
-            .AddSendGrid(sendGridApiKey)
+            .AddSendGrid()
             .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check");
     }
 }
