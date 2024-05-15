@@ -16,11 +16,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -95,9 +97,9 @@ public sealed class UserRoleController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("{userRoleId:guid}/auditlogentry")]
+    [HttpGet("{userRoleId:guid}/audit")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
-    public async Task<ActionResult<IEnumerable<UserRoleAuditLogEntryDto>>> GetUserRoleAuditLogsAsync(Guid userRoleId)
+    public async Task<ActionResult<IEnumerable<AuditLogDto<UserRoleAuditedChange>>>> GetAuditAsync(Guid userRoleId)
     {
         var command = new GetUserRoleAuditLogsCommand(userRoleId);
 
@@ -105,7 +107,7 @@ public sealed class UserRoleController : ControllerBase
             .Send(command)
             .ConfigureAwait(false);
 
-        return Ok(response.UserRoleAuditLogs);
+        return Ok(response.AuditLogs);
     }
 
     [HttpGet("permissions")]

@@ -20,32 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.Common.Configuration;
 public static class Settings
 #pragma warning restore CA1724
 {
-    public static Setting<string> SqlDbConnectionString { get; }
-        = new("SQL_MP_DB_CONNECTION_STRING");
-
-    public static Setting<string> B2CBackendObjectId { get; }
-        = new("AZURE_B2C_BACKEND_OBJECT_ID");
-    public static Setting<string> B2CBackendServicePrincipalNameObjectId { get; }
-        = new("AZURE_B2C_BACKEND_SPN_OBJECT_ID");
-    public static Setting<string> B2CBackendId { get; }
-        = new("AZURE_B2C_BACKEND_ID");
-    public static Setting<string> B2CTenant { get; }
-        = new("AZURE_B2C_TENANT");
-    public static Setting<string> B2CServicePrincipalId { get; }
-        = new("AZURE_B2C_SPN_ID");
-    public static Setting<string> B2CServicePrincipalSecret { get; }
-        = new("AZURE_B2C_SPN_SECRET");
-
-    public static Setting<string> ExternalOpenIdUrl { get; }
-        = new("EXTERNAL_OPEN_ID_URL");
-    public static Setting<string> InternalOpenIdUrl { get; }
-        = new("INTERNAL_OPEN_ID_URL");
-    public static Setting<string> BackendBffAppId { get; }
-        = new("BACKEND_BFF_APP_ID");
-
-    public static Setting<bool> AllowAllTokens { get; }
-        = new("ALLOW_ALL_TOKENS", false);
-
     public static Setting<Uri> TokenKeyVault { get; }
         = new("TOKEN_KEY_VAULT");
     public static Setting<string> TokenKeyName { get; }
@@ -57,12 +31,14 @@ public static class Settings
     public static Setting<string> SendGridApiKey { get; }
         = new("SEND_GRID_APIKEY");
 
-    public static Setting<string> UserInviteFromEmail { get; }
-        = new("USER_INVITE_FROM_EMAIL");
-    public static Setting<string> UserInviteBccEmail { get; }
-        = new("USER_INVITE_BCC_EMAIL");
+    public static Setting<string> SenderEmail { get; }
+        = new("SENDER_EMAIL");
+    public static Setting<string> BccEmail { get; }
+        = new("BCC_EMAIL");
     public static Setting<string> UserInviteFlow { get; }
         = new("USER_INVITE_FLOW");
+    public static Setting<string> EnvironmentDescription { get; }
+        = new("ENVIRONMENT_DESC");
 
     public static Setting<string> ServiceBusTopicConnectionString { get; }
         = new("SERVICE_BUS_CONNECTION_STRING");
@@ -73,4 +49,15 @@ public static class Settings
 
     public static Setting<bool> Enforce2Fa { get; }
         = new("ENFORCE_2FA", true);
+
+    public static Setting<string> CvrBaseAddress { get; }
+        = new("CVR_BASE_ADDRESS");
+    public static Setting<string> CvrUsername { get; }
+        = new("CVR_USERNAME");
+    public static Setting<string> CvrPassword { get; }
+        = new("CVR_PASSWORD");
+    public static Setting<string> OrganizationIdentityUpdateNotificationToEmail { get; }
+        = new("CVR_ORG_UPDATED_NOTIFICATION_TO_EMAIL");
+    public static Setting<string> BalanceResponsiblePartiesChangedNotificationToEmail { get; }
+        = new("BALANCE_RESPONSIBLE_CHANGED_NOTIFICATION_TO_EMAIL");
 }

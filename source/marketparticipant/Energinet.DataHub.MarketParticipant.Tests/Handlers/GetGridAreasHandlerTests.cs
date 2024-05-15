@@ -15,42 +15,41 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.GridAreas;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class GetGridAreasHandlerTests
 {
-    [UnitTest]
-    public sealed class GetGridAreasHandlerTests
+    [Fact]
+    public async Task Handle_Command_CallsRepository()
     {
-        [Fact]
-        public async Task Handle_Command_CallsRepository()
-        {
-            // arrange
-            var repositoryMock = new Mock<IGridAreaRepository>();
-            repositoryMock
-                .Setup(x => x.GetAsync())
-                .ReturnsAsync(new[]
-                {
-                    new GridArea(
+        // arrange
+        var repositoryMock = new Mock<IGridAreaRepository>();
+        repositoryMock
+            .Setup(x => x.GetAsync())
+            .ReturnsAsync(new[]
+            {
+                new GridArea(
                     new GridAreaName("name"),
                     new GridAreaCode("code"),
                     PriceAreaCode.Dk1,
                     DateTimeOffset.MinValue,
                     DateTimeOffset.MaxValue)
-                });
+            });
 
-            var target = new GetGridAreasHandler(repositoryMock.Object);
+        var target = new GetGridAreasHandler(repositoryMock.Object);
 
-            // act
-            var actual = await target.Handle(new Application.Commands.GridArea.GetGridAreasCommand(), CancellationToken.None);
+        // act
+        var actual = await target.Handle(new Application.Commands.GridAreas.GetGridAreasCommand(), CancellationToken.None);
 
-            // assert
-            Assert.NotEmpty(actual.GridAreas);
-        }
+        // assert
+        Assert.NotEmpty(actual.GridAreas);
     }
 }

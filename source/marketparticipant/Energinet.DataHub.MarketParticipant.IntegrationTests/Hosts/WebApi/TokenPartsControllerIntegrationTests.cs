@@ -40,9 +40,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class TokenPartsControllerIntegrationTests :
-    WebApiIntegrationTestsBase,
+    WebApiIntegrationTestsBase<MarketParticipantWebApiAssembly>,
     IClassFixture<KeyClientFixture>
 {
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
+
     private readonly KeyClientFixture _keyClientFixture;
     private readonly MarketParticipantDatabaseFixture _fixture;
 
@@ -150,8 +155,8 @@ public sealed class TokenPartsControllerIntegrationTests :
         var testActor = await _fixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(
             testUser.ExternalId,
-            notBefore: notBefore,
-            expires: notBefore.AddDays(1));
+            notBefore,
+            notBefore.AddDays(1));
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken, testActor.Id);
@@ -211,7 +216,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         ArgumentNullException.ThrowIfNull(builder);
 
         base.ConfigureWebHost(builder);
-        Startup.EnableIntegrationTestKeys = true;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = true;
 
         builder.UseSetting(Settings.TokenKeyVault.Key, _keyClientFixture.KeyClient.VaultUri.ToString());
         builder.UseSetting(Settings.TokenKeyName.Key, _keyClientFixture.KeyName);
@@ -227,7 +232,10 @@ public sealed class TokenPartsControllerIntegrationTests :
         var externalToken = new JwtSecurityToken(
             "https://example.com",
             "audience",
-            new[] { new Claim(JwtRegisteredClaimNames.Sub, externalUserId.ToString()) },
+            new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, externalUserId.ToString()),
+            },
             notBefore ?? DateTime.UtcNow.AddDays(-1),
             expires ?? DateTime.UtcNow.AddDays(1),
             new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256));
@@ -249,11 +257,13 @@ public sealed class TokenPartsControllerIntegrationTests :
         using var client = CreateClient();
 
         using var response = await client.PostAsync(new Uri(target, UriKind.Relative), httpContent);
+        response.EnsureSuccessStatusCode();
+
         var responseJson = await response.Content.ReadAsStringAsync();
 
         var internalTokenJson = JsonSerializer.Deserialize<TokenResponse>(
             responseJson,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            _jsonSerializerOptions);
 
         Assert.NotNull(internalTokenJson);
 

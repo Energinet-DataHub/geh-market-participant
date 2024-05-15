@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -30,11 +31,23 @@ public sealed class GraphApiHealthCheck : IHealthCheck
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        // Check that it is possible to connect to the Graph API.
-        await _graphServiceClient
-            .Admin
-            .GetAsync(cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+#pragma warning disable CA1031 // Do not catch general exception types
+        try
+        {
+            // Check that it is possible to connect to the Graph API.
+            await _graphServiceClient
+                .Admin
+                .GetAsync(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            await _graphServiceClient
+                .Admin
+                .GetAsync(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         return HealthCheckResult.Healthy();
     }

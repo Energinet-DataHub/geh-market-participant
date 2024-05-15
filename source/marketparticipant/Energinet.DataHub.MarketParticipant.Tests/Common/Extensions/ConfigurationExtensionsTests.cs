@@ -122,7 +122,7 @@ public sealed class ConfigurationExtensionsTests
     [InlineData(null)]
     [InlineData("  ")]
     [InlineData("")]
-    public void GetSetting_HasBrokenStringValue_ThrowsException(string value)
+    public void GetSetting_HasBrokenStringValue_ThrowsException(string? value)
     {
         // Arrange
         var configurationMock = new Mock<IConfiguration>();

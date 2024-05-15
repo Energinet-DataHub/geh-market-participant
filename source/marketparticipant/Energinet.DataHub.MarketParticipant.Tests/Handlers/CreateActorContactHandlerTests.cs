@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -28,134 +28,133 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class CreateActorContactHandlerTests
 {
-    [UnitTest]
-    public sealed class CreateActorContactHandlerTests
+    [Fact]
+    public async Task Handle_NonExistingActor_Throws()
     {
-        [Fact]
-        public async Task Handle_NonExistingActor_Throws()
-        {
-            // Arrange
-            var actorContactRepositoryMock = new Mock<IActorContactRepository>();
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var overlappingContactCategoriesRuleService = new Mock<IOverlappingActorContactCategoriesRuleService>();
-            var target = new CreateActorContactHandler(
-                actorRepositoryMock.Object,
-                actorContactRepositoryMock.Object,
-                overlappingContactCategoriesRuleService.Object);
+        // Arrange
+        var actorContactRepositoryMock = new Mock<IActorContactRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var overlappingContactCategoriesRuleService = new Mock<IOverlappingActorContactCategoriesRuleService>();
+        var target = new CreateActorContactHandler(
+            actorRepositoryMock.Object,
+            actorContactRepositoryMock.Object,
+            overlappingContactCategoriesRuleService.Object);
 
-            var actor = TestPreparationModels.MockedActor();
+        var actor = TestPreparationModels.MockedActor();
 
-            var contact = new ActorContact(
-                new ContactId(Guid.NewGuid()),
-                actor.Id,
-                "fake_value",
-                ContactCategory.ElectricalHeating,
-                new MockedEmailAddress(),
-                null);
+        var contact = new ActorContact(
+            new ContactId(Guid.NewGuid()),
+            actor.Id,
+            "fake_value",
+            ContactCategory.ElectricalHeating,
+            new RandomlyGeneratedEmailAddress(),
+            null);
 
-            actorContactRepositoryMock
-                .Setup(x => x.GetAsync(actor.Id))
-                .ReturnsAsync(new[] { contact, contact, contact });
+        actorContactRepositoryMock
+            .Setup(x => x.GetAsync(actor.Id))
+            .ReturnsAsync(new[] { contact, contact, contact });
 
-            actorContactRepositoryMock
-                .Setup(x => x.AddAsync(It.Is<ActorContact>(y => y.ActorId == actor.Id)))
-                .ReturnsAsync(contact.Id);
+        actorContactRepositoryMock
+            .Setup(x => x.AddAsync(It.Is<ActorContact>(y => y.ActorId == actor.Id)))
+            .ReturnsAsync(contact.Id);
 
-            var wrongId = Guid.NewGuid();
-            var command = new CreateActorContactCommand(
-                wrongId,
-                new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
+        var wrongId = Guid.NewGuid();
+        var command = new CreateActorContactCommand(
+            wrongId,
+            new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
 
-            // act + assert
-            var ex = await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
-            Assert.Contains(wrongId.ToString(), ex.Message, StringComparison.InvariantCultureIgnoreCase);
-        }
+        // act + assert
+        var ex = await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
+        Assert.Contains(wrongId.ToString(), ex.Message, StringComparison.InvariantCultureIgnoreCase);
+    }
 
-        [Fact]
-        public async Task Handle_NoOverlappingCategories_MustValidate()
-        {
-            // Arrange
-            var contactRepository = new Mock<IActorContactRepository>();
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var overlappingContactCategoriesRuleService = new Mock<IOverlappingActorContactCategoriesRuleService>();
-            var target = new CreateActorContactHandler(
-                actorRepositoryMock.Object,
-                contactRepository.Object,
-                overlappingContactCategoriesRuleService.Object);
+    [Fact]
+    public async Task Handle_NoOverlappingCategories_MustValidate()
+    {
+        // Arrange
+        var contactRepository = new Mock<IActorContactRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var overlappingContactCategoriesRuleService = new Mock<IOverlappingActorContactCategoriesRuleService>();
+        var target = new CreateActorContactHandler(
+            actorRepositoryMock.Object,
+            contactRepository.Object,
+            overlappingContactCategoriesRuleService.Object);
 
-            var actor = TestPreparationModels.MockedActor();
+        var actor = TestPreparationModels.MockedActor();
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
-                .ReturnsAsync(actor);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+            .ReturnsAsync(actor);
 
-            var contact = new ActorContact(
-                new ContactId(Guid.NewGuid()),
-                actor.Id,
-                "fake_value",
-                ContactCategory.ElectricalHeating,
-                new MockedEmailAddress(),
-                null);
+        var contact = new ActorContact(
+            new ContactId(Guid.NewGuid()),
+            actor.Id,
+            "fake_value",
+            ContactCategory.ElectricalHeating,
+            new RandomlyGeneratedEmailAddress(),
+            null);
 
-            contactRepository
-                .Setup(x => x.GetAsync(actor.Id))
-                .ReturnsAsync(new[] { contact, contact, contact });
+        contactRepository
+            .Setup(x => x.GetAsync(actor.Id))
+            .ReturnsAsync(new[] { contact, contact, contact });
 
-            contactRepository
-                .Setup(x => x.AddAsync(It.Is<ActorContact>(y => y.ActorId == actor.Id)))
-                .ReturnsAsync(contact.Id);
+        contactRepository
+            .Setup(x => x.AddAsync(It.Is<ActorContact>(y => y.ActorId == actor.Id)))
+            .ReturnsAsync(contact.Id);
 
-            var command = new CreateActorContactCommand(
-                actor.Id.Value,
-                new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
+        var command = new CreateActorContactCommand(
+            actor.Id.Value,
+            new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
 
-            // Act
-            await target.Handle(command, CancellationToken.None);
+        // Act
+        await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            overlappingContactCategoriesRuleService.Verify(x => x.ValidateCategoriesAcrossContacts(It.Is<IEnumerable<ActorContact>>(y => y.Count() == 4)), Times.Once);
-        }
+        // Assert
+        overlappingContactCategoriesRuleService.Verify(x => x.ValidateCategoriesAcrossContacts(It.Is<IEnumerable<ActorContact>>(y => y.Count() == 4)), Times.Once);
+    }
 
-        [Fact]
-        public async Task Handle_NewContact_ContactIdReturned()
-        {
-            // Arrange
-            var contactRepository = new Mock<IActorContactRepository>();
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var target = new CreateActorContactHandler(
-                actorRepositoryMock.Object,
-                contactRepository.Object,
-                new Mock<IOverlappingActorContactCategoriesRuleService>().Object);
+    [Fact]
+    public async Task Handle_NewContact_ContactIdReturned()
+    {
+        // Arrange
+        var contactRepository = new Mock<IActorContactRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var target = new CreateActorContactHandler(
+            actorRepositoryMock.Object,
+            contactRepository.Object,
+            new Mock<IOverlappingActorContactCategoriesRuleService>().Object);
 
-            var actor = TestPreparationModels.MockedActor();
+        var actor = TestPreparationModels.MockedActor();
 
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
-                .ReturnsAsync(actor);
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+            .ReturnsAsync(actor);
 
-            var contact = new ActorContact(
-                new ContactId(Guid.NewGuid()),
-                actor.Id,
-                "fake_value",
-                ContactCategory.ElectricalHeating,
-                new MockedEmailAddress(),
-                null);
+        var contact = new ActorContact(
+            new ContactId(Guid.NewGuid()),
+            actor.Id,
+            "fake_value",
+            ContactCategory.ElectricalHeating,
+            new RandomlyGeneratedEmailAddress(),
+            null);
 
-            contactRepository
-                .Setup(x => x.AddAsync(It.Is<ActorContact>(y => y.ActorId == actor.Id)))
-                .ReturnsAsync(contact.Id);
+        contactRepository
+            .Setup(x => x.AddAsync(It.Is<ActorContact>(y => y.ActorId == actor.Id)))
+            .ReturnsAsync(contact.Id);
 
-            var command = new CreateActorContactCommand(
-                actor.Id.Value,
-                new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
+        var command = new CreateActorContactCommand(
+            actor.Id.Value,
+            new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
 
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
 
-            // Assert
-            Assert.Equal(contact.Id.Value, response.ContactId);
-        }
+        // Assert
+        Assert.Equal(contact.Id.Value, response.ContactId);
     }
 }

@@ -16,48 +16,47 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Model
+namespace Energinet.DataHub.MarketParticipant.Tests.Model;
+
+[UnitTest]
+public sealed class ActorNumberTests
 {
-    [UnitTest]
-    public sealed class ActorNumberTests
+    [Fact]
+    public void Create_ValidEicNumber_ReturnsEicActorNumber()
     {
-        [Fact]
-        public void Create_ValidEicNumber_ReturnsEicActorNumber()
-        {
-            // arrange
-            const string ValidEic = "10X1001A1001A248";
+        // arrange
+        const string ValidEic = "10X1001A1001A248";
 
-            // act
-            var actual = ActorNumber.Create(ValidEic);
+        // act
+        var actual = ActorNumber.Create(ValidEic);
 
-            // assert
-            Assert.IsType<EicActorNumber>(actual);
-        }
+        // assert
+        Assert.IsType<EicActorNumber>(actual);
+    }
 
-        [Fact]
-        public void Create_ValidGlnNumber_ReturnsGlnActorNumber()
-        {
-            // arrange
-            const string ValidGln = "5790000555550";
+    [Fact]
+    public void Create_ValidGlnNumber_ReturnsGlnActorNumber()
+    {
+        // arrange
+        const string ValidGln = "5790000555550";
 
-            // act
-            var actual = ActorNumber.Create(ValidGln);
+        // act
+        var actual = ActorNumber.Create(ValidGln);
 
-            // assert
-            Assert.IsType<GlnActorNumber>(actual);
-        }
+        // assert
+        Assert.IsType<GlnActorNumber>(actual);
+    }
 
-        [Fact]
-        public void Create_InvalidNumber_ReturnsUnknownActorNumber()
-        {
-            // arrange
-            const string InvalidNumber = "invalid";
+    [Fact]
+    public void Create_InvalidNumber_ReturnsUnknownActorNumber()
+    {
+        // arrange
+        const string InvalidNumber = "invalid";
 
-            // act
-            var actual = ActorNumber.Create(InvalidNumber);
+        // act
+        var actual = ActorNumber.Create(InvalidNumber);
 
-            // assert
-            Assert.IsType<UnknownActorNumber>(actual);
-        }
+        // assert
+        Assert.IsType<UnknownActorNumber>(actual);
     }
 }

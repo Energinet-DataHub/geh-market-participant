@@ -31,7 +31,7 @@ public sealed class UserIdentityTests
     private readonly PhoneNumber _validPhoneNumber = new("+45 00000000");
     private readonly EmailAddress _validEmailAddress = new("todo@todo.dk");
     private readonly AuthenticationMethod _validAuthentication = new SmsAuthenticationMethod(new PhoneNumber("+45 71000000"));
-    private readonly IEnumerable<LoginIdentity> _validLoginIdentities = new List<LoginIdentity> { new("emailAddress", "issuer", "issuerAssignedId") };
+    private readonly IEnumerable<LoginIdentity> _validLoginIdentities = [new LoginIdentity("emailAddress", "issuer", "issuerAssignedId")];
 
     [Fact]
     public void Ctor_UserIdentityTests_ValidatesAuthenticationMethod()
@@ -52,18 +52,18 @@ public sealed class UserIdentityTests
     [InlineData("John", true)]
     [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true)]
     [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", false)]
-    public void Ctor_UserIdentityTests_ValidatesFirstName(string value, bool isValid)
+    public void Ctor_UserIdentityTests_ValidatesFirstName(string? value, bool isValid)
     {
         if (isValid)
         {
-            Assert.Equal(value, new UserIdentity(new SharedUserReferenceId(), _validEmailAddress, value, ValidLastName, _validPhoneNumber, _validAuthentication).FirstName);
+            Assert.Equal(value, new UserIdentity(new SharedUserReferenceId(), _validEmailAddress, value!, ValidLastName, _validPhoneNumber, _validAuthentication).FirstName);
         }
         else
         {
             Assert.Throws<ValidationException>(() => new UserIdentity(
                 new SharedUserReferenceId(),
                 _validEmailAddress,
-                value,
+                value!,
                 ValidLastName,
                 _validPhoneNumber,
                 _validAuthentication));
@@ -77,11 +77,11 @@ public sealed class UserIdentityTests
     [InlineData("Doe", true)]
     [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true)]
     [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", false)]
-    public void Ctor_UserIdentityTests_ValidatesLastName(string value, bool isValid)
+    public void Ctor_UserIdentityTests_ValidatesLastName(string? value, bool isValid)
     {
         if (isValid)
         {
-            Assert.Equal(value, new UserIdentity(new SharedUserReferenceId(), _validEmailAddress, ValidFirstName, value, _validPhoneNumber, _validAuthentication).LastName);
+            Assert.Equal(value, new UserIdentity(new SharedUserReferenceId(), _validEmailAddress, ValidFirstName, value!, _validPhoneNumber, _validAuthentication).LastName);
         }
         else
         {
@@ -89,7 +89,7 @@ public sealed class UserIdentityTests
                 new SharedUserReferenceId(),
                 _validEmailAddress,
                 ValidFirstName,
-                value,
+                value!,
                 _validPhoneNumber,
                 _validAuthentication));
         }
@@ -119,7 +119,7 @@ public sealed class UserIdentityTests
             _validPhoneNumber,
             DateTimeOffset.UtcNow,
             _validAuthentication,
-            new List<LoginIdentity> { new("federated", "issuer", "issuerAssignedId") });
+            [new LoginIdentity("federated", "issuer", "issuerAssignedId")]);
 
         // Act
         validUserIdentity.LinkOpenIdFrom(validUserIdentityToLink);
@@ -145,7 +145,7 @@ public sealed class UserIdentityTests
             _validAuthentication,
             _validLoginIdentities);
 
-        var validUserIdentityToLink = new UserIdentity(
+        var invalidUserIdentityToLink = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             new EmailAddress("notsameemail@notsame.dk"),
             UserIdentityStatus.Active,
@@ -154,9 +154,44 @@ public sealed class UserIdentityTests
             _validPhoneNumber,
             DateTimeOffset.UtcNow,
             _validAuthentication,
-            new List<LoginIdentity> { new("federated", "issuer", "issuerAssignedId") });
+            [new LoginIdentity("federated", "issuer", "issuerAssignedId")]);
 
         // Act + Assert
-        Assert.Throws<ValidationException>(() => validUserIdentity.LinkOpenIdFrom(validUserIdentityToLink));
+        Assert.Throws<ValidationException>(() => validUserIdentity.LinkOpenIdFrom(invalidUserIdentityToLink));
+    }
+
+    [Fact]
+    public void UserIdentityTests_UnlinkOpenId_RemovesOpenId()
+    {
+        // Arrange
+        var validUserIdentity = new UserIdentity(
+            new ExternalUserId(Guid.NewGuid()),
+            _validEmailAddress,
+            UserIdentityStatus.Active,
+            ValidFirstName,
+            ValidLastName,
+            _validPhoneNumber,
+            DateTimeOffset.UtcNow,
+            _validAuthentication,
+            _validLoginIdentities);
+
+        var validUserIdentityToLink = new UserIdentity(
+            new ExternalUserId(Guid.NewGuid()),
+            _validEmailAddress,
+            UserIdentityStatus.Active,
+            ValidFirstName,
+            ValidLastName,
+            _validPhoneNumber,
+            DateTimeOffset.UtcNow,
+            _validAuthentication,
+            [new LoginIdentity("federated", "issuer", "issuerAssignedId")]);
+
+        validUserIdentity.LinkOpenIdFrom(validUserIdentityToLink);
+
+        // Act
+        validUserIdentity.UnlinkOpenId();
+
+        // Assert
+        Assert.DoesNotContain(validUserIdentity.LoginIdentities, loginIdent => loginIdent.SignInType == "federated");
     }
 }

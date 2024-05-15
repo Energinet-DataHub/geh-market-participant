@@ -18,11 +18,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed record ActorId
 {
-    public ActorId(string value)
-    {
-        Value = Guid.Parse(value);
-    }
-
     public ActorId(Guid value)
     {
         Value = value;

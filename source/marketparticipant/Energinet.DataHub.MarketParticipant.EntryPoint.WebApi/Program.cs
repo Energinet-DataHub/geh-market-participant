@@ -12,28 +12,68 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+using System.Reflection;
+using System.Text.Json.Serialization;
+using Asp.Versioning;
+using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
+using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
+using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
-{
-    public static class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            var host = Host
-                .CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(builder =>
-                {
-                    builder
-                        .UseStartup<Startup>()
-                        .ConfigureServices(s => s.AddApplicationInsightsTelemetry());
-                })
-                .Build();
+const string subsystemName = "mark-part";
 
-            await host.RunAsync().ConfigureAwait(false);
-        }
-    }
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHttpLoggingScope(subsystemName);
+builder.Services.AddApplicationInsightsForWebApp(subsystemName);
+builder.Services.AddHealthChecksForWebApp();
+
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+builder.Services
+    .AddApiVersioningForWebApp(new ApiVersion(1, 0))
+    .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), subsystemName);
+
+builder.Services
+    .AddJwtBearerAuthenticationForWebApp(builder.Configuration)
+    .AddUserAuthenticationForWebApp<FrontendUser, FrontendUserProvider>()
+    .AddPermissionAuthorizationForWebApp();
+
+builder.Services
+    .AddMarketParticipantWebApiModule(builder.Configuration);
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
 }
+
+app.UseRouting();
+app.UseSwaggerForWebApp();
+app.UseHttpsRedirection();
+app.UseCommonExceptionHandling(exceptionBuilder =>
+{
+    exceptionBuilder.Use(new FluentValidationExceptionHandler("market_participant"));
+    exceptionBuilder.Use(new NotFoundValidationExceptionHandler("market_participant"));
+    exceptionBuilder.Use(new DataValidationExceptionHandler("market_participant"));
+    exceptionBuilder.Use(new FallbackExceptionHandler("market_participant"));
+});
+
+app.UseLoggingScope();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseUserMiddlewareForWebApp<FrontendUser>();
+app.MapControllers().RequireAuthorization();
+
+app.MapLiveHealthChecks();
+app.MapReadyHealthChecks();
+
+app.Run();

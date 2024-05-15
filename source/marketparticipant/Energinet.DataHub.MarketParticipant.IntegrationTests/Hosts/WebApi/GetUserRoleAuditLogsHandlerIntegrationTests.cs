@@ -60,9 +60,8 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
         var actual = await mediator.Send(command);
 
         // Assert
-        var actorCreatedAudit = actual.UserRoleAuditLogs.Single();
-        Assert.Equal(userRoleEntity.Id, actorCreatedAudit.UserRoleId);
-        Assert.Equal(UserRoleChangeType.Created, actorCreatedAudit.ChangeType);
+        var actorCreatedAudit = actual.AuditLogs.Single(log => log.Change == UserRoleAuditedChange.Status);
+        Assert.Equal(UserRoleStatus.Active.ToString(), actorCreatedAudit.CurrentValue);
         Assert.True(actorCreatedAudit.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
         Assert.True(actorCreatedAudit.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
     }
@@ -75,9 +74,12 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
         return TestAuditOfUserRoleChangeAsync(
             response =>
             {
-                var expectedLog = response.UserRoleAuditLogs.Single(log => log.ChangeType == UserRoleChangeType.NameChange);
+                var expectedLog = response
+                    .AuditLogs
+                    .Where(log => !log.IsInitialAssignment)
+                    .Single(log => log.Change == UserRoleAuditedChange.Name);
 
-                Assert.Equal(expected, expectedLog.Name);
+                Assert.Equal(expected, expectedLog.CurrentValue);
             },
             userRole =>
             {
@@ -93,9 +95,12 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
         return TestAuditOfUserRoleChangeAsync(
             response =>
             {
-                var expectedLog = response.UserRoleAuditLogs.Single(log => log.ChangeType == UserRoleChangeType.DescriptionChange);
+                var expectedLog = response
+                    .AuditLogs
+                    .Where(log => !log.IsInitialAssignment)
+                    .Single(log => log.Change == UserRoleAuditedChange.Description);
 
-                Assert.Equal(expected, expectedLog.Description);
+                Assert.Equal(expected, expectedLog.CurrentValue);
             },
             userRole =>
             {
@@ -111,9 +116,12 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
         return TestAuditOfUserRoleChangeAsync(
             response =>
             {
-                var expectedLog = response.UserRoleAuditLogs.Single(log => log.ChangeType == UserRoleChangeType.StatusChange);
+                var expectedLog = response
+                    .AuditLogs
+                    .Where(log => !log.IsInitialAssignment)
+                    .Single(log => log.Change == UserRoleAuditedChange.Status);
 
-                Assert.Equal(expected, expectedLog.Status);
+                Assert.Equal(expected.ToString(), expectedLog.CurrentValue);
             },
             userRole =>
             {
@@ -129,9 +137,7 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
         return TestAuditOfUserRoleChangeAsync(
             response =>
             {
-                var expectedLog = response.UserRoleAuditLogs.Single(log => log.ChangeType == UserRoleChangeType.PermissionAdded);
-
-                Assert.Contains((int)expected, expectedLog.Permissions);
+                Assert.Contains(response.AuditLogs, log => log.Change == UserRoleAuditedChange.PermissionAdded && expected == Enum.Parse<PermissionId>(log.CurrentValue!));
             },
             userRole =>
             {
@@ -148,9 +154,12 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
         return TestAuditOfUserRoleChangeAsync(
             response =>
             {
-                var expectedLog = response.UserRoleAuditLogs.Single(log => log.ChangeType == UserRoleChangeType.PermissionRemoved);
+                var expectedLog = response
+                    .AuditLogs
+                    .Where(log => !log.IsInitialAssignment)
+                    .Single(log => log.Change == UserRoleAuditedChange.PermissionRemoved);
 
-                Assert.Contains((int)expected, expectedLog.Permissions);
+                Assert.Equal(expected, Enum.Parse<PermissionId>(expectedLog.PreviousValue!));
             },
             userRole =>
             {
@@ -183,7 +192,6 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var command = new GetUserRoleAuditLogsCommand(userRoleEntity.Id);
-        var auditLogsProcessed = 1; // Skip 1, as first log is always Created.
 
         foreach (var action in changeActions)
         {
@@ -201,14 +209,11 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
 
             var auditLogs = await mediator.Send(command);
 
-            foreach (var actorAuditLog in auditLogs.UserRoleAuditLogs.Skip(auditLogsProcessed))
+            foreach (var actorAuditLog in auditLogs.AuditLogs.Where(log => !log.IsInitialAssignment))
             {
                 Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
-                Assert.Equal(userRoleEntity.Id, actorAuditLog.UserRoleId);
                 Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
-
-                auditLogsProcessed++;
             }
         }
 

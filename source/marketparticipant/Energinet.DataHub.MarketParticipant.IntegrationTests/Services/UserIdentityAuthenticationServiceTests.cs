@@ -89,7 +89,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         await using var scope = host.BeginScope();
         var target = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
-        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new RandomlyGeneratedEmailAddress());
         var smsAuthMethod = new SmsAuthenticationMethod(_validPhoneNumber);
 
         // Act
@@ -122,7 +122,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         await using var scope = host.BeginScope();
         var target = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
-        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new RandomlyGeneratedEmailAddress());
         var smsAuthMethod = new SmsAuthenticationMethod(_validPhoneNumber);
 
         await _graphServiceClientFixture
@@ -153,7 +153,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         await using var scope = host.BeginScope();
         var target = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
-        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new RandomlyGeneratedEmailAddress());
         var smsAuthMethod = new SmsAuthenticationMethod(_validPhoneNumber);
 
         await _graphServiceClientFixture
@@ -184,14 +184,12 @@ public sealed class UserIdentityAuthenticationServiceTests
         await using var scope = host.BeginScope();
         var target = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
-        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new RandomlyGeneratedEmailAddress());
         var smsAuthMethod = new SmsAuthenticationMethod(new PhoneNumber("+45 12345678"));
 
         // Act + Assert
         await Assert.ThrowsAsync<ValidationException>(() => target.AddAuthenticationAsync(externalUserId, smsAuthMethod));
     }
 
-    private sealed class UnknownAuthenticationMethod : AuthenticationMethod
-    {
-    }
+    private sealed class UnknownAuthenticationMethod : AuthenticationMethod;
 }

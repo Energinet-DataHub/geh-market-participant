@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
 
@@ -26,15 +27,25 @@ public sealed record EmailAddress
 
     public string Address { get; }
 
-    private static string ValidateAddress(string address)
+    public bool Equals(EmailAddress? other)
     {
-        return !string.IsNullOrWhiteSpace(address) && address.Length <= 64 && MailAddress.TryCreate(address, out _)
-            ? address
-            : throw new ValidationException($"The provided e-mail '{address}' is not valid.");
+        return string.Equals(Address, other?.Address, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public override int GetHashCode()
+    {
+        return string.GetHashCode(Address, StringComparison.OrdinalIgnoreCase);
     }
 
     public override string ToString()
     {
         return Address;
+    }
+
+    private static string ValidateAddress(string address)
+    {
+        return !string.IsNullOrWhiteSpace(address) && address.Length <= 64 && MailAddress.TryCreate(address, out _)
+            ? address.Trim()
+            : throw new ValidationException($"The provided e-mail '{address}' is not valid.");
     }
 }

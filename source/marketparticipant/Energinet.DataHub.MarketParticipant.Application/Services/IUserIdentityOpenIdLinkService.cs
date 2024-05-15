@@ -20,4 +20,5 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services;
 public interface IUserIdentityOpenIdLinkService
 {
     Task<UserIdentity> ValidateAndSetupOpenIdAsync(ExternalUserId requestExternalUserId);
+    Task UnlinkOpenIdAsync(UserIdentity userIdentity);
 }

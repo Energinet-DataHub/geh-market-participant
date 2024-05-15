@@ -29,90 +29,89 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class CreateUserRoleHandlerTests
 {
-    [UnitTest]
-    public sealed class CreateUserRoleHandlerTests
+    private const int ValidPermission = (int)PermissionId.ActorsManage;
+
+    [Fact]
+    public async Task Handle_NewUserRole_UserRoleIdReturned()
     {
-        private const int ValidPermission = (int)PermissionId.ActorsManage;
+        // Arrange
+        var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
+        var userRoleHelperServiceMock = new Mock<IEnsureUserRolePermissionsService>();
+        var target = new CreateUserRoleHandler(
+            userRoleRepositoryMock.Object,
+            userRoleHelperServiceMock.Object);
 
-        [Fact]
-        public async Task Handle_NewUserRole_UserRoleIdReturned()
-        {
-            // Arrange
-            var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var userRoleHelperServiceMock = new Mock<IEnsureUserRolePermissionsService>();
-            var target = new CreateUserRoleHandler(
-                userRoleRepositoryMock.Object,
-                userRoleHelperServiceMock.Object);
+        var roleId = Guid.NewGuid();
+        var userRole = new UserRole(
+            new UserRoleId(roleId),
+            "fake_value",
+            "fake_value",
+            UserRoleStatus.Active,
+            new List<PermissionId>(),
+            EicFunction.BillingAgent);
 
-            var roleId = Guid.NewGuid();
-            var userRole = new UserRole(
-                new UserRoleId(roleId),
-                "fake_value",
-                "fake_value",
-                UserRoleStatus.Active,
-                new List<PermissionId>(),
-                EicFunction.BillingAgent);
+        userRoleRepositoryMock
+            .Setup(x => x.AddAsync(It.IsAny<UserRole>()))
+            .ReturnsAsync(userRole.Id);
 
-            userRoleRepositoryMock
-                .Setup(x => x.AddAsync(It.IsAny<UserRole>()))
-                .ReturnsAsync(userRole.Id);
+        userRoleHelperServiceMock
+            .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<PermissionId>>(), It.IsAny<EicFunction>()))
+            .ReturnsAsync(true);
 
-            userRoleHelperServiceMock
-                .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<PermissionId>>(), It.IsAny<EicFunction>()))
-                .ReturnsAsync(true);
+        var command = new CreateUserRoleCommand(new CreateUserRoleDto(
+            "fake_value",
+            "fake_value",
+            UserRoleStatus.Active,
+            EicFunction.BillingAgent,
+            new Collection<int> { ValidPermission }));
 
-            var command = new CreateUserRoleCommand(new CreateUserRoleDto(
-                "fake_value",
-                "fake_value",
-                UserRoleStatus.Active,
-                EicFunction.BillingAgent,
-                new Collection<int> { ValidPermission }));
+        // Act
+        var response = await target.Handle(command, CancellationToken.None);
 
-            // Act
-            var response = await target.Handle(command, CancellationToken.None);
+        // Assert
+        Assert.Equal(userRole.Id.Value, response.UserRoleId);
+    }
 
-            // Assert
-            Assert.Equal(userRole.Id.Value, response.UserRoleId);
-        }
+    [Fact]
+    public async Task Handle_InvalidPermissions_ThrowsException()
+    {
+        // Arrange
+        var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
+        var userRoleHelperServiceMock = new Mock<IEnsureUserRolePermissionsService>();
+        var target = new CreateUserRoleHandler(
+            userRoleRepositoryMock.Object,
+            userRoleHelperServiceMock.Object);
 
-        [Fact]
-        public async Task Handle_InvalidPermissions_ThrowsException()
-        {
-            // Arrange
-            var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var userRoleHelperServiceMock = new Mock<IEnsureUserRolePermissionsService>();
-            var target = new CreateUserRoleHandler(
-                userRoleRepositoryMock.Object,
-                userRoleHelperServiceMock.Object);
+        var roleId = Guid.NewGuid();
+        var userRole = new UserRole(
+            new UserRoleId(roleId),
+            "fake_value",
+            "fake_value",
+            UserRoleStatus.Active,
+            new List<PermissionId>(),
+            EicFunction.BillingAgent);
 
-            var roleId = Guid.NewGuid();
-            var userRole = new UserRole(
-                new UserRoleId(roleId),
-                "fake_value",
-                "fake_value",
-                UserRoleStatus.Active,
-                new List<PermissionId>(),
-                EicFunction.BillingAgent);
+        userRoleRepositoryMock
+            .Setup(x => x.AddAsync(It.IsAny<UserRole>()))
+            .ReturnsAsync(userRole.Id);
 
-            userRoleRepositoryMock
-                .Setup(x => x.AddAsync(It.IsAny<UserRole>()))
-                .ReturnsAsync(userRole.Id);
+        userRoleHelperServiceMock
+            .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<PermissionId>>(), It.IsAny<EicFunction>()))
+            .ReturnsAsync(false);
 
-            userRoleHelperServiceMock
-                .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<PermissionId>>(), It.IsAny<EicFunction>()))
-                .ReturnsAsync(false);
+        var command = new CreateUserRoleCommand(new CreateUserRoleDto(
+            "fake_value",
+            "fake_value",
+            UserRoleStatus.Active,
+            EicFunction.BillingAgent,
+            new Collection<int> { ValidPermission }));
 
-            var command = new CreateUserRoleCommand(new CreateUserRoleDto(
-                "fake_value",
-                "fake_value",
-                UserRoleStatus.Active,
-                EicFunction.BillingAgent,
-                new Collection<int> { ValidPermission }));
-
-            // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() => target.Handle(command, CancellationToken.None));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => target.Handle(command, CancellationToken.None));
     }
 }

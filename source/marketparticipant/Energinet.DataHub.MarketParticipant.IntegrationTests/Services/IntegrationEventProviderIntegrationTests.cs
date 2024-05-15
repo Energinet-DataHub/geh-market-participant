@@ -17,11 +17,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
@@ -89,7 +92,7 @@ public sealed class IntegrationEventProviderIntegrationTests
         }
     }
 
-    private static async Task PrepareActorActivatedEventAsync(IServiceProvider scope)
+    private static Task PrepareActorActivatedEventAsync(IServiceProvider scope)
     {
         var actor = new Actor(
             new ActorId(Guid.NewGuid()),
@@ -105,10 +108,10 @@ public sealed class IntegrationEventProviderIntegrationTests
         actor.ExternalActorId = new ExternalActorId(Guid.NewGuid());
 
         var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
-        await domainEventRepository.EnqueueAsync(actor);
+        return domainEventRepository.EnqueueAsync(actor);
     }
 
-    private static async Task PrepareActorCertificateCredentialsAssignedEventAsync(IServiceProvider scope)
+    private static Task PrepareActorCertificateCredentialsAssignedEventAsync(IServiceProvider scope)
     {
         var actor = new Actor(
             new ActorId(Guid.NewGuid()),
@@ -128,7 +131,33 @@ public sealed class IntegrationEventProviderIntegrationTests
         actor.Activate();
 
         var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
-        await domainEventRepository.EnqueueAsync(actor);
+        return domainEventRepository.EnqueueAsync(actor);
+    }
+
+    private static Task PrepareActorCertificateCredentialsRemovedEventAsync(IServiceProvider scope)
+    {
+        var actor = new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            null,
+            new MockedGln(),
+            ActorStatus.New,
+            new[] { new ActorMarketRole(EicFunction.EnergySupplier) },
+            new ActorName(string.Empty),
+            null);
+
+        actor.Credentials = new ActorCertificateCredentials(
+            new string('A', 40),
+            "mocked_identifier",
+            DateTime.UtcNow.AddYears(1).ToInstant());
+
+        actor.Activate();
+        ((IPublishDomainEvents)actor).DomainEvents.ClearPublishedDomainEvents();
+
+        actor.Credentials = null;
+
+        var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
+        return domainEventRepository.EnqueueAsync(actor);
     }
 
     private async Task PrepareGridAreaOwnershipAssignedEventAsync(IServiceProvider scope)
@@ -156,13 +185,45 @@ public sealed class IntegrationEventProviderIntegrationTests
         await domainEventRepository.EnqueueAsync(actor);
     }
 
+    private async Task PrepareProcessDelegationConfiguredEventAsync(IServiceProvider scope)
+    {
+        var actorA = await _fixture.PrepareActorAsync();
+        var actorB = await _fixture.PrepareActorAsync();
+        var gridArea = await _fixture.PrepareGridAreaAsync();
+
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var processDelegationEntity = new ProcessDelegationEntity
+        {
+            DelegatedByActorId = actorA.Id,
+            ConcurrencyToken = Guid.NewGuid(),
+            DelegatedProcess = DelegatedProcess.ReceiveEnergyResults
+        };
+
+        await context.ProcessDelegations.AddAsync(processDelegationEntity);
+        await context.SaveChangesAsync();
+
+        var processDelegation = await scope
+            .GetRequiredService<IProcessDelegationRepository>()
+            .GetAsync(new ProcessDelegationId(processDelegationEntity.Id));
+
+        processDelegation!.DelegateTo(
+            new ActorId(actorB.Id),
+            new GridAreaId(gridArea.Id),
+            Instant.FromDateTimeOffset(DateTimeOffset.UtcNow));
+
+        var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
+        await domainEventRepository.EnqueueAsync(processDelegation);
+    }
+
     private Task PrepareDomainEventAsync(IServiceProvider scope, Type domainEvent)
     {
         return domainEvent.Name switch
         {
             nameof(ActorActivated) => PrepareActorActivatedEventAsync(scope),
             nameof(ActorCertificateCredentialsAssigned) => PrepareActorCertificateCredentialsAssignedEventAsync(scope),
+            nameof(ActorCertificateCredentialsRemoved) => PrepareActorCertificateCredentialsRemovedEventAsync(scope),
             nameof(GridAreaOwnershipAssigned) => PrepareGridAreaOwnershipAssignedEventAsync(scope),
+            nameof(ProcessDelegationConfigured) => PrepareProcessDelegationConfiguredEventAsync(scope),
             _ => throw new NotSupportedException($"Domain event {domainEvent.Name} is missing a test.")
         };
     }

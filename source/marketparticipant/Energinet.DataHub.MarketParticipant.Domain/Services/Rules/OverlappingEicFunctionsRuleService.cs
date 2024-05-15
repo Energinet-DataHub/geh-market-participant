@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
@@ -65,7 +66,9 @@ public sealed class OverlappingEicFunctionsRuleService : IOverlappingEicFunction
             {
                 if (!usedMarketRoles.Add(marketRole))
                 {
-                    throw new ValidationException($"Cannot add '{marketRole}' as this market role is already assigned to another actor within the organization.");
+                    throw new ValidationException($"Cannot add '{marketRole}' as this market role is already assigned to another actor within the organization.")
+                        .WithErrorCode("actor.market_role.reserved")
+                        .WithArgs(("market_role", marketRole));
                 }
             }
         }
@@ -84,7 +87,9 @@ public sealed class OverlappingEicFunctionsRuleService : IOverlappingEicFunction
                 a => a.MarketRoles.All(
                     m => m.Function != EicFunction.DataHubAdministrator)))
         {
-            throw new ValidationException($"Market role '{EicFunction.DataHubAdministrator}' cannot be used in this organization.");
+            throw new ValidationException($"Market role '{EicFunction.DataHubAdministrator}' cannot be used in this organization.")
+                .WithErrorCode("actor.market_role.forbidden")
+                .WithArgs(("market_role", EicFunction.DataHubAdministrator));
         }
     }
 }

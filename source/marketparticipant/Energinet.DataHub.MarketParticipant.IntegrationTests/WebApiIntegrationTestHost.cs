@@ -19,7 +19,6 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
@@ -31,13 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests;
 
 public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 {
-    private readonly Startup _startup;
-
-    private WebApiIntegrationTestHost(IConfiguration configuration)
-    {
-        _startup = new Startup(configuration);
-    }
-
     public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
 
     public static Task<WebApiIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture, B2CFixture? b2CFixture = null, CertificateFixture? certificateFixture = null)
@@ -46,14 +38,14 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
         var configuration = BuildConfig(databaseFixture.DatabaseManager.ConnectionString);
 
-        var host = new WebApiIntegrationTestHost(configuration);
+        var host = new WebApiIntegrationTestHost();
         host.ServiceCollection.AddSingleton(configuration);
-        host._startup.ConfigureServices(host.ServiceCollection);
+        host.ServiceCollection.AddMarketParticipantWebApiModule(configuration);
         InitUserIdProvider(host.ServiceCollection);
 
         if (b2CFixture != null)
         {
-            host.ServiceCollection.Replace(ServiceDescriptor.Scoped<IActiveDirectoryB2CService>(_ => b2CFixture.B2CService));
+            host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => b2CFixture.B2CService));
         }
 
         if (certificateFixture != null)
@@ -70,6 +62,14 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
         return serviceProvider.CreateAsyncScope();
     }
 
+    public async Task<T> InScopeAsync<T>(Func<IServiceProvider, Task<T>> action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        await using var scope = BeginScope();
+        return await action(scope.ServiceProvider);
+    }
+
     public ValueTask DisposeAsync()
     {
         return ValueTask.CompletedTask;
@@ -79,14 +79,18 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
     {
         KeyValuePair<string, string?>[] keyValuePairs =
         {
-            new(Settings.SqlDbConnectionString.Key, dbConnectionString),
-            new(Settings.ExternalOpenIdUrl.Key, "fake_value"),
-            new(Settings.BackendBffAppId.Key, "fake_value"),
-            new(Settings.InternalOpenIdUrl.Key, "fake_value"),
+            new("Database:ConnectionString", dbConnectionString),
+            new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.MitIdExternalMetadataAddress)}", "fake_value"),
+            new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.ExternalMetadataAddress)}", "fake_value"),
+            new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.InternalMetadataAddress)}", "fake_value"),
+            new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.BackendBffAppId)}", "fake_value"),
             new(Settings.CertificateKeyVault.Key, "fake_value"),
-            new(Settings.B2CBackendServicePrincipalNameObjectId.Key, "fake_value"),
-            new(Settings.B2CBackendId.Key, "fake_value"),
-            new(Settings.B2CBackendObjectId.Key, "fake_value"),
+            new("AzureB2c:Tenant", "fake_value"),
+            new("AzureB2c:SpnId", "fake_value"),
+            new("AzureB2c:SpnSecret", "fake_value"),
+            new("AzureB2c:BackendObjectId", "fake_value"),
+            new("AzureB2c:BackendSpnObjectId", "fake_value"),
+            new("AzureB2c:BackendId", "fake_value"),
         };
 
         return new ConfigurationBuilder()

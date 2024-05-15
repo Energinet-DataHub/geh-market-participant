@@ -24,27 +24,26 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
+
+[UnitTest]
+public sealed class GetUserRoleToPermissionHandlerTest
 {
-    [UnitTest]
-    public sealed class GetUserRoleToPermissionHandlerTest
+    [Fact]
+    public async Task HandleCommandCallsRepositoryAsync()
     {
-        [Fact]
-        public async Task HandleCommandCallsRepositoryAsync()
-        {
-            // arrange
-            var repositoryMock = new Mock<IUserRoleRepository>();
-            repositoryMock
-                .Setup(x => x.GetAsync(It.IsAny<PermissionId>()))
-                .ReturnsAsync(Array.Empty<UserRole>());
+        // arrange
+        var repositoryMock = new Mock<IUserRoleRepository>();
+        repositoryMock
+            .Setup(x => x.GetAsync(It.IsAny<PermissionId>()))
+            .ReturnsAsync(Array.Empty<UserRole>());
 
-            var target = new GetUserRolesToPermissionHandler(repositoryMock.Object);
+        var target = new GetUserRolesToPermissionHandler(repositoryMock.Object);
 
-            // act
-            var actual = await target.Handle(new GetUserRolesToPermissionCommand((int)PermissionId.UserRolesManage), CancellationToken.None);
+        // act
+        var actual = await target.Handle(new GetUserRolesToPermissionCommand((int)PermissionId.UserRolesManage), CancellationToken.None);
 
-            // assert
-            Assert.NotNull(actual.UserRoles);
-        }
+        // assert
+        Assert.NotNull(actual.UserRoles);
     }
 }

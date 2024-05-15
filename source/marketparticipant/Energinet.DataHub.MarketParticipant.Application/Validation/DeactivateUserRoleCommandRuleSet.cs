@@ -15,19 +15,18 @@
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
-{
-    public sealed class DeactivateUserRoleCommandRuleSet : AbstractValidator<DeactivateUserRoleCommand>
-    {
-        public DeactivateUserRoleCommandRuleSet()
-        {
-            RuleFor(command => command.ChangedByUserId)
-                .NotNull()
-                .NotEmpty();
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-            RuleFor(command => command.UserRoleId)
-                .NotNull()
-                .NotEmpty();
-        }
+public sealed class DeactivateUserRoleCommandRuleSet : AbstractValidator<DeactivateUserRoleCommand>
+{
+    public DeactivateUserRoleCommandRuleSet()
+    {
+        RuleFor(command => command.ChangedByUserId)
+            .NotNull()
+            .NotEmpty();
+
+        RuleFor(command => command.UserRoleId)
+            .NotNull()
+            .NotEmpty();
     }
 }

@@ -12,29 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
-{
-    public static class Program
+var host = new HostBuilder()
+    .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
+    .ConfigureServices((context, services) =>
     {
-        public static async Task Main()
-        {
-            var startup = new Startup();
+        services.AddApplicationInsightsForIsolatedWorker("mark-part");
+        services.AddHealthChecksForIsolatedWorker();
+        services.AddScoped<HealthCheckEndpoint>();
 
-            var host = new HostBuilder()
-                .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
-                .ConfigureServices((context, services) =>
-                {
-                    startup.Initialize(context.Configuration, services);
-                    services.AddApplicationInsights();
-                })
-                .Build();
+        services
+            .AddLogging()
+            .AddFunctionLoggingScope("mark-part");
 
-            await host.RunAsync().ConfigureAwait(false);
-        }
-    }
-}
+        services.AddMarketParticipantOrganizationModule(context.Configuration);
+    })
+    .ConfigureLogging((hostingContext, logging) =>
+    {
+        logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
+    })
+    .Build();
+
+host.Run();

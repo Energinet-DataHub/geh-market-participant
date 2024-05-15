@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class TokenControllerIntegrationTests :
-    WebApiIntegrationTestsBase,
+    WebApiIntegrationTestsBase<MarketParticipantWebApiAssembly>,
     IClassFixture<KeyClientFixture>,
     IAsyncLifetime
 {
@@ -50,6 +50,11 @@ public sealed class TokenControllerIntegrationTests :
     private readonly KeyClientFixture _keyClientFixture;
     private readonly MarketParticipantDatabaseFixture _marketParticipantDatabaseFixture;
     private readonly GraphServiceClientFixture _graphServiceClientFixture;
+
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
 
     public TokenControllerIntegrationTests(
         KeyClientFixture keyClientFixture,
@@ -77,7 +82,7 @@ public sealed class TokenControllerIntegrationTests :
         var expectedStructure = new
         {
             issuer = string.Empty,
-            jwks_uri = string.Empty
+            jwks_uri = string.Empty,
         };
 
         var configuration = Deserialize(rawConfiguration, expectedStructure);
@@ -107,9 +112,9 @@ public sealed class TokenControllerIntegrationTests :
                     kid = string.Empty,
                     kty = string.Empty,
                     n = string.Empty,
-                    e = string.Empty
-                }
-            }
+                    e = string.Empty,
+                },
+            },
         };
 
         var configuration = Deserialize(rawConfiguration, expectedStructure);
@@ -141,9 +146,9 @@ public sealed class TokenControllerIntegrationTests :
         using var client = CreateClient();
 
         // Act
-        Startup.EnableIntegrationTestKeys = false;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = false;
         using var response = await client.PostAsync(new Uri(target, UriKind.Relative), httpContent);
-        Startup.EnableIntegrationTestKeys = true;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = true;
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -176,7 +181,7 @@ public sealed class TokenControllerIntegrationTests :
         // Assert
         var internalTokenJson = JsonSerializer.Deserialize<TokenResponse>(
             responseJson,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            _jsonSerializerOptions);
 
         Assert.NotNull(internalTokenJson);
         Assert.NotNull(internalTokenJson.Token);
@@ -262,7 +267,7 @@ public sealed class TokenControllerIntegrationTests :
         // Assert
         var internalTokenJson = JsonSerializer.Deserialize<TokenResponse>(
             responseJson,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            _jsonSerializerOptions);
 
         Assert.NotNull(internalTokenJson);
 
@@ -279,7 +284,10 @@ public sealed class TokenControllerIntegrationTests :
             ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
                 "http://locahost/.well-known/openid-configuration",
                 new OpenIdConnectConfigurationRetriever(),
-                new HttpDocumentRetriever(CreateClient()) { RequireHttps = false })
+                new HttpDocumentRetriever(CreateClient())
+                {
+                    RequireHttps = false,
+                }),
         };
 
         var result = await new JwtSecurityTokenHandler()
@@ -294,14 +302,14 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var openIdIdentity = new List<ObjectIdentity>()
+        var openIdIdentity = new List<ObjectIdentity>
         {
             new()
             {
                 SignInType = "federated",
                 Issuer = Guid.NewGuid().ToString(),
-                IssuerAssignedId = Guid.NewGuid().ToString()
-            }
+                IssuerAssignedId = Guid.NewGuid().ToString(),
+            },
         };
 
         var invitedUserExternalId = await _graphServiceClientFixture.CreateUserAsync(TestUserInviteOpenIdEmail);
@@ -355,7 +363,7 @@ public sealed class TokenControllerIntegrationTests :
         ArgumentNullException.ThrowIfNull(builder);
 
         base.ConfigureWebHost(builder);
-        Startup.EnableIntegrationTestKeys = true;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = true;
 
         builder.UseSetting(Settings.TokenKeyVault.Key, _keyClientFixture.KeyClient.VaultUri.ToString());
         builder.UseSetting(Settings.TokenKeyName.Key, _keyClientFixture.KeyName);
@@ -371,7 +379,10 @@ public sealed class TokenControllerIntegrationTests :
         var externalToken = new JwtSecurityToken(
             "https://example.com",
             "audience",
-            new[] { new Claim(JwtRegisteredClaimNames.Sub, externalUserId.ToString()) },
+            new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, externalUserId.ToString()),
+            },
             notBefore ?? DateTime.UtcNow.AddDays(-1),
             expires ?? DateTime.UtcNow.AddDays(1),
             new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256));
@@ -379,6 +390,7 @@ public sealed class TokenControllerIntegrationTests :
         return new JwtSecurityTokenHandler().WriteToken(externalToken);
     }
 
+    // ReSharper disable once UnusedParameter.Local
     private static T? Deserialize<T>(string json, T inferType)
     {
         return JsonSerializer.Deserialize<T>(json);

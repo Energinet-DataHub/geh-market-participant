@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
@@ -21,7 +22,8 @@ public static class ActorErrorHandler
 {
     public static System.Exception HandleActorError(ActorError source) => source switch
     {
-        ActorError.ThumbprintCredentialsConflict => new ValidationException("An actor with the same certificate thumbprint already exists"),
+        ActorError.ThumbprintCredentialsConflict => new ValidationException("An actor with the same certificate thumbprint already exists.")
+            .WithErrorCode("actor.credentials.thumbprint_reserved"),
         _ => throw new ArgumentOutOfRangeException(nameof(source))
     };
 }

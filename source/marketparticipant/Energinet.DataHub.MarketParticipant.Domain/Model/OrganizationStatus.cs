@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public enum OrganizationStatus
 {
-    public enum OrganizationStatus
-    {
-        New = 1,
-        Active = 2,
-        Blocked = 3,
-        Deleted = 4
-    }
+    New = 1,
+    Active = 2,
+    Blocked = 3,
+    Deleted = 4
 }

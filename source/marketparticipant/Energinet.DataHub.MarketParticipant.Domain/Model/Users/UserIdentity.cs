@@ -94,9 +94,14 @@ public sealed class UserIdentity
             throw new ValidationException($"Email address of user {userIdentity.Id} does not match email address of user {Id}.");
         }
 
-        var loginIdentityToMove = userIdentity.LoginIdentities.First(e => e.SignInType == "federated");
+        var loginIdentityToMove = userIdentity.LoginIdentities.First(loginIdentity => loginIdentity.SignInType == "federated");
 
         _loginIdentities.Add(loginIdentityToMove);
+    }
+
+    public void UnlinkOpenId()
+    {
+        _loginIdentities.RemoveAll(loginIdentity => loginIdentity.SignInType == "federated");
     }
 
     private void ValidateName()

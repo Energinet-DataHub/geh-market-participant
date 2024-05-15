@@ -22,5 +22,6 @@ public sealed class EmailEventEntity
     public string Email { get; set; } = null!;
     public DateTimeOffset Created { get; set; }
     public DateTimeOffset? Sent { get; set; }
-    public int EmailEventType { get; set; }
+    public int TemplateId { get; set; }
+    public string TemplateParameters { get; set; } = null!;
 }

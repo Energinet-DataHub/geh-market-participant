@@ -17,19 +17,18 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
+
+public sealed class UniqueActorMarketRoleGridAreaEntityConfiguration : IEntityTypeConfiguration<UniqueActorMarketRoleGridAreaEntity>
 {
-    public sealed class UniqueActorMarketRoleGridAreaEntityConfiguration : IEntityTypeConfiguration<UniqueActorMarketRoleGridAreaEntity>
+    public void Configure(EntityTypeBuilder<UniqueActorMarketRoleGridAreaEntity> builder)
     {
-        public void Configure(EntityTypeBuilder<UniqueActorMarketRoleGridAreaEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("UniqueActorMarketRoleGridArea");
-            builder.HasKey(e => e.Id);
-            builder.Property(e => e.Id).ValueGeneratedOnAdd();
-            builder.Property(e => e.ActorId);
-            builder.Property(e => e.MarketRoleFunction);
-            builder.Property(e => e.GridAreaId);
-        }
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        builder.ToTable("UniqueActorMarketRoleGridArea");
+        builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
+        builder.Property(e => e.ActorId);
+        builder.Property(e => e.MarketRoleFunction);
+        builder.Property(e => e.GridAreaId);
     }
 }

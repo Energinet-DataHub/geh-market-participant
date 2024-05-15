@@ -61,7 +61,7 @@ public sealed class SigningKeyRing : ISigningKeyRing
         var latestKey = keyCache
             .Where(key => !key.Properties.NotBefore.HasValue || key.Properties.NotBefore <= currentTime)
             .Where(key => !key.Properties.ExpiresOn.HasValue || key.Properties.ExpiresOn > currentTime)
-            .First(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < currentTime.AddMinutes(-10) || Startup.EnableIntegrationTestKeys);
+            .First(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < currentTime.AddMinutes(-10) || MarketParticipantWebApiAssembly.EnableIntegrationTestKeys);
 
         return _keyClient.GetCryptographyClient(_keyName, latestKey.Properties.Version);
     }
@@ -85,32 +85,38 @@ public sealed class SigningKeyRing : ISigningKeyRing
             return _keyCache;
         }
 
-        var keyVersions = _keyClient.GetPropertiesOfKeyVersionsAsync(_keyName);
-        var keys = new List<KeyVaultKey>();
-
-        var currentTime = _clock
-            .GetCurrentInstant()
-            .ToDateTimeOffset();
-
-        await foreach (var keyDescription in keyVersions)
+        try
         {
-            if (keyDescription.Enabled != true)
-                continue;
+            var keyVersions = _keyClient.GetPropertiesOfKeyVersionsAsync(_keyName);
+            var keys = new List<KeyVaultKey>();
 
-            if (keyDescription.ExpiresOn < currentTime)
-                continue;
+            var currentTime = _clock
+                .GetCurrentInstant()
+                .ToDateTimeOffset();
 
-            var keyVersion = await _keyClient
-                .GetKeyAsync(keyDescription.Name, keyDescription.Version)
-                .ConfigureAwait(false);
+            await foreach (var keyDescription in keyVersions)
+            {
+                if (keyDescription.Enabled != true)
+                    continue;
 
-            keys.Add(keyVersion.Value);
+                if (keyDescription.ExpiresOn < currentTime)
+                    continue;
+
+                var keyVersion = await _keyClient
+                    .GetKeyAsync(keyDescription.Name, keyDescription.Version)
+                    .ConfigureAwait(false);
+
+                keys.Add(keyVersion.Value);
+            }
+
+            _keyCache = keys;
+            _lastCache = DateTimeOffset.UtcNow;
+            return _keyCache;
         }
-
-        _keyCache = keys;
-        _lastCache = DateTimeOffset.UtcNow;
-        _cacheLock.Release();
-        return _keyCache;
+        finally
+        {
+            _cacheLock.Release();
+        }
     }
 
     [MemberNotNullWhen(true, nameof(_keyCache))]

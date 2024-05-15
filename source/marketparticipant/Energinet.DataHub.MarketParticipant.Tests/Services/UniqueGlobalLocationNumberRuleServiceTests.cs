@@ -24,78 +24,77 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Services
+namespace Energinet.DataHub.MarketParticipant.Tests.Services;
+
+[UnitTest]
+public sealed class UniqueGlobalLocationNumberRuleServiceTests
 {
-    [UnitTest]
-    public sealed class UniqueGlobalLocationNumberRuleServiceTests
+    private readonly Address _validAddress = new(
+        "test Street",
+        "1",
+        "1111",
+        "Test City",
+        "DK");
+
+    private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
+
+    [Fact]
+    public async Task ValidateGlobalLocationNumberAvailableAsync_GlnAvailable_DoesNothing()
     {
-        private readonly Address _validAddress = new(
-            "test Street",
-            "1",
-            "1111",
-            "Test City",
-            "Test Country");
+        // Arrange
+        var organizationRepository = new Mock<IOrganizationRepository>();
+        var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
-        private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
+        var gln = new MockedGln();
+        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"));
 
-        [Fact]
-        public async Task ValidateGlobalLocationNumberAvailableAsync_GlnAvailable_DoesNothing()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
+        organizationRepository
+            .Setup(x => x.GetAsync(gln))
+            .ReturnsAsync(Enumerable.Empty<Organization>());
 
-            var gln = new MockedGln();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"));
+        // Act + Assert
+        await target.ValidateGlobalLocationNumberAvailableAsync(organization, gln);
+    }
 
-            organizationRepository
-                .Setup(x => x.GetAsync(gln))
-                .ReturnsAsync(Enumerable.Empty<Organization>());
+    [Fact]
+    public async Task ValidateGlobalLocationNumberAvailableAsync_GlnInOrganization_DoesNothing()
+    {
+        // Arrange
+        var organizationRepository = new Mock<IOrganizationRepository>();
+        var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
-            // Act + Assert
-            await target.ValidateGlobalLocationNumberAvailableAsync(organization, gln);
-        }
+        var gln = new MockedGln();
+        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"));
 
-        [Fact]
-        public async Task ValidateGlobalLocationNumberAvailableAsync_GlnInOrganization_DoesNothing()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
+        organizationRepository
+            .Setup(x => x.GetAsync(gln))
+            .ReturnsAsync(new[] { organization });
 
-            var gln = new MockedGln();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"));
+        // Act + Assert
+        await target.ValidateGlobalLocationNumberAvailableAsync(organization, gln);
+    }
 
-            organizationRepository
-                .Setup(x => x.GetAsync(gln))
-                .ReturnsAsync(new[] { organization });
+    [Fact]
+    public async Task ValidateGlobalLocationNumberAvailableAsync_GlnNotAvailable_ThrowsException()
+    {
+        // Arrange
+        var organizationRepository = new Mock<IOrganizationRepository>();
+        var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
-            // Act + Assert
-            await target.ValidateGlobalLocationNumberAvailableAsync(organization, gln);
-        }
+        var gln = new MockedGln();
+        var organization = new Organization(
+            new OrganizationId(Guid.NewGuid()),
+            "fake_value",
+            _validCvrBusinessRegisterIdentifier,
+            _validAddress,
+            new OrganizationDomain("energinet.dk"),
+            OrganizationStatus.Active);
 
-        [Fact]
-        public async Task ValidateGlobalLocationNumberAvailableAsync_GlnNotAvailable_ThrowsException()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
+        organizationRepository
+            .Setup(x => x.GetAsync(gln))
+            .ReturnsAsync(new[] { organization });
 
-            var gln = new MockedGln();
-            var organization = new Organization(
-                new OrganizationId(Guid.NewGuid()),
-                "fake_value",
-                _validCvrBusinessRegisterIdentifier,
-                _validAddress,
-                new OrganizationDomain("energinet.dk"),
-                OrganizationStatus.Active);
-
-            organizationRepository
-                .Setup(x => x.GetAsync(gln))
-                .ReturnsAsync(new[] { organization });
-
-            // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk")), gln));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk")), gln));
     }
 }

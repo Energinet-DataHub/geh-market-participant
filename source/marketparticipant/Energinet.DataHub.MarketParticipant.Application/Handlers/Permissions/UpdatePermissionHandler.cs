@@ -16,7 +16,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -39,8 +38,6 @@ public sealed class UpdatePermissionHandler : IRequestHandler<UpdatePermissionCo
         var permissionToUpdate = await _permissionRepository
             .GetAsync((PermissionId)request.PermissionId)
             .ConfigureAwait(false);
-
-        NotFoundValidationException.ThrowIfNull(permissionToUpdate, $"Permission not found: {request.PermissionId}");
 
         permissionToUpdate.Description = request.Description;
 

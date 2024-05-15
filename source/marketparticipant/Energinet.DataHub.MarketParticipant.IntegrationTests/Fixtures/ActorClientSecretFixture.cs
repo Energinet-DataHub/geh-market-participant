@@ -20,39 +20,37 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Graph;
 using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
-{
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 #pragma warning disable CA1001
-    public sealed class ActorClientSecretFixture : IAsyncLifetime
+public sealed class ActorClientSecretFixture : IAsyncLifetime
 #pragma warning restore CA1001
+{
+    private GraphServiceClient? _graphClient;
+
+    public IActorClientSecretService ClientSecretService { get; private set; } = null!;
+
+    public Task InitializeAsync()
     {
-        private GraphServiceClient? _graphClient;
+        var integrationTestConfig = new IntegrationTestConfiguration();
 
-        public IActorClientSecretService ClientSecretService { get; private set; } = null!;
+        _graphClient = new GraphServiceClient(
+            new ClientSecretCredential(
+                integrationTestConfig.B2CSettings.Tenant,
+                integrationTestConfig.B2CSettings.ServicePrincipalId,
+                integrationTestConfig.B2CSettings.ServicePrincipalSecret),
+            new[]
+            {
+                "https://graph.microsoft.com/.default",
+            });
 
-        public Task InitializeAsync()
-        {
-            var integrationTestConfig = new IntegrationTestConfiguration();
+        ClientSecretService = new ActorClientSecretService(_graphClient);
 
-            _graphClient = new GraphServiceClient(
-                new ClientSecretCredential(
-                    integrationTestConfig.B2CSettings.Tenant,
-                    integrationTestConfig.B2CSettings.ServicePrincipalId,
-                    integrationTestConfig.B2CSettings.ServicePrincipalSecret),
-                new[]
-                {
-                    "https://graph.microsoft.com/.default",
-                });
+        return Task.CompletedTask;
+    }
 
-            ClientSecretService = new ActorClientSecretService(_graphClient);
-
-            return Task.CompletedTask;
-        }
-
-        public Task DisposeAsync()
-        {
-            _graphClient?.Dispose();
-            return Task.CompletedTask;
-        }
+    public Task DisposeAsync()
+    {
+        _graphClient?.Dispose();
+        return Task.CompletedTask;
     }
 }

@@ -17,18 +17,17 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
-{
-    public class UserRoleAssignmentAuditLogEntryEntityConfiguration : IEntityTypeConfiguration<UserRoleAssignmentAuditLogEntryEntity>
-    {
-        public void Configure(EntityTypeBuilder<UserRoleAssignmentAuditLogEntryEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 
-            builder.ToTable("UserRoleAssignmentAuditLogEntry");
-            builder.HasKey(x => x.Id);
-            builder.Property(p => p.Id).ValueGeneratedOnAdd();
-            builder.Property(x => x.UserRoleId);
-        }
+public class UserRoleAssignmentAuditLogEntryEntityConfiguration : IEntityTypeConfiguration<UserRoleAssignmentAuditLogEntryEntity>
+{
+    public void Configure(EntityTypeBuilder<UserRoleAssignmentAuditLogEntryEntity> builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+
+        builder.ToTable("UserRoleAssignmentAuditLogEntry");
+        builder.HasKey(x => x.Id);
+        builder.Property(p => p.Id).ValueGeneratedOnAdd();
+        builder.Property(x => x.UserRoleId);
     }
 }

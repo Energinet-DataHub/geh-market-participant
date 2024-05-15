@@ -25,120 +25,119 @@ using Microsoft.Graph.Models;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
+
+[Collection(nameof(IntegrationTestCollectionFixture))]
+[IntegrationTest]
+public sealed class ActorClientSecretServiceTests
 {
-    [Collection(nameof(IntegrationTestCollectionFixture))]
-    [IntegrationTest]
-    public sealed class ActorClientSecretServiceTests
+    private readonly IActorClientSecretService _sut;
+    private readonly GraphServiceClientFixture _graphServiceClientFixture;
+    private readonly B2CFixture _b2CFixture;
+
+    public ActorClientSecretServiceTests(GraphServiceClientFixture graphServiceClientFixture, ActorClientSecretFixture actorClientSecretFixture, B2CFixture b2CFixture)
     {
-        private readonly IActorClientSecretService _sut;
-        private readonly GraphServiceClientFixture _graphServiceClientFixture;
-        private readonly B2CFixture _b2CFixture;
-
-        public ActorClientSecretServiceTests(GraphServiceClientFixture graphServiceClientFixture, ActorClientSecretFixture actorClientSecretFixture, B2CFixture b2CFixture)
-        {
-            _graphServiceClientFixture = graphServiceClientFixture;
-            _b2CFixture = b2CFixture;
+        _graphServiceClientFixture = graphServiceClientFixture;
+        _b2CFixture = b2CFixture;
 #pragma warning disable CA1062
-            _sut = actorClientSecretFixture.ClientSecretService;
+        _sut = actorClientSecretFixture.ClientSecretService;
 #pragma warning restore CA1062
-        }
+    }
 
-        [Fact]
-        public async Task AddSecretToAppRegistration_ReturnsPassword_AndAppHasPassword()
+    [Fact]
+    public async Task AddSecretToAppRegistration_ReturnsPassword_AndAppHasPassword()
+    {
+        // Arrange
+        var actor = CreateActor(new[]
+        {
+            EicFunction.SystemOperator, // transmission system operator
+        });
+
+        try
+        {
+            await _b2CFixture.B2CService.AssignApplicationRegistrationAsync(actor);
+
+            // Act
+            var result = await _sut
+                .CreateSecretForAppRegistrationAsync(actor);
+
+            var existing = await GetExistingAppAsync(actor.ExternalActorId!);
+
+            // Assert
+            Assert.NotEmpty(result.SecretText);
+            Assert.NotEmpty(result.SecretId.ToString());
+            Assert.NotNull(existing);
+            Assert.True(existing.PasswordCredentials is { Count: > 0 });
+        }
+        finally
+        {
+            await CleanupAsync(actor);
+        }
+    }
+
+    [Fact]
+    public async Task RemoveSecretFromAppRegistration_DoesNotThrow_And_PasswordIsRemoved()
+    {
+        var actor = CreateActor(new[]
+        {
+            EicFunction.SystemOperator, // transmission system operator
+        });
+
+        try
         {
             // Arrange
-            var actor = CreateActor(new[]
-            {
-                EicFunction.SystemOperator, // transmission system operator
-            });
+            await _b2CFixture.B2CService.AssignApplicationRegistrationAsync(actor);
 
-            try
-            {
-                await _b2CFixture.B2CService.AssignApplicationRegistrationAsync(actor);
+            await _sut
+                .CreateSecretForAppRegistrationAsync(actor);
 
-                // Act
-                var result = await _sut
-                    .CreateSecretForAppRegistrationAsync(actor);
+            // Act
+            var exceptions = await Record.ExceptionAsync(() => _sut.RemoveSecretAsync(actor));
+            var existing = await GetExistingAppAsync(actor.ExternalActorId!);
 
-                var existing = await GetExistingAppAsync(actor.ExternalActorId!);
-
-                // Assert
-                Assert.NotEmpty(result.SecretText);
-                Assert.NotEmpty(result.SecretId.ToString());
-                Assert.NotNull(existing);
-                Assert.True(existing.PasswordCredentials is { Count: > 0 });
-            }
-            finally
-            {
-                await CleanupAsync(actor);
-            }
+            // Assert
+            Assert.Null(exceptions);
+            Assert.NotNull(existing);
+            Assert.True(existing.PasswordCredentials is { Count: 0 });
         }
-
-        [Fact]
-        public async Task RemoveSecretFromAppRegistration_DoesNotThrow_And_PasswordIsRemoved()
+        finally
         {
-            var actor = CreateActor(new[]
-            {
-                EicFunction.SystemOperator, // transmission system operator
-            });
-
-            try
-            {
-                // Arrange
-                await _b2CFixture.B2CService.AssignApplicationRegistrationAsync(actor);
-
-                await _sut
-                    .CreateSecretForAppRegistrationAsync(actor);
-
-                // Act
-                var exceptions = await Record.ExceptionAsync(() => _sut.RemoveSecretAsync(actor));
-                var existing = await GetExistingAppAsync(actor.ExternalActorId!);
-
-                // Assert
-                Assert.Null(exceptions);
-                Assert.NotNull(existing);
-                Assert.True(existing.PasswordCredentials is { Count: 0 });
-            }
-            finally
-            {
-                await CleanupAsync(actor);
-            }
+            await CleanupAsync(actor);
         }
+    }
 
-        private static Actor CreateActor(IEnumerable<EicFunction> roles)
-        {
-            return new Actor(
-                new ActorId(Guid.NewGuid()),
-                new OrganizationId(Guid.NewGuid()),
-                null,
-                new MockedGln(),
-                ActorStatus.Active,
-                roles.Select(x => new ActorMarketRole(x)),
-                new ActorName(Guid.NewGuid().ToString()),
-                null);
-        }
+    private static Actor CreateActor(IEnumerable<EicFunction> roles)
+    {
+        return new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            null,
+            new MockedGln(),
+            ActorStatus.Active,
+            roles.Select(x => new ActorMarketRole(x)),
+            new ActorName(Guid.NewGuid().ToString()),
+            null);
+    }
 
-        private async Task CleanupAsync(Actor actor)
-        {
-            await _b2CFixture.B2CService
-                .DeleteAppRegistrationAsync(actor)
-                .ConfigureAwait(false);
-        }
+    private async Task CleanupAsync(Actor actor)
+    {
+        await _b2CFixture.B2CService
+            .DeleteAppRegistrationAsync(actor)
+            .ConfigureAwait(false);
+    }
 
-        private async Task<Microsoft.Graph.Models.Application?> GetExistingAppAsync(ExternalActorId externalActorId)
-        {
-            var appId = externalActorId.Value.ToString();
-            var applicationUsingAppId = await _graphServiceClientFixture.Client
-                .Applications
-                .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
-                .ConfigureAwait(false);
+    private async Task<Microsoft.Graph.Models.Application?> GetExistingAppAsync(ExternalActorId externalActorId)
+    {
+        var appId = externalActorId.Value.ToString();
+        var applicationUsingAppId = await _graphServiceClientFixture.Client
+            .Applications
+            .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
+            .ConfigureAwait(false);
 
-            var applications = await applicationUsingAppId!
-                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphServiceClientFixture.Client)
-                .ConfigureAwait(false);
+        var applications = await applicationUsingAppId!
+            .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphServiceClientFixture.Client)
+            .ConfigureAwait(false);
 
-            return applications.SingleOrDefault();
-        }
+        return applications.SingleOrDefault();
     }
 }

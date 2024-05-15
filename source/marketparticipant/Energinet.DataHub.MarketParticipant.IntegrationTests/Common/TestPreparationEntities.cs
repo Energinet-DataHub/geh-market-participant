@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -23,6 +24,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
 internal static class TestPreparationEntities
 {
+    private static int _gridAreaCount;
+
     public static OrganizationEntity ValidOrganization => new()
     {
         Name = "Test Organization Name",
@@ -32,7 +35,7 @@ internal static class TestPreparationEntities
         StreetName = "Vej Allé",
         Number = "7",
         City = "Vejle",
-        Country = "Denmark",
+        Country = "DK",
         ZipCode = "7100"
     };
 
@@ -46,6 +49,16 @@ internal static class TestPreparationEntities
         Status = ActorStatus.New
     };
 
+    public static ActorEntity ValidActiveActor => new()
+    {
+        Id = Guid.NewGuid(),
+        ActorNumber = new MockedGln(),
+        ActorId = null,
+        IsFas = false,
+        Name = "Test Actor Name",
+        Status = ActorStatus.Active
+    };
+
     public static MarketRoleEntity ValidMarketRole => new()
     {
         Function = EicFunction.GridAccessProvider,
@@ -54,7 +67,7 @@ internal static class TestPreparationEntities
 
     public static UserEntity UnconnectedUser => new()
     {
-        Email = new MockedEmailAddress(),
+        Email = new RandomlyGeneratedEmailAddress(),
         ExternalId = Guid.NewGuid()
     };
 
@@ -80,16 +93,17 @@ internal static class TestPreparationEntities
 
     public static EmailEventEntity ValidEmailEvent => new()
     {
-        Email = new MockedEmailAddress(),
-        EmailEventType = 1,
+        Email = new RandomlyGeneratedEmailAddress(),
+        TemplateId = 1,
+        TemplateParameters = "{}",
         Created = DateTimeOffset.UtcNow,
-        Sent = null
+        Sent = null,
     };
 
     public static GridAreaEntity ValidGridArea => new()
     {
         Id = Guid.NewGuid(),
-        Code = "100",
+        Code = (_gridAreaCount++ % 1000).ToString(CultureInfo.InvariantCulture).PadLeft(3, '0'),
         Name = "Test Grid Area Name",
         PriceAreaCode = PriceAreaCode.Dk1,
         ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value

@@ -38,8 +38,8 @@ public sealed class GetPermissionHandler : IRequestHandler<GetPermissionCommand,
         ArgumentNullException.ThrowIfNull(request);
 
         var permission = await _permissionRepository
-                            .GetAsync((PermissionId)request.Id)
-                            .ConfigureAwait(false);
+            .GetAsync((PermissionId)request.Id)
+            .ConfigureAwait(false);
 
         return new GetPermissionResponse(
             new PermissionDto(

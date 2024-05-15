@@ -14,16 +14,15 @@
 
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.Domain
+namespace Energinet.DataHub.MarketParticipant.Domain;
+
+/// <summary>
+/// Provider for <see cref="IUnitOfWork"/>
+/// </summary>
+public interface IUnitOfWorkProvider
 {
     /// <summary>
-    /// Provider for <see cref="IUnitOfWork"/>
+    /// Creates and initializes a new <see cref="IUnitOfWork"/>
     /// </summary>
-    public interface IUnitOfWorkProvider
-    {
-        /// <summary>
-        /// Creates and initializes a new <see cref="IUnitOfWork"/>
-        /// </summary>
-        Task<IUnitOfWork> NewUnitOfWorkAsync();
-    }
+    Task<IUnitOfWork> NewUnitOfWorkAsync();
 }

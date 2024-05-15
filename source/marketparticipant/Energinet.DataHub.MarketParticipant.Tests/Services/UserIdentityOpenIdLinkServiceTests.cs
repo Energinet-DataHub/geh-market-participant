@@ -26,184 +26,206 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Services
+namespace Energinet.DataHub.MarketParticipant.Tests.Services;
+
+[UnitTest]
+public sealed class UserIdentityOpenIdLinkServiceTests
 {
-    [UnitTest]
-    public sealed class UserIdentityOpenIdLinkServiceTests
+    [Fact]
+    public async Task ValidateAndSetupOpenIdAsync_CompletedFlow()
     {
-        [Fact]
-        public async Task ValidateAndSetupOpenIdAsync_CompletedFlow()
-        {
-            // Arrange
-            var externalUserId = new ExternalUserId(Guid.NewGuid());
-            var email = new MockedEmailAddress();
+        // Arrange
+        var externalUserId = new ExternalUserId(Guid.NewGuid());
+        var email = new RandomlyGeneratedEmailAddress();
 
-            var userIdentityRepository = new Mock<IUserIdentityRepository>();
-            userIdentityRepository
-                .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
-                .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
+            .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
 
-            var userToReturnFromService = GetUserIdentity(externalUserId, email, "emailAddress");
-            userIdentityRepository
-                .Setup(u => u.GetAsync(email))
-                .ReturnsAsync(userToReturnFromService);
+        var userToReturnFromService = GetUserIdentity(externalUserId, email, "emailAddress");
+        userIdentityRepository
+            .Setup(u => u.GetAsync(email))
+            .ReturnsAsync(userToReturnFromService);
 
-            var userRepository = new Mock<IUserRepository>();
-            userRepository
-                .Setup(e => e.GetAsync(externalUserId))
-                .ReturnsAsync(GetUser(externalUserId, DateTimeOffset.UtcNow));
+        var userRepository = new Mock<IUserRepository>();
+        userRepository
+            .Setup(e => e.GetAsync(externalUserId))
+            .ReturnsAsync(GetUser(externalUserId, DateTimeOffset.UtcNow));
 
-            var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
-                userRepository.Object,
-                userIdentityRepository.Object);
+        var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
+            userRepository.Object,
+            userIdentityRepository.Object);
 
-            // Act
-            var userIdentity = await userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId);
+        // Act
+        var userIdentity = await userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId);
 
-            // Assert
-            Assert.NotNull(userIdentity);
-            Assert.Equal(2, userIdentity.LoginIdentities.Count);
-            userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
-            userIdentityRepository.Verify(e => e.AssignUserLoginIdentitiesAsync(userToReturnFromService));
-        }
+        // Assert
+        Assert.NotNull(userIdentity);
+        Assert.Equal(2, userIdentity.LoginIdentities.Count);
+        userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
+        userIdentityRepository.Verify(e => e.AssignUserLoginIdentitiesAsync(userToReturnFromService));
+    }
 
-        [Fact]
-        public async Task ValidateAndSetupOpenIdAsync_IdentityNotFound_Throws()
-        {
-            // Arrange
-            var externalUserId = new ExternalUserId(Guid.NewGuid());
+    [Fact]
+    public async Task ValidateAndSetupOpenIdAsync_IdentityNotFound_Throws()
+    {
+        // Arrange
+        var externalUserId = new ExternalUserId(Guid.NewGuid());
 
-            var userRepository = new Mock<IUserRepository>();
-            var userIdentityRepository = new Mock<IUserIdentityRepository>();
-            userIdentityRepository
-                .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
-                .ReturnsAsync((UserIdentity?)null);
+        var userRepository = new Mock<IUserRepository>();
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
+            .ReturnsAsync((UserIdentity?)null);
 
-            var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
-                userRepository.Object,
-                userIdentityRepository.Object);
+        var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
+            userRepository.Object,
+            userIdentityRepository.Object);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<NotFoundValidationException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
+    }
 
-        [Fact]
-        public async Task ValidateAndSetupOpenIdAsync_InvitedUserNotFound_Throws()
-        {
-            // Arrange
-            var externalUserId = new ExternalUserId(Guid.NewGuid());
-            var email = new MockedEmailAddress();
+    [Fact]
+    public async Task ValidateAndSetupOpenIdAsync_InvitedUserNotFound_Throws()
+    {
+        // Arrange
+        var externalUserId = new ExternalUserId(Guid.NewGuid());
+        var email = new RandomlyGeneratedEmailAddress();
 
-            var userRepository = new Mock<IUserRepository>();
-            var userIdentityRepository = new Mock<IUserIdentityRepository>();
-            userIdentityRepository
-                .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
-                .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
+        var userRepository = new Mock<IUserRepository>();
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
+            .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
 
-            userIdentityRepository
-                .Setup(u => u.GetAsync(email))
-                .ReturnsAsync((UserIdentity?)null);
+        userIdentityRepository
+            .Setup(u => u.GetAsync(email))
+            .ReturnsAsync((UserIdentity?)null);
 
-            var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
-                userRepository.Object,
-                userIdentityRepository.Object);
+        var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
+            userRepository.Object,
+            userIdentityRepository.Object);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
-            userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
-            userIdentityRepository.Verify(e => e.GetAsync(email));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<NotSupportedException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
+        userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
+        userIdentityRepository.Verify(e => e.GetAsync(email));
+    }
 
-        [Fact]
-        public async Task ValidateAndSetupOpenIdAsync_LocalUserNotFound_Throws()
-        {
-            // Arrange
-            var externalUserId = new ExternalUserId(Guid.NewGuid());
-            var email = new MockedEmailAddress();
+    [Fact]
+    public async Task ValidateAndSetupOpenIdAsync_LocalUserNotFound_Throws()
+    {
+        // Arrange
+        var externalUserId = new ExternalUserId(Guid.NewGuid());
+        var email = new RandomlyGeneratedEmailAddress();
 
-            var userIdentityRepository = new Mock<IUserIdentityRepository>();
-            userIdentityRepository
-                .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
-                .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
+            .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
 
-            var userToReturnFromService = GetUserIdentity(externalUserId, email, "emailAddress");
-            userIdentityRepository
-                .Setup(u => u.GetAsync(email))
-                .ReturnsAsync(userToReturnFromService);
+        var userToReturnFromService = GetUserIdentity(externalUserId, email, "emailAddress");
+        userIdentityRepository
+            .Setup(u => u.GetAsync(email))
+            .ReturnsAsync(userToReturnFromService);
 
-            var userRepository = new Mock<IUserRepository>();
-            userRepository
-                .Setup(e => e.GetAsync(userToReturnFromService.Id))
-                .ReturnsAsync((User?)null);
+        var userRepository = new Mock<IUserRepository>();
+        userRepository
+            .Setup(e => e.GetAsync(userToReturnFromService.Id))
+            .ReturnsAsync((User?)null);
 
-            var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
-                userRepository.Object,
-                userIdentityRepository.Object);
+        var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
+            userRepository.Object,
+            userIdentityRepository.Object);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
-            userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
-            userRepository.Verify(e => e.GetAsync(userToReturnFromService.Id));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<NotSupportedException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
+        userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
+        userRepository.Verify(e => e.GetAsync(userToReturnFromService.Id));
+    }
 
-        [Fact]
-        public async Task ValidateAndSetupOpenIdAsync_OpenIdSetupExpired_Throws()
-        {
-            // Arrange
-            var externalUserId = new ExternalUserId(Guid.NewGuid());
-            var email = new MockedEmailAddress();
+    [Fact]
+    public async Task ValidateAndSetupOpenIdAsync_OpenIdSetupExpired_Throws()
+    {
+        // Arrange
+        var externalUserId = new ExternalUserId(Guid.NewGuid());
+        var email = new RandomlyGeneratedEmailAddress();
 
-            var userIdentityRepository = new Mock<IUserIdentityRepository>();
-            userIdentityRepository
-                .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
-                .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
+            .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
 
-            var userToReturnFromService = GetUserIdentity(externalUserId, email, "emailAddress");
-            userIdentityRepository
-                .Setup(u => u.GetAsync(email))
-                .ReturnsAsync(userToReturnFromService);
+        var userToReturnFromService = GetUserIdentity(externalUserId, email, "emailAddress");
+        userIdentityRepository
+            .Setup(u => u.GetAsync(email))
+            .ReturnsAsync(userToReturnFromService);
 
-            var openIdSetupExpired = DateTimeOffset.UtcNow.AddDays(-1);
-            var localDbUser = GetUser(externalUserId, openIdSetupExpired);
-            var userRepository = new Mock<IUserRepository>();
-            userRepository
-                .Setup(e => e.GetAsync(externalUserId))
-                .ReturnsAsync(localDbUser);
+        var openIdSetupExpired = DateTimeOffset.UtcNow.AddDays(-1);
+        var localDbUser = GetUser(externalUserId, openIdSetupExpired);
+        var userRepository = new Mock<IUserRepository>();
+        userRepository
+            .Setup(e => e.GetAsync(externalUserId))
+            .ReturnsAsync(localDbUser);
 
-            var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
-                userRepository.Object,
-                userIdentityRepository.Object);
+        var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
+            userRepository.Object,
+            userIdentityRepository.Object);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
-            userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
-            userRepository.Verify(e => e.GetAsync(userToReturnFromService.Id));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
+        userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
+        userRepository.Verify(e => e.GetAsync(userToReturnFromService.Id));
+    }
 
-        private static UserIdentity GetUserIdentity(ExternalUserId externalUserId, MockedEmailAddress email, string signInType)
-        {
-            return new UserIdentity(
-                externalUserId,
-                email,
-                UserIdentityStatus.Active,
-                "fake_value",
-                "fake_value",
-                null,
-                DateTime.UtcNow,
-                AuthenticationMethod.Undetermined,
-                new List<LoginIdentity>() { new(signInType, "issuer", "issuerAssignedId") });
-        }
+    [Fact]
+    public async Task UnlinkOpenIdAsync_UserLinked_NoLongerHasOpenId()
+    {
+        // Arrange
+        var externalUserId = new ExternalUserId(Guid.NewGuid());
+        var email = new RandomlyGeneratedEmailAddress();
+        var userIdentity = GetUserIdentity(externalUserId, email, "federated");
 
-        private static User GetUser(ExternalUserId externalUserId, DateTimeOffset mitIdInitiatedAt)
-        {
-            var user = new User(
-                new UserId(Guid.Empty),
-                new ActorId(Guid.Empty),
-                externalUserId,
-                new List<UserRoleAssignment>(),
-                mitIdInitiatedAt,
-                null);
-            return user;
-        }
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        var userRepository = new Mock<IUserRepository>();
+
+        var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
+            userRepository.Object,
+            userIdentityRepository.Object);
+
+        // Act
+        await userIdentityOpenIdLinkService.UnlinkOpenIdAsync(userIdentity);
+
+        // Assert
+        Assert.Empty(userIdentity.LoginIdentities);
+        userIdentityRepository.Verify(repo => repo.AssignUserLoginIdentitiesAsync(userIdentity), Times.Once);
+    }
+
+    private static UserIdentity GetUserIdentity(ExternalUserId externalUserId, RandomlyGeneratedEmailAddress email, string signInType)
+    {
+        return new UserIdentity(
+            externalUserId,
+            email,
+            UserIdentityStatus.Active,
+            "fake_value",
+            "fake_value",
+            null,
+            DateTime.UtcNow,
+            AuthenticationMethod.Undetermined,
+            [new LoginIdentity(signInType, "issuer", "issuerAssignedId")]);
+    }
+
+    private static User GetUser(ExternalUserId externalUserId, DateTimeOffset mitIdInitiatedAt)
+    {
+        var user = new User(
+            new UserId(Guid.Empty),
+            new ActorId(Guid.Empty),
+            externalUserId,
+            new List<UserRoleAssignment>(),
+            mitIdInitiatedAt,
+            null);
+        return user;
     }
 }

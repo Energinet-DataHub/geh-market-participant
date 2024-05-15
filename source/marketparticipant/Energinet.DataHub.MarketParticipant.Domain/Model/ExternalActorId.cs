@@ -14,20 +14,19 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record ExternalActorId
 {
-    public sealed record ExternalActorId
+    public ExternalActorId(Guid value)
     {
-        public ExternalActorId(Guid value)
-        {
-            Value = value;
-        }
+        Value = value;
+    }
 
-        public Guid Value { get; }
+    public Guid Value { get; }
 
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
+    public override string ToString()
+    {
+        return Value.ToString();
     }
 }

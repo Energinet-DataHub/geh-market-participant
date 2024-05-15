@@ -226,7 +226,7 @@ public sealed class UserOverviewRepositoryTests
             {
                 new UserIdentity(
                     externalId,
-                    new MockedEmailAddress(),
+                    new RandomlyGeneratedEmailAddress(),
                     UserIdentityStatus.Active,
                     "fake_value",
                     "fake_value",
@@ -276,7 +276,7 @@ public sealed class UserOverviewRepositoryTests
             {
                 new UserIdentity(
                     externalId,
-                    new MockedEmailAddress(),
+                    new RandomlyGeneratedEmailAddress(),
                     UserIdentityStatus.Active,
                     "fake_value",
                     "fake_value",
@@ -304,6 +304,61 @@ public sealed class UserOverviewRepositoryTests
 
         // Assert
         Assert.Single(actual.Items, user => user.Id == userId);
+    }
+
+    [Fact]
+    public async Task SearchUsers_NoUserRolesButAdministratedBy_ReturnsUser()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var actorEntity = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t =>
+            {
+                t.Name = "fake_value";
+            }));
+
+        var userEntity = await _fixture.PrepareUserAsync(
+            TestPreparationEntities.UnconnectedUser.Patch(t => t.AdministratedByActorId = actorEntity.Id));
+
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        userIdentityRepositoryMock
+            .Setup(x => x.SearchUserIdentitiesAsync(null, null))
+            .ReturnsAsync(new[]
+            {
+                new UserIdentity(
+                    new ExternalUserId(userEntity.ExternalId),
+                    new RandomlyGeneratedEmailAddress(),
+                    UserIdentityStatus.Active,
+                    "fake_value",
+                    "fake_value",
+                    null,
+                    DateTime.UtcNow,
+                    AuthenticationMethod.Undetermined,
+                    new List<LoginIdentity>())
+            });
+
+        var target = new UserOverviewRepository(
+            context,
+            userIdentityRepositoryMock.Object,
+            new UserStatusCalculator());
+
+        // Act
+        var actual = await target.SearchUsersAsync(
+            1,
+            1000,
+            UserOverviewSortProperty.Email,
+            SortDirection.Asc,
+            null,
+            null,
+            Enumerable.Empty<UserStatus>(),
+            Enumerable.Empty<UserRoleId>());
+
+        // Assert
+        Assert.Single(actual.Items, user => user.Id.Value == userEntity.Id);
     }
 
     [Fact]
@@ -496,7 +551,7 @@ public sealed class UserOverviewRepositoryTests
         var userRoleTemplate = new UserRoleEntity
         {
             Name = "Template name",
-            Permissions = { new UserRolePermissionEntity { Permission = PermissionId.OrganizationsManage, ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value } },
+            Permissions = { new UserRolePermissionEntity { Permission = PermissionId.ActorsManage, ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value } },
             EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } },
             ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value
         };

@@ -15,78 +15,80 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+internal sealed class OrganizationStatusTransitioner
 {
-    internal sealed class OrganizationStatusTransitioner
+    private OrganizationStatus _status;
+
+    public OrganizationStatusTransitioner()
     {
-        private OrganizationStatus _status;
+        _status = OrganizationStatus.New;
+    }
 
-        public OrganizationStatusTransitioner()
-        {
-            _status = OrganizationStatus.New;
-        }
+    public OrganizationStatusTransitioner(OrganizationStatus status)
+    {
+        _status = status;
+    }
 
-        public OrganizationStatusTransitioner(OrganizationStatus status)
+    public OrganizationStatus Status
+    {
+        get => _status;
+        set
         {
-            _status = status;
-        }
-
-        public OrganizationStatus Status
-        {
-            get => _status;
-            set
+            switch (value)
             {
-                switch (value)
-                {
-                    case OrganizationStatus.New:
-                        New();
-                        break;
-                    case OrganizationStatus.Active:
-                        Activate();
-                        break;
-                    case OrganizationStatus.Blocked:
-                        Blocked();
-                        break;
-                    case OrganizationStatus.Deleted:
-                        Delete();
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(value));
-                }
+                case OrganizationStatus.New:
+                    New();
+                    break;
+                case OrganizationStatus.Active:
+                    Activate();
+                    break;
+                case OrganizationStatus.Blocked:
+                    Blocked();
+                    break;
+                case OrganizationStatus.Deleted:
+                    Delete();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value));
             }
         }
+    }
 
-        public void Activate()
-        {
-            EnsureCorrectState(OrganizationStatus.Active, OrganizationStatus.New, OrganizationStatus.Blocked);
-            _status = OrganizationStatus.Active;
-        }
+    public void Activate()
+    {
+        EnsureCorrectState(OrganizationStatus.Active, OrganizationStatus.New, OrganizationStatus.Blocked);
+        _status = OrganizationStatus.Active;
+    }
 
-        public void Blocked()
-        {
-            EnsureCorrectState(OrganizationStatus.Blocked, OrganizationStatus.New, OrganizationStatus.Active);
-            _status = OrganizationStatus.Blocked;
-        }
+    public void Blocked()
+    {
+        EnsureCorrectState(OrganizationStatus.Blocked, OrganizationStatus.New, OrganizationStatus.Active);
+        _status = OrganizationStatus.Blocked;
+    }
 
-        public void Delete()
-        {
-            EnsureCorrectState(OrganizationStatus.Deleted, OrganizationStatus.New, OrganizationStatus.Active, OrganizationStatus.Blocked);
-            _status = OrganizationStatus.Deleted;
-        }
+    public void Delete()
+    {
+        EnsureCorrectState(OrganizationStatus.Deleted, OrganizationStatus.New, OrganizationStatus.Active, OrganizationStatus.Blocked);
+        _status = OrganizationStatus.Deleted;
+    }
 
-        private void New()
-        {
-            EnsureCorrectState(OrganizationStatus.New, OrganizationStatus.New);
-            _status = OrganizationStatus.New;
-        }
+    private void New()
+    {
+        EnsureCorrectState(OrganizationStatus.New, OrganizationStatus.New);
+        _status = OrganizationStatus.New;
+    }
 
-        private void EnsureCorrectState(OrganizationStatus targetState, params OrganizationStatus[] allowedStates)
+    private void EnsureCorrectState(OrganizationStatus targetState, params OrganizationStatus[] allowedStates)
+    {
+        if (!allowedStates.Contains(_status) && targetState != _status)
         {
-            if (!allowedStates.Contains(_status) && targetState != _status)
-            {
-                throw new ValidationException($"Cannot change state from {_status} to {targetState}.");
-            }
+            throw new ValidationException($"Cannot change state from {_status} to {targetState}.")
+                .WithErrorCode("organization.state.mismatch")
+                .WithArgs(("from", _status), ("to", targetState));
         }
     }
 }

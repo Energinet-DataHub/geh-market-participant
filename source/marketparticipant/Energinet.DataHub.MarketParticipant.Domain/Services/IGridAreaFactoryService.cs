@@ -16,27 +16,26 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+/// <summary>
+/// A factory service ensuring correct construction of a GridArea.
+/// </summary>
+public interface IGridAreaFactoryService
 {
     /// <summary>
-    /// A factory service ensuring correct construction of a GridArea.
+    /// Creates an Organization.
     /// </summary>
-    public interface IGridAreaFactoryService
-    {
-        /// <summary>
-        /// Creates an Organization.
-        /// </summary>
-        /// <param name="code">The code for the Grid Area</param>
-        /// <param name="name">The name of the new Grid Area.</param>
-        /// <param name="priceAreaCode">The PriceAreaCode <see cref="PriceAreaCode"/> of the new Grid Area.</param>
-        /// <param name="validFrom">The date from which this Grid Area is valid</param>
-        /// <param name="validTo">The date where this Grid area is no longer valid</param>
-        /// <returns>The created actor.</returns>
-        Task<GridArea> CreateAsync(
-            GridAreaCode code,
-            GridAreaName name,
-            PriceAreaCode priceAreaCode,
-            DateTimeOffset validFrom,
-            DateTimeOffset? validTo);
-    }
+    /// <param name="code">The code for the Grid Area</param>
+    /// <param name="name">The name of the new Grid Area.</param>
+    /// <param name="priceAreaCode">The PriceAreaCode <see cref="PriceAreaCode"/> of the new Grid Area.</param>
+    /// <param name="validFrom">The date from which this Grid Area is valid</param>
+    /// <param name="validTo">The date where this Grid area is no longer valid</param>
+    /// <returns>The created actor.</returns>
+    Task<GridArea> CreateAsync(
+        GridAreaCode code,
+        GridAreaName name,
+        PriceAreaCode priceAreaCode,
+        DateTimeOffset validFrom,
+        DateTimeOffset? validTo);
 }

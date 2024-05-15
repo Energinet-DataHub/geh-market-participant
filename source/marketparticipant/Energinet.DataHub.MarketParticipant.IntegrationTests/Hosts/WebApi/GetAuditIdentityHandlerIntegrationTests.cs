@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
@@ -117,7 +117,7 @@ public sealed class GetAuditIdentityHandlerIntegrationTests
         var externalUserId = new ExternalUserId(auditUser.ExternalId);
         var userIdentity = new UserIdentity(
             externalUserId,
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "expected_first_name",
             "expected_last_name",

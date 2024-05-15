@@ -16,13 +16,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed class Actor : IPublishDomainEvents
 {
-    private readonly List<DomainEvent> _domainEvents = new();
+    private readonly DomainEventList _domainEvents;
     private readonly List<ActorMarketRole> _marketRoles = new();
     private readonly ActorStatusTransitioner _actorStatusTransitioner;
     private ExternalActorId? _externalActorId;
@@ -37,6 +38,7 @@ public sealed class Actor : IPublishDomainEvents
         OrganizationId = organizationId;
         ActorNumber = actorNumber;
         Name = actorName;
+        _domainEvents = new DomainEventList();
         _actorStatusTransitioner = new ActorStatusTransitioner();
     }
 
@@ -54,6 +56,7 @@ public sealed class Actor : IPublishDomainEvents
         OrganizationId = organizationId;
         ActorNumber = actorNumber;
         Name = name;
+        _domainEvents = new DomainEventList(Id.Value);
         _externalActorId = externalActorId;
         _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
         _marketRoles.AddRange(marketRoles);
@@ -132,14 +135,28 @@ public sealed class Actor : IPublishDomainEvents
                 throw new NotSupportedException("Cannot overwrite credentials. Remember to delete the credentials first using the appropriate service.");
             }
 
-            if (value is ActorCertificateCredentials acc && Status == ActorStatus.Active)
+            if (Status == ActorStatus.Active && _credentials != value)
             {
-                foreach (var marketRole in _marketRoles)
+                if (_credentials is ActorCertificateCredentials oldCredentials)
                 {
-                    _domainEvents.Add(new ActorCertificateCredentialsAssigned(
-                        ActorNumber,
-                        marketRole.Function,
-                        acc.CertificateThumbprint));
+                    foreach (var marketRole in _marketRoles)
+                    {
+                        _domainEvents.Add(new ActorCertificateCredentialsRemoved(
+                            ActorNumber,
+                            marketRole.Function,
+                            oldCredentials.CertificateThumbprint));
+                    }
+                }
+
+                if (value is ActorCertificateCredentials newCredentials)
+                {
+                    foreach (var marketRole in _marketRoles)
+                    {
+                        _domainEvents.Add(new ActorCertificateCredentialsAssigned(
+                            ActorNumber,
+                            marketRole.Function,
+                            newCredentials.CertificateThumbprint));
+                    }
                 }
             }
 
@@ -152,7 +169,9 @@ public sealed class Actor : IPublishDomainEvents
     /// </summary>
     public IReadOnlyList<ActorMarketRole> MarketRoles => _marketRoles;
 
-    IReadOnlyList<DomainEvent> IPublishDomainEvents.DomainEvents => _domainEvents;
+    IDomainEvents IPublishDomainEvents.DomainEvents => _domainEvents;
+
+    private bool AreMarketRolesReadOnly => Status != ActorStatus.New;
 
     /// <summary>
     /// Adds a new role from the current actor.
@@ -163,14 +182,15 @@ public sealed class Actor : IPublishDomainEvents
     {
         ArgumentNullException.ThrowIfNull(marketRole);
 
-        if (Status != ActorStatus.New)
+        if (AreMarketRolesReadOnly)
         {
             throw new ValidationException("It is only allowed to modify market roles for actors marked as 'New'.");
         }
 
         if (_marketRoles.Any(role => role.Function == marketRole.Function))
         {
-            throw new ValidationException("The market roles cannot contain duplicates.");
+            throw new ValidationException("The market roles cannot contain duplicates.")
+                .WithErrorCode("actor.market_role.duplicates");
         }
 
         _marketRoles.Add(marketRole);
@@ -185,14 +205,16 @@ public sealed class Actor : IPublishDomainEvents
     {
         ArgumentNullException.ThrowIfNull(marketRole);
 
-        if (Status != ActorStatus.New)
+        if (AreMarketRolesReadOnly)
         {
             throw new ValidationException("It is only allowed to modify market roles for actors marked as 'New'.");
         }
 
         if (!_marketRoles.Remove(marketRole))
         {
-            throw new ValidationException($"Market role for {marketRole.Function} was not found.");
+            throw new ValidationException($"Market role for {marketRole.Function} was not found.")
+                .WithErrorCode("actor.market_role.not_found")
+                .WithArgs(("market_role", marketRole.Function.ToString()));
         }
     }
 
@@ -237,7 +259,10 @@ public sealed class Actor : IPublishDomainEvents
     public void Deactivate()
     {
         if (_credentials != null)
-            throw new ValidationException("Cannot disable actor with active credentials. Remove the credentials first, then try again.");
+        {
+            throw new ValidationException("Cannot disable actor with active credentials. Remove the credentials first, then try again.")
+                .WithErrorCode("actor.credentials.still_active");
+        }
 
         _actorStatusTransitioner.Deactivate();
     }
@@ -247,14 +272,4 @@ public sealed class Actor : IPublishDomainEvents
     /// Only Active and New actors can be set to passive.
     /// </summary>
     public void SetAsPassive() => _actorStatusTransitioner.SetAsPassive();
-
-    void IPublishDomainEvents.ClearPublishedDomainEvents()
-    {
-        _domainEvents.Clear();
-    }
-
-    Guid IPublishDomainEvents.GetAggregateIdForDomainEvents()
-    {
-        return Id.Value;
-    }
 }

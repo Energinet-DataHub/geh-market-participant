@@ -13,33 +13,27 @@
 // limitations under the License.
 
 using Azure.Identity;
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Common.Extensions;
-using Microsoft.Extensions.Configuration;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 
-namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
+namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
+
+internal static class GraphServiceClientRegistration
 {
-    internal static class GraphServiceClientRegistration
+    public static void AddGraphServiceClient(this IServiceCollection services)
     {
-        public static void AddGraphServiceClient(this IServiceCollection services)
+        services.AddSingleton(provider =>
         {
-            services.AddSingleton(provider =>
-            {
-                var configuration = provider.GetRequiredService<IConfiguration>();
+            var options = provider.GetRequiredService<IOptions<AzureB2COptions>>();
 
-                var azureB2CTenant = configuration.GetSetting(Settings.B2CTenant);
-                var azureB2CSpnId = configuration.GetSetting(Settings.B2CServicePrincipalId);
-                var azureB2CSpnSecret = configuration.GetSetting(Settings.B2CServicePrincipalSecret);
+            var clientSecretCredential = new ClientSecretCredential(
+                options.Value.Tenant,
+                options.Value.SpnId,
+                options.Value.SpnSecret);
 
-                var clientSecretCredential = new ClientSecretCredential(
-                    azureB2CTenant,
-                    azureB2CSpnId,
-                    azureB2CSpnSecret);
-
-                return new GraphServiceClient(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
-            });
-        }
+            return new GraphServiceClient(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
+        });
     }
 }

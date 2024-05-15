@@ -44,7 +44,17 @@ internal static class TestPreparationModels
         new MockedGln(),
         ActorStatus.New,
         new[] { new ActorMarketRole(EicFunction.GridAccessProvider) },
-        new ActorName("Sloth Power"),
+        new ActorName("Racoon Power"),
+        null);
+
+    public static Actor MockedActiveActor(Guid actorId, Guid organizationId) => new(
+        new ActorId(actorId),
+        new OrganizationId(organizationId),
+        new ExternalActorId(Guid.NewGuid()),
+        new MockedGln(),
+        ActorStatus.Active,
+        new[] { new ActorMarketRole(EicFunction.GridAccessProvider) },
+        new ActorName("Racoon Power"),
         null);
 
     public static UserRole MockedUserRole(Guid userRoleId) => new(
@@ -73,7 +83,7 @@ internal static class TestPreparationModels
 
     public static UserIdentity MockedUserIdentity(Guid externalUserId) => new(
         new ExternalUserId(externalUserId),
-        new MockedEmailAddress(),
+        new RandomlyGeneratedEmailAddress(),
         UserIdentityStatus.Active,
         "Mocked First Name",
         "Mocked Last Name",

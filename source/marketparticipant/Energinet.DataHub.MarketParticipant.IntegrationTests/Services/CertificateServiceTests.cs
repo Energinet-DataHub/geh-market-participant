@@ -23,93 +23,92 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
+
+[Collection(nameof(IntegrationTestCollectionFixture))]
+[IntegrationTest]
+public sealed class CertificateServiceTests
 {
-    [Collection(nameof(IntegrationTestCollectionFixture))]
-    [IntegrationTest]
-    public sealed class CertificateServiceTests
+    private readonly CertificateFixture _certificateFixture;
+
+    public CertificateServiceTests(CertificateFixture certificateFixture)
     {
-        private readonly CertificateFixture _certificateFixture;
+        _certificateFixture = certificateFixture;
+    }
 
-        public CertificateServiceTests(CertificateFixture certificateFixture)
+    [Fact]
+    public void CertificateService_CreateAndValidate_Invalid()
+    {
+        // Arrange
+        var certificateService = new CertificateService(
+            _certificateFixture.SecretClient,
+            new CertificateValidation(),
+            new Mock<ILogger<CertificateService>>().Object);
+
+        using var memoryStream = new MemoryStream();
+        memoryStream.Write("Invalid certificate integrations tests"u8);
+
+        // Act + Assert
+        Assert.Throws<ValidationException>(() => certificateService.CreateAndValidateX509Certificate(memoryStream));
+    }
+
+    [Fact]
+    public void CertificateService_CreateAndValidate_Valid()
+    {
+        // Arrange
+        var validationMock = new Mock<ICertificateValidation>();
+
+        var certificateService = new CertificateService(
+            _certificateFixture.SecretClient,
+            validationMock.Object,
+            new Mock<ILogger<CertificateService>>().Object);
+
+        using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
+
+        // Act
+        var certificate = certificateService.CreateAndValidateX509Certificate(fileStream);
+
+        // Assert
+        Assert.NotNull(certificate);
+        validationMock.Verify(x => x.Verify(certificate), Times.Once);
+    }
+
+    [Fact]
+    public async Task CertificateService_Save()
+    {
+        // Arrange
+        var certificateService = new CertificateService(
+            _certificateFixture.SecretClient,
+            new Mock<ICertificateValidation>().Object,
+            new Mock<ILogger<CertificateService>>().Object);
+
+        var name = Guid.NewGuid().ToString();
+
+        await using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
+
+        var x509Certificate = certificateService.CreateAndValidateX509Certificate(fileStream);
+
+        try
         {
-            _certificateFixture = certificateFixture;
-        }
-
-        [Fact]
-        public void CertificateService_CreateAndValidate_Invalid()
-        {
-            // Arrange
-            var certificateService = new CertificateService(
-                _certificateFixture.SecretClient,
-                new CertificateValidation(),
-                new Mock<ILogger<CertificateService>>().Object);
-
-            using var memoryStream = new MemoryStream();
-            memoryStream.Write("Invalid certificate integrations tests"u8);
-
-            // Act + Assert
-            Assert.Throws<ValidationException>(() => certificateService.CreateAndValidateX509Certificate(memoryStream));
-        }
-
-        [Fact]
-        public void CertificateService_CreateAndValidate_Valid()
-        {
-            // Arrange
-            var validationMock = new Mock<ICertificateValidation>();
-
-            var certificateService = new CertificateService(
-                _certificateFixture.SecretClient,
-                validationMock.Object,
-                new Mock<ILogger<CertificateService>>().Object);
-
-            using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
-
             // Act
-            var certificate = certificateService.CreateAndValidateX509Certificate(fileStream);
+            await certificateService.SaveCertificateAsync(name, x509Certificate);
 
             // Assert
-            Assert.NotNull(certificate);
-            validationMock.Verify(x => x.Verify(certificate), Times.Once);
+            Assert.True(await _certificateFixture.CertificateExistsAsync(name));
         }
-
-        [Fact]
-        public async Task CertificateService_Save()
+        finally
         {
-            // Arrange
-            var certificateService = new CertificateService(
-                _certificateFixture.SecretClient,
-                new Mock<ICertificateValidation>().Object,
-                new Mock<ILogger<CertificateService>>().Object);
-
-            var name = Guid.NewGuid().ToString();
-
-            await using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
-
-            var x509Certificate = certificateService.CreateAndValidateX509Certificate(fileStream);
-
-            try
-            {
-                // Act
-                await certificateService.SaveCertificateAsync(name, x509Certificate);
-
-                // Assert
-                Assert.True(await _certificateFixture.CertificateExistsAsync(name));
-            }
-            finally
-            {
-                await _certificateFixture.CleanUpCertificateFromStorageAsync(name);
-            }
+            await _certificateFixture.CleanUpCertificateFromStorageAsync(name);
         }
+    }
 
-        private static Stream SetupTestCertificate(string certificateName)
-        {
-            var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateName}";
+    private static Stream SetupTestCertificate(string certificateName)
+    {
+        var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateName}";
 
-            var assembly = typeof(CertificateServiceTests).Assembly;
-            var stream = assembly.GetManifestResourceStream(resourceName);
+        var assembly = typeof(CertificateServiceTests).Assembly;
+        var stream = assembly.GetManifestResourceStream(resourceName);
 
-            return stream ?? throw new InvalidOperationException($"Could not find resource {resourceName}");
-        }
+        return stream ?? throw new InvalidOperationException($"Could not find resource {resourceName}");
     }
 }

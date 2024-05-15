@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -81,9 +81,9 @@ public sealed class ReInviteUserHandlerIntegrationTests : IAsyncLifetime
         Assert.NotNull(createdUser);
         Assert.True(createdUser.InvitationExpiresAt > DateTime.UtcNow);
 
-        var userInviteAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserInviteAuditLogEntryRepository>();
-        var userInviteAuditLog = await userInviteAuditLogEntryRepository.GetAsync(createdUser.Id);
-        Assert.Single(userInviteAuditLog, e => e.UserId == createdUser.Id);
+        var userInviteAuditLogRepository = scope.ServiceProvider.GetRequiredService<IUserInviteAuditLogRepository>();
+        var userInviteAuditLog = await userInviteAuditLogRepository.GetAsync(createdUser.Id);
+        Assert.Single(userInviteAuditLog, e => e.Change == UserAuditedChange.InvitedIntoActor);
     }
 
     public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);

@@ -17,55 +17,66 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Model
+namespace Energinet.DataHub.MarketParticipant.Tests.Model;
+
+[UnitTest]
+public sealed class EmailAddressTests
 {
-    [UnitTest]
-    public sealed class EmailAddressTests
+    [Theory]
+    [InlineData("", false)]
+    [InlineData(" ", false)]
+    [InlineData(null, false)]
+    [InlineData("johndoe.com", false)]
+    [InlineData("john.@doe.com", true)]
+    [InlineData("john@doe.com", true)]
+    [InlineData("john@doe.com.", true)]
+    [InlineData("john@doe", true)]
+    [InlineData("john+other@doe", true)]
+    public void Ctor_Email_ValidatesAddress(string? value, bool isValid)
     {
-        [Theory]
-        [InlineData("", false)]
-        [InlineData(" ", false)]
-        [InlineData(null, false)]
-        [InlineData("johndoe.com", false)]
-        [InlineData("john.@doe.com", true)]
-        [InlineData("john@doe.com", true)]
-        [InlineData("john@doe.com.", true)]
-        [InlineData("john@doe", true)]
-        [InlineData("john+other@doe", true)]
-        public void Ctor_Email_ValidatesAddress(string value, bool isValid)
+        if (isValid)
         {
-            if (isValid)
-            {
-                Assert.Equal(value, new EmailAddress(value).Address);
-            }
-            else
-            {
-                Assert.Throws<ValidationException>(() => new EmailAddress(value));
-            }
+            Assert.Equal(value, new EmailAddress(value!).Address);
         }
-
-        [Fact]
-        public void Ctor_EmailTooLong_Fails()
+        else
         {
-            // Arrange
-            const int maxLength = 64;
-            const string suffix = "@a.b";
-            var value = new string('a', maxLength - suffix.Length + 1) + suffix;
-
-            // Act + Assert
-            Assert.Throws<ValidationException>(() => new EmailAddress(value));
+            Assert.Throws<ValidationException>(() => new EmailAddress(value!));
         }
+    }
 
-        [Fact]
-        public void Ctor_EmailMaxLength_Accepted()
-        {
-            // Arrange
-            const int maxLength = 64;
-            const string suffix = "@a.b";
-            var value = new string('a', maxLength - suffix.Length) + suffix;
+    [Fact]
+    public void Ctor_EmailTooLong_Fails()
+    {
+        // Arrange
+        const int maxLength = 64;
+        const string suffix = "@a.b";
+        var value = new string('a', maxLength - suffix.Length + 1) + suffix;
 
-            // Act + Assert
-            Assert.Equal(value, new EmailAddress(value).Address);
-        }
+        // Act + Assert
+        Assert.Throws<ValidationException>(() => new EmailAddress(value));
+    }
+
+    [Fact]
+    public void Ctor_EmailMaxLength_Accepted()
+    {
+        // Arrange
+        const int maxLength = 64;
+        const string suffix = "@a.b";
+        var value = new string('a', maxLength - suffix.Length) + suffix;
+
+        // Act + Assert
+        Assert.Equal(value, new EmailAddress(value).Address);
+    }
+
+    [Theory]
+    [InlineData("a@a.dk", "b@a.dk", false)]
+    [InlineData("a@a.dk", "a@a.dk", true)]
+    [InlineData("a@ab.dk", "a@ac.dk", false)]
+    [InlineData("A@ab.dk", "a@ab.dk", true)]
+    [InlineData("a@ab.dk", "A@ab.dk", true)]
+    [InlineData("a@aB.dk", "A@aB.dk", true)]
+    public void Equals_DifferentStrings_AreCompared(string a, string b, bool isEqual)
+    {
+        Assert.Equal(isEqual, new EmailAddress(a) == new EmailAddress(b));
     }
 }

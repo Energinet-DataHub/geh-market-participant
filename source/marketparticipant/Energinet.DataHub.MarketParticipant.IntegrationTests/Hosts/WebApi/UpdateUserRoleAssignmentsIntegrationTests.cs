@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -125,7 +125,7 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         var actor2 = await _fixture.PrepareActorAsync();
 
         var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
-        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
         var userRoleNew = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
 
         var user = await _fixture.PrepareUserAsync();
@@ -180,9 +180,9 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         var response = await mediator.Send(getCommand);
 
         // Assert
-        var responseLogs = response.UserRoleAssignmentAuditLogs.ToList();
+        var responseLogs = response.AuditLogs.ToList();
         responseLogs.Should().HaveCount(2);
-        responseLogs.TrueForAll(e => e.AssignmentType == UserRoleAssignmentTypeAuditLog.Added).Should().BeTrue();
+        responseLogs.TrueForAll(e => e.Change == UserAuditedChange.UserRoleAssigned).Should().BeTrue();
     }
 
     [Fact]
@@ -229,11 +229,11 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         var response = await mediator.Send(getCommand);
 
         // Assert
-        var responseLogs = response.UserRoleAssignmentAuditLogs.ToList();
+        var responseLogs = response.AuditLogs.ToList();
         responseLogs.Should().HaveCount(4);
 
-        var addedLogs = responseLogs.Where(l => l.AssignmentType == UserRoleAssignmentTypeAuditLog.Added);
-        var removedLogs = responseLogs.Where(l => l.AssignmentType == UserRoleAssignmentTypeAuditLog.Removed);
+        var addedLogs = responseLogs.Where(l => l.Change == UserAuditedChange.UserRoleAssigned);
+        var removedLogs = responseLogs.Where(l => l.Change == UserAuditedChange.UserRoleRemoved);
         addedLogs.Should().HaveCount(3);
         removedLogs.Should().HaveCount(1);
     }

@@ -20,17 +20,16 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys.Cryptography;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
@@ -49,18 +48,18 @@ public class TokenController : ControllerBase
 
     private readonly IExternalTokenValidator _externalTokenValidator;
     private readonly ISigningKeyRing _signingKeyRing;
-    private readonly IConfiguration _configuration;
+    private readonly IOptions<UserAuthentication> _authSettings;
     private readonly IMediator _mediator;
 
     public TokenController(
         IExternalTokenValidator externalTokenValidator,
         ISigningKeyRing signingKeyRing,
-        IConfiguration configuration,
+        IOptions<UserAuthentication> authSettings,
         IMediator mediator)
     {
         _externalTokenValidator = externalTokenValidator;
         _signingKeyRing = signingKeyRing;
-        _configuration = configuration;
+        _authSettings = authSettings;
         _mediator = mediator;
     }
 
@@ -161,7 +160,7 @@ public class TokenController : ControllerBase
 
         var dataHubToken = new JwtSecurityToken(
             Issuer,
-            _configuration.GetSetting(Settings.BackendBffAppId),
+            _authSettings.Value.BackendBffAppId,
             dataHubTokenClaims,
             externalJwt.ValidFrom,
             externalJwt.ValidTo);

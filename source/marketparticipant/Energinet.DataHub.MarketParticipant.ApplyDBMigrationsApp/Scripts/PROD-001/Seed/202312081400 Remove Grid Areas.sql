@@ -1,0 +1,1 @@
+DELETE FROM [GridArea] WHERE Name in ('Netområde 533', 'Netområde 543', 'Netområde 584', 'Netområde 803', 'Netområde 804')

@@ -22,9 +22,12 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
+using Microsoft.Kiota.Abstractions;
 using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication.AuthenticationMethod;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
 using User = Microsoft.Graph.Models.User;
@@ -35,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 public sealed class UserIdentityRepository : IUserIdentityRepository
 {
     private readonly GraphServiceClient _graphClient;
-    private readonly AzureIdentityConfig _azureIdentityConfig;
+    private readonly IOptions<AzureB2COptions> _options;
     private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
     private readonly IUserPasswordGenerator _passwordGenerator;
 
@@ -56,12 +59,12 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
     public UserIdentityRepository(
         GraphServiceClient graphClient,
-        AzureIdentityConfig azureIdentityConfig,
+        IOptions<AzureB2COptions> options,
         IUserIdentityAuthenticationService userIdentityAuthenticationService,
         IUserPasswordGenerator passwordGenerator)
     {
         _graphClient = graphClient;
-        _azureIdentityConfig = azureIdentityConfig;
+        _options = options;
         _userIdentityAuthenticationService = userIdentityAuthenticationService;
         _passwordGenerator = passwordGenerator;
     }
@@ -146,7 +149,6 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
         var request = await _graphClient.Users.GetAsync(x =>
         {
-            x.Headers.Add("ConsistencyLevel", "eventual");
             x.QueryParameters.Select = _selectors;
             x.QueryParameters.Count = true;
             if (filters.Any())
@@ -209,25 +211,39 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .PatchAsync(new User
             {
                 AccountEnabled = true,
-                Department = employeeId // Cannot use relevant User.EmployeeId as MS thought is was a brilliant idea to limit it to 16 chars, so it cannot fit a Guid.
+                Department = employeeId // Cannot use relevant User.EmployeeId as MS thought it was a brilliant idea to limit it to 16 chars, so it cannot fit a Guid.
             })
             .ConfigureAwait(false);
 
         return externalUserId;
     }
 
-    public Task UpdateUserAsync(UserIdentity userIdentity)
+    public async Task UpdateUserAsync(UserIdentity userIdentity)
     {
         ArgumentNullException.ThrowIfNull(userIdentity);
 
-        return _graphClient
+        var authenticationId = await FindAuthenticationMethodIdAsync(userIdentity.Id).ConfigureAwait(false);
+
+        await _graphClient
             .Users[userIdentity.Id.Value.ToString()]
             .PatchAsync(new User
             {
                 GivenName = userIdentity.FirstName,
                 Surname = userIdentity.LastName,
                 MobilePhone = userIdentity.PhoneNumber?.Number
-            });
+            }).ConfigureAwait(false);
+
+        if (!string.IsNullOrWhiteSpace(authenticationId))
+        {
+            await _graphClient
+                .Users[userIdentity.Id.Value.ToString()]
+                .Authentication
+                .PhoneMethods[authenticationId]
+                .PatchAsync(new PhoneAuthenticationMethod
+                {
+                    PhoneNumber = userIdentity.PhoneNumber!.Number
+                }).ConfigureAwait(false);
+        }
     }
 
     public Task AssignUserLoginIdentitiesAsync(UserIdentity userIdentity)
@@ -247,13 +263,28 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             });
     }
 
-    public Task DeleteAsync(ExternalUserId externalUserId)
+    public async Task DeleteAsync(ExternalUserId externalUserId)
     {
         ArgumentNullException.ThrowIfNull(externalUserId);
 
-        return _graphClient
-            .Users[externalUserId.Value.ToString()]
-            .DeleteAsync();
+        for (var i = 0; i < 15; i++)
+        {
+            try
+            {
+                await _graphClient
+                    .Users[externalUserId.Value.ToString()]
+                    .DeleteAsync()
+                    .ConfigureAwait(false);
+
+                return;
+            }
+            catch (ODataError ex) when (ex.ResponseStatusCode == 404)
+            {
+                await Task.Delay(500).ConfigureAwait(false);
+            }
+        }
+
+        throw new InvalidOperationException($"Could not delete user {externalUserId.Value}.");
     }
 
     public Task EnableUserAccountAsync(ExternalUserId externalUserId)
@@ -300,6 +331,27 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                user.Identities.Any(ident => ident.SignInType == "emailAddress");
     }
 
+    private async Task<string?> FindAuthenticationMethodIdAsync(ExternalUserId userId)
+    {
+        var collection = await _graphClient
+            .Users[userId.ToString()]
+            .Authentication
+            .PhoneMethods
+            .GetAsync(configuration => configuration.Options = new List<IRequestOption>
+            {
+                NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
+            })
+            .ConfigureAwait(false);
+
+        var phoneMethods = await collection!
+            .IteratePagesAsync<PhoneAuthenticationMethod, PhoneAuthenticationMethodCollectionResponse>(_graphClient)
+            .ConfigureAwait(false);
+
+        return phoneMethods
+            .FirstOrDefault(method => method.PhoneType == AuthenticationPhoneType.Mobile)?
+            .Id;
+    }
+
     private Task UpdateUserAccountStatusAsync(ExternalUserId externalUserId, bool enabled)
     {
         ArgumentNullException.ThrowIfNull(externalUserId);
@@ -321,7 +373,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .GetAsync(x =>
             {
                 x.QueryParameters.Select = _selectors;
-                x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{_azureIdentityConfig.Issuer}' and id/issuerAssignedId eq '{email.Address}')";
+                x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{_options.Value.Tenant}' and id/issuerAssignedId eq '{email.Address}')";
             })
             .ConfigureAwait(false);
 
@@ -366,7 +418,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 new()
                 {
                     SignInType = "emailAddress",
-                    Issuer = _azureIdentityConfig.Issuer,
+                    Issuer = _options.Value.Tenant,
                     IssuerAssignedId = userIdentity.Email.Address
                 }
             }

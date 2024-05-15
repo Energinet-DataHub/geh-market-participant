@@ -16,7 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
@@ -43,6 +43,8 @@ public sealed class InvitationController : ControllerBase
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<ActionResult> InviteUserAsync([FromBody] UserInvitationDto userInvitation)
     {
+        ArgumentNullException.ThrowIfNull(userInvitation);
+
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(userInvitation.AssignedActor))
             return Unauthorized();
 

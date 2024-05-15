@@ -22,119 +22,118 @@ using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Services
+namespace Energinet.DataHub.MarketParticipant.Tests.Services;
+
+public sealed class UniqueMarketRoleGridAreaRuleServiceTests
 {
-    public sealed class UniqueMarketRoleGridAreaRuleServiceTests
+    [Fact]
+    public async Task Ensure_ActorSupplied_CallsRemoveForActor()
     {
-        [Fact]
-        public async Task Ensure_ActorSupplied_CallsRemoveForActor()
-        {
-            // arrange
-            var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
+        // arrange
+        var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
 
-            var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
+        var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
 
-            var actor = new Actor(
-                new ActorId(Guid.NewGuid()),
-                new OrganizationId(Guid.NewGuid()),
-                null,
-                new MockedGln(),
-                ActorStatus.Active,
-                new[]
-                {
-                    new ActorMarketRole(
-                        EicFunction.GridAccessProvider,
-                        Enumerable.Empty<ActorGridArea>())
-                },
-                new ActorName("fake_value"),
-                null);
-
-            // act
-            await target.ValidateAndReserveAsync(actor);
-
-            // assert
-            repository.Verify(x => x.RemoveAllReservationsAsync(actor.Id), Times.Exactly(1));
-        }
-
-        [Fact]
-        public async Task Ensure_ActorSupplied_CallsTryAddForMarketRoleGridAreas()
-        {
-            // arrange
-            var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
-            repository
-                .Setup(x => x.TryReserveAsync(It.IsAny<ActorId>(), EicFunction.GridAccessProvider, It.IsAny<GridAreaId>()))
-                .ReturnsAsync(true);
-
-            var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
-
-            var actor = new Actor(
-                new ActorId(Guid.NewGuid()),
-                new OrganizationId(Guid.NewGuid()),
-                null,
-                new MockedGln(),
-                ActorStatus.Active,
-                new[]
-                {
-                    new ActorMarketRole(
-                        EicFunction.GridAccessProvider,
-                        new[]
-                        {
-                            new ActorGridArea(
-                                new GridAreaId(Guid.NewGuid()),
-                                new[] { MeteringPointType.D02Analysis })
-                        })
-                },
-                new ActorName("fake_value"),
-                null);
-
-            // act
-            await target.ValidateAndReserveAsync(actor);
-
-            // assert
-            foreach (var mr in actor.MarketRoles)
+        var actor = new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            null,
+            new MockedGln(),
+            ActorStatus.Active,
+            new[]
             {
-                foreach (var ga in mr.GridAreas)
-                {
-                    repository.Verify(x => x.TryReserveAsync(actor.Id, mr.Function, ga.Id), Times.Exactly(1));
-                }
-            }
-        }
+                new ActorMarketRole(
+                    EicFunction.GridAccessProvider,
+                    Enumerable.Empty<ActorGridArea>())
+            },
+            new ActorName("fake_value"),
+            null);
 
-        [Fact]
-        public async Task Ensure_NonDdmMarketRole_DoesntEnsureUniqueness()
-        {
-            foreach (var nonDdmMarketRole in Enum.GetValues<EicFunction>().Except(
-                new[]
-                {
-                    EicFunction.GridAccessProvider
-                }))
+        // act
+        await target.ValidateAndReserveAsync(actor);
+
+        // assert
+        repository.Verify(x => x.RemoveAllReservationsAsync(actor.Id), Times.Exactly(1));
+    }
+
+    [Fact]
+    public async Task Ensure_ActorSupplied_CallsTryAddForMarketRoleGridAreas()
+    {
+        // arrange
+        var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
+        repository
+            .Setup(x => x.TryReserveAsync(It.IsAny<ActorId>(), EicFunction.GridAccessProvider, It.IsAny<GridAreaId>()))
+            .ReturnsAsync(true);
+
+        var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
+
+        var actor = new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            null,
+            new MockedGln(),
+            ActorStatus.Active,
+            new[]
             {
-                // arrange
-                var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
-
-                var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
-
-                var actor = new Actor(
-                    new ActorId(Guid.NewGuid()),
-                    new OrganizationId(Guid.NewGuid()),
-                    null,
-                    new MockedGln(),
-                    ActorStatus.Active,
+                new ActorMarketRole(
+                    EicFunction.GridAccessProvider,
                     new[]
                     {
+                        new ActorGridArea(
+                            new GridAreaId(Guid.NewGuid()),
+                            new[] { MeteringPointType.D02Analysis })
+                    })
+            },
+            new ActorName("fake_value"),
+            null);
+
+        // act
+        await target.ValidateAndReserveAsync(actor);
+
+        // assert
+        foreach (var mr in actor.MarketRoles)
+        {
+            foreach (var ga in mr.GridAreas)
+            {
+                repository.Verify(x => x.TryReserveAsync(actor.Id, mr.Function, ga.Id), Times.Exactly(1));
+            }
+        }
+    }
+
+    [Fact]
+    public async Task Ensure_NonDdmMarketRole_DoesntEnsureUniqueness()
+    {
+        foreach (var nonDdmMarketRole in Enum.GetValues<EicFunction>().Except(
+                     new[]
+                     {
+                         EicFunction.GridAccessProvider
+                     }))
+        {
+            // arrange
+            var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
+
+            var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
+
+            var actor = new Actor(
+                new ActorId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                new[]
+                {
                     new ActorMarketRole(
                         nonDdmMarketRole,
                         Enumerable.Empty<ActorGridArea>())
-                    },
-                    new ActorName("fake_value"),
-                    null);
+                },
+                new ActorName("fake_value"),
+                null);
 
-                // act
-                await target.ValidateAndReserveAsync(actor);
+            // act
+            await target.ValidateAndReserveAsync(actor);
 
-                // assert
-                repository.Verify(x => x.TryReserveAsync(It.IsAny<ActorId>(), It.IsAny<EicFunction>(), It.IsAny<GridAreaId>()), Times.Never);
-            }
+            // assert
+            repository.Verify(x => x.TryReserveAsync(It.IsAny<ActorId>(), It.IsAny<EicFunction>(), It.IsAny<GridAreaId>()), Times.Never);
         }
     }
 }

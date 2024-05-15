@@ -18,5 +18,5 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 public interface IDeletableAuditedEntity : IAuditedEntity
 {
-    public Guid? DeletedByIdentityId { get; set; }
+    Guid? DeletedByIdentityId { get; set; }
 }

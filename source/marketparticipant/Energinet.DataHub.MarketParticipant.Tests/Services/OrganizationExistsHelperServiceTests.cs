@@ -22,54 +22,53 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Services
+namespace Energinet.DataHub.MarketParticipant.Tests.Services;
+
+[UnitTest]
+public sealed class OrganizationExistsHelperServiceTests
 {
-    [UnitTest]
-    public sealed class OrganizationExistsHelperServiceTests
+    [Fact]
+    public async Task EnsureOrganizationExistsAsync_HasOrganization_ReturnsOrganization()
     {
-        [Fact]
-        public async Task EnsureOrganizationExistsAsync_HasOrganization_ReturnsOrganization()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new OrganizationExistsHelperService(organizationRepository.Object);
-            var validAddress = new Address(
+        // Arrange
+        var organizationRepository = new Mock<IOrganizationRepository>();
+        var target = new OrganizationExistsHelperService(organizationRepository.Object);
+        var validAddress = new Address(
             "test Street",
             "1",
             "1111",
             "Test City",
-            "Test Country");
+            "DK");
 
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678");
-            var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", validBusinessRegisterIdentifier, validAddress, new OrganizationDomain("energinet.dk"));
+        var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678");
+        var organizationId = Guid.NewGuid();
+        var organization = new Organization("fake_value", validBusinessRegisterIdentifier, validAddress, new OrganizationDomain("energinet.dk"));
 
-            organizationRepository
-                .Setup(x => x.GetAsync(It.Is<OrganizationId>(y => y.Value == organizationId)))
-                .ReturnsAsync(organization);
+        organizationRepository
+            .Setup(x => x.GetAsync(It.Is<OrganizationId>(y => y.Value == organizationId)))
+            .ReturnsAsync(organization);
 
-            // Act
-            var actual = await target.EnsureOrganizationExistsAsync(organizationId);
+        // Act
+        var actual = await target.EnsureOrganizationExistsAsync(organizationId);
 
-            // Assert
-            Assert.NotNull(actual);
-        }
+        // Assert
+        Assert.NotNull(actual);
+    }
 
-        [Fact]
-        public async Task EnsureOrganizationExistsAsync_NoOrganization_ThrowsNotFoundException()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new OrganizationExistsHelperService(organizationRepository.Object);
+    [Fact]
+    public async Task EnsureOrganizationExistsAsync_NoOrganization_ThrowsNotFoundException()
+    {
+        // Arrange
+        var organizationRepository = new Mock<IOrganizationRepository>();
+        var target = new OrganizationExistsHelperService(organizationRepository.Object);
 
-            var organizationId = Guid.NewGuid();
+        var organizationId = Guid.NewGuid();
 
-            organizationRepository
-                .Setup(x => x.GetAsync(It.Is<OrganizationId>(y => y.Value == organizationId)))
-                .ReturnsAsync((Organization?)null);
+        organizationRepository
+            .Setup(x => x.GetAsync(It.Is<OrganizationId>(y => y.Value == organizationId)))
+            .ReturnsAsync((Organization?)null);
 
-            // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => target.EnsureOrganizationExistsAsync(organizationId));
-        }
+        // Act + Assert
+        await Assert.ThrowsAsync<NotFoundValidationException>(() => target.EnsureOrganizationExistsAsync(organizationId));
     }
 }

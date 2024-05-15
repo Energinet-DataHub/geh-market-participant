@@ -14,27 +14,26 @@
 
 using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+[JsonDerivedType(typeof(EicActorNumber), typeDiscriminator: "eic")]
+[JsonDerivedType(typeof(GlnActorNumber), typeDiscriminator: "gln")]
+[JsonDerivedType(typeof(UnknownActorNumber), typeDiscriminator: "unknown")]
+public abstract record ActorNumber
 {
-    [JsonDerivedType(typeof(EicActorNumber), typeDiscriminator: "eic")]
-    [JsonDerivedType(typeof(GlnActorNumber), typeDiscriminator: "gln")]
-    [JsonDerivedType(typeof(UnknownActorNumber), typeDiscriminator: "unknown")]
-    public abstract record ActorNumber
+    protected ActorNumber(string value)
     {
-        protected ActorNumber(string value)
-        {
-            Value = value;
-        }
-
-        public string Value { get; }
-
-        public abstract ActorNumberType Type { get; }
-
-        public static ActorNumber Create(string value) => value switch
-        {
-            _ when EicActorNumber.TryCreate(value, out var eic) => eic,
-            _ when GlnActorNumber.TryCreate(value, out var gln) => gln,
-            _ => new UnknownActorNumber(value)
-        };
+        Value = value;
     }
+
+    public string Value { get; }
+
+    public abstract ActorNumberType Type { get; }
+
+    public static ActorNumber Create(string value) => value switch
+    {
+        _ when EicActorNumber.TryCreate(value, out var eic) => eic,
+        _ when GlnActorNumber.TryCreate(value, out var gln) => gln,
+        _ => new UnknownActorNumber(value)
+    };
 }

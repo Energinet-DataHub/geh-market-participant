@@ -32,6 +32,7 @@ public sealed class ActorEntity : IAuditedEntity
     public Collection<MarketRoleEntity> MarketRoles { get; } = new();
     public ActorCertificateCredentialsEntity? CertificateCredential { get; set; }
     public ActorClientSecretCredentialsEntity? ClientSecretCredential { get; set; }
+    public Collection<UsedActorCertificatesEntity> UsedActorCertificates { get; } = new();
     public int Version { get; set; }
     public Guid ChangedByIdentityId { get; set; }
 }

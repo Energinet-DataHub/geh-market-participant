@@ -1,0 +1,1 @@
+DELETE FROM [GridArea] WHERE Name = 'Vildbjerg Elnet A/S' AND Code = '398'

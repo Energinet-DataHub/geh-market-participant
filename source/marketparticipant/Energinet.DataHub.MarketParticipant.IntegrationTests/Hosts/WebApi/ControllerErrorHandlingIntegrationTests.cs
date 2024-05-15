@@ -16,10 +16,17 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Mime;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -30,15 +37,19 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationTestsBase
+public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationTestsBase<MarketParticipantNoAuthWebApiAssembly>
 {
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
+
     private readonly MarketParticipantDatabaseFixture _fixture;
 
     public ControllerErrorHandlingIntegrationTests(MarketParticipantDatabaseFixture fixture)
         : base(fixture)
     {
         _fixture = fixture;
-        AllowAllTokens = true;
     }
 
     [Fact]
@@ -58,6 +69,15 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
         // Assert
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var errors = await ReadErrorResponseAsync(response);
+        Assert.Single(errors);
+
+        var badArgumentError = errors.Single();
+        Assert.NotEmpty(badArgumentError.Message);
+        Assert.NotNull(badArgumentError.Args["param"]);
+        Assert.NotNull(badArgumentError.Args["value"]);
+        Assert.Equal("market_participant.bad_argument.missing_required_value", badArgumentError.Code);
     }
 
     [Fact]
@@ -77,6 +97,145 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
         // Assert
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+        var errors = await ReadErrorResponseAsync(response);
+        Assert.Single(errors);
+
+        var badArgumentError = errors.Single();
+        Assert.NotEmpty(badArgumentError.Message);
+        Assert.NotNull(badArgumentError.Args["id"]);
+        Assert.Equal("market_participant.bad_argument.not_found", badArgumentError.Code);
+    }
+
+    [Fact]
+    public async Task CreateOrganization_WrongLength_ReturnsBadRequest()
+    {
+        // Arrange
+        var target = new Uri("organization", UriKind.Relative);
+
+        using var client = CreateClient();
+
+        var token = await CreateTokenAsync(PermissionId.ActorsManage);
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+        var request = new CreateOrganizationDto(
+            new string('a', 1000),
+            MockedBusinessRegisterIdentifier.New().Identifier,
+            new AddressDto(null, null, null, null, "DK"),
+            new MockedDomain());
+
+        using var httpContent = new StringContent(
+            JsonSerializer.Serialize(request),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        // Act
+        var response = await client.PostAsync(target, httpContent);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var errors = await ReadErrorResponseAsync(response);
+        Assert.Single(errors);
+
+        var badArgumentError = errors.Single();
+        Assert.NotEmpty(badArgumentError.Message);
+        Assert.NotNull(badArgumentError.Args["param"]);
+        Assert.NotNull(badArgumentError.Args["value"]);
+        Assert.NotNull(badArgumentError.Args["min"]);
+        Assert.NotNull(badArgumentError.Args["max"]);
+        Assert.Equal("market_participant.bad_argument.invalid_length", badArgumentError.Code);
+    }
+
+    [Fact]
+    public async Task CreateOrganization_NoValue_ReturnsBadRequest()
+    {
+        // Arrange
+        var target = new Uri("organization", UriKind.Relative);
+
+        using var client = CreateClient();
+
+        var token = await CreateTokenAsync(PermissionId.ActorsManage);
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+        var request = new CreateOrganizationDto(
+            string.Empty,
+            MockedBusinessRegisterIdentifier.New().Identifier,
+            new AddressDto(null, null, null, null, "DK"),
+            new MockedDomain());
+
+        using var httpContent = new StringContent(
+            JsonSerializer.Serialize(request),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        // Act
+        var response = await client.PostAsync(target, httpContent);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var errors = await ReadErrorResponseAsync(response);
+
+        var badArgumentError = errors.Single(err => err.Code == "market_participant.bad_argument.missing_required_value");
+        Assert.NotEmpty(badArgumentError.Message);
+        Assert.NotNull(badArgumentError.Args["param"]);
+    }
+
+    [Fact]
+    public async Task CreateOrganization_DomainError_ReturnsBadRequest()
+    {
+        // Arrange
+        var target = new Uri("organization", UriKind.Relative);
+
+        using var client = CreateClient();
+
+        var token = await CreateTokenAsync(PermissionId.ActorsManage);
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+        var request = new CreateOrganizationDto(
+            "Mocked Organization",
+            MockedBusinessRegisterIdentifier.New().Identifier,
+            new AddressDto(null, null, null, null, "DK"),
+            new MockedDomain());
+
+        using var httpContent = new StringContent(
+            JsonSerializer.Serialize(request),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        var firstResponse = await client.PostAsync(target, httpContent);
+        Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
+
+        // Act
+        var response = await client.PostAsync(target, httpContent);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var errors = await ReadErrorResponseAsync(response);
+
+        var badArgumentError = errors.Single(err => err.Code == "market_participant.validation.organization.business_register_identifier.reserved");
+        Assert.NotEmpty(badArgumentError.Message);
+        Assert.NotNull(badArgumentError.Args["identifier"]);
+    }
+
+    private static async Task<ErrorDescriptor[]> ReadErrorResponseAsync(HttpResponseMessage response)
+    {
+        var responseContent = await response.Content.ReadAsStringAsync();
+
+        var returnValue = new
+        {
+            errors = Array.Empty<ErrorDescriptor>(),
+        };
+        var errorResponse = JsonSerializer.Deserialize(responseContent, returnValue.GetType(), _jsonSerializerOptions);
+
+        Assert.NotNull(errorResponse);
+        returnValue = (dynamic)errorResponse;
+        return returnValue.errors;
     }
 
     private async Task<string> CreateTokenAsync(PermissionId permission)
@@ -94,6 +253,7 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
         testToken.Payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()));
         testToken.Payload.AddClaim(new Claim(JwtRegisteredClaimNames.Azp, actor.Id.ToString()));
         testToken.Payload.AddClaim(new Claim("role", KnownPermissions.All.Single(p => p.Id == permission).Claim));
+        testToken.Payload.AddClaim(new Claim("multitenancy", "true"));
 
         return new JwtSecurityTokenHandler().WriteToken(testToken);
     }

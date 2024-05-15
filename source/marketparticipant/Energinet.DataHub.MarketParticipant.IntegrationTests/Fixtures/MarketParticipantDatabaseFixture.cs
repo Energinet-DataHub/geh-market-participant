@@ -15,20 +15,19 @@
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+
+public sealed class MarketParticipantDatabaseFixture : IAsyncLifetime
 {
-    public sealed class MarketParticipantDatabaseFixture : IAsyncLifetime
+    public MarketParticipantDatabaseManager DatabaseManager { get; } = new();
+
+    public Task InitializeAsync()
     {
-        public MarketParticipantDatabaseManager DatabaseManager { get; } = new();
+        return DatabaseManager.CreateDatabaseAsync();
+    }
 
-        public Task InitializeAsync()
-        {
-            return DatabaseManager.CreateDatabaseAsync();
-        }
-
-        public Task DisposeAsync()
-        {
-            return DatabaseManager.DeleteDatabaseAsync();
-        }
+    public Task DisposeAsync()
+    {
+        return DatabaseManager.DeleteDatabaseAsync();
     }
 }

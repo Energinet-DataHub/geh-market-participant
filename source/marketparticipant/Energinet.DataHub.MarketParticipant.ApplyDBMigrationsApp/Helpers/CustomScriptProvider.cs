@@ -20,29 +20,28 @@ using DbUp.Engine;
 using DbUp.Engine.Transactions;
 using DbUp.ScriptProviders;
 
-namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
+
+public class CustomScriptProvider : EmbeddedScriptProvider, IScriptProvider
 {
-    public class CustomScriptProvider : EmbeddedScriptProvider, IScriptProvider
+    public CustomScriptProvider(Assembly assembly, Func<string, bool> filter)
+        : base(assembly, filter)
     {
-        public CustomScriptProvider(Assembly assembly, Func<string, bool> filter)
-            : base(assembly, filter)
-        {
-        }
+    }
 
-        public new IEnumerable<SqlScript> GetScripts(IConnectionManager connectionManager)
+    public new IEnumerable<SqlScript> GetScripts(IConnectionManager connectionManager)
+    {
+        var sqlScripts = base.GetScripts(connectionManager).ToList();
+        Console.WriteLine($"Total scripts to upgrade: {sqlScripts.Count}");
+        Console.WriteLine($"All scripts to upgrade: {string.Join(Environment.NewLine, sqlScripts.Select(x => x.Name))}");
+        foreach (var script in sqlScripts)
         {
-            var sqlScripts = base.GetScripts(connectionManager).ToList();
-            Console.WriteLine($"Total scripts to upgrade: {sqlScripts.Count}");
-            Console.WriteLine($"All scripts to upgrade: {string.Join(Environment.NewLine, sqlScripts.Select(x => x.Name))}");
-            foreach (var script in sqlScripts)
+            if (!NamingConvention.Regex.IsMatch(script.Name))
             {
-                if (!NamingConvention.Regex.IsMatch(script.Name))
-                {
-                    throw new FormatException($"The script '{script.Name}' doesn't adhere to the naming convention.");
-                }
+                throw new FormatException($"The script '{script.Name}' doesn't adhere to the naming convention.");
             }
-
-            return sqlScripts;
         }
+
+        return sqlScripts;
     }
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
@@ -26,26 +26,29 @@ public sealed class InviteUserCommandRuleSet : AbstractValidator<InviteUserComma
             .ChildRules(invitationRules =>
             {
                 invitationRules
-                    .RuleFor(invitation => invitation.FirstName)
+                    .RuleFor(invitation => invitation.InvitationUserDetails!.FirstName)
                     .NotEmpty()
-                    .MaximumLength(64);
+                    .MaximumLength(64)
+                    .When(x => x.InvitationUserDetails is not null);
 
                 invitationRules
-                    .RuleFor(invitation => invitation.LastName)
+                    .RuleFor(invitation => invitation.InvitationUserDetails!.LastName)
                     .NotEmpty()
-                    .MaximumLength(64);
+                    .MaximumLength(64)
+                    .When(x => x.InvitationUserDetails is not null);
+
+                invitationRules
+                    .RuleFor(invitation => invitation.InvitationUserDetails!.PhoneNumber)
+                    .NotEmpty()
+                    .MaximumLength(30)
+                    .Matches("^\\+[0-9]+ [0-9]+$")
+                    .When(x => x.InvitationUserDetails is not null);
 
                 invitationRules
                     .RuleFor(invitation => invitation.Email)
                     .NotEmpty()
                     .EmailAddress()
                     .MaximumLength(64);
-
-                invitationRules
-                    .RuleFor(invitation => invitation.PhoneNumber)
-                    .NotEmpty()
-                    .MaximumLength(30)
-                    .Matches("^\\+[0-9]+ [0-9]+$");
 
                 invitationRules
                     .RuleFor(invitation => invitation.AssignedActor)

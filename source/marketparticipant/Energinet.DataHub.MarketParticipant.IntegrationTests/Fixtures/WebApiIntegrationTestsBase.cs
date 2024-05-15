@@ -14,13 +14,13 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
-public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup>
+public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFactory<TStartup>
+    where TStartup : class
 {
     private readonly MarketParticipantDatabaseFixture _marketParticipantDatabaseFixture;
 
@@ -29,21 +29,19 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
         _marketParticipantDatabaseFixture = marketParticipantDatabaseFixture;
     }
 
-    public static string TestBackendAppId => "7C39AF16-AEA0-4B00-B4DB-D3E7B2D90A2E";
-
-    public bool AllowAllTokens { get; set; }
+    protected static string TestBackendAppId => "7C39AF16-AEA0-4B00-B4DB-D3E7B2D90A2E";
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.UseSetting(Settings.SqlDbConnectionString.Key, _marketParticipantDatabaseFixture.DatabaseManager.ConnectionString);
-        builder.UseSetting(Settings.ExternalOpenIdUrl.Key, "fake_value");
-        builder.UseSetting(Settings.InternalOpenIdUrl.Key, "fake_value");
-        builder.UseSetting(Settings.BackendBffAppId.Key, TestBackendAppId);
+        builder.UseSetting("Database:ConnectionString", _marketParticipantDatabaseFixture.DatabaseManager.ConnectionString);
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.MitIdExternalMetadataAddress)}", "fake_value");
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.ExternalMetadataAddress)}", "fake_value");
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.InternalMetadataAddress)}", "fake_value");
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.BackendBffAppId)}", TestBackendAppId);
         builder.UseSetting(Settings.TokenKeyVault.Key, "fake_value");
         builder.UseSetting(Settings.TokenKeyName.Key, "fake_value");
-        builder.UseSetting(Settings.AllowAllTokens.Key, AllowAllTokens ? "true" : "false");
         builder.UseSetting(Settings.CertificateKeyVault.Key, "fake_value");
     }
 }

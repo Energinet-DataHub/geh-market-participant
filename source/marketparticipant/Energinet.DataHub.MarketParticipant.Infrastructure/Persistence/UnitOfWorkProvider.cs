@@ -17,27 +17,26 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+
+public sealed class UnitOfWorkProvider : IUnitOfWorkProvider
 {
-    public sealed class UnitOfWorkProvider : IUnitOfWorkProvider
+    private readonly DbContext _context;
+
+    public UnitOfWorkProvider(IMarketParticipantDbContext marketParticipantDbContext)
     {
-        private readonly DbContext _context;
+        ArgumentNullException.ThrowIfNull(marketParticipantDbContext, nameof(marketParticipantDbContext));
 
-        public UnitOfWorkProvider(IMarketParticipantDbContext marketParticipantDbContext)
-        {
-            ArgumentNullException.ThrowIfNull(marketParticipantDbContext, nameof(marketParticipantDbContext));
+        if (marketParticipantDbContext is not DbContext context)
+            throw new InvalidOperationException($"{nameof(IMarketParticipantDbContext)} must inherit {nameof(DbContext)}");
 
-            if (marketParticipantDbContext is not DbContext context)
-                throw new InvalidOperationException($"{nameof(IMarketParticipantDbContext)} must inherit {nameof(DbContext)}");
+        _context = context;
+    }
 
-            _context = context;
-        }
-
-        public async Task<IUnitOfWork> NewUnitOfWorkAsync()
-        {
-            var unitOfWork = new UnitOfWork(_context);
-            await unitOfWork.InitializeAsync().ConfigureAwait(false);
-            return unitOfWork;
-        }
+    public async Task<IUnitOfWork> NewUnitOfWorkAsync()
+    {
+        var unitOfWork = new UnitOfWork(_context);
+        await unitOfWork.InitializeAsync().ConfigureAwait(false);
+        return unitOfWork;
     }
 }

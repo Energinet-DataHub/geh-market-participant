@@ -15,30 +15,31 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+
+public sealed class UniqueGlobalLocationNumberRuleService : IUniqueGlobalLocationNumberRuleService
 {
-    public sealed class UniqueGlobalLocationNumberRuleService : IUniqueGlobalLocationNumberRuleService
+    private readonly IOrganizationRepository _organizationRepository;
+
+    public UniqueGlobalLocationNumberRuleService(IOrganizationRepository organizationRepository)
     {
-        private readonly IOrganizationRepository _organizationRepository;
+        _organizationRepository = organizationRepository;
+    }
 
-        public UniqueGlobalLocationNumberRuleService(IOrganizationRepository organizationRepository)
+    public async Task ValidateGlobalLocationNumberAvailableAsync(Organization organization, ActorNumber actorNumber)
+    {
+        var organizations = await _organizationRepository
+            .GetAsync(actorNumber)
+            .ConfigureAwait(false);
+
+        if (organizations.Any(o => o.Id != organization.Id))
         {
-            _organizationRepository = organizationRepository;
-        }
-
-        public async Task ValidateGlobalLocationNumberAvailableAsync(Organization organization, ActorNumber actorNumber)
-        {
-            var organizations = await _organizationRepository
-                .GetAsync(actorNumber)
-                .ConfigureAwait(false);
-
-            if (organizations.Any(o => o.Id != organization.Id))
-            {
-                throw new ValidationException("The specified GLN is already in use.");
-            }
+            throw new ValidationException("The specified GLN is already in use.")
+                .WithErrorCode("actor.number.reserved");
         }
     }
 }

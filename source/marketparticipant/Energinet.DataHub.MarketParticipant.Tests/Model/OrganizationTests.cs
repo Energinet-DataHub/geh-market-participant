@@ -18,132 +18,131 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Model
+namespace Energinet.DataHub.MarketParticipant.Tests.Model;
+
+[UnitTest]
+public sealed class OrganizationTests
 {
-    [UnitTest]
-    public sealed class OrganizationTests
+    [Fact]
+    public void Ctor_NewRole_HasStatusNew()
     {
-        [Fact]
-        public void Ctor_NewRole_HasStatusNew()
-        {
-            // Arrange + Act
-            var organization = new Organization(
+        // Arrange + Act
+        var organization = new Organization(
+            "fake_value",
+            new BusinessRegisterIdentifier("fake_value"),
+            new Address(
                 "fake_value",
-                new BusinessRegisterIdentifier("fake_value"),
-                new Address(
-                    "fake_value",
-                    "fake_value",
-                    "fake_value",
-                    "fake_value",
-                    "fake_value"),
-                new OrganizationDomain("energinet.dk"));
+                "fake_value",
+                "fake_value",
+                "fake_value",
+                "DK"),
+            new OrganizationDomain("energinet.dk"));
 
-            // Assert
-            Assert.Equal(OrganizationStatus.New, organization.Status);
-        }
+        // Assert
+        Assert.Equal(OrganizationStatus.New, organization.Status);
+    }
 
-        [Theory]
-        [InlineData(OrganizationStatus.New, true)]
-        [InlineData(OrganizationStatus.Active, false)]
-        [InlineData(OrganizationStatus.Blocked, false)]
-        [InlineData(OrganizationStatus.Deleted, false)]
-        public void FromStateToNew_ChangesState_IfAllowed(OrganizationStatus initialStatus, bool isAllowed)
+    [Theory]
+    [InlineData(OrganizationStatus.New, true)]
+    [InlineData(OrganizationStatus.Active, false)]
+    [InlineData(OrganizationStatus.Blocked, false)]
+    [InlineData(OrganizationStatus.Deleted, false)]
+    public void FromStateToNew_ChangesState_IfAllowed(OrganizationStatus initialStatus, bool isAllowed)
+    {
+        // Arrange
+        var target = CreateTestOrganization(initialStatus);
+
+        // Act + Assert
+        if (isAllowed)
         {
-            // Arrange
-            var target = CreateTestOrganization(initialStatus);
-
-            // Act + Assert
-            if (isAllowed)
-            {
-                target.Status = OrganizationStatus.New;
-                Assert.Equal(OrganizationStatus.New, target.Status);
-            }
-            else
-            {
-                Assert.Throws<ValidationException>(() => target.Status = OrganizationStatus.New);
-            }
+            target.Status = OrganizationStatus.New;
+            Assert.Equal(OrganizationStatus.New, target.Status);
         }
-
-        [Theory]
-        [InlineData(OrganizationStatus.New, true)]
-        [InlineData(OrganizationStatus.Active, true)]
-        [InlineData(OrganizationStatus.Blocked, true)]
-        [InlineData(OrganizationStatus.Deleted, false)]
-        public void Activate_ChangesState_IfAllowed(OrganizationStatus initialStatus, bool isAllowed)
+        else
         {
-            // Arrange
-            var target = CreateTestOrganization(initialStatus);
-
-            // Act + Assert
-            if (isAllowed)
-            {
-                target.Activate();
-                Assert.Equal(OrganizationStatus.Active, target.Status);
-            }
-            else
-            {
-                Assert.Throws<ValidationException>(() => target.Activate());
-            }
+            Assert.Throws<ValidationException>(() => target.Status = OrganizationStatus.New);
         }
+    }
 
-        [Theory]
-        [InlineData(OrganizationStatus.New, true)]
-        [InlineData(OrganizationStatus.Active, true)]
-        [InlineData(OrganizationStatus.Blocked, true)]
-        [InlineData(OrganizationStatus.Deleted, false)]
-        public void Blocked_ChangesState_IfAllowed(OrganizationStatus initialStatus, bool isAllowed)
+    [Theory]
+    [InlineData(OrganizationStatus.New, true)]
+    [InlineData(OrganizationStatus.Active, true)]
+    [InlineData(OrganizationStatus.Blocked, true)]
+    [InlineData(OrganizationStatus.Deleted, false)]
+    public void Activate_ChangesState_IfAllowed(OrganizationStatus initialStatus, bool isAllowed)
+    {
+        // Arrange
+        var target = CreateTestOrganization(initialStatus);
+
+        // Act + Assert
+        if (isAllowed)
         {
-            // Arrange
-            var target = CreateTestOrganization(initialStatus);
-
-            // Act + Assert
-            if (isAllowed)
-            {
-                target.Blocked();
-                Assert.Equal(OrganizationStatus.Blocked, target.Status);
-            }
-            else
-            {
-                Assert.Throws<ValidationException>(() => target.Blocked());
-            }
+            target.Activate();
+            Assert.Equal(OrganizationStatus.Active, target.Status);
         }
-
-        [Theory]
-        [InlineData(OrganizationStatus.New, true)]
-        [InlineData(OrganizationStatus.Active, true)]
-        [InlineData(OrganizationStatus.Blocked, true)]
-        [InlineData(OrganizationStatus.Deleted, true)]
-        public void Delete_ChangesState_IfAllowed(OrganizationStatus initialStatus, bool isAllowed)
+        else
         {
-            // Arrange
-            var target = CreateTestOrganization(initialStatus);
-
-            // Act + Assert
-            if (isAllowed)
-            {
-                target.Delete();
-                Assert.Equal(OrganizationStatus.Deleted, target.Status);
-            }
-            else
-            {
-                Assert.Throws<ValidationException>(() => target.Delete());
-            }
+            Assert.Throws<ValidationException>(() => target.Activate());
         }
+    }
 
-        private static Organization CreateTestOrganization(OrganizationStatus status)
+    [Theory]
+    [InlineData(OrganizationStatus.New, true)]
+    [InlineData(OrganizationStatus.Active, true)]
+    [InlineData(OrganizationStatus.Blocked, true)]
+    [InlineData(OrganizationStatus.Deleted, false)]
+    public void Blocked_ChangesState_IfAllowed(OrganizationStatus initialStatus, bool isAllowed)
+    {
+        // Arrange
+        var target = CreateTestOrganization(initialStatus);
+
+        // Act + Assert
+        if (isAllowed)
         {
-            return new Organization(
-                 new OrganizationId(Guid.Empty),
-                 "fake_name",
-                 new BusinessRegisterIdentifier("fake_value"),
-                 new Address(
-                    "fake_value",
-                    "fake_value",
-                    "fake_value",
-                    "fake_value",
-                    "fake_value"),
-                 new OrganizationDomain("energinet.dk"),
-                 status);
+            target.Blocked();
+            Assert.Equal(OrganizationStatus.Blocked, target.Status);
         }
+        else
+        {
+            Assert.Throws<ValidationException>(() => target.Blocked());
+        }
+    }
+
+    [Theory]
+    [InlineData(OrganizationStatus.New, true)]
+    [InlineData(OrganizationStatus.Active, true)]
+    [InlineData(OrganizationStatus.Blocked, true)]
+    [InlineData(OrganizationStatus.Deleted, true)]
+    public void Delete_ChangesState_IfAllowed(OrganizationStatus initialStatus, bool isAllowed)
+    {
+        // Arrange
+        var target = CreateTestOrganization(initialStatus);
+
+        // Act + Assert
+        if (isAllowed)
+        {
+            target.Delete();
+            Assert.Equal(OrganizationStatus.Deleted, target.Status);
+        }
+        else
+        {
+            Assert.Throws<ValidationException>(() => target.Delete());
+        }
+    }
+
+    private static Organization CreateTestOrganization(OrganizationStatus status)
+    {
+        return new Organization(
+            new OrganizationId(Guid.Empty),
+            "fake_name",
+            new BusinessRegisterIdentifier("fake_value"),
+            new Address(
+                "fake_value",
+                "fake_value",
+                "fake_value",
+                "fake_value",
+                "DK"),
+            new OrganizationDomain("energinet.dk"),
+            status);
     }
 }

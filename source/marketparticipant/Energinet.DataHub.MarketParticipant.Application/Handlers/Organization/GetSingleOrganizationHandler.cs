@@ -15,33 +15,32 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
+
+public sealed class GetSingleOrganizationHandler : IRequestHandler<GetSingleOrganizationCommand, GetSingleOrganizationResponse>
 {
-    public sealed class GetSingleOrganizationHandler : IRequestHandler<GetSingleOrganizationCommand, GetSingleOrganizationResponse>
+    private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+
+    public GetSingleOrganizationHandler(IOrganizationExistsHelperService organizationExistsHelperService)
     {
-        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        _organizationExistsHelperService = organizationExistsHelperService;
+    }
 
-        public GetSingleOrganizationHandler(IOrganizationExistsHelperService organizationExistsHelperService)
-        {
-            _organizationExistsHelperService = organizationExistsHelperService;
-        }
+    public async Task<GetSingleOrganizationResponse> Handle(
+        GetSingleOrganizationCommand request,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        public async Task<GetSingleOrganizationResponse> Handle(
-            GetSingleOrganizationCommand request,
-            CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+        var organization = await _organizationExistsHelperService
+            .EnsureOrganizationExistsAsync(request.OrganizationId)
+            .ConfigureAwait(false);
 
-            var organization = await _organizationExistsHelperService
-                .EnsureOrganizationExistsAsync(request.OrganizationId)
-                .ConfigureAwait(false);
-
-            return new GetSingleOrganizationResponse(OrganizationMapper.Map(organization));
-        }
+        return new GetSingleOrganizationResponse(OrganizationMapper.Map(organization));
     }
 }

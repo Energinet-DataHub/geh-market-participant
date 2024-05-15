@@ -16,14 +16,16 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -38,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class ResetUserTwoFactorAuthenticationHandlerTests : WebApiIntegrationTestsBase
+public sealed class ResetUserTwoFactorAuthenticationHandlerTests : WebApiIntegrationTestsBase<MarketParticipantWebApiAssembly>
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
@@ -112,7 +114,7 @@ public sealed class ResetUserTwoFactorAuthenticationHandlerTests : WebApiIntegra
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "first",
             "last",
@@ -168,7 +170,7 @@ public sealed class ResetUserTwoFactorAuthenticationHandlerTests : WebApiIntegra
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             initialUserIdentityStatus,
             "first",
             "last",

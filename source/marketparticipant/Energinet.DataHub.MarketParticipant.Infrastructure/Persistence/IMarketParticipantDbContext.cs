@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -125,6 +126,31 @@ public interface IMarketParticipantDbContext
     DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; }
 
     /// <summary>
+    ///     Represent access to the UsedActorCertificates database table
+    /// </summary>
+    DbSet<UsedActorCertificatesEntity> UsedActorCertificates { get; }
+
+    /// <summary>
+    ///     Represent access to the ProcessDelegations database table
+    /// </summary>
+    DbSet<ProcessDelegationEntity> ProcessDelegations { get; }
+
+    /// <summary>
+    ///     Represent access to the DelegationPeriod database table
+    /// </summary>
+    DbSet<DelegationPeriodEntity> DelegationPeriods { get; }
+
+    /// <summary>
+    ///     Represent access to the BalanceResponsibilityRequest database table
+    /// </summary>
+    DbSet<BalanceResponsibilityRequestEntity> BalanceResponsibilityRequests { get; }
+
+    /// <summary>
+    ///     Represent access to the BalanceResponsibilityRelation database table
+    /// </summary>
+    DbSet<BalanceResponsibilityRelationEntity> BalanceResponsibilityRelations { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();
@@ -134,4 +160,6 @@ public interface IMarketParticipantDbContext
     /// </summary>
     EntityEntry<TEntity> Entry<TEntity>(TEntity entity)
         where TEntity : class;
+
+    Task CreateLockAsync(LockableEntity lockableEntity);
 }

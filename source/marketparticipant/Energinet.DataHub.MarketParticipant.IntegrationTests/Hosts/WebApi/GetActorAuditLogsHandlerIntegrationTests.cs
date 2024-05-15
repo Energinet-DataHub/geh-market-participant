@@ -17,9 +17,10 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -27,6 +28,7 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
+using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
@@ -63,11 +65,8 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         var actual = await mediator.Send(command);
 
         // Assert
-        Assert.Empty(actual.ActorContactAuditLogs);
-
-        var actorCreatedAudit = actual.ActorAuditLogs.Single();
-        Assert.Equal(actorEntity.Id, actorCreatedAudit.ActorId);
-        Assert.Equal(ActorChangeType.Created, actorCreatedAudit.ActorChangeType);
+        var actorCreatedAudit = actual.AuditLogs.Single(log => log.Change == ActorAuditedChange.Status);
+        Assert.Equal(ActorStatus.New.ToString(), actorCreatedAudit.CurrentValue);
         Assert.True(actorCreatedAudit.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
         Assert.True(actorCreatedAudit.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
     }
@@ -80,7 +79,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorAuditLogs.Single(log => log.ActorChangeType == ActorChangeType.Name);
+                var expectedLog = response.AuditLogs.Single(log => log is { Change: ActorAuditedChange.Name, IsInitialAssignment: false });
 
                 Assert.Equal(expected.Value, expectedLog.CurrentValue);
                 Assert.Equal(TestPreparationEntities.ValidActor.Name, expectedLog.PreviousValue);
@@ -97,7 +96,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorAuditLogs.Single(log => log.ActorChangeType == ActorChangeType.Status);
+                var expectedLog = response.AuditLogs.Single(log => log is { Change: ActorAuditedChange.Status, IsInitialAssignment: false });
 
                 Assert.Equal(ActorStatus.Active.ToString(), expectedLog.CurrentValue);
                 Assert.Equal(ActorStatus.New.ToString(), expectedLog.PreviousValue);
@@ -119,10 +118,10 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorAuditLogs.Single(log => log.ActorChangeType == ActorChangeType.SecretCredentials);
+                var expectedLog = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.ClientSecretCredentials);
 
                 Assert.Equal(expected.ExpirationDate.ToString("g", CultureInfo.InvariantCulture), expectedLog.CurrentValue);
-                Assert.Equal(string.Empty, expectedLog.PreviousValue);
+                Assert.Null(expectedLog.PreviousValue);
             },
             actor =>
             {
@@ -141,10 +140,10 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorAuditLogs.Single(log => log.ActorChangeType == ActorChangeType.CertificateCredentials);
+                var expectedLog = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.CertificateCredentials);
 
                 Assert.Equal(expected.CertificateThumbprint, expectedLog.CurrentValue);
-                Assert.Equal(string.Empty, expectedLog.PreviousValue);
+                Assert.Null(expectedLog.PreviousValue);
             },
             actor =>
             {
@@ -164,14 +163,14 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedLogs = response
-                    .ActorAuditLogs
-                    .Where(log => log.ActorChangeType == ActorChangeType.CertificateCredentials)
+                    .AuditLogs
+                    .Where(log => log.Change == ActorAuditedChange.CertificateCredentials)
                     .ToList();
 
                 Assert.Equal(2, expectedLogs.Count);
                 Assert.Equal(expected.CertificateThumbprint, expectedLogs[0].CurrentValue);
-                Assert.Equal(string.Empty, expectedLogs[0].PreviousValue);
-                Assert.Equal(string.Empty, expectedLogs[1].CurrentValue);
+                Assert.Null(expectedLogs[0].PreviousValue);
+                Assert.Null(expectedLogs[1].CurrentValue);
                 Assert.Equal(expected.CertificateThumbprint, expectedLogs[1].PreviousValue);
             },
             actor =>
@@ -196,14 +195,14 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedLogs = response
-                    .ActorAuditLogs
-                    .Where(log => log.ActorChangeType == ActorChangeType.SecretCredentials)
+                    .AuditLogs
+                    .Where(log => log.Change == ActorAuditedChange.ClientSecretCredentials)
                     .ToList();
 
                 Assert.Equal(2, expectedLogs.Count);
                 Assert.Equal(expected.ExpirationDate.ToString("g", CultureInfo.InvariantCulture), expectedLogs[0].CurrentValue);
-                Assert.Equal(string.Empty, expectedLogs[0].PreviousValue);
-                Assert.Equal(string.Empty, expectedLogs[1].CurrentValue);
+                Assert.Null(expectedLogs[0].PreviousValue);
+                Assert.Null(expectedLogs[1].CurrentValue);
                 Assert.Equal(expected.ExpirationDate.ToString("g", CultureInfo.InvariantCulture), expectedLogs[1].PreviousValue);
             },
             actor =>
@@ -221,12 +220,12 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     {
         var initialName = Guid.NewGuid().ToString();
         var changedName = Guid.NewGuid().ToString();
-        var emailAddress = new MockedEmailAddress();
+        var emailAddress = new RandomlyGeneratedEmailAddress();
 
         return TestAuditOfActorContactChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorContactAuditLogs.Single(log => log.ActorContactChangeType == ActorContactChangeType.Name);
+                var expectedLog = response.AuditLogs.Single(log => log is { Change: ActorAuditedChange.ContactName, IsInitialAssignment: false });
 
                 Assert.Equal(changedName, expectedLog.CurrentValue);
                 Assert.Equal(initialName, expectedLog.PreviousValue);
@@ -238,13 +237,13 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     [Fact]
     public Task GetAuditLogs_ChangeActorContactEmail_IsAudited()
     {
-        var initialEmail = new MockedEmailAddress();
-        var changedEmail = new MockedEmailAddress();
+        var initialEmail = new RandomlyGeneratedEmailAddress();
+        var changedEmail = new RandomlyGeneratedEmailAddress();
 
         return TestAuditOfActorContactChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorContactAuditLogs.Single(log => log.ActorContactChangeType == ActorContactChangeType.Email);
+                var expectedLog = response.AuditLogs.Single(log => log is { Change: ActorAuditedChange.ContactEmail, IsInitialAssignment: false });
 
                 Assert.Equal(changedEmail, expectedLog.CurrentValue);
                 Assert.Equal(initialEmail, expectedLog.PreviousValue);
@@ -258,12 +257,12 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     {
         var initialPhone = new PhoneNumber("+45 12345678");
         var changedPhone = new PhoneNumber("+45 87654321");
-        var emailAddress = new MockedEmailAddress();
+        var emailAddress = new RandomlyGeneratedEmailAddress();
 
         return TestAuditOfActorContactChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorContactAuditLogs.Single(log => log.ActorContactChangeType == ActorContactChangeType.Phone);
+                var expectedLog = response.AuditLogs.Single(log => log is { Change: ActorAuditedChange.ContactPhone, IsInitialAssignment: false });
 
                 Assert.Equal(changedPhone.Number, expectedLog.CurrentValue);
                 Assert.Equal(initialPhone.Number, expectedLog.PreviousValue);
@@ -278,14 +277,75 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorContactChangeAsync(
             response =>
             {
-                var expectedCreated = response.ActorContactAuditLogs.Single(log => log.ActorContactChangeType == ActorContactChangeType.Created);
-                var expectedDeleted = response.ActorContactAuditLogs.Single(log => log.ActorContactChangeType == ActorContactChangeType.Deleted);
+                var expectedCreated = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.ContactCategoryAdded);
+                var expectedDeleted = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.ContactCategoryRemoved);
 
                 Assert.NotNull(expectedCreated);
                 Assert.NotNull(expectedDeleted);
             },
-            actorId => new ActorContact(actorId, "mocked", ContactCategory.Default, new MockedEmailAddress(), null),
+            actorId => new ActorContact(actorId, "mocked", ContactCategory.Default, new RandomlyGeneratedEmailAddress(), null),
             _ => null);
+    }
+
+    [Fact]
+    public async Task GetAuditLogs_DelegationCreated_IsAudited()
+    {
+        var expectedDelegateTo = await _databaseFixture.PrepareActorAsync();
+        var expectedGridArea = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
+        var expectedStartTime = SystemClock.Instance.GetCurrentInstant();
+        var expectedProcess = DelegatedProcess.RequestWholesaleResults;
+
+        await TestAuditOfProcessDelegationChangeAsync(
+            null,
+            response =>
+            {
+                Assert.Equal(
+                    $"({expectedDelegateTo.Id};{expectedStartTime:g};{expectedGridArea.Value};{expectedProcess})",
+                    response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStart).CurrentValue);
+            },
+            actor =>
+            {
+                var processDelegation = new ProcessDelegation(actor, expectedProcess);
+                processDelegation.DelegateTo(new ActorId(expectedDelegateTo.Id), expectedGridArea, expectedStartTime);
+                return processDelegation;
+            });
+    }
+
+    [Fact]
+    public async Task GetAuditLogs_DelegationStopped_IsAudited()
+    {
+        var delegatedEntity = await _databaseFixture.PrepareActorAsync();
+        var delegatorEntity = await _databaseFixture.PrepareActorAsync();
+        var expectedGridArea = new GridAreaId((await _databaseFixture.PrepareGridAreaAsync()).Id);
+        var expectedStartTime = SystemClock.Instance.GetCurrentInstant();
+        var expectedProcess = DelegatedProcess.RequestWholesaleResults;
+        var expectedStop = expectedStartTime.Plus(Duration.FromDays(2));
+
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+        var delegated = await actorRepository.GetAsync(new ActorId(delegatedEntity.Id));
+        var delegator = await actorRepository.GetAsync(new ActorId(delegatorEntity.Id));
+        var processDelegation = new ProcessDelegation(delegator!, expectedProcess);
+        processDelegation.DelegateTo(delegated!.Id, expectedGridArea, expectedStartTime);
+
+        var processDelegationRepository = scope.ServiceProvider.GetRequiredService<IProcessDelegationRepository>();
+        var id = await processDelegationRepository.AddOrUpdateAsync(processDelegation);
+        processDelegation = await processDelegationRepository.GetAsync(id);
+
+        await TestAuditOfProcessDelegationChangeAsync(
+            delegator,
+            response =>
+            {
+                Assert.Equal(
+                    $"({delegated.Id.Value};{expectedStartTime:g};{expectedGridArea.Value};{expectedProcess};{expectedStop:g})",
+                    response.AuditLogs.Single(log => log.Change == ActorAuditedChange.DelegationStop).CurrentValue);
+            },
+            _ =>
+            {
+                processDelegation!.StopDelegation(processDelegation.Delegations.Single(), expectedStop);
+                return processDelegation;
+            });
     }
 
     private async Task TestAuditOfActorChangeAsync(
@@ -311,7 +371,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var command = new GetActorAuditLogsCommand(actorEntity.Id);
-        var auditLogsProcessed = 1; // Skip 1, as first log is always Created.
+        var auditLogsProcessed = 2; // Skip 2, as first log is always Created.
 
         foreach (var action in changeActions)
         {
@@ -329,10 +389,9 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
 
             var auditLogs = await mediator.Send(command);
 
-            foreach (var actorAuditLog in auditLogs.ActorAuditLogs.Skip(auditLogsProcessed))
+            foreach (var actorAuditLog in auditLogs.AuditLogs.Skip(auditLogsProcessed))
             {
                 Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
-                Assert.Equal(actorEntity.Id, actorAuditLog.ActorId);
                 Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
 
@@ -368,7 +427,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
 
         var actorId = new ActorId(actorEntity.Id);
         var command = new GetActorAuditLogsCommand(actorEntity.Id);
-        var auditLogsProcessed = 0;
+        var auditLogsProcessed = 2;
 
         foreach (var generator in contactGenerator)
         {
@@ -395,10 +454,70 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
 
             var auditLogs = await mediator.Send(command);
 
-            foreach (var actorAuditLog in auditLogs.ActorContactAuditLogs.Skip(auditLogsProcessed))
+            foreach (var actorAuditLog in auditLogs.AuditLogs.Skip(auditLogsProcessed))
             {
                 Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
-                Assert.Equal(actorEntity.Id, actorAuditLog.ActorId);
+                Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
+                Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
+
+                auditLogsProcessed++;
+            }
+        }
+
+        // Act
+        var actual = await mediator.Send(command);
+
+        // Assert
+        assert(actual);
+    }
+
+    private async Task TestAuditOfProcessDelegationChangeAsync(
+        Actor? delegator,
+        Action<GetActorAuditLogsResponse> assert,
+        params Func<Actor, ProcessDelegation>[] processDelegationGenerator)
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+
+        var userContext = new Mock<IUserContext<FrontendUser>>();
+
+        host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
+        host.ServiceCollection.AddScoped(_ => userContext.Object);
+
+        await using var scope = host.BeginScope();
+
+        var actorRepo = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+        delegator ??= await actorRepo.GetAsync(new ActorId((await _databaseFixture.PrepareActorAsync()).Id));
+        var processDelegationRepository = scope.ServiceProvider.GetRequiredService<IProcessDelegationRepository>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var command = new GetActorAuditLogsCommand(delegator!.Id.Value);
+        var auditLogsProcessed = 2;
+
+        foreach (var generator in processDelegationGenerator)
+        {
+            var auditedUser = await _databaseFixture.PrepareUserAsync();
+
+            userContext
+                .Setup(uc => uc.CurrentUser)
+                .Returns(new FrontendUser(auditedUser.Id, delegator.OrganizationId.Value, delegator.Id.Value, false));
+
+            var delegation = generator(delegator);
+
+            await processDelegationRepository.AddOrUpdateAsync(delegation);
+
+            var auditLogs = await mediator.Send(command);
+
+            var actorAuditLogs = auditLogs.AuditLogs
+                .Skip(auditLogsProcessed)
+                .Where(x => x.AuditIdentityId == auditedUser.Id)
+                .ToList();
+
+            if (!actorAuditLogs.Any())
+                Assert.Fail("No audit logs produced");
+
+            foreach (var actorAuditLog in actorAuditLogs)
+            {
                 Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
 

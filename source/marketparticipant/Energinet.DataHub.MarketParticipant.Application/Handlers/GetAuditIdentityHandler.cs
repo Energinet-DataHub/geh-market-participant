@@ -18,7 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -101,12 +101,12 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
             .GetAsync(user.ExternalId)
             .ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(userIdentity, $"No external identity found for id {request.AuditIdentityId}.");
+        NotFoundValidationException.ThrowIfNull(userIdentity, request.AuditIdentityId, $"No external identity found for id {request.AuditIdentityId}.");
 
         return new GetAuditIdentityResponse($"{userIdentity.FirstName} ({userIdentity.Email})");
     }
 
-    private bool HasCurrentUserAccessToUser(Domain.Model.Users.User user)
+    private bool HasCurrentUserAccessToUser(User user)
     {
         return _userContext.CurrentUser.IsFas ||
                _userContext.CurrentUser.IsAssignedToActor(user.AdministratedBy.Value) ||

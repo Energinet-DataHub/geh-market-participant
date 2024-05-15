@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
@@ -54,6 +55,40 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
         // Assert
         var jwk = keys.Single();
         Assert.Equal(_keyClientFixture.KeyName + "/", new Uri(jwk.Id).Segments[^2]);
+    }
+
+    [Fact]
+    public async Task GetKeysAsync_ConnectionDrops_CanRecover()
+    {
+        // Arrange
+        var keyClient = new Mock<KeyClient>();
+        keyClient
+            .Setup(x => x.GetPropertiesOfKeyVersionsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Throws(() => new InvalidOperationException());
+
+        var keys = _keyClientFixture
+            .KeyClient
+            .GetPropertiesOfKeyVersionsAsync(_keyClientFixture.KeyName);
+
+        var target = new SigningKeyRing(
+            SystemClock.Instance,
+            keyClient.Object,
+            _keyClientFixture.KeyName);
+
+        // Act
+        await Assert.ThrowsAsync<InvalidOperationException>(target.GetKeysAsync);
+
+        // Assert
+        keyClient
+            .Setup(x => x.GetPropertiesOfKeyVersionsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(keys);
+
+        keyClient
+            .Setup(x => x.GetKeyAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(_keyClientFixture.KeyClient.GetKeyAsync);
+
+        var actual = await target.GetKeysAsync();
+        Assert.NotEmpty(actual);
     }
 
     [Fact]

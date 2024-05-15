@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
@@ -53,7 +53,7 @@ public sealed class GetUserHandlerIntegrationTests
         var userIdentityMock = new Mock<IUserIdentityRepository>();
         var userIdentity = new UserIdentity(
             new ExternalUserId(user.ExternalId),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "expected_name",
             "expected_name",
@@ -109,7 +109,7 @@ public sealed class GetUserHandlerIntegrationTests
         var userIdentityMock = new Mock<IUserIdentityRepository>();
         var userIdentity = new UserIdentity(
             new ExternalUserId(user.ExternalId),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "expected_name",
             "expected_name",

@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -27,6 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
 {
     private readonly IAuditIdentityProvider _auditIdentityProvider;
+    private bool _savingChanges;
 
     public MarketParticipantDbContext(
         DbContextOptions<MarketParticipantDbContext> options,
@@ -70,12 +72,26 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<EmailEventEntity> EmailEventEntries { get; private set; } = null!;
     public DbSet<ActorCertificateCredentialsEntity> ActorCertificateCredentials { get; private set; } = null!;
     public DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; private set; } = null!;
+    public DbSet<UsedActorCertificatesEntity> UsedActorCertificates { get; private set; } = null!;
+    public DbSet<ProcessDelegationEntity> ProcessDelegations { get; private set; } = null!;
+    public DbSet<DelegationPeriodEntity> DelegationPeriods { get; private set; } = null!;
+    public DbSet<BalanceResponsibilityRequestEntity> BalanceResponsibilityRequests { get; private set; } = null!;
+    public DbSet<BalanceResponsibilityRelationEntity> BalanceResponsibilityRelations { get; private set; } = null!;
 
     public async Task<int> SaveChangesAsync()
     {
         var hasExternalTransaction = Database.CurrentTransaction != null;
+        int affected;
 
-        var affected = await base.SaveChangesAsync().ConfigureAwait(false);
+        try
+        {
+            _savingChanges = true;
+            affected = await base.SaveChangesAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            _savingChanges = false;
+        }
 
         if (!hasExternalTransaction)
         {
@@ -87,6 +103,18 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         }
 
         return affected;
+    }
+
+    public async Task CreateLockAsync(LockableEntity lockableEntity)
+    {
+        ArgumentNullException.ThrowIfNull(lockableEntity);
+
+        if (Database.CurrentTransaction == null)
+            throw new InvalidOperationException("A transaction is required");
+
+#pragma warning disable EF1002
+        await Database.ExecuteSqlRawAsync($"SELECT TOP 0 NULL FROM {lockableEntity.Name} WITH (TABLOCKX)").ConfigureAwait(false);
+#pragma warning restore EF1002
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -113,6 +141,10 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new EmailEventEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorCertificateCredentialsEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorClientSecretCredentialsEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ProcessDelegationEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new DelegationPeriodEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new BalanceResponsibilityRequestEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new BalanceResponsibilityRelationEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 
@@ -143,7 +175,12 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         where T : class, IDeletableAuditedEntity
     {
         if (Database.CurrentTransaction == null)
+        {
+            if (!_savingChanges)
+                throw new InvalidOperationException("Deleting audited entity requires a transaction. Since the audited entity was deleted outside of SaveChanges, a transaction is not started automatically.");
+
             Database.BeginTransaction();
+        }
 
         Set<T>()
             .Where(entity => entity == entityDeleted)

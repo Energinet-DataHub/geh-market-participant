@@ -223,16 +223,22 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     {
         var userRoles = userRoleIds.Select(x => x.Value).ToList();
 
+        var userRolesQuery =
+            from assignment in _marketParticipantDbContext.UserRoleAssignments
+            join userRole in _marketParticipantDbContext.UserRoles on assignment.UserRoleId equals userRole.Id
+            join actor in _marketParticipantDbContext.Actors on assignment.ActorId equals actor.Id
+            select new { assignment, userRole, actor };
+
         var query =
-            from u in _marketParticipantDbContext.Users
-            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
-            where !userRoles.Any() || userRoles.Contains(r.UserRoleId)
-            join ur in _marketParticipantDbContext.UserRoles on r.UserRoleId equals ur.Id
-            join actor in _marketParticipantDbContext.Actors on r.ActorId equals actor.Id
+            from user in _marketParticipantDbContext.Users
+            join owner in _marketParticipantDbContext.Actors on user.AdministratedByActorId equals owner.Id
+            join userRole in userRolesQuery on user.Id equals userRole.assignment.UserId into assignments
+            from assignment in assignments.DefaultIfEmpty()
             where
-                (actorId == null || r.ActorId == actorId.Value || u.AdministratedByActorId == actorId.Value)
-                && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || ur.Name.Contains(searchText))
-            select u;
+                (userRoles.Count == 0 || userRoles.Contains(assignment.userRole.Id)) &&
+                (actorId == null || actorId.Value == assignment.actor.Id || actorId.Value == user.AdministratedByActorId) &&
+                (searchText == null || assignment.actor.Name.Contains(searchText) || assignment.actor.ActorNumber.Contains(searchText) || assignment.userRole.Name.Contains(searchText))
+            select user;
 
         return query.Distinct();
     }
@@ -245,14 +251,20 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         var userRoles = userRoleIds.Select(x => x.Value).ToList();
         var externalUsers = externalUserIds.Select(x => x.Value);
 
+        var userRolesQuery =
+            from assignment in _marketParticipantDbContext.UserRoleAssignments
+            select assignment;
+
         var query =
-            from u in _marketParticipantDbContext.Users
-            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
-            where !userRoles.Any() || userRoles.Contains(r.UserRoleId)
+            from user in _marketParticipantDbContext.Users
+            join owner in _marketParticipantDbContext.Actors on user.AdministratedByActorId equals owner.Id
+            join userRole in userRolesQuery on user.Id equals userRole.UserId into assignments
+            from assignment in assignments.DefaultIfEmpty()
             where
-                (actorId == null || r.ActorId == actorId.Value || u.AdministratedByActorId == actorId.Value)
-                && externalUsers.Contains(u.ExternalId)
-            select u;
+                (userRoles.Count == 0 || userRoles.Contains(assignment.UserRoleId)) &&
+                (actorId == null || actorId.Value == assignment.ActorId || actorId.Value == user.AdministratedByActorId) &&
+                externalUsers.Contains(user.ExternalId)
+            select user;
 
         return query.Distinct();
     }

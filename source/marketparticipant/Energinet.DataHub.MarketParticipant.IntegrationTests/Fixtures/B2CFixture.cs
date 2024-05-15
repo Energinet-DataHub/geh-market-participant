@@ -16,59 +16,60 @@ using System.Threading.Tasks;
 using Azure.Identity;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
-{
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 #pragma warning disable CA1001
-    public sealed class B2CFixture : IAsyncLifetime
+public sealed class B2CFixture : IAsyncLifetime
 #pragma warning restore CA1001
+{
+    private GraphServiceClient? _graphClient;
+
+    public IActiveDirectoryB2CService B2CService { get; private set; } = null!;
+
+    public Task InitializeAsync()
     {
-        private GraphServiceClient? _graphClient;
+        var integrationTestConfig = new IntegrationTestConfiguration();
 
-        public IActiveDirectoryB2CService B2CService { get; private set; } = null!;
+        // Graph Service Client
+        var clientSecretCredential = new ClientSecretCredential(
+            integrationTestConfig.B2CSettings.Tenant,
+            integrationTestConfig.B2CSettings.ServicePrincipalId,
+            integrationTestConfig.B2CSettings.ServicePrincipalSecret);
 
-        public Task InitializeAsync()
+        _graphClient = new GraphServiceClient(
+            clientSecretCredential,
+            new[]
+            {
+                "https://graph.microsoft.com/.default"
+            });
+
+        // Azure AD Config
+        var config = new OptionsWrapper<AzureB2COptions>(new AzureB2COptions
         {
-            var integrationTestConfig = new IntegrationTestConfiguration();
+            BackendSpnObjectId = integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
+            BackendId = integrationTestConfig.B2CSettings.BackendAppId,
+        });
 
-            // Graph Service Client
-            var clientSecretCredential = new ClientSecretCredential(
-                integrationTestConfig.B2CSettings.Tenant,
-                integrationTestConfig.B2CSettings.ServicePrincipalId,
-                integrationTestConfig.B2CSettings.ServicePrincipalSecret);
+        // Active Directory Roles
+        var activeDirectoryB2CRoles =
+            new ActiveDirectoryB2BRolesProvider(_graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
 
-            _graphClient = new GraphServiceClient(
-                clientSecretCredential,
-                new[]
-                {
-                    "https://graph.microsoft.com/.default"
-                });
+        B2CService = new ActiveDirectoryB2CService(
+            _graphClient,
+            config,
+            activeDirectoryB2CRoles);
 
-            // Azure AD Config
-            var config = new AzureAdConfig(
-                integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
-                integrationTestConfig.B2CSettings.BackendAppId);
+        return Task.CompletedTask;
+    }
 
-            // Active Directory Roles
-            var activeDirectoryB2CRoles =
-                new ActiveDirectoryB2BRolesProvider(_graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
-
-            B2CService = new ActiveDirectoryB2CService(
-                _graphClient,
-                config,
-                activeDirectoryB2CRoles);
-
-            return Task.CompletedTask;
-        }
-
-        public Task DisposeAsync()
-        {
-            _graphClient?.Dispose();
-            return Task.CompletedTask;
-        }
+    public Task DisposeAsync()
+    {
+        _graphClient?.Dispose();
+        return Task.CompletedTask;
     }
 }

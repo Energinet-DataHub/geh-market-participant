@@ -16,25 +16,24 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+/// <summary>
+/// A factory service ensuring correct construction of an actor.
+/// </summary>
+public interface IActorFactoryService
 {
     /// <summary>
-    /// A factory service ensuring correct construction of an actor.
+    /// Creates an actor.
     /// </summary>
-    public interface IActorFactoryService
-    {
-        /// <summary>
-        /// Creates an actor.
-        /// </summary>
-        /// <param name="organization">The organization that will contain the new actor.</param>
-        /// <param name="actorNumber">The actor number of the new actor.</param>
-        /// <param name="actorName">The actor name for the new actor.</param>
-        /// <param name="marketRoles">The market roles assigned to the new actor.</param>
-        /// <returns>The created actor.</returns>
-        Task<Actor> CreateAsync(
-            Organization organization,
-            ActorNumber actorNumber,
-            ActorName actorName,
-            IReadOnlyCollection<ActorMarketRole> marketRoles);
-    }
+    /// <param name="organization">The organization that will contain the new actor.</param>
+    /// <param name="actorNumber">The actor number of the new actor.</param>
+    /// <param name="actorName">The actor name for the new actor.</param>
+    /// <param name="marketRoles">The market roles assigned to the new actor.</param>
+    /// <returns>The created actor.</returns>
+    Task<Actor> CreateAsync(
+        Organization organization,
+        ActorNumber actorNumber,
+        ActorName actorName,
+        IReadOnlyCollection<ActorMarketRole> marketRoles);
 }

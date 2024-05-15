@@ -48,7 +48,8 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         var userRoleWithSameName = await _userRoleRepository.GetByNameInMarketRoleAsync(request.UserRoleUpdateDto.Name, userRoleToUpdate.EicFunction).ConfigureAwait(false);
         if (userRoleWithSameName != null && userRoleWithSameName.Id.Value != userRoleToUpdate.Id.Value)
         {
-            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists in market role");
+            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists in market role")
+                .WithErrorCode("market_role.reserved");
         }
 
         userRoleToUpdate.Name = request.UserRoleUpdateDto.Name;

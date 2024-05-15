@@ -19,7 +19,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -31,9 +31,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
+public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase<MarketParticipantWebApiAssembly>
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
+
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
 
     public UserControllerIntegrationTests(MarketParticipantDatabaseFixture fixture)
         : base(fixture)
@@ -77,14 +82,14 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
         using var client = CreateClient();
 
         // Act
-        Startup.EnableIntegrationTestKeys = true;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = true;
         var responseJson = await client.GetStringAsync(query);
-        Startup.EnableIntegrationTestKeys = false;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = false;
 
         // Assert
         var response = JsonSerializer.Deserialize<GetActorsAssociatedWithExternalUserIdResponse>(
             responseJson,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            _jsonSerializerOptions);
 
         Assert.NotNull(response);
         Assert.Empty(response.ActorIds);
@@ -98,7 +103,7 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
-        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
+        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         var testToken = new JwtSecurityToken();
@@ -110,14 +115,14 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
         using var client = CreateClient();
 
         // Act
-        Startup.EnableIntegrationTestKeys = true;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = true;
         var responseJson = await client.GetStringAsync(query);
-        Startup.EnableIntegrationTestKeys = false;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = false;
 
         // Assert
         var response = JsonSerializer.Deserialize<GetActorsAssociatedWithExternalUserIdResponse>(
             responseJson,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            _jsonSerializerOptions);
 
         Assert.NotNull(response);
         Assert.Equal(actor.Id, response.ActorIds.Single());

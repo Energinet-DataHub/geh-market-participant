@@ -39,11 +39,15 @@ public sealed class OrganizationDomainValidationService : IOrganizationDomainVal
             .GetAsync(actor.OrganizationId)
             .ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(organization, $"The specified organization {actor.OrganizationId} was not found.");
+        NotFoundValidationException.ThrowIfNull(
+            organization,
+            actor.OrganizationId.Value,
+            $"The specified organization {actor.OrganizationId} was not found.");
 
         if (!userInviteEmail.Address.EndsWith("@" + organization.Domain.Value, StringComparison.OrdinalIgnoreCase))
         {
-            throw new ValidationException("User email not valid, should match organization domain");
+            throw new ValidationException("User email not valid, should match organization domain.")
+                .WithErrorCode("user.authentication.email_domain_mismatch");
         }
     }
 }

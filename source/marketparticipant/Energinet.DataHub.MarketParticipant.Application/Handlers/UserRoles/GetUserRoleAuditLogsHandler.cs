@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -26,11 +27,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 public sealed class GetUserRoleAuditLogsHandler
     : IRequestHandler<GetUserRoleAuditLogsCommand, GetUserRoleAuditLogsResponse>
 {
-    private readonly IUserRoleAuditLogEntryRepository _userRoleAuditLogEntryRepository;
+    private readonly IUserRoleAuditLogRepository _userRoleAuditLogRepository;
 
-    public GetUserRoleAuditLogsHandler(IUserRoleAuditLogEntryRepository userRoleAuditLogEntryRepository)
+    public GetUserRoleAuditLogsHandler(IUserRoleAuditLogRepository userRoleAuditLogRepository)
     {
-        _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
+        _userRoleAuditLogRepository = userRoleAuditLogRepository;
     }
 
     public async Task<GetUserRoleAuditLogsResponse> Handle(
@@ -39,24 +40,12 @@ public sealed class GetUserRoleAuditLogsHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var auditLogs = await _userRoleAuditLogEntryRepository
+        var auditLogs = await _userRoleAuditLogRepository
             .GetAsync(new UserRoleId(request.UserRoleId))
             .ConfigureAwait(false);
 
-        return new GetUserRoleAuditLogsResponse(auditLogs.Select(Map));
-    }
-
-    private static UserRoleAuditLogEntryDto Map(UserRoleAuditLogEntry auditLogEntry)
-    {
-        return new UserRoleAuditLogEntryDto(
-            auditLogEntry.UserRoleId.Value,
-            auditLogEntry.AuditIdentityId,
-            auditLogEntry.Name,
-            auditLogEntry.Description,
-            auditLogEntry.Permissions.Select(p => (int)p),
-            auditLogEntry.EicFunction,
-            auditLogEntry.Status,
-            auditLogEntry.ChangeType,
-            auditLogEntry.Timestamp);
+        return new GetUserRoleAuditLogsResponse(auditLogs
+            .OrderBy(log => log.Timestamp)
+            .Select(log => new AuditLogDto<UserRoleAuditedChange>(log)));
     }
 }

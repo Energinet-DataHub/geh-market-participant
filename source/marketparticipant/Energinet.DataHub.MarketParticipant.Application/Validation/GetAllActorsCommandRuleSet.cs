@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class GetAllActorsCommandRuleSet : AbstractValidator<GetAllActorsCommand>
-{
-}
+public sealed class GetAllActorsCommandRuleSet : AbstractValidator<GetAllActorsCommand>;

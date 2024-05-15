@@ -64,7 +64,7 @@ public sealed class EmailEventIntegrationTests
         host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
 
         await using var scope = host.BeginScope();
-        var command = new SendUserInviteEmailCommand();
+        var command = new SendEmailCommand();
 
         // Act + Assert
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -75,7 +75,7 @@ public sealed class EmailEventIntegrationTests
     {
         return new UserIdentity(
             externalUserId,
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "firstName",
             "lastName",

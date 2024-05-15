@@ -7,7 +7,7 @@ INSERT INTO [dbo].[GridArea] (
     [ValidFrom],
     [ValidTo],
     [FullFlexDate],
-[ChangedByIdentityId]
+    [ChangedByIdentityId]
 )
 VALUES
     (NEWID(), '533', 'Netområde 533', 1, '2000-01-01', NULL, NULL, '00000000-FFFF-FFFF-FFFF-000000000000'),
@@ -56,7 +56,8 @@ INSERT INTO [dbo].[Actor] (
     [ActorNumber],
     [Status],
     [Name],
-    [IsFas]
+    [IsFas],
+    [ChangedByIdentityId]
 )
 VALUES
     (
@@ -66,14 +67,15 @@ VALUES
         '5790001330583',
         2,
         'Energinet DataHub A/S (DataHub systemadministrator)',
-        1);
+        1,
+        '00000000-FFFF-FFFF-FFFF-000000000000');
 
 -- Assign Market Role
 INSERT INTO [dbo].[MarketRole] (
     [Id],
     [ActorId],
     [Function],
-[Comment]
+    [Comment]
 )
 VALUES
     (NEWID(), @actorId, 50, NULL);
@@ -115,7 +117,7 @@ VALUES
 INSERT INTO [dbo].[UserRolePermission] (
     [UserRoleId],
     [PermissionId],
-[ChangedByIdentityId]
+    [ChangedByIdentityId]
 )
 VALUES
     (@userAdminRoleId, 5, '00000000-FFFF-FFFF-FFFF-000000000000'),

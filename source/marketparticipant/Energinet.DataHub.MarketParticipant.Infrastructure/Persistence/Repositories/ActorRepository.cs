@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
@@ -25,15 +26,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class ActorRepository : IActorRepository
+public sealed class ActorRepository(IMarketParticipantDbContext marketParticipantDbContext, IEntityLock entityLock) : IActorRepository
 {
-    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
-
-    public ActorRepository(IMarketParticipantDbContext marketParticipantDbContext)
-    {
-        _marketParticipantDbContext = marketParticipantDbContext;
-    }
-
     public async Task<Result<ActorId, ActorError>> AddOrUpdateAsync(Actor actor)
     {
         ArgumentNullException.ThrowIfNull(actor);
@@ -42,26 +36,43 @@ public sealed class ActorRepository : IActorRepository
 
         if (actor.Id.Value == default)
         {
+            entityLock.EnsureLocked(LockableEntity.Actor);
             destination = new ActorEntity();
         }
         else
         {
-            destination = await _marketParticipantDbContext
+            destination = await marketParticipantDbContext
                 .Actors
                 .FindAsync(actor.Id.Value)
                 .ConfigureAwait(false) ?? throw new InvalidOperationException($"Actor with id {actor.Id.Value} is missing, even though it cannot be deleted.");
         }
 
+        if (actor.Credentials is ActorCertificateCredentials certificateCredentials &&
+            destination.CertificateCredential?.CertificateThumbprint != certificateCredentials.CertificateThumbprint)
+        {
+            var certificateReUsedByCurrentActor = await marketParticipantDbContext.UsedActorCertificates.SingleOrDefaultAsync(e =>
+                e.Thumbprint == certificateCredentials.CertificateThumbprint && e.ActorId == destination.Id).ConfigureAwait(false);
+
+            if (certificateReUsedByCurrentActor is null)
+            {
+                destination.UsedActorCertificates.Add(new UsedActorCertificatesEntity
+                {
+                    Thumbprint = certificateCredentials.CertificateThumbprint
+                });
+            }
+        }
+
         ActorMapper.MapToEntity(actor, destination);
-        _marketParticipantDbContext.Actors.Update(destination);
+        marketParticipantDbContext.Actors.Update(destination);
 
         try
         {
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (DbUpdateException ex) when (
             ex.InnerException is SqlException inner &&
-            inner.Message.Contains("UQ_ActorCertificateCredentials_Thumbprint", StringComparison.InvariantCultureIgnoreCase))
+            (inner.Message.Contains("UQ_ActorCertificateCredentials_Thumbprint", StringComparison.InvariantCultureIgnoreCase) ||
+             inner.Message.Contains("UQ_UsedActorCertificates_Thumbprint", StringComparison.InvariantCultureIgnoreCase)))
         {
             return new(ActorError.ThumbprintCredentialsConflict);
         }
@@ -71,7 +82,7 @@ public sealed class ActorRepository : IActorRepository
 
     public async Task<Actor?> GetAsync(ActorId actorId)
     {
-        var foundActor = await _marketParticipantDbContext
+        var foundActor = await marketParticipantDbContext
             .Actors
             .Include(a => a.MarketRoles)
             .ThenInclude(m => m.GridAreas)
@@ -85,7 +96,7 @@ public sealed class ActorRepository : IActorRepository
 
     public async Task<IEnumerable<Actor>> GetActorsAsync()
     {
-        var actors = await _marketParticipantDbContext
+        var actors = await marketParticipantDbContext
             .Actors
             .Include(a => a.MarketRoles)
             .ThenInclude(m => m.GridAreas)
@@ -103,7 +114,7 @@ public sealed class ActorRepository : IActorRepository
             .ToList();
 
         var query =
-            from actor in _marketParticipantDbContext.Actors
+            from actor in marketParticipantDbContext.Actors
             where ids.Contains(actor.Id)
             select actor;
 
@@ -119,7 +130,7 @@ public sealed class ActorRepository : IActorRepository
     public async Task<IEnumerable<Actor>> GetActorsAsync(OrganizationId organizationId)
     {
         var query =
-            from actor in _marketParticipantDbContext.Actors
+            from actor in marketParticipantDbContext.Actors
             where actor.OrganizationId == organizationId.Value
             select actor;
 

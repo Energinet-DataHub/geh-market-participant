@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
@@ -21,7 +22,7 @@ public static class OrganizationErrorHandler
 {
     public static System.Exception HandleOrganizationError(OrganizationError source) => source switch
     {
-        OrganizationError.DomainConflict => new ValidationException("An organization with the given domain already exists"),
+        OrganizationError.DomainConflict => new ValidationException("An organization with the given domain already exists.").WithErrorCode("organization.domain.reserved"),
         _ => throw new ArgumentOutOfRangeException(nameof(source))
     };
 }

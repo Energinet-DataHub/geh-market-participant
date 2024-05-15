@@ -18,6 +18,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 public interface IAuditedEntity
 {
-    public int Version { get; set; }
-    public Guid ChangedByIdentityId { get; set; }
+    int Version { get; set; }
+    Guid ChangedByIdentityId { get; set; }
 }

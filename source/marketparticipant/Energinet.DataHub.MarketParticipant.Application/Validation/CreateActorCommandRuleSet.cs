@@ -12,88 +12,88 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class CreateActorCommandRuleSet : AbstractValidator<CreateActorCommand>
 {
-    public sealed class CreateActorCommandRuleSet : AbstractValidator<CreateActorCommand>
+    public CreateActorCommandRuleSet()
     {
-        public CreateActorCommandRuleSet()
-        {
-            RuleFor(command => command.Actor)
-                .NotNull()
-                .ChildRules(validator =>
-                {
-                    validator
-                        .RuleFor(actor => actor.OrganizationId)
-                        .NotEmpty();
+        RuleFor(command => command.Actor)
+            .NotNull()
+            .ChildRules(validator =>
+            {
+                validator
+                    .RuleFor(actor => actor.OrganizationId)
+                    .NotEmpty();
 
-                    validator
-                        .RuleFor(actor => actor.Name)
-                        .NotNull()
-                        .ChildRules(nameValidator =>
-                        {
-                            nameValidator
-                                .RuleFor(actorNameDto => actorNameDto.Value)
-                                .NotEmpty()
-                                .Length(1, 255);
-                        });
+                validator
+                    .RuleFor(actor => actor.Name)
+                    .NotNull()
+                    .ChildRules(nameValidator =>
+                    {
+                        nameValidator
+                            .RuleFor(actorNameDto => actorNameDto.Value)
+                            .NotEmpty()
+                            .Length(1, 512);
+                    });
 
-                    validator
-                        .RuleFor(actor => actor.ActorNumber)
-                        .SetValidator(new GlobalLocationNumberValidationRule<CreateActorDto>())
-                        .When(i => string.IsNullOrWhiteSpace(i.ActorNumber.Value) || i.ActorNumber.Value.Length <= 13);
+                validator
+                    .RuleFor(actor => actor.ActorNumber)
+                    .SetValidator(new GlobalLocationNumberValidationRule<CreateActorDto>())
+                    .When(i => string.IsNullOrWhiteSpace(i.ActorNumber.Value) || i.ActorNumber.Value.Length <= 13);
 
-                    validator
-                        .RuleFor(actor => actor.ActorNumber)
-                        .SetValidator(new EnergyIdentificationCodeValidationRule<CreateActorDto>())
-                        .When(i => string.IsNullOrWhiteSpace(i.ActorNumber.Value) || i.ActorNumber.Value.Length >= 14);
+                validator
+                    .RuleFor(actor => actor.ActorNumber)
+                    .SetValidator(new EnergyIdentificationCodeValidationRule<CreateActorDto>())
+                    .When(i => string.IsNullOrWhiteSpace(i.ActorNumber.Value) || i.ActorNumber.Value.Length >= 14);
 
-                    validator
-                        .RuleForEach(actor => actor.MarketRoles)
-                        .ChildRules(gridAreaValidator =>
-                            gridAreaValidator
-                                .RuleFor(x => x.GridAreas)
-                                .NotEmpty()
-                                .When(marketRole => marketRole.EicFunction == EicFunction.GridAccessProvider));
+                validator
+                    .RuleForEach(actor => actor.MarketRoles)
+                    .ChildRules(gridAreaValidator =>
+                        gridAreaValidator
+                            .RuleFor(x => x.GridAreas)
+                            .NotEmpty()
+                            .When(marketRole => marketRole.EicFunction == EicFunction.GridAccessProvider));
 
-                    validator
-                        .RuleFor(actor => actor.MarketRoles)
-                        .NotNull()
-                        .ChildRules(rolesValidator =>
-                        {
-                            rolesValidator
-                                .RuleForEach(x => x)
-                                .NotNull()
-                                .ChildRules(roleValidator =>
-                                {
-                                    roleValidator
-                                        .RuleFor(x => x.EicFunction)
+                validator
+                    .RuleFor(actor => actor.MarketRoles)
+                    .NotNull()
+                    .ChildRules(rolesValidator =>
+                    {
+                        rolesValidator
+                            .RuleForEach(x => x)
+                            .NotNull()
+                            .ChildRules(roleValidator =>
+                            {
+                                roleValidator
+                                    .RuleFor(x => x.EicFunction)
+                                    .NotEmpty()
+                                    .IsInEnum();
+                            });
+                    });
+
+                validator
+                    .RuleForEach(actor => actor.MarketRoles)
+                    .ChildRules(inlineValidator =>
+                    {
+                        inlineValidator
+                            .RuleForEach(m => m.GridAreas)
+                            .ChildRules(validationRules =>
+                            {
+                                validationRules
+                                    .RuleFor(r => r.MeteringPointTypes)
+                                    .NotNull()
+                                    .ChildRules(v => v
+                                        .RuleForEach(r => r)
                                         .NotEmpty()
-                                        .IsInEnum();
-                                });
-                        });
-
-                    validator
-                        .RuleForEach(actor => actor.MarketRoles)
-                        .ChildRules(inlineValidator =>
-                        {
-                            inlineValidator
-                                .RuleForEach(m => m.GridAreas)
-                                .ChildRules(validationRules =>
-                                {
-                                    validationRules
-                                        .RuleFor(r => r.MeteringPointTypes)
-                                        .ChildRules(v =>
-                                            v.RuleForEach(r => r)
-                                                .Must(x => Enum.TryParse<MeteringPointType>(x, true, out _)));
-                                });
-                        });
-                });
-        }
+                                        .IsEnumName(typeof(MeteringPointType), false));
+                            });
+                    });
+            });
     }
 }

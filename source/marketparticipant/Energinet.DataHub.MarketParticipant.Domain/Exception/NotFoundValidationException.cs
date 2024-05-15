@@ -16,49 +16,57 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Exception
+namespace Energinet.DataHub.MarketParticipant.Domain.Exception;
+
+public sealed class NotFoundValidationException : ValidationException
 {
-    public sealed class NotFoundValidationException : ValidationException
+    [Obsolete("Use ctor with a value.")]
+    public NotFoundValidationException()
+        : base("Entity does not exist.")
     {
-        [Obsolete("Use ctor with a value.")]
-        public NotFoundValidationException()
-        {
-        }
+    }
 
-        public NotFoundValidationException(string message)
-            : base(message)
-        {
-        }
+    [Obsolete("Use ctor with a value.")]
+    public NotFoundValidationException(string message)
+        : base(message)
+    {
+    }
 
-        public NotFoundValidationException(string message, System.Exception innerException)
-            : base(message, innerException)
-        {
-        }
+    [Obsolete("Use ctor with a value.")]
+    public NotFoundValidationException(string message, System.Exception innerException)
+        : base(message, innerException)
+    {
+    }
 
-        public NotFoundValidationException(Guid id)
-            : base(CreateMessage(id))
-        {
-        }
+    public NotFoundValidationException(Guid id)
+        : this(id, CreateMessage(id))
+    {
+    }
 
-        public static void ThrowIfNull([NotNull] object? value, Guid id)
-        {
-            if (value == null)
-            {
-                throw new NotFoundValidationException(id);
-            }
-        }
+    public NotFoundValidationException(Guid id, string message)
+        : base(message)
+    {
+        this.WithArgs(("id", id));
+    }
 
-        public static void ThrowIfNull([NotNull] object? value, string message)
+    public static void ThrowIfNull([NotNull] object? value, Guid id)
+    {
+        if (value == null)
         {
-            if (value == null)
-            {
-                throw new NotFoundValidationException(message);
-            }
+            throw new NotFoundValidationException(id);
         }
+    }
 
-        private static string CreateMessage(Guid id)
+    public static void ThrowIfNull([NotNull] object? value, Guid id, string message)
+    {
+        if (value == null)
         {
-            return $"Entity with id {id} does not exist.";
+            throw new NotFoundValidationException(id, message);
         }
+    }
+
+    private static string CreateMessage(Guid id)
+    {
+        return $"Entity '{id}' does not exist.";
     }
 }

@@ -31,6 +31,6 @@ public sealed class UpdatePermissionCommandRuleSet : AbstractValidator<UpdatePer
 
         RuleFor(command => command.Description)
             .NotEmpty()
-            .MaximumLength(250);
+            .MaximumLength(1000);
     }
 }

@@ -17,64 +17,64 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+public sealed class OrganizationFactoryService : IOrganizationFactoryService
 {
-    public sealed class OrganizationFactoryService : IOrganizationFactoryService
+    private readonly IOrganizationRepository _organizationRepository;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+    private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
+
+    public OrganizationFactoryService(
+        IOrganizationRepository organizationRepository,
+        IUnitOfWorkProvider unitOfWorkProvider,
+        IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService)
     {
-        private readonly IOrganizationRepository _organizationRepository;
-        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-        private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
+        _organizationRepository = organizationRepository;
+        _unitOfWorkProvider = unitOfWorkProvider;
+        _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
+    }
 
-        public OrganizationFactoryService(
-            IOrganizationRepository organizationRepository,
-            IUnitOfWorkProvider unitOfWorkProvider,
-            IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService)
-        {
-            _organizationRepository = organizationRepository;
-            _unitOfWorkProvider = unitOfWorkProvider;
-            _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
-        }
+    public async Task<Organization> CreateAsync(
+        string name,
+        BusinessRegisterIdentifier businessRegisterIdentifier,
+        Address address,
+        OrganizationDomain domain)
+    {
+        ArgumentNullException.ThrowIfNull(name, nameof(name));
+        ArgumentNullException.ThrowIfNull(businessRegisterIdentifier, nameof(businessRegisterIdentifier));
+        ArgumentNullException.ThrowIfNull(address, nameof(address));
 
-        public async Task<Organization> CreateAsync(
-            string name,
-            BusinessRegisterIdentifier businessRegisterIdentifier,
-            Address address,
-            OrganizationDomain domain)
-        {
-            ArgumentNullException.ThrowIfNull(name, nameof(name));
-            ArgumentNullException.ThrowIfNull(businessRegisterIdentifier, nameof(businessRegisterIdentifier));
-            ArgumentNullException.ThrowIfNull(address, nameof(address));
+        var newOrganization = new Organization(name, businessRegisterIdentifier, address, domain);
+        newOrganization.Activate();
 
-            var newOrganization = new Organization(name, businessRegisterIdentifier, address, domain);
-            newOrganization.Activate();
+        await _uniqueOrganizationBusinessRegisterIdentifierService
+            .EnsureUniqueBusinessRegisterIdentifierAsync(newOrganization)
+            .ConfigureAwait(false);
 
-            await _uniqueOrganizationBusinessRegisterIdentifierService
-                .EnsureUniqueBusinessRegisterIdentifierAsync(newOrganization).ConfigureAwait(false);
+        var uow = await _unitOfWorkProvider
+            .NewUnitOfWorkAsync()
+            .ConfigureAwait(false);
 
-            var uow = await _unitOfWorkProvider
-                .NewUnitOfWorkAsync()
-                .ConfigureAwait(false);
+        var savedOrganization = await SaveOrganizationAsync(newOrganization).ConfigureAwait(false);
 
-            var savedOrganization = await SaveOrganizationAsync(newOrganization).ConfigureAwait(false);
+        await uow.CommitAsync().ConfigureAwait(false);
 
-            await uow.CommitAsync().ConfigureAwait(false);
+        return savedOrganization;
+    }
 
-            return savedOrganization;
-        }
+    private async Task<Organization> SaveOrganizationAsync(Organization organization)
+    {
+        var result = await _organizationRepository
+            .AddOrUpdateAsync(organization)
+            .ConfigureAwait(false);
 
-        private async Task<Organization> SaveOrganizationAsync(Organization organization)
-        {
-            var result = await _organizationRepository
-                .AddOrUpdateAsync(organization)
-                .ConfigureAwait(false);
+        result.ThrowOnError(OrganizationErrorHandler.HandleOrganizationError);
 
-            result.ThrowOnError(OrganizationErrorHandler.HandleOrganizationError);
+        var savedOrganization = await _organizationRepository
+            .GetAsync(result.Value)
+            .ConfigureAwait(false);
 
-            var savedOrganization = await _organizationRepository
-                .GetAsync(result.Value)
-                .ConfigureAwait(false);
-
-            return savedOrganization!;
-        }
+        return savedOrganization!;
     }
 }

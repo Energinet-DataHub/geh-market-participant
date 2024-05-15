@@ -15,18 +15,17 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+
+/// <summary>
+/// Ensures that GLN is unique across actors according to domain rules.
+/// </summary>
+public interface IUniqueGlobalLocationNumberRuleService
 {
     /// <summary>
-    /// Ensures that GLN is unique across actors according to domain rules.
+    /// Checks whether GLN is available and throws an exception, if it is not.
     /// </summary>
-    public interface IUniqueGlobalLocationNumberRuleService
-    {
-        /// <summary>
-        /// Checks whether GLN is available and throws an exception, if it is not.
-        /// </summary>
-        /// <param name="organization">The organization that will contain the actor with the specified GLN.</param>
-        /// <param name="actorNumber">The GLN to check for availability.</param>
-        Task ValidateGlobalLocationNumberAvailableAsync(Organization organization, ActorNumber actorNumber);
-    }
+    /// <param name="organization">The organization that will contain the actor with the specified GLN.</param>
+    /// <param name="actorNumber">The GLN to check for availability.</param>
+    Task ValidateGlobalLocationNumberAvailableAsync(Organization organization, ActorNumber actorNumber);
 }

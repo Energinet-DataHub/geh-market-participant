@@ -14,15 +14,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -37,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
+public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase<MarketParticipantWebApiAssembly>
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
@@ -107,7 +111,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             UserIdentityStatus.Active,
             "first",
             "last",
@@ -128,7 +132,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var command = new DeactivateUserCommand(userEntity.Id);
+        var command = new DeactivateUserCommand(userEntity.Id, true);
 
         // Act
         await mediator.Send(command);
@@ -140,6 +144,68 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
                 log.UserId == userEntity.Id &&
                 log.Field == (int)UserIdentityAuditLogField.Status &&
                 log.NewValue == UserStatus.Inactive.ToString());
+    }
+
+    [Fact]
+    public async Task Deactivate_UserIsNotAdministeredByIdentity_RolesAreRemovedForIdentityActor()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+
+        var userIdentity = new UserIdentity(
+            new ExternalUserId(Guid.NewGuid()),
+            new RandomlyGeneratedEmailAddress(),
+            UserIdentityStatus.Active,
+            "first",
+            "last",
+            null,
+            DateTimeOffset.UtcNow,
+            AuthenticationMethod.Undetermined,
+            new Mock<IList<LoginIdentity>>().Object);
+
+        var userEntity = await _fixture.PrepareUserAsync(TestPreparationEntities.UnconnectedUser.Patch(u => u.ExternalId = userIdentity.Id.Value));
+        var organization = await _fixture.PrepareOrganizationAsync(TestPreparationEntities.ValidOrganization);
+        var actor = await _fixture.PrepareActorAsync(organization, TestPreparationEntities.ValidActor.Patch(x => x.Status = ActorStatus.Active));
+        var someOtherActor = await _fixture.PrepareActorAsync(organization, TestPreparationEntities.ValidActor.Patch(x => x.Status = ActorStatus.Active));
+        var userRole = await _fixture.PrepareUserRoleAsync(EicFunction.EnergySupplier);
+
+        await _fixture.AssignUserRoleAsync(userEntity.Id, actor.Id, userRole.Id);
+        await _fixture.AssignUserRoleAsync(userEntity.Id, someOtherActor.Id, userRole.Id);
+
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepositoryMock.Object);
+
+        userIdentityRepositoryMock
+            .Setup(x => x.GetAsync(new ExternalUserId(userEntity.ExternalId)))
+            .ReturnsAsync(userIdentity);
+
+        var userContext = new Mock<IUserContext<FrontendUser>>();
+        host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
+        host.ServiceCollection.AddScoped(_ => userContext.Object);
+
+        userContext
+            .Setup(x => x.CurrentUser)
+            .Returns(new FrontendUser(Guid.NewGuid(), organization.Id, actor.Id, false));
+
+        var userBeforeAct = await ReloadUserAsync(userEntity);
+        Assert.Equal(2, userBeforeAct.RoleAssignments.Count);
+        Assert.Contains(userBeforeAct.RoleAssignments, x => x.ActorId == actor.Id);
+
+        // act
+        await using var scope = host.BeginScope();
+        await scope.ServiceProvider.GetRequiredService<IMediator>().Send(new DeactivateUserCommand(userEntity.Id, false));
+        var actual = await ReloadUserAsync(userBeforeAct);
+
+        // assert
+        Assert.Single(actual.RoleAssignments);
+        Assert.Equal(someOtherActor.Id, actual.RoleAssignments.Single().ActorId);
+    }
+
+    private async Task<UserEntity> ReloadUserAsync(UserEntity userEntity)
+    {
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        return await context.Users.Include(x => x.RoleAssignments).SingleAsync(u => u.Id == userEntity.Id);
     }
 
     private async Task Deactivate_UserWithStatus_StatusBecomesInactive(
@@ -159,7 +225,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
-            new MockedEmailAddress(),
+            new RandomlyGeneratedEmailAddress(),
             initialUserIdentityStatus,
             "first",
             "last",
@@ -180,7 +246,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var command = new DeactivateUserCommand(userEntity.Id);
+        var command = new DeactivateUserCommand(userEntity.Id, true);
 
         // Act
         await mediator.Send(command);

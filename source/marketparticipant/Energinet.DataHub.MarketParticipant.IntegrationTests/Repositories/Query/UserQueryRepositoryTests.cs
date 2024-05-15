@@ -330,7 +330,7 @@ public sealed class UserQueryRepositoryTests
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.GridAccessProvider));
 
         var userRole1 = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.OrganizationsManage, PermissionId.UsersManage },
+            new[] { PermissionId.ActorsManage, PermissionId.UsersManage },
             EicFunction.DataHubAdministrator);
 
         var userRole2 = await _fixture.PrepareUserRoleAsync(
@@ -348,7 +348,7 @@ public sealed class UserQueryRepositoryTests
         // Assert
         Assert.NotEmpty(permsActor);
         Assert.Equal(3, permsActor.Count);
-        Assert.Contains(PermissionId.OrganizationsManage, permsActor.Select(p => p.Id));
+        Assert.Contains(PermissionId.ActorsManage, permsActor.Select(p => p.Id));
         Assert.Contains(PermissionId.UsersManage, permsActor.Select(p => p.Id));
         Assert.Contains(PermissionId.UsersView, permsActor.Select(p => p.Id));
     }
@@ -369,7 +369,7 @@ public sealed class UserQueryRepositoryTests
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BalanceResponsibleParty));
 
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.OrganizationsManage, PermissionId.UsersManage },
+            new[] { PermissionId.ActorsManage, PermissionId.UsersManage },
             EicFunction.BalanceResponsibleParty);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);

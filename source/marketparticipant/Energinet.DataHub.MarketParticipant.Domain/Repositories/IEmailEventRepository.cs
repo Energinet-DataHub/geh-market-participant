@@ -14,28 +14,13 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+public interface IEmailEventRepository
 {
-    /// <summary>
-    /// Repository giving access to domain events
-    /// </summary>
-    public interface IEmailEventRepository
-    {
-        /// <summary>
-        /// Inserts a <see cref="EmailEvent"/>
-        /// </summary>
-        Task InsertAsync(EmailEvent emailEvent);
-
-        /// <summary>
-        /// Saves changes to the given <see cref="EmailEvent"/>
-        /// </summary>
-        Task MarkAsSentAsync(EmailEvent emailEvent);
-
-        /// <summary>
-        /// Get all email events to be sent by type
-        /// </summary>
-        Task<IEnumerable<EmailEvent>> GetAllEmailsToBeSentByTypeAsync(params EmailEventType[] emailEventTypes);
-    }
+    Task InsertAsync(EmailEvent emailEvent);
+    Task MarkAsSentAsync(EmailEvent emailEvent);
+    Task<IEnumerable<EmailEvent>> GetAllPendingEmailEventsAsync();
 }

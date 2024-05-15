@@ -15,21 +15,20 @@
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
-{
-    internal sealed class GridAreaLinkMapper
-    {
-        public static void MapToEntity(GridAreaLink from, GridAreaLinkEntity to)
-        {
-            to.Id = from.Id.Value;
-            to.GridAreaId = from.GridAreaId.Value;
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 
-        public static GridAreaLink MapFromEntity(GridAreaLinkEntity from)
-        {
-            return new GridAreaLink(
-                new GridAreaLinkId(from.Id),
-                new GridAreaId(from.GridAreaId));
-        }
+internal sealed class GridAreaLinkMapper
+{
+    public static void MapToEntity(GridAreaLink from, GridAreaLinkEntity to)
+    {
+        to.Id = from.Id.Value;
+        to.GridAreaId = from.GridAreaId.Value;
+    }
+
+    public static GridAreaLink MapFromEntity(GridAreaLinkEntity from)
+    {
+        return new GridAreaLink(
+            new GridAreaLinkId(from.Id),
+            new GridAreaId(from.GridAreaId));
     }
 }

@@ -19,9 +19,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -45,6 +47,13 @@ public class UserController : ControllerBase
         _externalTokenValidator = externalTokenValidator;
         _userContext = userContext;
         _mediator = mediator;
+    }
+
+    private enum IdentityUserPermission
+    {
+        None,
+        AssignedToActor,
+        AdministratedByActor,
     }
 
     [HttpGet("actors")]
@@ -76,7 +85,7 @@ public class UserController : ControllerBase
     [AuthorizeUser(PermissionId.UsersView, PermissionId.UsersManage)]
     public async Task<ActionResult<GetUserResponse>> GetAsync(Guid userId)
     {
-        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+        if (await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false) == IdentityUserPermission.None)
             return Unauthorized();
 
         var command = new GetUserCommand(userId);
@@ -104,12 +113,15 @@ public class UserController : ControllerBase
             .Where(_userContext.CurrentUser.IsAssignedToActor)
             .ToList();
 
-        return Ok(associatedActors with { ActorIds = allowedActors });
+        return Ok(associatedActors with
+        {
+            ActorIds = allowedActors
+        });
     }
 
-    [HttpGet("{userId:guid}/auditlogentry")]
+    [HttpGet("{userId:guid}/audit")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<ActionResult<GetUserAuditLogsResponse>> GetAuditLogsAsync(Guid userId)
+    public async Task<ActionResult<IEnumerable<AuditLogDto<UserAuditedChange>>>> GetAuditAsync(Guid userId)
     {
         var command = new GetUserAuditLogsCommand(userId);
 
@@ -117,7 +129,7 @@ public class UserController : ControllerBase
             .Send(command)
             .ConfigureAwait(false);
 
-        return Ok(response);
+        return Ok(response.AuditLogs);
     }
 
     [HttpPut("{userId:guid}/useridentity")]
@@ -126,10 +138,40 @@ public class UserController : ControllerBase
         Guid userId,
         UserIdentityUpdateDto userIdentityUpdateDto)
     {
-        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+        if (await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false) == IdentityUserPermission.None)
             return Unauthorized();
 
         var command = new UpdateUserIdentityCommand(userIdentityUpdateDto, userId);
+
+        await _mediator.Send(command).ConfigureAwait(false);
+        return Ok();
+    }
+
+    [HttpGet("userprofile")]
+    [Authorize]
+    public async Task<ActionResult<GetUserProfileResponse>> GetUserProfileAsync()
+    {
+        var command = new GetUserProfileCommand(_userContext.CurrentUser.UserId);
+
+        var userProfile = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok(userProfile);
+    }
+
+    [HttpPut("userprofile")]
+    [Authorize]
+    public async Task<ActionResult> UpdateUserProfileAsync(UserProfileUpdateDto userProfileUpdateDto)
+    {
+        ArgumentNullException.ThrowIfNull(userProfileUpdateDto);
+
+        var command = new UpdateUserIdentityCommand(
+            new UserIdentityUpdateDto(
+                userProfileUpdateDto.FirstName,
+                userProfileUpdateDto.LastName,
+                userProfileUpdateDto.PhoneNumber),
+            _userContext.CurrentUser.UserId);
 
         await _mediator.Send(command).ConfigureAwait(false);
         return Ok();
@@ -147,17 +189,49 @@ public class UserController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("reset-mitid")]
+    public async Task<ActionResult> ResetMitIdAsync()
+    {
+        var command = new ResetMitIdCommand(_userContext.CurrentUser.UserId);
+
+        await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok();
+    }
+
     [HttpPut("{userId:guid}/deactivate")]
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<ActionResult> DeactivateAsync(Guid userId)
     {
-        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
-            return Unauthorized();
+        var identityUserPermission = await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false);
 
-        var command = new DeactivateUserCommand(userId);
+        if (identityUserPermission is IdentityUserPermission.None)
+        {
+            return Unauthorized();
+        }
 
         await _mediator
-            .Send(command)
+            .Send(new DeactivateUserCommand(userId, identityUserPermission == IdentityUserPermission.AdministratedByActor))
+            .ConfigureAwait(false);
+
+        return Ok();
+    }
+
+    [HttpPut("{userId:guid}/reactivate")]
+    [AuthorizeUser(PermissionId.UsersReActivate)]
+    public async Task<ActionResult> ReActivateAsync(Guid userId)
+    {
+        var identityUserPermission = await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false);
+
+        if (identityUserPermission != IdentityUserPermission.AdministratedByActor)
+        {
+            return Unauthorized();
+        }
+
+        await _mediator
+            .Send(new ReActivateUserCommand(userId))
             .ConfigureAwait(false);
 
         return Ok();
@@ -167,7 +241,7 @@ public class UserController : ControllerBase
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<ActionResult> ResetTwoFactorAuthenticationAsync(Guid userId)
     {
-        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+        if (await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false) == IdentityUserPermission.None)
             return Unauthorized();
 
         var command = new ResetUserTwoFactorAuthenticationCommand(userId);
@@ -198,16 +272,21 @@ public class UserController : ControllerBase
         return Guid.Parse(userIdClaim.Value);
     }
 
-    private async Task<bool> HasCurrentUserAccessToUserAsync(Guid userId)
+    private async Task<IdentityUserPermission> GetIdentityPermissionForCurrentUserAsync(Guid userId)
     {
         if (_userContext.CurrentUser.IsFas)
-            return true;
+            return IdentityUserPermission.AdministratedByActor;
 
         var associatedActors = await _mediator
             .Send(new GetActorsAssociatedWithUserCommand(userId))
             .ConfigureAwait(false);
 
-        return _userContext.CurrentUser.IsAssignedToActor(associatedActors.AdministratedBy) ||
-               associatedActors.ActorIds.Any(_userContext.CurrentUser.IsAssignedToActor);
+        if (_userContext.CurrentUser.IsAssignedToActor(associatedActors.AdministratedBy))
+            return IdentityUserPermission.AdministratedByActor;
+
+        if (associatedActors.ActorIds.Any(_userContext.CurrentUser.IsAssignedToActor))
+            return IdentityUserPermission.AssignedToActor;
+
+        return IdentityUserPermission.None;
     }
 }

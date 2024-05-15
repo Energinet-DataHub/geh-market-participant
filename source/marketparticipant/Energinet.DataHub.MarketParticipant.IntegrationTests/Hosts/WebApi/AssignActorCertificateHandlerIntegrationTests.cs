@@ -16,7 +16,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -111,7 +111,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         // Act + assert
         var actual = await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(command));
 
-        Assert.Equal("Credentials have already been assigned", actual.Message);
+        Assert.Equal("Credentials have already been assigned.", actual.Message);
     }
 
     private static Stream SetupTestCertificate(string certificateName)

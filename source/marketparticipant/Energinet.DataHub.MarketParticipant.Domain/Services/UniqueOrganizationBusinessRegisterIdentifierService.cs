@@ -16,32 +16,36 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+public class UniqueOrganizationBusinessRegisterIdentifierService : IUniqueOrganizationBusinessRegisterIdentifierService
 {
-    public class UniqueOrganizationBusinessRegisterIdentifierService : IUniqueOrganizationBusinessRegisterIdentifierService
+    private readonly IOrganizationRepository _organizationRepository;
+
+    public UniqueOrganizationBusinessRegisterIdentifierService(IOrganizationRepository organizationRepository)
     {
-        private readonly IOrganizationRepository _organizationRepository;
+        _organizationRepository = organizationRepository;
+    }
 
-        public UniqueOrganizationBusinessRegisterIdentifierService(IOrganizationRepository organizationRepository)
-        {
-            _organizationRepository = organizationRepository;
-        }
+    public async Task EnsureUniqueBusinessRegisterIdentifierAsync(Organization organization)
+    {
+        ArgumentNullException.ThrowIfNull(organization);
 
-        public async Task EnsureUniqueBusinessRegisterIdentifierAsync(Organization organization)
-        {
-            var organizations = await _organizationRepository.GetAsync().ConfigureAwait(false);
-            if (organizations.Any(
+        var organizations = await _organizationRepository.GetAsync().ConfigureAwait(false);
+        if (organizations.Any(
                 x => string.Equals(
-                    x.BusinessRegisterIdentifier.Identifier,
-                    organization.BusinessRegisterIdentifier.Identifier,
-                    StringComparison.OrdinalIgnoreCase)
+                         x.BusinessRegisterIdentifier.Identifier,
+                         organization.BusinessRegisterIdentifier.Identifier,
+                         StringComparison.OrdinalIgnoreCase)
                      && x.Id.Value != organization.Id.Value))
-            {
-                throw new ValidationException("The business register identifier is already in use");
-            }
+        {
+            throw new ValidationException("The business register identifier is already in use.")
+                .WithErrorCode("organization.business_register_identifier.reserved")
+                .WithArgs(("identifier", organization.BusinessRegisterIdentifier.Identifier));
         }
     }
 }

@@ -12,80 +12,104 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class PermissionController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class PermissionController : ControllerBase
+    private readonly IUserContext<FrontendUser> _userContext;
+    private readonly IMediator _mediator;
+
+    public PermissionController(
+        IUserContext<FrontendUser> userContext,
+        IMediator mediator)
     {
-        private readonly IUserContext<FrontendUser> _userContext;
-        private readonly IMediator _mediator;
+        _userContext = userContext;
+        _mediator = mediator;
+    }
 
-        public PermissionController(
-            IUserContext<FrontendUser> userContext,
-            IMediator mediator)
+    [HttpGet("{permissionId:int}")]
+    public async Task<ActionResult<PermissionDto>> GetPermissionAsync(int permissionId)
+    {
+        var getPermissionCommand = new GetPermissionCommand(permissionId);
+        var response = await _mediator
+            .Send(getPermissionCommand)
+            .ConfigureAwait(false);
+        return Ok(response.Permission);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<PermissionDto>>> ListAllAsync()
+    {
+        var getPermissionsCommand = new GetPermissionsCommand();
+        var response = await _mediator
+            .Send(getPermissionsCommand)
+            .ConfigureAwait(false);
+        return Ok(response.Permissions);
+    }
+
+    [HttpPut]
+    [AuthorizeUser(PermissionId.UserRolesManage)]
+    public async Task<ActionResult> UpdateAsync(UpdatePermissionDto updatePermissionDto)
+    {
+        ArgumentNullException.ThrowIfNull(updatePermissionDto);
+
+        if (!_userContext.CurrentUser.IsFas)
+            return Unauthorized();
+
+        var command = new UpdatePermissionCommand(updatePermissionDto.Id, updatePermissionDto.Description);
+
+        await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok();
+    }
+
+    [HttpGet("{permissionId:int}/audit")]
+    [AuthorizeUser(PermissionId.UserRolesManage)]
+    public async Task<ActionResult<IEnumerable<AuditLogDto<PermissionAuditedChange>>>> GetAuditAsync(int permissionId)
+    {
+        var command = new GetPermissionAuditLogsCommand(permissionId);
+
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok(response.AuditLogs);
+    }
+
+    [HttpGet("relation")]
+    [AuthorizeUser(PermissionId.UserRolesManage)]
+    [Produces("application/octet-stream")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+    public async Task<ActionResult> GetPermissionsRelationAsync()
+    {
+        if (!_userContext.CurrentUser.IsFas)
         {
-            _userContext = userContext;
-            _mediator = mediator;
+            return Unauthorized();
         }
 
-        [HttpGet("{permissionId:int}")]
-        public async Task<ActionResult<PermissionDto>> GetPermissionAsync(int permissionId)
-        {
-            var getPermissionCommand = new GetPermissionCommand(permissionId);
-            var response = await _mediator
-                .Send(getPermissionCommand)
-                .ConfigureAwait(false);
-            return Ok(response.Permission);
-        }
+        var command = new GetPermissionRelationsCommand();
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PermissionDto>>> ListAllAsync()
-        {
-            var getPermissionsCommand = new GetPermissionsCommand();
-            var response = await _mediator
-                .Send(getPermissionsCommand)
-                .ConfigureAwait(false);
-            return Ok(response.Permissions);
-        }
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-        [HttpPut]
-        [AuthorizeUser(PermissionId.UserRolesManage)]
-        public async Task<ActionResult> UpdateAsync(UpdatePermissionDto updatePermissionDto)
-        {
-            if (!_userContext.CurrentUser.IsFas)
-                return Unauthorized();
-
-            var command = new UpdatePermissionCommand(updatePermissionDto.Id, updatePermissionDto.Description);
-
-            await _mediator
-                .Send(command)
-                .ConfigureAwait(false);
-
-            return Ok();
-        }
-
-        [HttpGet("{permissionId:int}/auditlogs")]
-        [AuthorizeUser(PermissionId.UserRolesManage)]
-        public async Task<ActionResult<IEnumerable<PermissionAuditLogDto>>> GetAuditLogsAsync(int permissionId)
-        {
-            var command = new GetPermissionAuditLogsCommand(permissionId);
-
-            var response = await _mediator
-                .Send(command)
-                .ConfigureAwait(false);
-
-            return Ok(response.PermissionAuditLogs);
-        }
+        return File(response, "text/csv", "PermissionOverview.csv");
     }
 }

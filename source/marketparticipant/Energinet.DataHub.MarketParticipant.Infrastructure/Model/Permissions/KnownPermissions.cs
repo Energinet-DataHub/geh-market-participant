@@ -26,10 +26,6 @@ public static class KnownPermissions
 {
     public static IReadOnlyCollection<KnownPermission> All { get; } = new KnownPermission[]
     {
-        new(PermissionId.OrganizationsManage, "organizations:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
-        {
-            EicFunction.DataHubAdministrator
-        }),
         new(PermissionId.GridAreasManage, "grid-areas:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
@@ -59,6 +55,7 @@ public static class KnownPermissions
         {
             EicFunction.BalanceResponsibleParty,
             EicFunction.BillingAgent,
+            EicFunction.EnergySupplier,
             EicFunction.GridAccessProvider,
             EicFunction.ImbalanceSettlementResponsible,
             EicFunction.MeteredDataAdministrator,
@@ -69,13 +66,14 @@ public static class KnownPermissions
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader,
-            EicFunction.MeterOperator
+            EicFunction.MeterOperator,
+            EicFunction.ItSupplier,
         }),
         new(PermissionId.UserRolesManage, "user-roles:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
         }),
-        new(PermissionId.PermissionsManage, "permissions:manage", InstantPattern.ExtendedIso.Parse("2023-03-15T00:00:00Z").Value, new[]
+        new(PermissionId.ImbalancePricesManage, "imbalance-prices:manage", InstantPattern.ExtendedIso.Parse("2024-01-12T00:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
         }),
@@ -87,8 +85,7 @@ public static class KnownPermissions
         {
             EicFunction.EnergySupplier,
             EicFunction.GridAccessProvider,
-            EicFunction.MeteredDataResponsible,
-            EicFunction.BalanceResponsibleParty,
+            EicFunction.SystemOperator,
             EicFunction.DataHubAdministrator
         }),
         new(PermissionId.ESettExchangeManage, "esett-exchange:manage", InstantPattern.ExtendedIso.Parse("2023-09-01T00:00:00Z").Value, new[]
@@ -116,7 +113,46 @@ public static class KnownPermissions
             EicFunction.DanishEnergyAgency,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader,
-            EicFunction.MeterOperator
-        })
+            EicFunction.MeterOperator,
+            EicFunction.Delegated
+        }),
+        new(PermissionId.ActorMasterDataManage, "actor-master-data:manage", InstantPattern.ExtendedIso.Parse("2024-02-08T00:00:00Z").Value, new[]
+        {
+            EicFunction.BalanceResponsibleParty,
+            EicFunction.BillingAgent,
+            EicFunction.GridAccessProvider,
+            EicFunction.ImbalanceSettlementResponsible,
+            EicFunction.MeteredDataAdministrator,
+            EicFunction.MeteredDataResponsible,
+            EicFunction.MeteringPointAdministrator,
+            EicFunction.SystemOperator,
+            EicFunction.DanishEnergyAgency,
+            EicFunction.DataHubAdministrator,
+            EicFunction.IndependentAggregator,
+            EicFunction.SerialEnergyTrader,
+            EicFunction.MeterOperator,
+            EicFunction.EnergySupplier
+        }),
+        new(PermissionId.DelegationManage, "delegation:manage", InstantPattern.ExtendedIso.Parse("2024-03-05T00:00:00Z").Value, new[]
+        {
+            EicFunction.DataHubAdministrator,
+        }),
+        new(PermissionId.DelegationView, "delegation:view", InstantPattern.ExtendedIso.Parse("2024-03-05T00:00:00Z").Value, new[]
+        {
+            EicFunction.BalanceResponsibleParty,
+            EicFunction.GridAccessProvider,
+            EicFunction.EnergySupplier,
+            EicFunction.DataHubAdministrator
+        }),
+        new(PermissionId.UsersReActivate, "users:reactivate", InstantPattern.ExtendedIso.Parse("2024-04-02T00:00:00Z").Value, new[]
+        {
+            EicFunction.DataHubAdministrator
+        }),
+        new(PermissionId.BalanceResponsibilityView, "balance-responsibility:view", InstantPattern.ExtendedIso.Parse("2024-04-15T00:00:00Z").Value, new[]
+        {
+            EicFunction.DataHubAdministrator,
+            EicFunction.EnergySupplier,
+            EicFunction.BalanceResponsibleParty
+        }),
     };
 }

@@ -15,48 +15,47 @@
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
+
+internal static class OrganizationMapper
 {
-    internal static class OrganizationMapper
+    public static void MapToEntity(Organization from, OrganizationEntity to)
     {
-        public static void MapToEntity(Organization from, OrganizationEntity to)
-        {
-            to.Id = from.Id.Value;
-            to.Name = from.Name;
-            to.BusinessRegisterIdentifier = from.BusinessRegisterIdentifier.Identifier;
-            to.Status = (int)from.Status;
-            to.Domain = from.Domain.Value;
-            MapAddressToEntity(from.Address, to);
-        }
+        to.Id = from.Id.Value;
+        to.Name = from.Name;
+        to.BusinessRegisterIdentifier = from.BusinessRegisterIdentifier.Identifier;
+        to.Status = (int)from.Status;
+        to.Domain = from.Domain.Value;
+        MapAddressToEntity(from.Address, to);
+    }
 
-        public static Organization MapFromEntity(OrganizationEntity from)
-        {
-            return new Organization(
-                new OrganizationId(from.Id),
-                from.Name,
-                new BusinessRegisterIdentifier(from.BusinessRegisterIdentifier),
-                MapAddress(from),
-                new OrganizationDomain(from.Domain),
-                (OrganizationStatus)from.Status);
-        }
+    public static Organization MapFromEntity(OrganizationEntity from)
+    {
+        return new Organization(
+            new OrganizationId(from.Id),
+            from.Name,
+            new BusinessRegisterIdentifier(from.BusinessRegisterIdentifier),
+            MapAddress(from),
+            new OrganizationDomain(from.Domain),
+            (OrganizationStatus)from.Status);
+    }
 
-        private static Address MapAddress(OrganizationEntity from)
-        {
-            return new Address(
-                from.StreetName,
-                from.Number,
-                from.ZipCode,
-                from.City,
-                from.Country);
-        }
+    private static Address MapAddress(OrganizationEntity from)
+    {
+        return new Address(
+            from.StreetName,
+            from.Number,
+            from.ZipCode,
+            from.City,
+            from.Country);
+    }
 
-        private static void MapAddressToEntity(Address from, OrganizationEntity to)
-        {
-            to.StreetName = from.StreetName;
-            to.Number = from.Number;
-            to.ZipCode = from.ZipCode;
-            to.City = from.City;
-            to.Country = from.Country;
-        }
+    private static void MapAddressToEntity(Address from, OrganizationEntity to)
+    {
+        to.StreetName = from.StreetName;
+        to.Number = from.Number;
+        to.ZipCode = from.ZipCode;
+        to.City = from.City;
+        to.Country = from.Country;
     }
 }

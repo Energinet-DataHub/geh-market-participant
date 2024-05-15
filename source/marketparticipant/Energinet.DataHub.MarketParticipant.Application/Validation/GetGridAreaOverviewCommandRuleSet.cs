@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
-{
-    public sealed class GetGridAreaOverviewCommandRuleSet : AbstractValidator<GetGridAreaOverviewCommand>
-    {
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetGridAreaOverviewCommandRuleSet : AbstractValidator<GetGridAreaOverviewCommand>;

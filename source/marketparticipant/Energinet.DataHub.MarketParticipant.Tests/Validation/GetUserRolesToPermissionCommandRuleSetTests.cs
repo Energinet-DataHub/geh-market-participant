@@ -20,40 +20,39 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Validation
+namespace Energinet.DataHub.MarketParticipant.Tests.Validation;
+
+[UnitTest]
+public sealed class GetUserRolesToPermissionCommandRuleSetTests
 {
-    [UnitTest]
-    public sealed class GetUserRolesToPermissionCommandRuleSetTests
+    [Fact]
+    public async Task Validate_PermissionId_ValidatesInvalidProperty()
     {
-        [Fact]
-        public async Task Validate_PermissionId_ValidatesInvalidProperty()
-        {
-            // Arrange
-            const string propertyName = nameof(GetUserRolesToPermissionCommand.PermissionId);
+        // Arrange
+        const string propertyName = nameof(GetUserRolesToPermissionCommand.PermissionId);
 
-            var target = new GetUserRolesToPermissionCommandRuleSet();
-            var command = new GetUserRolesToPermissionCommand(-1);
+        var target = new GetUserRolesToPermissionCommandRuleSet();
+        var command = new GetUserRolesToPermissionCommand(-1);
 
-            // Act
-            var result = await target.ValidateAsync(command);
+        // Act
+        var result = await target.ValidateAsync(command);
 
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+    }
 
-        [Fact]
-        public async Task Validate_PermissionId_ValidatesProperty()
-        {
-            // Arrange
-            var target = new GetUserRolesToPermissionCommandRuleSet();
-            var command = new GetUserRolesToPermissionCommand((int)PermissionId.OrganizationsManage);
+    [Fact]
+    public async Task Validate_PermissionId_ValidatesProperty()
+    {
+        // Arrange
+        var target = new GetUserRolesToPermissionCommandRuleSet();
+        var command = new GetUserRolesToPermissionCommand((int)PermissionId.ActorsManage);
 
-            // Act
-            var result = await target.ValidateAsync(command);
+        // Act
+        var result = await target.ValidateAsync(command);
 
-            // Assert
-            Assert.True(result.IsValid);
-        }
+        // Assert
+        Assert.True(result.IsValid);
     }
 }

@@ -23,68 +23,67 @@ using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests;
+
+[Collection(nameof(IntegrationTestCollectionFixture))]
+[IntegrationTest]
+public class UnitOfWorkTests
 {
-    [Collection(nameof(IntegrationTestCollectionFixture))]
-    [IntegrationTest]
-    public class UnitOfWorkTests
+    private readonly MarketParticipantDatabaseFixture _fixture;
+
+    public UnitOfWorkTests(MarketParticipantDatabaseFixture fixture)
     {
-        private readonly MarketParticipantDatabaseFixture _fixture;
+        _fixture = fixture;
+    }
 
-        public UnitOfWorkTests(MarketParticipantDatabaseFixture fixture)
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, false)]
+    public async Task TestAsync(bool commitUnitOfWork, bool entityCreated)
+    {
+        // arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+
+        var repository = scope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
+        var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
+
+        var entity = CreateEntity();
+        OrganizationId id = null!;
+
+        // act
+        await ExecuteInUnitOfWork(uowProvider, commitUnitOfWork, async () =>
         {
-            _fixture = fixture;
-        }
+            id = (await repository.AddOrUpdateAsync(entity)).Value;
+        });
 
-        [Theory]
-        [InlineData(true, true)]
-        [InlineData(false, false)]
-        public async Task TestAsync(bool commitUnitOfWork, bool entityCreated)
+        // assert
+        await using var newScope = host.BeginScope();
+        var newRepository = newScope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
+        var actualEntityCreated = await newRepository.GetAsync(id) != null;
+        Assert.Equal(entityCreated, actualEntityCreated);
+    }
+
+    private static async Task ExecuteInUnitOfWork(IUnitOfWorkProvider provider, bool commit, Func<Task> work)
+    {
+        await using var uow = await provider.NewUnitOfWorkAsync();
+        await work();
+        if (commit)
         {
-            // arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-
-            var repository = scope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
-            var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
-
-            var entity = CreateEntity();
-            OrganizationId id = null!;
-
-            // act
-            await ExecuteInUnitOfWork(uowProvider, commitUnitOfWork, async () =>
-            {
-                id = (await repository.AddOrUpdateAsync(entity)).Value;
-            });
-
-            // assert
-            await using var newScope = host.BeginScope();
-            var newRepository = newScope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
-            var actualEntityCreated = await newRepository.GetAsync(id) != null;
-            Assert.Equal(entityCreated, actualEntityCreated);
+            await uow.CommitAsync();
         }
+    }
 
-        private static async Task ExecuteInUnitOfWork(IUnitOfWorkProvider provider, bool commit, Func<Task> work)
-        {
-            await using var uow = await provider.NewUnitOfWorkAsync();
-            await work();
-            if (commit)
-            {
-                await uow.CommitAsync();
-            }
-        }
+    private static Organization CreateEntity()
+    {
+        var validAddress = new Address(
+            "test Street",
+            "1",
+            "1111",
+            "Test City",
+            "DK");
 
-        private static Organization CreateEntity()
-        {
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
-
-            var validBusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New();
-            return new Organization("Test", validBusinessRegisterIdentifier, validAddress, new MockedDomain());
-        }
+        var validBusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New();
+        return new Organization("Test", validBusinessRegisterIdentifier, validAddress, new MockedDomain());
     }
 }

@@ -72,12 +72,12 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var permissionAuditLogEntryRepository = new PermissionAuditLogEntryRepository(context);
+        var permissionAuditLogEntryRepository = new PermissionAuditLogRepository(context);
 
         var frontendFirstUser = await _fixture.PrepareUserAsync();
         host.ServiceCollection.MockFrontendUser(frontendFirstUser.Id);
 
-        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
+        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
         var targetPermission = (int)userRoleWithPermission.Permissions[0].Permission;
 
         await using var scopeFirstUser = host.BeginScope();
@@ -98,13 +98,11 @@ public sealed class UpdatePermissionHandlerIntegrationTests
             .GetAsync(userRoleWithPermission.Permissions[0].Permission);
 
         Assert.Single(logs, p =>
-            p.Permission == userRoleWithPermission.Permissions[0].Permission &&
-            p.PermissionChangeType == PermissionChangeType.DescriptionChange &&
+            p.Change == PermissionAuditedChange.Description &&
             p.AuditIdentity.Value == frontendFirstUser.Id);
 
         Assert.Single(logs, p =>
-            p.Permission == userRoleWithPermission.Permissions[0].Permission &&
-            p.PermissionChangeType == PermissionChangeType.DescriptionChange &&
+            p.Change == PermissionAuditedChange.Description &&
             p.AuditIdentity.Value == frontendSecondUser.Id);
     }
 }

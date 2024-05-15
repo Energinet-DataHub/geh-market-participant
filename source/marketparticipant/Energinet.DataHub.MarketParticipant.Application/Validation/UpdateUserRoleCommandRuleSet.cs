@@ -17,33 +17,32 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class UpdateUserRoleCommandRuleSet : AbstractValidator<UpdateUserRoleCommand>
 {
-    public sealed class UpdateUserRoleCommandRuleSet : AbstractValidator<UpdateUserRoleCommand>
+    public UpdateUserRoleCommandRuleSet()
     {
-        public UpdateUserRoleCommandRuleSet()
-        {
-            RuleFor(command => command.UserRoleId)
-                .NotNull()
-                .NotEmpty();
+        RuleFor(command => command.UserRoleId)
+            .NotNull()
+            .NotEmpty();
 
-            RuleFor(command => command.UserRoleUpdateDto)
-                .NotNull()
-                .ChildRules(validator =>
-                {
-                    validator
-                        .RuleFor(role => role.Name)
-                        .NotEmpty()
-                        .Length(1, 250);
+        RuleFor(command => command.UserRoleUpdateDto)
+            .NotNull()
+            .ChildRules(validator =>
+            {
+                validator
+                    .RuleFor(role => role.Name)
+                    .NotEmpty()
+                    .Length(1, 250);
 
-                    validator
-                        .RuleFor(role => role.Status)
-                        .IsInEnum();
+                validator
+                    .RuleFor(role => role.Status)
+                    .IsInEnum();
 
-                    validator
-                        .RuleForEach(e => e.Permissions)
-                        .Must(p => Enum.IsDefined(typeof(PermissionId), p));
-                });
-        }
+                validator
+                    .RuleForEach(e => e.Permissions)
+                    .Must(p => Enum.IsDefined(typeof(PermissionId), p));
+            });
     }
 }
