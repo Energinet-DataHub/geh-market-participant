@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Secrets;
@@ -57,7 +56,7 @@ public static class MarketParticipantWebApiModuleExtensions
         {
             var tokenCredentials = new DefaultAzureCredential();
             var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
-            var keyClient = new KeyClient(new Uri(options.Value.TokenSignKeyVault), tokenCredentials);
+            var keyClient = new KeyClient(options.Value.TokenSignKeyVault, tokenCredentials);
             return new SigningKeyRing(Clock.Instance, keyClient, options.Value.TokenSignKeyName);
         });
 
@@ -65,7 +64,7 @@ public static class MarketParticipantWebApiModuleExtensions
         {
             var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
             var defaultCredentials = new DefaultAzureCredential();
-            return new SecretClient(new Uri(options.Value.CertificatesKeyVault), defaultCredentials);
+            return new SecretClient(options.Value.CertificatesKeyVault, defaultCredentials);
         });
 
         services.AddSingleton<ICertificateService>(s =>

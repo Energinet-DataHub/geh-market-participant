@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Options;
@@ -21,11 +22,11 @@ public sealed record KeyVaultOptions
     public const string SectionName = "KeyVault";
 
     [Required]
-    public string TokenSignKeyVault { get; set; } = null!;
+    public Uri TokenSignKeyVault { get; set; } = null!;
 
     [Required]
     public string TokenSignKeyName { get; set; } = null!;
 
     [Required]
-    public string CertificatesKeyVault { get; set; } = null!;
+    public Uri CertificatesKeyVault { get; set; } = null!;
 }
