@@ -16,8 +16,9 @@ using System.Threading.Tasks;
 using Azure.Identity;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Xunit;
 
@@ -48,9 +49,11 @@ public sealed class B2CFixture : IAsyncLifetime
             });
 
         // Azure AD Config
-        var config = new AzureAdConfig(
-            integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
-            integrationTestConfig.B2CSettings.BackendAppId);
+        var config = new OptionsWrapper<AzureB2COptions>(new AzureB2COptions
+        {
+            BackendSpnObjectId = integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
+            BackendId = integrationTestConfig.B2CSettings.BackendAppId,
+        });
 
         // Active Directory Roles
         var activeDirectoryB2CRoles =

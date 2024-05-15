@@ -60,9 +60,12 @@ public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
         KeyValuePair<string, string?>[] keyValuePairs =
         {
             new("Database:ConnectionString", dbConnectionString),
-            new(Settings.B2CBackendServicePrincipalNameObjectId.Key, Guid.Empty.ToString()),
-            new(Settings.B2CBackendId.Key, Guid.Empty.ToString()),
-            new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
+            new("AzureB2c:Tenant", "fake_value"),
+            new("AzureB2c:SpnId", Guid.Empty.ToString()),
+            new("AzureB2c:SpnSecret", Guid.NewGuid().ToString()),
+            new("AzureB2c:BackendObjectId", Guid.Empty.ToString()),
+            new("AzureB2c:BackendSpnObjectId", Guid.Empty.ToString()),
+            new("AzureB2c:BackendId", Guid.Empty.ToString()),
             new(Settings.SendGridApiKey.Key, "fake_value"),
             new(Settings.SenderEmail.Key, "fake_value"),
             new(Settings.BccEmail.Key, "fake_value"),

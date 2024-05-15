@@ -23,10 +23,12 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Kiota.Abstractions;
@@ -64,7 +66,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
 
         var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
-        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<IOptions<AzureB2COptions>>();
         var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
         var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 
@@ -114,7 +116,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
 
         var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
-        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<IOptions<AzureB2COptions>>();
         var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
         var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 
@@ -146,7 +148,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
 
         var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
-        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<IOptions<AzureB2COptions>>();
         var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
         var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 
@@ -181,7 +183,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
 
         var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
-        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<IOptions<AzureB2COptions>>();
         var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 
         var userIdentityAuthenticationServiceMock = new Mock<IUserIdentityAuthenticationService>();
@@ -222,7 +224,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
 
         var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
-        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<IOptions<AzureB2COptions>>();
         var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
         var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
@@ -263,7 +265,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
 
         var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
-        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<IOptions<AzureB2COptions>>();
         var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
         var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
@@ -312,7 +314,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
 
         var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
-        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<IOptions<AzureB2COptions>>();
         var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
         var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
@@ -360,7 +362,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
 
         var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
-        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<IOptions<AzureB2COptions>>();
         var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
         var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
@@ -400,7 +402,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
 
         var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
-        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<IOptions<AzureB2COptions>>();
         var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
         var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 
@@ -438,7 +440,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
 
         var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
-        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<IOptions<AzureB2COptions>>();
         var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
         var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 

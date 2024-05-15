@@ -19,7 +19,9 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 
@@ -29,16 +31,16 @@ public sealed class ActiveDirectoryB2CService : IActiveDirectoryB2CService
 {
     private const string ActorApplicationRegistrationDisplayNamePrefix = "Actor";
     private readonly GraphServiceClient _graphClient;
-    private readonly AzureAdConfig _azureAdConfig;
+    private readonly IOptions<AzureB2COptions> _azureAdOptions;
     private readonly IActiveDirectoryB2BRolesProvider _activeDirectoryB2BRolesProvider;
 
     public ActiveDirectoryB2CService(
         GraphServiceClient graphClient,
-        AzureAdConfig config,
+        IOptions<AzureB2COptions> azureAdOptions,
         IActiveDirectoryB2BRolesProvider activeDirectoryB2BRolesProvider)
     {
         _graphClient = graphClient;
-        _azureAdConfig = config;
+        _azureAdOptions = azureAdOptions;
         _activeDirectoryB2BRolesProvider = activeDirectoryB2BRolesProvider;
     }
 
@@ -195,7 +197,7 @@ public sealed class ActiveDirectoryB2CService : IActiveDirectoryB2CService
         var appRole = new AppRoleAssignment
         {
             PrincipalId = Guid.Parse(consumerServicePrincipalObjectId),
-            ResourceId = Guid.Parse(_azureAdConfig.BackendAppServicePrincipalObjectId),
+            ResourceId = Guid.Parse(_azureAdOptions.Value.BackendSpnObjectId),
             AppRoleId = roleId,
         };
 
@@ -241,7 +243,7 @@ public sealed class ActiveDirectoryB2CService : IActiveDirectoryB2CService
                 {
                     new()
                     {
-                        ResourceAppId = _azureAdConfig.BackendAppId,
+                        ResourceAppId = _azureAdOptions.Value.BackendId,
                         ResourceAccess = resourceAccesses,
                     },
                 },

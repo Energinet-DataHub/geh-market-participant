@@ -85,9 +85,12 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.InternalMetadataAddress)}", "fake_value"),
             new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.BackendBffAppId)}", "fake_value"),
             new(Settings.CertificateKeyVault.Key, "fake_value"),
-            new(Settings.B2CBackendServicePrincipalNameObjectId.Key, "fake_value"),
-            new(Settings.B2CBackendId.Key, "fake_value"),
-            new(Settings.B2CBackendObjectId.Key, "fake_value"),
+            new("AzureB2c:Tenant", "fake_value"),
+            new("AzureB2c:SpnId", "fake_value"),
+            new("AzureB2c:SpnSecret", "fake_value"),
+            new("AzureB2c:BackendObjectId", "fake_value"),
+            new("AzureB2c:BackendSpnObjectId", "fake_value"),
+            new("AzureB2c:BackendId", "fake_value"),
         };
 
         return new ConfigurationBuilder()
