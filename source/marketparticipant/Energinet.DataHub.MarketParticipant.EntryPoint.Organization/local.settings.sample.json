@@ -17,6 +17,13 @@
     "CVR_ORG_UPDATED_NOTIFICATION_TO_EMAIL": "CVR update notification to email",
     "BALANCE_RESPONSIBLE_CHANGED_NOTIFICATION_TO_EMAIL": "Balance responsible changed notification to email",
 
+    "AzureB2c:Tenant": "The tenant id of the current tenant, e.g. devDataHubB2C.onmicrosoft.com",
+    "AzureB2c:SpnId": "The client id of the 'sp-b2c-<environment>' service principal with management permissions.",
+    "AzureB2c:SpnSecret": "The client secret of the 'sp-b2c-<environment>' service principal with management permissions.",
+    "AzureB2c:BackendObjectId": "The object id of the 'backend-b2b-app' application registration.",
+    "AzureB2c:BackendSpnObjectId": "The object id of the 'backend-b2b-app' service principal (the enterprise application for the application registration).",
+    "AzureB2c:BackendId": "The client id of the 'backend-b2b-app' application registration.",
+    
     "ConsumeServiceBusSettings:ConnectionString": "",
     "ConsumeServiceBusSettings:SharedIntegrationEventTopic": "",
     "ConsumeServiceBusSettings:IntegrationEventSubscription": "",

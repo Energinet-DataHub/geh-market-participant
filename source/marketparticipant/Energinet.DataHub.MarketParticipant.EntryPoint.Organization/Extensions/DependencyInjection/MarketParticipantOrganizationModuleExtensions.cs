@@ -19,6 +19,7 @@ using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Energinet.DataHub.MarketParticipant.Application.Contracts;
+using Energinet.DataHub.MarketParticipant.Application.Options;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
@@ -32,10 +33,11 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using SendGrid.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions.DependencyInjection;
 
 internal static class MarketParticipantOrganizationModuleExtensions
 {
@@ -48,6 +50,7 @@ internal static class MarketParticipantOrganizationModuleExtensions
 
         services.AddOptions();
         services.Configure<ConsumeServiceBusSettings>(configuration.GetSection(nameof(ConsumeServiceBusSettings)));
+        services.AddOptions<SendGridOptions>().BindConfiguration(SendGridOptions.SectionName).ValidateDataAnnotations();
 
         services.AddScoped<SynchronizeActorsTimerTrigger>();
         services.AddScoped<EmailEventTimerTrigger>();
@@ -68,8 +71,12 @@ internal static class MarketParticipantOrganizationModuleExtensions
             BalanceResponsiblePartiesChanged.Descriptor,
         });
 
-        var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
-        services.AddSendGrid(options => options.ApiKey = sendGridApiKey);
+        services.AddSendGrid((provider, options) =>
+        {
+            var sendGridOptions = provider.GetRequiredService<IOptions<SendGridOptions>>();
+            options.ApiKey = sendGridOptions.Value.ApiKey;
+        });
+
         services.AddFunctionLoggingScope("mark-part");
 
         AddHealthChecks(configuration, services);
@@ -101,7 +108,6 @@ internal static class MarketParticipantOrganizationModuleExtensions
             return !expiredEmails;
         }
 
-        var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
         var consumeEventsOptions = configuration.GetSection(nameof(ConsumeServiceBusSettings)).Get<ConsumeServiceBusSettings>()!;
 
         services.AddScoped<HealthCheckEndpoint>();
@@ -120,7 +126,7 @@ internal static class MarketParticipantOrganizationModuleExtensions
                 _ => consumeEventsOptions.SharedIntegrationEventTopic,
                 _ => consumeEventsOptions.IntegrationEventSubscription,
                 name: "integration event consumer")
-            .AddSendGrid(sendGridApiKey)
+            .AddSendGrid()
             .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check");
     }
 }

@@ -6,18 +6,16 @@
   "UserAuthentication:ExternalMetadataAddress": "The OpenId configuration endpoint for external Azure token, formatted as https://<tentant-id>.b2clogin.com/<tentant-id>.onmicrosoft.com/<sign-in-user-flow>/v2.0/.well-known/openid-configuration",
   "UserAuthentication:BackendBffAppId": "The client id of the 'backend-bff-app' application registration.",
 
-  "AZURE_B2C_BACKEND_ID": "The client id of the 'backend-b2b-app' application registration.",
-  "AZURE_B2C_BACKEND_OBJECT_ID": "The object id of the 'backend-b2b-app' application registration.",
-  "AZURE_B2C_BACKEND_SPN_OBJECT_ID": "The object id of the 'backend-b2b-app' service principal (the enterprise application for the application registration).",
+  "AzureB2c:Tenant": "The tenant id of the current tenant, e.g. devDataHubB2C.onmicrosoft.com",
+  "AzureB2c:SpnId": "The client id of the 'sp-b2c-<environment>' service principal with management permissions.",
+  "AzureB2c:SpnSecret": "The client secret of the 'sp-b2c-<environment>' service principal with management permissions.",
+  "AzureB2c:BackendObjectId": "The object id of the 'backend-b2b-app' application registration.",
+  "AzureB2c:BackendSpnObjectId": "The object id of the 'backend-b2b-app' service principal (the enterprise application for the application registration).",
+  "AzureB2c:BackendId": "The client id of the 'backend-b2b-app' application registration.",
 
-  "AZURE_B2C_SPN_ID": "The client id of the 'sp-b2c-<environment>' service principal with management permissions.",
-  "AZURE_B2C_SPN_SECRET": "The client secret of the 'sp-b2c-<environment>' service principal with management permissions.",
-  "AZURE_B2C_TENANT": "The tenant id of the current tenant, e.g. devDataHubB2C.onmicrosoft.com",
-
-  "TOKEN_KEY_NAME": "The name of the key used to sign the token.",
-  "TOKEN_KEY_VAULT": "The address of the key vault containing the token signing key.",
-
-  "CERTIFICATES_KEY_VAULT": "The address of the key vault containing the actor certificates",
+  "KeyVault:TokenSignKeyVault": "The address of the key vault containing the token signing key.",
+  "KeyVault:TokenSignKeyName": "The name of the key used to sign the token.",
+  "KeyVault:CertificatesKeyVault": "The address of the key vault containing the actor certificates",
 
   "ENFORCE_2FA": true,
 

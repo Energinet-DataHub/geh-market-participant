@@ -15,9 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Options;
 using Energinet.DataHub.MarketParticipant.Application.Services.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
@@ -26,17 +28,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 public sealed class SendGridEmailSender : IEmailSender
 {
+    private readonly IOptions<SendGridOptions> _sendGridOptions;
     private readonly EmailRecipientConfig _config;
     private readonly ILogger<SendGridEmailSender> _logger;
     private readonly ISendGridClient _client;
     private readonly IEmailContentGenerator _emailContentGenerator;
 
     public SendGridEmailSender(
+        IOptions<SendGridOptions> sendGridOptions,
         EmailRecipientConfig config,
         ISendGridClient sendGridClient,
         IEmailContentGenerator emailContentGenerator,
         ILogger<SendGridEmailSender> logger)
     {
+        _sendGridOptions = sendGridOptions;
         _config = config;
         _logger = logger;
         _client = sendGridClient;
@@ -53,7 +58,7 @@ public sealed class SendGridEmailSender : IEmailSender
             .ConfigureAwait(false);
 
         return await SendAsync(
-                new SendGrid.Helpers.Mail.EmailAddress(_config.SenderEmail),
+                new SendGrid.Helpers.Mail.EmailAddress(_sendGridOptions.Value.SenderEmail),
                 new SendGrid.Helpers.Mail.EmailAddress(emailAddress.Address),
                 generatedEmail.Subject,
                 generatedEmail.HtmlContent)
@@ -86,7 +91,7 @@ public sealed class SendGridEmailSender : IEmailSender
         string htmlContent)
     {
         var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
-        msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.BccEmail));
+        msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_sendGridOptions.Value.BccEmail));
 
         var response = await _client.SendEmailAsync(msg).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)

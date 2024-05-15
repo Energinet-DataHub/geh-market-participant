@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application;
+using Energinet.DataHub.MarketParticipant.Application.Options;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Application.Services.Email;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SendGrid;
 
 namespace Energinet.DataHub.MarketParticipant.Common.Email;
@@ -29,11 +31,13 @@ internal static class EmailSenderRegistration
         services.AddScoped<IEmailSender>(provider =>
         {
             var configuration = provider.GetRequiredService<EmailRecipientConfig>();
+            var sendGridOptions = provider.GetRequiredService<IOptions<SendGridOptions>>();
             var senGridClient = provider.GetRequiredService<ISendGridClient>();
             var logger = provider.GetRequiredService<ILogger<SendGridEmailSender>>();
             var emailContentGenerator = provider.GetRequiredService<IEmailContentGenerator>();
 
             return new SendGridEmailSender(
+                sendGridOptions,
                 configuration,
                 senGridClient,
                 emailContentGenerator,

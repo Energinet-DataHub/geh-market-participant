@@ -12,29 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Energinet.DataHub.MarketParticipant.Common.Configuration;
 
 #pragma warning disable CA1724
 public static class Settings
 #pragma warning restore CA1724
 {
-    public static Setting<Uri> TokenKeyVault { get; }
-        = new("TOKEN_KEY_VAULT");
-    public static Setting<string> TokenKeyName { get; }
-        = new("TOKEN_KEY_NAME");
-
-    public static Setting<Uri> CertificateKeyVault { get; }
-        = new("CERTIFICATES_KEY_VAULT");
-
-    public static Setting<string> SendGridApiKey { get; }
-        = new("SEND_GRID_APIKEY");
-
-    public static Setting<string> SenderEmail { get; }
-        = new("SENDER_EMAIL");
-    public static Setting<string> BccEmail { get; }
-        = new("BCC_EMAIL");
     public static Setting<string> UserInviteFlow { get; }
         = new("USER_INVITE_FLOW");
     public static Setting<string> EnvironmentDescription { get; }
