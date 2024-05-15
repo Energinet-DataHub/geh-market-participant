@@ -15,7 +15,7 @@
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

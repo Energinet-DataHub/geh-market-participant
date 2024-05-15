@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 public class ProcessDelegationHelperService : IProcessDelegationHelperService
 {
-    private IProcessDelegationRepository _processDelegationRepository;
+    private readonly IProcessDelegationRepository _processDelegationRepository;
 
     public ProcessDelegationHelperService(IProcessDelegationRepository processDelegationRepository)
     {

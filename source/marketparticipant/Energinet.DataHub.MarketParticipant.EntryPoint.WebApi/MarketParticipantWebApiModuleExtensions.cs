@@ -18,8 +18,8 @@ using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Options;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
@@ -42,6 +42,7 @@ public static class MarketParticipantWebApiModuleExtensions
 
         services.AddOptions();
         services.AddOptions<UserAuthentication>().BindConfiguration(nameof(UserAuthentication)).ValidateDataAnnotations();
+        services.AddOptions<KeyVaultOptions>().BindConfiguration(KeyVaultOptions.SectionName).ValidateDataAnnotations();
 
         services.AddSingleton<IExternalTokenValidator>(sp =>
         {
@@ -51,22 +52,19 @@ public static class MarketParticipantWebApiModuleExtensions
                 authSettings.BackendBffAppId);
         });
 
-        services.AddSingleton<ISigningKeyRing>(_ =>
+        services.AddSingleton<ISigningKeyRing>(provider =>
         {
-            var tokenKeyVaultUri = configuration.GetSetting(Settings.TokenKeyVault);
-            var tokenKeyName = configuration.GetSetting(Settings.TokenKeyName);
-
             var tokenCredentials = new DefaultAzureCredential();
-
-            var keyClient = new KeyClient(tokenKeyVaultUri, tokenCredentials);
-            return new SigningKeyRing(Clock.Instance, keyClient, tokenKeyName);
+            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
+            var keyClient = new KeyClient(options.Value.TokenSignKeyVault, tokenCredentials);
+            return new SigningKeyRing(Clock.Instance, keyClient, options.Value.TokenSignKeyName);
         });
 
-        services.AddSingleton(_ =>
+        services.AddSingleton(provider =>
         {
-            var certificateKeyVaultUri = configuration.GetSetting(Settings.CertificateKeyVault);
+            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
             var defaultCredentials = new DefaultAzureCredential();
-            return new SecretClient(certificateKeyVaultUri, defaultCredentials);
+            return new SecretClient(options.Value.CertificatesKeyVault, defaultCredentials);
         });
 
         services.AddSingleton<ICertificateService>(s =>

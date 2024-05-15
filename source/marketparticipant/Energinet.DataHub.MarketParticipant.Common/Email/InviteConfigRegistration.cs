@@ -28,14 +28,12 @@ internal static class InviteConfigRegistration
         {
             var configuration = provider.GetRequiredService<IConfiguration>();
 
-            var sender = configuration.GetSetting(Settings.SenderEmail);
-            var bcc = configuration.GetSetting(Settings.BccEmail);
             var cvrUpdateNotificationTo = configuration.GetSetting(Settings.OrganizationIdentityUpdateNotificationToEmail);
             var brpChangedNotificationTo = configuration.GetSetting(Settings.BalanceResponsiblePartiesChangedNotificationToEmail);
             var userFlow = configuration.GetSetting(Settings.UserInviteFlow);
             var environmentDescription = configuration.GetOptionalSetting(Settings.EnvironmentDescription);
 
-            return new EmailRecipientConfig(sender, bcc, cvrUpdateNotificationTo, brpChangedNotificationTo, userFlow, environmentDescription);
+            return new EmailRecipientConfig(cvrUpdateNotificationTo, brpChangedNotificationTo, userFlow, environmentDescription);
         });
     }
 }
