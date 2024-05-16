@@ -18,20 +18,12 @@ namespace Energinet.DataHub.MarketParticipant.Common.Configuration;
 public static class Settings
 #pragma warning restore CA1724
 {
-    public static Setting<string> UserInviteFlow { get; }
-        = new("USER_INVITE_FLOW");
-    public static Setting<string> EnvironmentDescription { get; }
-        = new("ENVIRONMENT_DESC");
-
     public static Setting<string> ServiceBusTopicConnectionString { get; }
         = new("SERVICE_BUS_CONNECTION_STRING");
     public static Setting<string> ServiceBusHealthConnectionString { get; }
         = new("SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING");
     public static Setting<string> ServiceBusTopicName { get; }
         = new("SBT_MARKET_PARTICIPANT_CHANGED_NAME");
-
-    public static Setting<bool> Enforce2Fa { get; }
-        = new("ENFORCE_2FA", true);
 
     public static Setting<string> OrganizationIdentityUpdateNotificationToEmail { get; }
         = new("CVR_ORG_UPDATED_NOTIFICATION_TO_EMAIL");

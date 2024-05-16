@@ -12,8 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application;
+using System;
+using System.ComponentModel.DataAnnotations;
 
-public sealed record EmailRecipientConfig(
-    string OrgUpdateNotificationToEmail,
-    string BalanceResponsibleChangedNotificationToEmail);
+namespace Energinet.DataHub.MarketParticipant.Application.Options;
+
+public sealed record UserInviteOptions
+{
+    public const string SectionName = "UserInvite";
+
+    [Required]
+    public Uri InviteFlowUrl { get; set; } = null!;
+}

@@ -29,20 +29,23 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services;
 public sealed class SendGridEmailSender : IEmailSender
 {
     private readonly IOptions<SendGridOptions> _sendGridOptions;
-    private readonly EmailRecipientConfig _config;
+    private readonly IOptions<UserInviteOptions> _userInviteOptions;
+    private readonly IOptions<EnvironmentOptions> _environmentOptions;
     private readonly ILogger<SendGridEmailSender> _logger;
     private readonly ISendGridClient _client;
     private readonly IEmailContentGenerator _emailContentGenerator;
 
     public SendGridEmailSender(
         IOptions<SendGridOptions> sendGridOptions,
-        EmailRecipientConfig config,
+        IOptions<UserInviteOptions> userInviteOptions,
+        IOptions<EnvironmentOptions> environmentOptions,
         ISendGridClient sendGridClient,
         IEmailContentGenerator emailContentGenerator,
         ILogger<SendGridEmailSender> logger)
     {
         _sendGridOptions = sendGridOptions;
-        _config = config;
+        _userInviteOptions = userInviteOptions;
+        _environmentOptions = environmentOptions;
         _logger = logger;
         _client = sendGridClient;
         _emailContentGenerator = emailContentGenerator;
@@ -70,17 +73,17 @@ public sealed class SendGridEmailSender : IEmailSender
         var environmentShort = string.Empty;
         var environmentLong = string.Empty;
 
-        if (_config.EnvironmentDescription != null)
+        if (_environmentOptions.Value.Description != null)
         {
-            environmentShort = $"({_config.EnvironmentDescription})";
-            environmentLong = $"(Miljø: {_config.EnvironmentDescription})";
+            environmentShort = $"({_environmentOptions.Value.Description})";
+            environmentLong = $"(Miljø: {_environmentOptions.Value.Description})";
         }
 
         return new Dictionary<string, string>
         {
             { "environment_short", environmentShort },
             { "environment_long", environmentLong },
-            { "invite_link", _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge" },
+            { "invite_link", _userInviteOptions.Value.InviteFlowUrl + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge" },
         };
     }
 

@@ -30,10 +30,8 @@ internal static class InviteConfigRegistration
 
             var cvrUpdateNotificationTo = configuration.GetSetting(Settings.OrganizationIdentityUpdateNotificationToEmail);
             var brpChangedNotificationTo = configuration.GetSetting(Settings.BalanceResponsiblePartiesChangedNotificationToEmail);
-            var userFlow = configuration.GetSetting(Settings.UserInviteFlow);
-            var environmentDescription = configuration.GetOptionalSetting(Settings.EnvironmentDescription);
 
-            return new EmailRecipientConfig(cvrUpdateNotificationTo, brpChangedNotificationTo, userFlow, environmentDescription);
+            return new EmailRecipientConfig(cvrUpdateNotificationTo, brpChangedNotificationTo);
         });
     }
 }
