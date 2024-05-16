@@ -19,9 +19,9 @@
 
   "ENFORCE_2FA": true,
 
-  "CVR_BASE_ADDRESS": "https://localhost",
-  "CVR_USERNAME": "cvr-username",
-  "CVR_PASSWORD": "cvr-password",
+  "CvrRegister:BaseAddress": "https://localhost",
+  "CvrRegister:Username": "cvr-username",
+  "CvrRegister:Password": "cvr-password",
   
   "Database:ConnectionString": ""
 }

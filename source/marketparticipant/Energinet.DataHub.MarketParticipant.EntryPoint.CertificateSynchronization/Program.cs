@@ -33,7 +33,7 @@ var host = new HostBuilder()
             .AddFunctionLoggingScope("mark-part");
 
         services
-            .AddHttpClient(context.Configuration)
+            .AddCertificatesHttpClient()
             .AddCertificateStore(context.Configuration);
     })
     .ConfigureLogging((hostingContext, logging) =>
