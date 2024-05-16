@@ -14,17 +14,21 @@
 
 using System;
 using System.Net.Http;
-using Microsoft.Extensions.Configuration;
+using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Extensions.DependencyInjection;
 
 internal static class HttpClientExtensions
 {
-    public static IServiceCollection AddHttpClient(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddCertificatesHttpClient(this IServiceCollection services)
     {
-        services.AddHttpClient<HttpClient>((_, httpClient)
-            => httpClient.BaseAddress = new Uri($"https://management.azure.com{configuration.GetValue<string>("APIM_SERVICE_NAME")}/certificates/"));
+        services.AddHttpClient<HttpClient>((serviceProvider, httpClient) =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<CertificateSynchronizationOptions>>();
+            httpClient.BaseAddress = new Uri($"https://management.azure.com{options.Value.ApimServiceName}/certificates/");
+        });
         return services;
     }
 }
