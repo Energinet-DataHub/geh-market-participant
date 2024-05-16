@@ -154,5 +154,11 @@ public static class KnownPermissions
             EicFunction.EnergySupplier,
             EicFunction.BalanceResponsibleParty
         }),
+        new(PermissionId.RequestWholesaleSettlement, "request-wholesale-settlement:view", InstantPattern.ExtendedIso.Parse("2024-05-16T00:00:00Z").Value, new[]
+        {
+            EicFunction.EnergySupplier,
+            EicFunction.SystemOperator,
+            EicFunction.GridAccessProvider,
+        }),
     };
 }
