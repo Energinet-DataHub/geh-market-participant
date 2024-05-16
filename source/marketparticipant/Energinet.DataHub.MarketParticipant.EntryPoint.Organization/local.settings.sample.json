@@ -28,6 +28,8 @@
     "ConsumeServiceBusSettings:SharedIntegrationEventTopic": "",
     "ConsumeServiceBusSettings:IntegrationEventSubscription": "",
     
-    "Database:ConnectionString": ""
+    "Database:ConnectionString": "",
+    
+    "UserInvite:InviteFlowUrl": ""
   }
 }
