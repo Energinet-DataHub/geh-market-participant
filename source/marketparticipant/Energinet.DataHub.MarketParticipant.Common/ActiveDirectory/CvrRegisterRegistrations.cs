@@ -15,10 +15,9 @@
 using System;
 using System.Net.Http.Headers;
 using System.Text;
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Common.Extensions;
-using Microsoft.Extensions.Configuration;
+using Energinet.DataHub.MarketParticipant.Common.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
 
@@ -26,15 +25,17 @@ internal static class CvrRegisterRegistration
 {
     public static void AddCvrRegisterConfiguration(this IServiceCollection services)
     {
+        services.AddOptions<CvrRegisterOptions>().BindConfiguration(CvrRegisterOptions.SectionName).ValidateDataAnnotations();
+
         services.AddHttpClient("CvrRegister", (provider, client) =>
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
+            var options = provider.GetRequiredService<IOptions<CvrRegisterOptions>>();
 
-            client.BaseAddress = new Uri(configuration.GetSetting(Settings.CvrBaseAddress));
+            client.BaseAddress = options.Value.BaseAddress;
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(
                     "Basic",
-                    Convert.ToBase64String(Encoding.ASCII.GetBytes($"{configuration.GetSetting(Settings.CvrUsername)}:{configuration.GetSetting(Settings.CvrPassword)}")));
+                    Convert.ToBase64String(Encoding.ASCII.GetBytes($"{options.Value.Username}:{options.Value.Password}")));
         });
     }
 }
