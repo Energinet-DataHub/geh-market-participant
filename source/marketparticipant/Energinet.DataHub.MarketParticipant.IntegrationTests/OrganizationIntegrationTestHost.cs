@@ -72,10 +72,12 @@ public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
             new("SendGrid:SenderEmail", "fake_value"),
             new("SendGrid:BccEmail", "fake_value"),
 
+            new("UserInvite.InviteFlowUrl", "https://fake_value"),
+
+            new("Environment:Description", "fake_value"),
+
             new(Settings.OrganizationIdentityUpdateNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
             new(Settings.BalanceResponsiblePartiesChangedNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
-            new(Settings.UserInviteFlow.Key, "fake_value"),
-            new(Settings.EnvironmentDescription.Key, "fake_value"),
             new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
             new(Settings.ServiceBusTopicName.Key, "fake_value"),
             new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.ConnectionString)}", "fake_value"),

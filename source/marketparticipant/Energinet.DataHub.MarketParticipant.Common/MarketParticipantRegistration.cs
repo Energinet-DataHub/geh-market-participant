@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application;
+using Energinet.DataHub.MarketParticipant.Application.Options;
 using Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Common.Email;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
@@ -35,6 +36,8 @@ public static class MarketParticipantRegistration
 
         services.AddOptions();
         services.AddOptions<AzureB2COptions>().BindConfiguration(AzureB2COptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<UserInviteOptions>().BindConfiguration(UserInviteOptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<EnvironmentOptions>().BindConfiguration(EnvironmentOptions.SectionName).ValidateDataAnnotations();
 
         services.AddApplicationServices();
         services.AddInfrastructureServices();
