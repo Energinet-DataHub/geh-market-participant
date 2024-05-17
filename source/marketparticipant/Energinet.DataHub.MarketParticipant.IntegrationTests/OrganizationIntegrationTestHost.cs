@@ -16,8 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
@@ -76,12 +74,12 @@ public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
 
             new("Environment:Description", "fake_value"),
 
-            new(Settings.OrganizationIdentityUpdateNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
-            new(Settings.BalanceResponsiblePartiesChangedNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
-            new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
-            new(Settings.ServiceBusTopicName.Key, "fake_value"),
-            new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.ConnectionString)}", "fake_value"),
-            new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.SharedIntegrationEventTopic)}", "fake_value"),
+            new("CvrUpdate:NotificationToEmail", "fake_value@fake_value_test.dk"),
+            new("BalanceResponsibleChanged:NotificationToEmail", "fake_value@fake_value_test.dk"),
+            new("ServiceBus:SharedIntegrationEventTopic", "fake_value"),
+            new("ServiceBus:IntegrationEventSubscription", "fake_value"),
+            new("ServiceBus:ConsumerConnectionString", "fake_value"),
+            new("ServiceBus:ProducerConnectionString", "fake_value"),
         };
 
         return new ConfigurationBuilder()
