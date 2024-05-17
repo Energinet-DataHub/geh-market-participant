@@ -47,7 +47,6 @@ public static class MarketParticipantRegistration
         services.AddGraphServiceClient();
         services.AddActiveDirectoryRoles();
         services.AddSendGridEmailSenderClient();
-        services.AddEmailConfigRegistration();
         services.AddCvrRegisterConfiguration();
     }
 }

@@ -12,22 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.MarketParticipant.Common.Configuration;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Options;
 
-public sealed class UserAuthentication
+public class ServiceBusOptions
 {
-    [Required]
-    public Uri MitIdExternalMetadataAddress { get; set; } = null!;
+    public const string SectionName = "ServiceBus";
 
     [Required]
-    public Uri ExternalMetadataAddress { get; set; } = null!;
+    public string SharedIntegrationEventTopic { get; set; } = string.Empty;
 
     [Required]
-    public Uri InternalMetadataAddress { get; set; } = null!;
+    public string IntegrationEventSubscription { get; set; } = string.Empty;
 
     [Required]
-    public string BackendBffAppId { get; set; } = null!;
+    public string ConsumerConnectionString { get; set; } = string.Empty;
+
+    [Required]
+    public string ProducerConnectionString { get; set; } = string.Empty;
+
+    [Required]
+    public string HealthConnectionString { get; set; } = string.Empty;
 }

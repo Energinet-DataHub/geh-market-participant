@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Configuration;
+using System.ComponentModel.DataAnnotations;
 
-public class ConsumeServiceBusSettings
+namespace Energinet.DataHub.MarketParticipant.Application.Options;
+
+public sealed record CvrUpdateOptions
 {
-    public string ConnectionString { get; set; } = string.Empty;
-    public string SharedIntegrationEventTopic { get; set; } = string.Empty;
-    public string IntegrationEventSubscription { get; set; } = string.Empty;
+    public const string SectionName = "CvrUpdate";
+
+    [Required]
+    public string NotificationToEmail { get; set; } = null!;
 }
