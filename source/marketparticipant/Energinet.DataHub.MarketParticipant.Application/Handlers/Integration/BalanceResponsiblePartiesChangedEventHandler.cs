@@ -14,10 +14,12 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Options;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Microsoft.Extensions.Options;
 using NodaTime.Serialization.Protobuf;
 using MeteringPointType = Energinet.DataHub.MarketParticipant.Application.Contracts.MeteringPointType;
 
@@ -29,7 +31,7 @@ public sealed class BalanceResponsiblePartiesChangedEventHandler(
     IBalanceResponsibilityRequestRepository balanceResponsibilityRequestRepository,
     IEmailEventRepository emailEventRepository,
     IUnitOfWorkProvider unitOfWorkProvider,
-    EmailRecipientConfig emailRecipientConfig)
+    IOptions<BalanceResponsibleChangedOptions> balanceResponsibleChangedOptions)
     : IBalanceResponsiblePartiesChangedEventHandler
 {
     public async Task HandleAsync(Contracts.BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
@@ -78,7 +80,7 @@ public sealed class BalanceResponsiblePartiesChangedEventHandler(
     {
         return emailEventRepository.InsertAsync(
             new EmailEvent(
-                new EmailAddress(emailRecipientConfig.BalanceResponsibleChangedNotificationToEmail),
+                new EmailAddress(balanceResponsibleChangedOptions.Value.NotificationToEmail),
                 new BalanceResponsiblePartiesChangedEmailTemplate(balanceResponsibilityRequest)));
     }
 }

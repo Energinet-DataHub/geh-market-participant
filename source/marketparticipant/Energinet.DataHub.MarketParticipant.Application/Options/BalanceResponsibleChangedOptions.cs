@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application;
+using System.ComponentModel.DataAnnotations;
 
-public sealed record EmailRecipientConfig(
-    string OrgUpdateNotificationToEmail,
-    string BalanceResponsibleChangedNotificationToEmail);
+namespace Energinet.DataHub.MarketParticipant.Application.Options;
+
+public sealed record BalanceResponsibleChangedOptions
+{
+    public const string SectionName = "BalanceResponsibleChanged";
+
+    [Required]
+    public string NotificationToEmail { get; set; } = null!;
+}

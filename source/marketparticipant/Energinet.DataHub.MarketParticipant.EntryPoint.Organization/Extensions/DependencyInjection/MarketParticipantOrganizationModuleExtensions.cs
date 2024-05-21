@@ -22,12 +22,10 @@ using Energinet.DataHub.MarketParticipant.Application.Contracts;
 using Energinet.DataHub.MarketParticipant.Application.Options;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Common.Extensions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Integration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -49,8 +47,16 @@ internal static class MarketParticipantOrganizationModuleExtensions
         services.AddFeatureManagement();
 
         services.AddOptions();
-        services.Configure<ConsumeServiceBusSettings>(configuration.GetSection(nameof(ConsumeServiceBusSettings)));
         services.AddOptions<SendGridOptions>().BindConfiguration(SendGridOptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<ServiceBusOptions>().BindConfiguration(ServiceBusOptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<CvrUpdateOptions>().BindConfiguration(CvrUpdateOptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<BalanceResponsibleChangedOptions>().BindConfiguration(BalanceResponsibleChangedOptions.SectionName).ValidateDataAnnotations();
+
+        services.AddScoped<SynchronizeActorsTimerTrigger>();
+        services.AddScoped<EmailEventTimerTrigger>();
+        services.AddScoped<UserInvitationExpiredTimerTrigger>();
+        services.AddScoped<DispatchIntegrationEventsTrigger>();
+        services.AddScoped<ReceiveIntegrationEventsTrigger>();
 
         services.AddScoped<SynchronizeActorsTimerTrigger>();
         services.AddScoped<EmailEventTimerTrigger>();
@@ -62,8 +68,8 @@ internal static class MarketParticipantOrganizationModuleExtensions
         services.AddPublisher<IntegrationEventProvider>();
         services.Configure<PublisherOptions>(options =>
         {
-            options.ServiceBusConnectionString = configuration.GetSetting(Settings.ServiceBusTopicConnectionString);
-            options.TopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
+            options.ServiceBusConnectionString = configuration.GetValue($"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ProducerConnectionString)}", defaultValue: string.Empty)!;
+            options.TopicName = configuration.GetValue($"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SharedIntegrationEventTopic)}", defaultValue: string.Empty)!;
         });
 
         services.AddSubscriber<IntegrationEventSubscriptionHandler>(new[]
@@ -79,12 +85,12 @@ internal static class MarketParticipantOrganizationModuleExtensions
 
         services.AddFunctionLoggingScope("mark-part");
 
-        AddHealthChecks(configuration, services);
+        AddHealthChecks(services);
 
         return services;
     }
 
-    private static void AddHealthChecks(IConfiguration configuration, IServiceCollection services)
+    private static void AddHealthChecks(IServiceCollection services)
     {
         static async Task<bool> CheckExpiredEventsAsync(MarketParticipantDbContext context, CancellationToken cancellationToken)
         {
@@ -108,8 +114,6 @@ internal static class MarketParticipantOrganizationModuleExtensions
             return !expiredEmails;
         }
 
-        var consumeEventsOptions = configuration.GetSection(nameof(ConsumeServiceBusSettings)).Get<ConsumeServiceBusSettings>()!;
-
         services.AddScoped<HealthCheckEndpoint>();
 
         services
@@ -118,14 +122,9 @@ internal static class MarketParticipantOrganizationModuleExtensions
             .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEventsAsync, name: "expired_events")
             .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEmailsAsync, name: "expired_emails")
             .AddAzureServiceBusSubscription(
-                _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
-                _ => configuration.GetSetting(Settings.ServiceBusTopicName),
-                _ => consumeEventsOptions.IntegrationEventSubscription) // This is the name of the subscription in the infrastructure project
-            .AddAzureServiceBusSubscription(
-                _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
-                _ => consumeEventsOptions.SharedIntegrationEventTopic,
-                _ => consumeEventsOptions.IntegrationEventSubscription,
-                name: "integration event consumer")
+                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.HealthConnectionString,
+                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.SharedIntegrationEventTopic,
+                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.IntegrationEventSubscription)
             .AddSendGrid()
             .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check");
     }
