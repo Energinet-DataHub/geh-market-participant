@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Net.Http;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
@@ -52,11 +51,11 @@ internal static class ApimCertificateStoreExtensions
         });
 
         // register secret client
-        services.AddSingleton(_ =>
+        services.AddSingleton(serviceProvider =>
         {
-            var certificatesKeyVault = configuration.GetValue<Uri>("CERTIFICATES_KEY_VAULT");
+            var options = serviceProvider.GetRequiredService<IOptions<CertificateSynchronizationOptions>>();
             var defaultCredentials = new DefaultAzureCredential();
-            return new SecretClient(certificatesKeyVault, defaultCredentials);
+            return new SecretClient(options.Value.CertificatesKeyVault, defaultCredentials);
         });
 
         // specific health checks
