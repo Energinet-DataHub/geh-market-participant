@@ -21,6 +21,7 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.Core.FunctionApp.TestCommon;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -36,7 +37,7 @@ public sealed class CertificateFixture : IAsyncLifetime
     public Task InitializeAsync()
     {
         var keyVaultUri = GetKeyVaultUri();
-        SecretClient = new SecretClient(keyVaultUri, new DefaultAzureCredential());
+        SecretClient = new SecretClient(keyVaultUri, AzureCredentialsHelper.Credentials);
 
         var certValidation = new Mock<ICertificateValidation>();
 
