@@ -18,6 +18,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Xunit;
@@ -33,7 +34,7 @@ public sealed class B2CFixture : IAsyncLifetime
 
     public Task InitializeAsync()
     {
-        var integrationTestConfig = new IntegrationTestConfiguration();
+        var integrationTestConfig = new IntegrationTestConfiguration(AzureCredentialsHelper.Credentials);
 
         // Graph Service Client
         var clientSecretCredential = new ClientSecretCredential(
