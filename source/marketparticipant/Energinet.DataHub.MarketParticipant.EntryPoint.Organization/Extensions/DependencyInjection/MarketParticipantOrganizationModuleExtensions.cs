@@ -15,7 +15,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Energinet.DataHub.MarketParticipant.Application.Contracts;
@@ -82,8 +81,6 @@ internal static class MarketParticipantOrganizationModuleExtensions
             var sendGridOptions = provider.GetRequiredService<IOptions<SendGridOptions>>();
             options.ApiKey = sendGridOptions.Value.ApiKey;
         });
-
-        services.AddFunctionLoggingScope("mark-part");
 
         AddHealthChecks(services);
 

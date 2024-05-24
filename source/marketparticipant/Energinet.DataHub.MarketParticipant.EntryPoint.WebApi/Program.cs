@@ -17,7 +17,7 @@ using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
-using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
+using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
