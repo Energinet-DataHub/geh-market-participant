@@ -34,7 +34,7 @@ public sealed class B2CFixture : IAsyncLifetime
 
     public Task InitializeAsync()
     {
-        var integrationTestConfig = new IntegrationTestConfiguration(AzureCredentialsHelper.Credentials);
+        var integrationTestConfig = new IntegrationTestConfiguration(AzureCredentialsProvider.Credentials);
 
         // Graph Service Client
         var clientSecretCredential = new ClientSecretCredential(

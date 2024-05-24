@@ -16,7 +16,7 @@ using Azure.Identity;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
-internal static class AzureCredentialsHelper
+internal static class AzureCredentialsProvider
 {
     public static DefaultAzureCredential Credentials { get; } = new DefaultAzureCredential();
 }
