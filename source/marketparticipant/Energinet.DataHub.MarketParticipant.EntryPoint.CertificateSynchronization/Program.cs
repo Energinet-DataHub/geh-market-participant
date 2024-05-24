@@ -14,11 +14,12 @@
 
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
-using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
+using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Monitor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
@@ -28,9 +29,7 @@ var host = new HostBuilder()
         services.AddHealthChecksForIsolatedWorker();
         services.AddScoped<HealthCheckEndpoint>();
 
-        services
-            .AddLogging()
-            .AddFunctionLoggingScope("mark-part");
+        services.AddFunctionLoggingScope("mark-part");
 
         services
             .AddCertificatesHttpClient()
@@ -39,6 +38,8 @@ var host = new HostBuilder()
     .ConfigureLogging((hostingContext, logging) =>
     {
         logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
+        logging.AddApplicationInsights();
+        logging.SetApplicationInsightLogLevel();
     })
     .Build();
 
