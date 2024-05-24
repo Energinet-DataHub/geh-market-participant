@@ -73,8 +73,8 @@ jobs:
     if: |
       always() &&
       contains(needs.*.result, 'failure')
-    uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v13
+    uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v14
     with:
-      team_name: Titans
+      team_name: Raccoons
       subject: "Deployment dispatch failed: Market Participant"
     secrets: inherit
