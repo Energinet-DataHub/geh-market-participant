@@ -21,6 +21,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
@@ -33,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 public sealed class GraphServiceClientFixture : IAsyncLifetime
 #pragma warning restore CA1001
 {
-    private readonly IntegrationTestConfiguration _integrationTestConfiguration = new();
+    private readonly IntegrationTestConfiguration _integrationTestConfiguration = new(AzureCredentialsProvider.Credentials);
     private readonly List<ExternalUserId> _createdUsers = new();
     private GraphServiceClient? _graphClient;
 
