@@ -83,10 +83,9 @@ public static class KnownPermissions
         }),
         new(PermissionId.SettlementReportsManage, "settlement-reports:manage", InstantPattern.ExtendedIso.Parse("2023-08-15T00:00:00Z").Value, new[]
         {
-            // Temporary disabled to allow testing in preprod environment.
-            // EicFunction.EnergySupplier,
-            // EicFunction.GridAccessProvider,
-            // EicFunction.SystemOperator,
+            EicFunction.EnergySupplier,
+            EicFunction.GridAccessProvider,
+            EicFunction.SystemOperator,
             EicFunction.DataHubAdministrator
         }),
         new(PermissionId.ESettExchangeManage, "esett-exchange:manage", InstantPattern.ExtendedIso.Parse("2023-09-01T00:00:00Z").Value, new[]
