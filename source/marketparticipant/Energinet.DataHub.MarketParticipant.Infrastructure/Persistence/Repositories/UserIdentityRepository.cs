@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
@@ -41,6 +42,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     private readonly IOptions<AzureB2COptions> _options;
     private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
     private readonly IUserPasswordGenerator _passwordGenerator;
+    private readonly ILogger<UserIdentityRepository> _logger;
 
     private readonly string[] _selectors =
     {
@@ -61,12 +63,14 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         GraphServiceClient graphClient,
         IOptions<AzureB2COptions> options,
         IUserIdentityAuthenticationService userIdentityAuthenticationService,
-        IUserPasswordGenerator passwordGenerator)
+        IUserPasswordGenerator passwordGenerator,
+        ILogger<UserIdentityRepository> logger)
     {
         _graphClient = graphClient;
         _options = options;
         _userIdentityAuthenticationService = userIdentityAuthenticationService;
         _passwordGenerator = passwordGenerator;
+        _logger = logger;
     }
 
     public async Task<UserIdentity?> GetAsync(ExternalUserId externalId)
@@ -394,7 +398,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             throw new NotSupportedException($"Found existing user for '{email}', but UserType is incorrect.");
 
         if (user.AccountEnabled == true)
-            throw new NotSupportedException($"Found existing user for '{email}', but account is already enabled.");
+            _logger.LogError($"Found existing user for '{email}', but account is already enabled.");
 
         return user;
     }

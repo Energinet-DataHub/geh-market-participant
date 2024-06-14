@@ -28,6 +28,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
@@ -74,7 +75,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             graphServiceClient,
             azureIdentityConfig,
             userIdentityAuthenticationService,
-            userPasswordGenerator);
+            userPasswordGenerator,
+            new Mock<ILogger<UserIdentityRepository>>().Object);
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
             new SharedUserReferenceId(),
@@ -124,7 +126,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             graphServiceClient,
             azureIdentityConfig,
             userIdentityAuthenticationService,
-            userPasswordGenerator);
+            userPasswordGenerator,
+            new Mock<ILogger<UserIdentityRepository>>().Object);
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
             new SharedUserReferenceId(),
@@ -166,7 +169,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             graphServiceClient,
             azureIdentityConfig,
             userIdentityAuthenticationService,
-            userPasswordGenerator);
+            userPasswordGenerator,
+            new Mock<ILogger<UserIdentityRepository>>().Object);
 
         // Act
         var actual = await target.CreateAsync(userIdentity);
@@ -197,7 +201,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             graphServiceClient,
             azureIdentityConfig,
             userIdentityAuthenticationServiceMock.Object,
-            userPasswordGenerator);
+            userPasswordGenerator,
+            new Mock<ILogger<UserIdentityRepository>>().Object);
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
             new SharedUserReferenceId(),
@@ -232,7 +237,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             graphServiceClient,
             azureIdentityConfig,
             userIdentityAuthenticationService,
-            userPasswordGenerator);
+            userPasswordGenerator,
+            new Mock<ILogger<UserIdentityRepository>>().Object);
 
         var newFirstName = "New First Name";
         var newLastName = "New Last Name";
@@ -273,7 +279,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             graphServiceClient,
             azureIdentityConfig,
             userIdentityAuthenticationService,
-            userPasswordGenerator);
+            userPasswordGenerator,
+            new Mock<ILogger<UserIdentityRepository>>().Object);
 
         var newFirstName = "New First Name";
         var newLastName = "New Last Name";
@@ -322,7 +329,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             graphServiceClient,
             azureIdentityConfig,
             userIdentityAuthenticationService,
-            userPasswordGenerator);
+            userPasswordGenerator,
+            new Mock<ILogger<UserIdentityRepository>>().Object);
 
         // Act
         var externalId = await _graphServiceClientFixture.CreateUserAsync(new RandomlyGeneratedEmailAddress());
@@ -370,7 +378,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             graphServiceClient,
             azureIdentityConfig,
             userIdentityAuthenticationService,
-            userPasswordGenerator);
+            userPasswordGenerator,
+            new Mock<ILogger<UserIdentityRepository>>().Object);
 
         var openIdIdentity = new List<ObjectIdentity>()
         {
@@ -410,7 +419,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             graphServiceClient,
             azureIdentityConfig,
             userIdentityAuthenticationService,
-            userPasswordGenerator);
+            userPasswordGenerator,
+            new Mock<ILogger<UserIdentityRepository>>().Object);
 
         var externalId = await _graphServiceClientFixture.CreateUserAsync(new RandomlyGeneratedEmailAddress());
         await _graphServiceClientFixture
@@ -448,7 +458,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             graphServiceClient,
             azureIdentityConfig,
             userIdentityAuthenticationService,
-            userPasswordGenerator);
+            userPasswordGenerator,
+            new Mock<ILogger<UserIdentityRepository>>().Object);
 
         var userIdentityInfo = new Domain.Model.Users.UserIdentity(
             new SharedUserReferenceId(),
