@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public sealed class User
 {
-    private const int UserInvitationExpiresAtHours = 24;
+    private const int UserInvitationExpiresAtHours = 24 * 7;
     private readonly SharedUserReferenceId? _sharedId;
 
     public User(ActorId administratedBy, SharedUserReferenceId sharedId, ExternalUserId externalId)
