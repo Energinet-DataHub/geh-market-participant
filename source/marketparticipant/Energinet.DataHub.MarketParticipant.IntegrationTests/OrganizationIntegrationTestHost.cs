@@ -16,9 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Configuration;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,13 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests;
 
 public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
 {
-    private readonly Startup _startup;
-
-    private OrganizationIntegrationTestHost()
-    {
-        _startup = new Startup();
-    }
-
     public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
 
     public static Task<OrganizationIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture)
@@ -45,7 +36,7 @@ public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
 
         var host = new OrganizationIntegrationTestHost();
         host.ServiceCollection.AddSingleton(configuration);
-        host._startup.Initialize(configuration, host.ServiceCollection);
+        host.ServiceCollection.AddMarketParticipantOrganizationModule(configuration);
         InitEmailSender(host.ServiceCollection);
 
         return Task.FromResult(host);
@@ -66,21 +57,29 @@ public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
     {
         KeyValuePair<string, string?>[] keyValuePairs =
         {
-            new(Settings.SqlDbConnectionString.Key, dbConnectionString),
-            new(Settings.B2CBackendServicePrincipalNameObjectId.Key, Guid.Empty.ToString()),
-            new(Settings.B2CBackendId.Key, Guid.Empty.ToString()),
-            new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
-            new(Settings.SendGridApiKey.Key, "fake_value"),
-            new(Settings.SenderEmail.Key, "fake_value"),
-            new(Settings.BccEmail.Key, "fake_value"),
-            new(Settings.OrganizationIdentityUpdateNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
-            new(Settings.BalanceResponsiblePartiesChangedNotificationToEmail.Key, "fake_value@fake_value_test.dk"),
-            new(Settings.UserInviteFlow.Key, "fake_value"),
-            new(Settings.EnvironmentDescription.Key, "fake_value"),
-            new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
-            new(Settings.ServiceBusTopicName.Key, "fake_value"),
-            new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.ConnectionString)}", "fake_value"),
-            new($"{nameof(ConsumeServiceBusSettings)}:{nameof(ConsumeServiceBusSettings.SharedIntegrationEventTopic)}", "fake_value"),
+            new("Database:ConnectionString", dbConnectionString),
+
+            new("AzureB2c:Tenant", "fake_value"),
+            new("AzureB2c:SpnId", Guid.Empty.ToString()),
+            new("AzureB2c:SpnSecret", Guid.NewGuid().ToString()),
+            new("AzureB2c:BackendObjectId", Guid.Empty.ToString()),
+            new("AzureB2c:BackendSpnObjectId", Guid.Empty.ToString()),
+            new("AzureB2c:BackendId", Guid.Empty.ToString()),
+
+            new("SendGrid:ApiKey", "fake_value"),
+            new("SendGrid:SenderEmail", "fake_value"),
+            new("SendGrid:BccEmail", "fake_value"),
+
+            new("UserInvite.InviteFlowUrl", "https://fake_value"),
+
+            new("Environment:Description", "fake_value"),
+
+            new("CvrUpdate:NotificationToEmail", "fake_value@fake_value_test.dk"),
+            new("BalanceResponsibleChanged:NotificationToEmail", "fake_value@fake_value_test.dk"),
+            new("ServiceBus:SharedIntegrationEventTopic", "fake_value"),
+            new("ServiceBus:IntegrationEventSubscription", "fake_value"),
+            new("ServiceBus:ConsumerConnectionString", "fake_value"),
+            new("ServiceBus:ProducerConnectionString", "fake_value"),
         };
 
         return new ConfigurationBuilder()

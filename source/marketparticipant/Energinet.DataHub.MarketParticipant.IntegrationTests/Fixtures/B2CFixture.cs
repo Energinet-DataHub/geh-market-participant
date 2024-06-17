@@ -16,8 +16,10 @@ using System.Threading.Tasks;
 using Azure.Identity;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Xunit;
 
@@ -32,7 +34,7 @@ public sealed class B2CFixture : IAsyncLifetime
 
     public Task InitializeAsync()
     {
-        var integrationTestConfig = new IntegrationTestConfiguration();
+        var integrationTestConfig = new IntegrationTestConfiguration(AzureCredentialsProvider.Credentials);
 
         // Graph Service Client
         var clientSecretCredential = new ClientSecretCredential(
@@ -48,9 +50,11 @@ public sealed class B2CFixture : IAsyncLifetime
             });
 
         // Azure AD Config
-        var config = new AzureAdConfig(
-            integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
-            integrationTestConfig.B2CSettings.BackendAppId);
+        var config = new OptionsWrapper<AzureB2COptions>(new AzureB2COptions
+        {
+            BackendSpnObjectId = integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
+            BackendId = integrationTestConfig.B2CSettings.BackendAppId,
+        });
 
         // Active Directory Roles
         var activeDirectoryB2CRoles =

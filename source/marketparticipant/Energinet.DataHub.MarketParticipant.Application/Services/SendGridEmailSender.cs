@@ -15,9 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Options;
 using Energinet.DataHub.MarketParticipant.Application.Services.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
@@ -26,18 +28,24 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 public sealed class SendGridEmailSender : IEmailSender
 {
-    private readonly EmailRecipientConfig _config;
+    private readonly IOptions<SendGridOptions> _sendGridOptions;
+    private readonly IOptions<UserInviteOptions> _userInviteOptions;
+    private readonly IOptions<EnvironmentOptions> _environmentOptions;
     private readonly ILogger<SendGridEmailSender> _logger;
     private readonly ISendGridClient _client;
     private readonly IEmailContentGenerator _emailContentGenerator;
 
     public SendGridEmailSender(
-        EmailRecipientConfig config,
+        IOptions<SendGridOptions> sendGridOptions,
+        IOptions<UserInviteOptions> userInviteOptions,
+        IOptions<EnvironmentOptions> environmentOptions,
         ISendGridClient sendGridClient,
         IEmailContentGenerator emailContentGenerator,
         ILogger<SendGridEmailSender> logger)
     {
-        _config = config;
+        _sendGridOptions = sendGridOptions;
+        _userInviteOptions = userInviteOptions;
+        _environmentOptions = environmentOptions;
         _logger = logger;
         _client = sendGridClient;
         _emailContentGenerator = emailContentGenerator;
@@ -53,7 +61,7 @@ public sealed class SendGridEmailSender : IEmailSender
             .ConfigureAwait(false);
 
         return await SendAsync(
-                new SendGrid.Helpers.Mail.EmailAddress(_config.SenderEmail),
+                new SendGrid.Helpers.Mail.EmailAddress(_sendGridOptions.Value.SenderEmail),
                 new SendGrid.Helpers.Mail.EmailAddress(emailAddress.Address),
                 generatedEmail.Subject,
                 generatedEmail.HtmlContent)
@@ -65,17 +73,17 @@ public sealed class SendGridEmailSender : IEmailSender
         var environmentShort = string.Empty;
         var environmentLong = string.Empty;
 
-        if (_config.EnvironmentDescription != null)
+        if (_environmentOptions.Value.Description != null)
         {
-            environmentShort = $"({_config.EnvironmentDescription})";
-            environmentLong = $"(Miljø: {_config.EnvironmentDescription})";
+            environmentShort = $"({_environmentOptions.Value.Description})";
+            environmentLong = $"(Miljø: {_environmentOptions.Value.Description})";
         }
 
         return new Dictionary<string, string>
         {
             { "environment_short", environmentShort },
             { "environment_long", environmentLong },
-            { "invite_link", _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge" },
+            { "invite_link", _userInviteOptions.Value.InviteFlowUrl + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge" },
         };
     }
 
@@ -86,7 +94,7 @@ public sealed class SendGridEmailSender : IEmailSender
         string htmlContent)
     {
         var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
-        msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.BccEmail));
+        msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_sendGridOptions.Value.BccEmail));
 
         var response = await _client.SendEmailAsync(msg).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)

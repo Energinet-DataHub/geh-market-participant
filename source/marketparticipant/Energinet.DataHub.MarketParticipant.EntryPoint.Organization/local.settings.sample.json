@@ -11,14 +11,25 @@
     "SENDER_EMAIL": "from email for user invites",
     "BCC_EMAIL": "bcc email for user invites",
     "ENVIRONMENT_DESC": "The environment description",
-    "CVR_BASE_ADDRESS": "CVR lookup base address",
-    "CVR_USERNAME": "CVR lookup username",
-    "CVR_PASSWORD": "CVR lookup password",
+    "CvrRegister:BaseAddress": "CVR lookup base address",
+    "CvrRegister:Username": "CVR lookup username",
+    "CvrRegister:Password": "CVR lookup password",
     "CVR_ORG_UPDATED_NOTIFICATION_TO_EMAIL": "CVR update notification to email",
     "BALANCE_RESPONSIBLE_CHANGED_NOTIFICATION_TO_EMAIL": "Balance responsible changed notification to email",
 
+    "AzureB2c:Tenant": "The tenant id of the current tenant, e.g. devDataHubB2C.onmicrosoft.com",
+    "AzureB2c:SpnId": "The client id of the 'sp-b2c-<environment>' service principal with management permissions.",
+    "AzureB2c:SpnSecret": "The client secret of the 'sp-b2c-<environment>' service principal with management permissions.",
+    "AzureB2c:BackendObjectId": "The object id of the 'backend-b2b-app' application registration.",
+    "AzureB2c:BackendSpnObjectId": "The object id of the 'backend-b2b-app' service principal (the enterprise application for the application registration).",
+    "AzureB2c:BackendId": "The client id of the 'backend-b2b-app' application registration.",
+    
     "ConsumeServiceBusSettings:ConnectionString": "",
     "ConsumeServiceBusSettings:SharedIntegrationEventTopic": "",
-    "ConsumeServiceBusSettings:IntegrationEventSubscription": ""
+    "ConsumeServiceBusSettings:IntegrationEventSubscription": "",
+    
+    "Database:ConnectionString": "",
+    
+    "UserInvite:InviteFlowUrl": ""
   }
 }

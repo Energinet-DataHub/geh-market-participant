@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Common.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 
@@ -35,13 +35,13 @@ public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFacto
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.UseSetting(Settings.SqlDbConnectionString.Key, _marketParticipantDatabaseFixture.DatabaseManager.ConnectionString);
-        builder.UseSetting(Settings.MitIdExternalOpenIdUrl.Key, "fake_value");
-        builder.UseSetting(Settings.ExternalOpenIdUrl.Key, "fake_value");
-        builder.UseSetting(Settings.InternalOpenIdUrl.Key, "fake_value");
-        builder.UseSetting(Settings.BackendBffAppId.Key, TestBackendAppId);
-        builder.UseSetting(Settings.TokenKeyVault.Key, "fake_value");
-        builder.UseSetting(Settings.TokenKeyName.Key, "fake_value");
-        builder.UseSetting(Settings.CertificateKeyVault.Key, "fake_value");
+        builder.UseSetting("Database:ConnectionString", _marketParticipantDatabaseFixture.DatabaseManager.ConnectionString);
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.MitIdExternalMetadataAddress)}", "fake_value");
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.ExternalMetadataAddress)}", "fake_value");
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.InternalMetadataAddress)}", "fake_value");
+        builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.BackendBffAppId)}", TestBackendAppId);
+        builder.UseSetting("KeyVault:TokenSignKeyVault", "https://fake_value");
+        builder.UseSetting("KeyVault:TokenSignKeyName", "fake_value");
+        builder.UseSetting("KeyVault:CertificatesKeyVault", "https://fake_value");
     }
 }

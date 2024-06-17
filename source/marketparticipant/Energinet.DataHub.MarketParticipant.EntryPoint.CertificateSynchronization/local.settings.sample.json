@@ -4,11 +4,10 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
 
-    "CERTIFICATES_KEY_VAULT": "The key vault containing the certificates.",
-
-    "APIM_TENANT_ID": "The id of the tenant hosting APIM.",
-    "APIM_SP_CLIENT_ID": "The client id of the service principal that can manage APIM.",
-    "APIM_SP_CLIENT_SECRET": "The client secret of the service principal that can manage APIM.",
-    "APIM_SERVICE_NAME": "The APIM service instance name: /subscriptions/<...>/resourceGroups/<...>/providers/Microsoft.ApiManagement/service/<...>"
+    "CertificateSynchronization:CertificatesKeyVault": "The key vault containing the certificates.",
+    "CertificateSynchronization:ApimServiceName": "The APIM service instance name: /subscriptions/<...>/resourceGroups/<...>/providers/Microsoft.ApiManagement/service/<...>",
+    "CertificateSynchronization:ApimTenantId": "The id of the tenant hosting APIM.",
+    "CertificateSynchronization:ApimSpClientId": "The client id of the service principal that can manage APIM.",
+    "CertificateSynchronization:ApimSpClientSecret": "The client secret of the service principal that can manage APIM."
   }
 }

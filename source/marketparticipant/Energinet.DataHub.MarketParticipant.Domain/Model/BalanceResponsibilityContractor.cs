@@ -18,16 +18,16 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed class BalanceResponsibilityContractor
 {
-    private readonly List<BalanceResponsibilityAgreement> _agreements = [];
+    private readonly List<BalanceResponsibilityRelation> _relations = [];
 
     public BalanceResponsibilityContractor(
         ActorId balanceResponsibleParty,
-        IEnumerable<BalanceResponsibilityAgreement> agreements)
+        IEnumerable<BalanceResponsibilityRelation> relations)
     {
         BalanceResponsibleParty = balanceResponsibleParty;
-        _agreements.AddRange(agreements);
+        _relations.AddRange(relations);
     }
 
     public ActorId BalanceResponsibleParty { get; }
-    public IReadOnlyCollection<BalanceResponsibilityAgreement> Agreements => _agreements;
+    public IReadOnlyCollection<BalanceResponsibilityRelation> Relations => _relations;
 }

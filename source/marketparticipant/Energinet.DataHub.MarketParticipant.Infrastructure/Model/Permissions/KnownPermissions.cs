@@ -85,8 +85,7 @@ public static class KnownPermissions
         {
             EicFunction.EnergySupplier,
             EicFunction.GridAccessProvider,
-            EicFunction.MeteredDataResponsible,
-            EicFunction.BalanceResponsibleParty,
+            EicFunction.SystemOperator,
             EicFunction.DataHubAdministrator
         }),
         new(PermissionId.ESettExchangeManage, "esett-exchange:manage", InstantPattern.ExtendedIso.Parse("2023-09-01T00:00:00Z").Value, new[]
@@ -154,6 +153,12 @@ public static class KnownPermissions
             EicFunction.DataHubAdministrator,
             EicFunction.EnergySupplier,
             EicFunction.BalanceResponsibleParty
+        }),
+        new(PermissionId.RequestWholesaleSettlement, "request-wholesale-settlement:view", InstantPattern.ExtendedIso.Parse("2024-05-16T00:00:00Z").Value, new[]
+        {
+            EicFunction.EnergySupplier,
+            EicFunction.SystemOperator,
+            EicFunction.GridAccessProvider,
         }),
     };
 }

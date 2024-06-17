@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
@@ -31,7 +29,7 @@ internal static class InfrastructureRegistration
         services.AddScoped<IUserIdentityAuthenticationService>(sp =>
         {
             var configuration = sp.GetRequiredService<IConfiguration>();
-            var enforce2Fa = configuration.GetOptionalSetting(Settings.Enforce2Fa);
+            var enforce2Fa = configuration.GetValue("ENFORCE_2FA", defaultValue: true);
 
             var graphServiceClient = sp.GetRequiredService<GraphServiceClient>();
             return new UserIdentityAuthenticationService(graphServiceClient, enforce2Fa);

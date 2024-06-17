@@ -18,10 +18,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 public sealed class GraphServiceClientFixture : IAsyncLifetime
 #pragma warning restore CA1001
 {
-    private readonly IntegrationTestConfiguration _integrationTestConfiguration = new();
+    private readonly IntegrationTestConfiguration _integrationTestConfiguration = new(AzureCredentialsProvider.Credentials);
     private readonly List<ExternalUserId> _createdUsers = new();
     private GraphServiceClient? _graphClient;
 
@@ -54,9 +54,12 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                 "https://graph.microsoft.com/.default"
             });
 
-        Environment.SetEnvironmentVariable(Settings.B2CTenant.Key, _integrationTestConfiguration.B2CSettings.Tenant);
-        Environment.SetEnvironmentVariable(Settings.B2CServicePrincipalId.Key, _integrationTestConfiguration.B2CSettings.ServicePrincipalId);
-        Environment.SetEnvironmentVariable(Settings.B2CServicePrincipalSecret.Key, _integrationTestConfiguration.B2CSettings.ServicePrincipalSecret);
+        Environment.SetEnvironmentVariable("AzureB2c:Tenant", _integrationTestConfiguration.B2CSettings.Tenant);
+        Environment.SetEnvironmentVariable("AzureB2c:SpnId", _integrationTestConfiguration.B2CSettings.ServicePrincipalId);
+        Environment.SetEnvironmentVariable("AzureB2c:SpnSecret", _integrationTestConfiguration.B2CSettings.ServicePrincipalSecret);
+        Environment.SetEnvironmentVariable("AzureB2c:BackendObjectId", "fake_value");
+        Environment.SetEnvironmentVariable("AzureB2c:BackendSpnObjectId", "fake_value");
+        Environment.SetEnvironmentVariable("AzureB2c:BackendId", "fake_value");
 
         return Task.CompletedTask;
     }

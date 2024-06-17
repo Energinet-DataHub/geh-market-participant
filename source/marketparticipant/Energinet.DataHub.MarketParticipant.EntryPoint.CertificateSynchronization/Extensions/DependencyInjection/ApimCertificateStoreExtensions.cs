@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Net.Http;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Monitor;
+using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Options;
 using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Extensions.DependencyInjection;
 
@@ -29,34 +30,32 @@ internal static class ApimCertificateStoreExtensions
 {
     public static IServiceCollection AddCertificateStore(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddOptions();
+        services.AddOptions<CertificateSynchronizationOptions>().BindConfiguration(CertificateSynchronizationOptions.SectionName).ValidateDataAnnotations();
+
         // register certificate store
         services.AddScoped<IKeyVaultCertificates, KeyVaultCertificates>();
         services.AddSingleton<IApimCertificateStore>(serviceProvider =>
         {
-            var apimTenantId = configuration.GetValue<string>("APIM_TENANT_ID");
-            var apimServicePrincipalClientId = configuration.GetValue<string>("APIM_SP_CLIENT_ID");
-            var apimServicePrincipalClientSecret = configuration.GetValue<string>("APIM_SP_CLIENT_SECRET");
-
-            var certificatesKeyVault = configuration.GetValue<Uri>("CERTIFICATES_KEY_VAULT");
-            ArgumentNullException.ThrowIfNull(certificatesKeyVault);
+            var options = serviceProvider.GetRequiredService<IOptions<CertificateSynchronizationOptions>>();
 
             var apimCredentials = new ClientSecretCredential(
-                apimTenantId,
-                apimServicePrincipalClientId,
-                apimServicePrincipalClientSecret);
+                options.Value.ApimTenantId,
+                options.Value.ApimSpClientId,
+                options.Value.ApimSpClientSecret);
 
             return new ApimCertificateStore(
-                certificatesKeyVault,
+                options.Value.CertificatesKeyVault,
                 apimCredentials,
                 serviceProvider.GetRequiredService<IHttpClientFactory>());
         });
 
         // register secret client
-        services.AddSingleton(_ =>
+        services.AddSingleton(serviceProvider =>
         {
-            var certificatesKeyVault = configuration.GetValue<Uri>("CERTIFICATES_KEY_VAULT");
+            var options = serviceProvider.GetRequiredService<IOptions<CertificateSynchronizationOptions>>();
             var defaultCredentials = new DefaultAzureCredential();
-            return new SecretClient(certificatesKeyVault, defaultCredentials);
+            return new SecretClient(options.Value.CertificatesKeyVault, defaultCredentials);
         });
 
         // specific health checks

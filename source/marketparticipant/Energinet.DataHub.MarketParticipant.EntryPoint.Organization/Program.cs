@@ -12,28 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
-using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
+using Energinet.DataHub.Core.Logging.LoggingMiddleware;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions.DependencyInjection;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
-
-public static class Program
-{
-    public static async Task Main()
+var host = new HostBuilder()
+    .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
+    .ConfigureServices((context, services) =>
     {
-        var startup = new Startup();
+        services.AddApplicationInsightsForIsolatedWorker("mark-part");
+        services.AddHealthChecksForIsolatedWorker();
+        services.AddScoped<HealthCheckEndpoint>();
 
-        var host = new HostBuilder()
-            .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
-            .ConfigureServices((context, services) =>
-            {
-                startup.Initialize(context.Configuration, services);
-                services.AddApplicationInsights();
-            })
-            .Build();
+        services.AddFunctionLoggingScope("mark-part");
 
-        await host.RunAsync().ConfigureAwait(false);
-    }
-}
+        services.AddMarketParticipantOrganizationModule(context.Configuration);
+    })
+    .ConfigureLogging((hostingContext, logging) =>
+    {
+        logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
+        logging.AddApplicationInsights();
+        logging.SetApplicationInsightLogLevel();
+    })
+    .Build();
+
+host.Run();

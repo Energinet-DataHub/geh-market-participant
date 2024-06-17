@@ -16,14 +16,7 @@ using System.Threading.Tasks;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 
-/// <summary>
-/// Validates external token
-/// </summary>
 public interface IExternalTokenValidator
 {
-    /// <summary>
-    /// Validates external token
-    /// </summary>
-    /// <param name="token"></param>
     Task<bool> ValidateTokenAsync(string token);
 }

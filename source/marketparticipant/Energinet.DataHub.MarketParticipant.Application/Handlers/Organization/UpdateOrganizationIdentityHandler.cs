@@ -18,11 +18,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
+using Energinet.DataHub.MarketParticipant.Application.Options;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 
@@ -33,20 +35,20 @@ public class UpdateOrganizationIdentityHandler : IRequestHandler<UpdateOrganisat
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IOrganizationIdentityRepository _organizationIdentityRepository;
     private readonly IEmailEventRepository _emailEventRepository;
-    private readonly EmailRecipientConfig _emailRecipientConfig;
+    private readonly IOptions<CvrUpdateOptions> _cvrUpdateOptions;
     private readonly ILogger<UpdateOrganizationIdentityHandler> _logger;
 
     public UpdateOrganizationIdentityHandler(
         IOrganizationRepository organizationRepository,
         IOrganizationIdentityRepository organizationIdentityRepository,
         IEmailEventRepository emailEventRepository,
-        EmailRecipientConfig emailRecipientConfig,
+        IOptions<CvrUpdateOptions> cvrUpdateOptions,
         ILogger<UpdateOrganizationIdentityHandler> logger)
     {
         _organizationRepository = organizationRepository;
         _organizationIdentityRepository = organizationIdentityRepository;
         _emailEventRepository = emailEventRepository;
-        _emailRecipientConfig = emailRecipientConfig;
+        _cvrUpdateOptions = cvrUpdateOptions;
         _logger = logger;
     }
 
@@ -93,7 +95,7 @@ public class UpdateOrganizationIdentityHandler : IRequestHandler<UpdateOrganisat
     {
         return _emailEventRepository.InsertAsync(
             new EmailEvent(
-                new EmailAddress(_emailRecipientConfig.OrgUpdateNotificationToEmail),
+                new EmailAddress(_cvrUpdateOptions.Value.NotificationToEmail),
                 new OrganizationIdentityChangedEmailTemplate(updatedOrganization, oldOrganizationName)));
     }
 }

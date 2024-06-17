@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Energinet.DataHub.Core.FunctionApp.TestCommon;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 
@@ -31,7 +32,7 @@ public sealed class KeyClientFixture : IAsyncLifetime
     public Task InitializeAsync()
     {
         var keyVaultUri = GetKeyVaultUri();
-        KeyClient = new KeyClient(keyVaultUri, new DefaultAzureCredential());
+        KeyClient = new KeyClient(keyVaultUri, AzureCredentialsProvider.Credentials);
 
         var rsaKeyOptions = CreateTestKeyOptions();
         return KeyClient.CreateRsaKeyAsync(rsaKeyOptions);
