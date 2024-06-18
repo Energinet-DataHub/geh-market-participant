@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Users;
 
@@ -34,17 +35,20 @@ public sealed class GetUserPermissionsHandler
     private readonly IUserQueryRepository _userQueryRepository;
     private readonly IUserIdentityOpenIdLinkService _userIdentityOpenIdLinkService;
     private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
+    private readonly ILogger<GetUserPermissionsHandler> _logger;
 
     public GetUserPermissionsHandler(
         IUserRepository userRepository,
         IUserQueryRepository userQueryRepository,
         IUserIdentityOpenIdLinkService userIdentityOpenIdLinkService,
-        IUserIdentityAuthenticationService userIdentityAuthenticationService)
+        IUserIdentityAuthenticationService userIdentityAuthenticationService,
+        ILogger<GetUserPermissionsHandler> logger)
     {
         _userRepository = userRepository;
         _userQueryRepository = userQueryRepository;
         _userIdentityOpenIdLinkService = userIdentityOpenIdLinkService;
         _userIdentityAuthenticationService = userIdentityAuthenticationService;
+        _logger = logger;
     }
 
     public async Task<GetUserPermissionsResponse> Handle(
@@ -88,11 +92,21 @@ public sealed class GetUserPermissionsHandler
             throw new UnauthorizedAccessException("User invitation has expired");
         }
 
-        if (user.InvitationExpiresAt.HasValue &&
-            await _userIdentityAuthenticationService.HasTwoFactorAuthenticationAsync(user.ExternalId).ConfigureAwait(false))
+        if (user.InvitationExpiresAt.HasValue)
         {
-            user.DeactivateUserExpiration();
-            await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
+            var has2Fa = await _userIdentityAuthenticationService
+                .HasTwoFactorAuthenticationAsync(user.ExternalId)
+                .ConfigureAwait(false);
+
+            if (has2Fa)
+            {
+                user.DeactivateUserExpiration();
+                await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
+            }
+            else
+            {
+                _logger.LogError("User {UserId} was logged in, but has not enabled 2FA. There may be a race condition?", user.Id.Value);
+            }
         }
     }
 }
