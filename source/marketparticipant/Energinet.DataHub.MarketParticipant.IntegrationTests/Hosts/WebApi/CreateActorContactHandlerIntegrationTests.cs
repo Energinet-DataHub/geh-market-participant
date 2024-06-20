@@ -51,4 +51,27 @@ public sealed class CreateActorContactHandlerIntegrationTests(MarketParticipantD
         Assert.NotNull(response);
         Assert.NotEqual(Guid.Empty, response.ContactId);
     }
+
+    [Fact]
+    public async Task CreateActorContact_LongPhoneNumber_IsAccepted()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(fixture);
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        var actor = await fixture.PrepareActiveActorAsync();
+
+        var createActorContactDto = new CreateActorContactDto(
+            "test",
+            ContactCategory.Default,
+            new RandomlyGeneratedEmailAddress().ToString(),
+            "010 1 718 222 2222");
+
+        var createCommand = new CreateActorContactCommand(actor.Id, createActorContactDto);
+
+        // Act + Assert
+        var response = await mediator.Send(createCommand);
+        Assert.NotNull(response);
+        Assert.NotEqual(Guid.Empty, response.ContactId);
+    }
 }

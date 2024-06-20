@@ -44,7 +44,7 @@ public sealed class CreateActorContactCommandRuleSet : AbstractValidator<CreateA
 
                 validator
                     .RuleFor(contact => contact.Phone)
-                    .Length(1, 15)
+                    .Length(1, 30)
                     .When(contact => contact.Phone != null);
             });
     }
