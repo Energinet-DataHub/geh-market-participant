@@ -222,18 +222,8 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         ArgumentNullException.ThrowIfNull(userIdentity);
 
-        var authenticationId = await FindAuthenticationMethodIdAsync(userIdentity.Id).ConfigureAwait(false);
-
-        await _graphClient
-            .Users[userIdentity.Id.Value.ToString()]
-            .PatchAsync(new User
-            {
-                GivenName = userIdentity.FirstName,
-                Surname = userIdentity.LastName,
-                MobilePhone = userIdentity.PhoneNumber?.Number
-            }).ConfigureAwait(false);
-
-        if (!string.IsNullOrWhiteSpace(authenticationId))
+        // The Authentication model is more strict regarding phone number validation, so we update that one first.
+        if (await FindAuthenticationMethodIdAsync(userIdentity.Id).ConfigureAwait(false) is { } authenticationId && !string.IsNullOrWhiteSpace(authenticationId))
         {
             await _graphClient
                 .Users[userIdentity.Id.Value.ToString()]
@@ -241,9 +231,18 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 .PhoneMethods[authenticationId]
                 .PatchAsync(new PhoneAuthenticationMethod
                 {
-                    PhoneNumber = userIdentity.PhoneNumber!.Number
+                    PhoneNumber = userIdentity.PhoneNumber!.Number,
                 }).ConfigureAwait(false);
         }
+
+        await _graphClient
+            .Users[userIdentity.Id.Value.ToString()]
+            .PatchAsync(new User
+            {
+                GivenName = userIdentity.FirstName,
+                Surname = userIdentity.LastName,
+                MobilePhone = userIdentity.PhoneNumber?.Number,
+            }).ConfigureAwait(false);
     }
 
     public Task AssignUserLoginIdentitiesAsync(UserIdentity userIdentity)
