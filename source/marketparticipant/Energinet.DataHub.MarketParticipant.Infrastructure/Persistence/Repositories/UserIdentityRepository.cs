@@ -14,8 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -93,7 +95,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
             // TODO: Check issuer is pp nets
             var userWithOpenIdConnect = user is { UserType: "Member", Identities: { } } &&
-                                       user.Identities.Any(ident => ident.SignInType == "federated");
+                                        user.Identities.Any(ident => ident.SignInType == "federated");
 
             var userEmail = user.OtherMails?.FirstOrDefault();
 
@@ -222,27 +224,34 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         ArgumentNullException.ThrowIfNull(userIdentity);
 
-        // The Authentication model is more strict regarding phone number validation, so we update that one first.
-        if (await FindAuthenticationMethodIdAsync(userIdentity.Id).ConfigureAwait(false) is { } authenticationId && !string.IsNullOrWhiteSpace(authenticationId))
+        try
         {
+            // The Authentication model is more strict regarding phone number validation, so we update that one first.
+            if (await FindAuthenticationMethodIdAsync(userIdentity.Id).ConfigureAwait(false) is { } authenticationId && !string.IsNullOrWhiteSpace(authenticationId))
+            {
+                await _graphClient
+                    .Users[userIdentity.Id.Value.ToString()]
+                    .Authentication
+                    .PhoneMethods[authenticationId]
+                    .PatchAsync(new PhoneAuthenticationMethod
+                    {
+                        PhoneNumber = userIdentity.PhoneNumber!.Number,
+                    }).ConfigureAwait(false);
+            }
+
             await _graphClient
                 .Users[userIdentity.Id.Value.ToString()]
-                .Authentication
-                .PhoneMethods[authenticationId]
-                .PatchAsync(new PhoneAuthenticationMethod
+                .PatchAsync(new User
                 {
-                    PhoneNumber = userIdentity.PhoneNumber!.Number,
+                    GivenName = userIdentity.FirstName,
+                    Surname = userIdentity.LastName,
+                    MobilePhone = userIdentity.PhoneNumber?.Number,
                 }).ConfigureAwait(false);
         }
-
-        await _graphClient
-            .Users[userIdentity.Id.Value.ToString()]
-            .PatchAsync(new User
-            {
-                GivenName = userIdentity.FirstName,
-                Surname = userIdentity.LastName,
-                MobilePhone = userIdentity.PhoneNumber?.Number,
-            }).ConfigureAwait(false);
+        catch (ODataError e) when (e.Error?.Code == "invalidPhoneNumber")
+        {
+            throw new ValidationException("Phone number cannot be used with 2FA").WithErrorCode("user.idp.phone_number.invalid");
+        }
     }
 
     public Task AssignUserLoginIdentitiesAsync(UserIdentity userIdentity)
