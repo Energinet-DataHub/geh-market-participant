@@ -250,7 +250,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         }
         catch (ODataError e) when (e.Error?.Code == "invalidPhoneNumber")
         {
-            throw new ValidationException("Phone number cannot be used with 2FA").WithErrorCode("user.idp.phone_number.invalid");
+            throw new ValidationException("Phone number cannot be used with 2FA").WithErrorCode("user.authentication.invalid_phone");
         }
     }
 
