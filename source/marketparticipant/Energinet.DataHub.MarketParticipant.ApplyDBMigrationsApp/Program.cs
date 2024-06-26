@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
@@ -22,6 +24,8 @@ public static class Program
 {
     public static async Task<int> Main(string[] args)
     {
+        var measureTime = Stopwatch.StartNew();
+
         var connectionString = ConnectionStringFactory.GetConnectionString(args);
         var filter = EnvironmentFilter.GetFilter(args);
         var isDryRun = args.Contains("dryRun");
@@ -30,6 +34,10 @@ public static class Program
 
         var result = upgradeEngine.PerformUpgrade();
 
-        return ResultReporter.ReportResult(result);
+        var returnValue = ResultReporter.ReportResult(result);
+
+        Console.WriteLine($"Total run time: {measureTime.Elapsed.TotalSeconds} seconds.");
+
+        return returnValue;
     }
 }

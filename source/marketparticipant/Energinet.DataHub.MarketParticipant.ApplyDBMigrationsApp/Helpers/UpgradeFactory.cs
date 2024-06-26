@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
 using DbUp;
@@ -57,9 +58,10 @@ public static class UpgradeFactory
             ++tryCount;
             try
             {
+                var measure = Stopwatch.StartNew();
                 Console.WriteLine("Ensuring DB exists...");
                 EnsureDatabase.For.SqlDatabase(connectionString);
-                Console.WriteLine("DB was found to be existing.");
+                Console.WriteLine($"DB was found to be existing. Took {measure.Elapsed.TotalSeconds} seconds.");
                 return;
             }
             catch (SqlException)
