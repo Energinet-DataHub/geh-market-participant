@@ -54,6 +54,6 @@ public sealed class GetUserHandler : IRequestHandler<GetUserCommand, GetUserResp
         var externalIdentity = externalIdentities.SingleOrDefault();
         NotFoundValidationException.ThrowIfNull(externalIdentity, user.Id.Value, $"No external identity found for id {user.Id}.");
 
-        return new GetUserResponse(externalIdentity.FullName);
+        return new GetUserResponse(user.Id.Value, externalIdentity.FullName, externalIdentity.Email.Address, externalIdentity.PhoneNumber?.Number);
     }
 }
