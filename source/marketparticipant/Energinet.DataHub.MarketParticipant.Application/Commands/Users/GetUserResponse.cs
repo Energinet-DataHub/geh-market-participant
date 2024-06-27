@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 
-public sealed record GetUserResponse(string Name);
+public sealed record GetUserResponse(Guid Id, string Name, string Email, string? PhoneNumber);
