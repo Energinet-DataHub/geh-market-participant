@@ -13,7 +13,15 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 
-public sealed record GetUserResponse(Guid Id, string Name, string Email, string? PhoneNumber);
+public sealed record GetUserResponse(
+    Guid Id,
+    string Name, UserStatus Status,
+    string FirstName,
+    string LastName,
+    string Email,
+    string? PhoneNumber,
+    DateTimeOffset CreatedDate);

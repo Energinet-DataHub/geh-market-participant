@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Users;
@@ -28,13 +29,16 @@ public sealed class GetUserHandler : IRequestHandler<GetUserCommand, GetUserResp
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
+    private readonly IUserStatusCalculator _userStatusCalculator;
 
     public GetUserHandler(
         IUserRepository userRepository,
-        IUserIdentityRepository userIdentityRepository)
+        IUserIdentityRepository userIdentityRepository,
+        IUserStatusCalculator userStatusCalculator)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
+        _userStatusCalculator = userStatusCalculator;
     }
 
     public async Task<GetUserResponse> Handle(GetUserCommand request, CancellationToken cancellationToken)
@@ -54,6 +58,14 @@ public sealed class GetUserHandler : IRequestHandler<GetUserCommand, GetUserResp
         var externalIdentity = externalIdentities.SingleOrDefault();
         NotFoundValidationException.ThrowIfNull(externalIdentity, user.Id.Value, $"No external identity found for id {user.Id}.");
 
-        return new GetUserResponse(user.Id.Value, externalIdentity.FullName, externalIdentity.Email.Address, externalIdentity.PhoneNumber?.Number);
+        return new GetUserResponse(
+            user.Id.Value,
+            externalIdentity.FullName,
+            _userStatusCalculator.CalculateUserStatus(externalIdentity.Status, user.InvitationExpiresAt),
+            externalIdentity.FirstName,
+            externalIdentity.LastName,
+            externalIdentity.Email.Address,
+            externalIdentity.PhoneNumber?.Number,
+            externalIdentity.CreatedDate);
     }
 }
