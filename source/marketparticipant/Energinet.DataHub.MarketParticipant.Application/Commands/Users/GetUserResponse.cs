@@ -19,7 +19,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 
 public sealed record GetUserResponse(
     Guid Id,
-    string Name, UserStatus Status,
+    string Name,
+    UserStatus Status,
     string FirstName,
     string LastName,
     string Email,
