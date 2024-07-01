@@ -70,6 +70,19 @@ public sealed class UserRoleController : ControllerBase
         return Ok(response.Role);
     }
 
+    [HttpGet("assignedtopermission")]
+    [AuthorizeUser(PermissionId.UsersManage)]
+    public async Task<ActionResult<IEnumerable<UserRoleDto>>> AssignedToPermissionAsync(int permissionId)
+    {
+        var command = new GetUserRolesToPermissionCommand(permissionId);
+
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok(response.UserRoles);
+    }
+
     [HttpPost]
     [AuthorizeUser(PermissionId.UserRolesManage)]
     public async Task<ActionResult<Guid>> CreateAsync(CreateUserRoleDto userRole)
@@ -121,19 +134,6 @@ public sealed class UserRoleController : ControllerBase
             .ConfigureAwait(false);
 
         return Ok(response.Permissions);
-    }
-
-    [HttpGet("assignedtopermission")]
-    [AuthorizeUser(PermissionId.UserRolesManage)]
-    public async Task<ActionResult<IEnumerable<UserRoleDto>>> AssignedToPermissionAsync(int permissionId)
-    {
-        var command = new GetUserRolesToPermissionCommand(permissionId);
-
-        var response = await _mediator
-            .Send(command)
-            .ConfigureAwait(false);
-
-        return Ok(response.UserRoles);
     }
 
     [HttpPut("{userRoleId:guid}/deactivate")]
