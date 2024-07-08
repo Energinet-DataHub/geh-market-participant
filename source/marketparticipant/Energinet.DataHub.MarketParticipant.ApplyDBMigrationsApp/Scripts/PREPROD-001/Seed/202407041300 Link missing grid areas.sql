@@ -35,7 +35,7 @@ BEGIN
     VALUES (NEWID(), @MarketRoleId, @GridAreaId)
 
     INSERT INTO [dbo].[DomainEvent] ([EntityId], [EntityType], [IsSent], [Timestamp], [Event], [EventTypeName])
-    VALUES (@ActorId, 'Actor', 0, GETDATE(), '{"actorNumber":{"$type":"gln","type":1,"value":"' + @ActorNumber + '"},"actorRole":14,"gridAreaId":{"value":"' + CONVERT(NVARCHAR(36), @GridAreaId) + '"},"validFrom":"2021-01-01T23:00:00Z","eventId":"' + CONVERT(NVARCHAR(36), NEWID()) + '"}', 'GridAreaOwnershipAssigned')
+    VALUES (@ActorId, 'Actor', 0, GETUTCDATE(), '{"actorNumber":{"$type":"gln","type":1,"value":"' + @ActorNumber + '"},"actorRole":14,"gridAreaId":{"value":"' + CONVERT(NVARCHAR(36), @GridAreaId) + '"},"validFrom":"2021-01-01T23:00:00Z","eventId":"' + CONVERT(NVARCHAR(36), NEWID()) + '"}', 'GridAreaOwnershipAssigned')
 
     SET @Id = @Id + 1;
 
