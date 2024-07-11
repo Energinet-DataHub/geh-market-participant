@@ -117,8 +117,6 @@ public sealed class CreateUserRoleHandlerIntegrationTests
             EicFunction.Delegated,
             KnownPermissions.All.Where(p => !p.AssignableTo.Contains(EicFunction.Delegated)).Select(p => (int)p.Id)));
 
-        await mediator.Send(userRoleCommand);
-
         // Act + Assert
         await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(userRoleCommand));
     }

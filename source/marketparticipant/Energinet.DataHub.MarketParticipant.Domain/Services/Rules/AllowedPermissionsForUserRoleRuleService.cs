@@ -21,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 
-// TODO: Test
 public sealed class AllowedPermissionsForUserRoleRuleService : IAllowedPermissionsForUserRoleRuleService
 {
     private readonly IPermissionRepository _permissionRepository;
