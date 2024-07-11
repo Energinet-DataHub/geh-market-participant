@@ -23,16 +23,16 @@ public sealed class OrganizationFactoryService : IOrganizationFactoryService
 {
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-    private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
+    private readonly IUniqueOrganizationBusinessRegisterIdentifierRuleService _uniqueOrganizationBusinessRegisterIdentifierRuleService;
 
     public OrganizationFactoryService(
         IOrganizationRepository organizationRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
-        IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService)
+        IUniqueOrganizationBusinessRegisterIdentifierRuleService uniqueOrganizationBusinessRegisterIdentifierRuleService)
     {
         _organizationRepository = organizationRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
-        _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
+        _uniqueOrganizationBusinessRegisterIdentifierRuleService = uniqueOrganizationBusinessRegisterIdentifierRuleService;
     }
 
     public async Task<Organization> CreateAsync(
@@ -48,7 +48,7 @@ public sealed class OrganizationFactoryService : IOrganizationFactoryService
         var newOrganization = new Organization(name, businessRegisterIdentifier, address, domain);
         newOrganization.Activate();
 
-        await _uniqueOrganizationBusinessRegisterIdentifierService
+        await _uniqueOrganizationBusinessRegisterIdentifierRuleService
             .EnsureUniqueBusinessRegisterIdentifierAsync(newOrganization)
             .ConfigureAwait(false);
 

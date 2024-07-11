@@ -22,16 +22,24 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
 public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleCommand>
 {
+    private readonly IUniqueUserRoleNameRuleService _uniqueUserRoleNameRuleService;
+    private readonly IAllowedPermissionsForUserRoleRuleService _allowedPermissionsForUserRoleRuleService;
     private readonly IUserRoleRepository _userRoleRepository;
 
-    public UpdateUserRoleHandler(IUserRoleRepository userRoleRepository)
+    public UpdateUserRoleHandler(
+        IUniqueUserRoleNameRuleService uniqueUserRoleNameRuleService,
+        IAllowedPermissionsForUserRoleRuleService allowedPermissionsForUserRoleRuleService,
+        IUserRoleRepository userRoleRepository)
     {
+        _uniqueUserRoleNameRuleService = uniqueUserRoleNameRuleService;
+        _allowedPermissionsForUserRoleRuleService = allowedPermissionsForUserRoleRuleService;
         _userRoleRepository = userRoleRepository;
     }
 
@@ -43,19 +51,20 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         NotFoundValidationException.ThrowIfNull(userRoleToUpdate, request.UserRoleId);
 
         if (userRoleToUpdate.Status == UserRoleStatus.Inactive)
-            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} is deactivated and can't be updated");
-
-        var userRoleWithSameName = await _userRoleRepository.GetByNameInMarketRoleAsync(request.UserRoleUpdateDto.Name, userRoleToUpdate.EicFunction).ConfigureAwait(false);
-        if (userRoleWithSameName != null && userRoleWithSameName.Id.Value != userRoleToUpdate.Id.Value)
-        {
-            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists in market role")
-                .WithErrorCode("market_role.reserved");
-        }
+            throw new ValidationException($"Cannot update inactive user role '{request.UserRoleUpdateDto.Name}'.");
 
         userRoleToUpdate.Name = request.UserRoleUpdateDto.Name;
         userRoleToUpdate.Description = request.UserRoleUpdateDto.Description;
         userRoleToUpdate.Status = request.UserRoleUpdateDto.Status;
         userRoleToUpdate.Permissions = request.UserRoleUpdateDto.Permissions.Select(p => (PermissionId)p);
+
+        await _allowedPermissionsForUserRoleRuleService
+            .ValidateUserRolePermissionsAsync(userRoleToUpdate)
+            .ConfigureAwait(false);
+
+        await _uniqueUserRoleNameRuleService
+            .ValidateUserRoleNameAsync(userRoleToUpdate)
+            .ConfigureAwait(false);
 
         await _userRoleRepository
             .UpdateAsync(userRoleToUpdate)

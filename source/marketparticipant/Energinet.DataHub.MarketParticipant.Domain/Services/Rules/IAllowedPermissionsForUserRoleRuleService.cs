@@ -13,18 +13,19 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 
 /// <summary>
-/// Ensures business register identifier for an organization is unique
+/// Validates that permissions assigned to a user role are allowed.
 /// </summary>
-public interface IUniqueOrganizationBusinessRegisterIdentifierService
+public interface IAllowedPermissionsForUserRoleRuleService
 {
     /// <summary>
-    /// Ensures business register identifier for an organization is unique; throws ValidationException if it is not unique
+    /// Validates that permissions assigned to a user role are allowed.
+    /// Throws an exception, if the permissions are disallowed.
     /// </summary>
-    /// <param name="organization">Organization</param>
-    Task EnsureUniqueBusinessRegisterIdentifierAsync(Organization organization);
+    /// <param name="userRole">The user role to validate.</param>
+    Task ValidateUserRolePermissionsAsync(UserRole userRole);
 }

@@ -41,6 +41,11 @@ public sealed class Permission
     public string Description { get; set; }
     public Instant Created { get; }
     public IReadOnlyCollection<EicFunction> AssignableTo { get; }
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }
 
 #pragma warning restore CA1711

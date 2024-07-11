@@ -22,11 +22,11 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
-public class UniqueOrganizationBusinessRegisterIdentifierService : IUniqueOrganizationBusinessRegisterIdentifierService
+public class UniqueOrganizationBusinessRegisterIdentifierRuleService : IUniqueOrganizationBusinessRegisterIdentifierRuleService
 {
     private readonly IOrganizationRepository _organizationRepository;
 
-    public UniqueOrganizationBusinessRegisterIdentifierService(IOrganizationRepository organizationRepository)
+    public UniqueOrganizationBusinessRegisterIdentifierRuleService(IOrganizationRepository organizationRepository)
     {
         _organizationRepository = organizationRepository;
     }
