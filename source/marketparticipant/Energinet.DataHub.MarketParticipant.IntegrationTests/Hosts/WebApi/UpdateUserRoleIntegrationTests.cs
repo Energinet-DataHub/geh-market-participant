@@ -193,4 +193,51 @@ public sealed class UpdateUserRoleIntegrationTests
         Assert.Equal(2, actualPermissionListAsInts.Count);
         Assert.Equivalent(newUserRolePermissions, actualPermissionListAsInts);
     }
+
+    [Fact]
+    public async Task UpdateUserRole_RoleInactive_ThrowsException()
+    {
+        // Create context user
+        var frontendUser = await _fixture.PrepareUserAsync();
+
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var userRole = await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(e => e.Status = UserRoleStatus.Inactive));
+
+        var updateCommand = new UpdateUserRoleCommand(
+            userRole.Id,
+            new UpdateUserRoleDto(userRole.Name, "desc", UserRoleStatus.Active, [(int)PermissionId.UsersView]));
+
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(updateCommand));
+    }
+
+    [Fact]
+    public async Task UpdateUserRole_GivenDisallowedPermissions_ThrowsException()
+    {
+        // Create context user
+        var frontendUser = await _fixture.PrepareUserAsync();
+
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersView);
+        var newUserRolePermissions = new Collection<int> { (int)PermissionId.ActorsManage, (int)PermissionId.UsersView };
+
+        var updateCommand = new UpdateUserRoleCommand(
+            userRole.Id,
+            new UpdateUserRoleDto("UpdateUserPermissionsStatus", string.Empty, UserRoleStatus.Active, newUserRolePermissions));
+
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(updateCommand));
+    }
 }

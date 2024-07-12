@@ -51,15 +51,14 @@ public sealed class UserRoleRepository : IUserRoleRepository
             : MapUserRole(userRole);
     }
 
-    public async Task<UserRole?> GetByNameInMarketRoleAsync(string userRoleName, EicFunction marketRole)
+    public async Task<IEnumerable<UserRole>> GetByNameInMarketRoleAsync(string userRoleName, EicFunction marketRole)
     {
-        var userRole = await BuildUserRoleQuery()
-            .SingleOrDefaultAsync(r => r.Name == userRoleName && r.EicFunctions.Any(e => e.EicFunction == marketRole))
+        var userRoles = await BuildUserRoleQuery()
+            .Where(r => r.Name == userRoleName && r.EicFunctions.Any(e => e.EicFunction == marketRole))
+            .ToListAsync()
             .ConfigureAwait(false);
 
-        return userRole == null
-            ? null
-            : MapUserRole(userRole);
+        return userRoles.Select(MapUserRole);
     }
 
     public async Task<IEnumerable<UserRole>> GetAsync(IEnumerable<EicFunction> eicFunctions)

@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
-public sealed record CreateUserRoleDto(
-    string Name,
-    string Description,
-    UserRoleStatus Status,
-    EicFunction EicFunction,
-    IEnumerable<int> Permissions);
+/// <summary>
+/// Ensures business register identifier for an organization is unique
+/// </summary>
+public interface IUniqueOrganizationBusinessRegisterIdentifierRuleService
+{
+    /// <summary>
+    /// Ensures business register identifier for an organization is unique; throws ValidationException if it is not unique
+    /// </summary>
+    /// <param name="organization">Organization</param>
+    Task EnsureUniqueBusinessRegisterIdentifierAsync(Organization organization);
+}

@@ -13,31 +13,32 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
-public sealed class CreateUserRoleHandler
-    : IRequestHandler<CreateUserRoleCommand, CreateUserRoleResponse>
+public sealed class CreateUserRoleHandler : IRequestHandler<CreateUserRoleCommand, CreateUserRoleResponse>
 {
     private readonly IUserRoleRepository _userRoleRepository;
-    private readonly IEnsureUserRolePermissionsService _ensureUserRolePermissionsService;
+    private readonly IUniqueUserRoleNameRuleService _uniqueUserRoleNameRuleService;
+    private readonly IAllowedPermissionsForUserRoleRuleService _allowedPermissionsForUserRoleRuleService;
 
     public CreateUserRoleHandler(
         IUserRoleRepository userRoleRepository,
-        IEnsureUserRolePermissionsService userRoleHelperService)
+        IUniqueUserRoleNameRuleService uniqueUserRoleNameRuleService,
+        IAllowedPermissionsForUserRoleRuleService allowedPermissionsForUserRoleRuleService)
     {
         _userRoleRepository = userRoleRepository;
-        _ensureUserRolePermissionsService = userRoleHelperService;
+        _uniqueUserRoleNameRuleService = uniqueUserRoleNameRuleService;
+        _allowedPermissionsForUserRoleRuleService = allowedPermissionsForUserRoleRuleService;
     }
 
     public async Task<CreateUserRoleResponse> Handle(
@@ -46,21 +47,20 @@ public sealed class CreateUserRoleHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var valid = await _ensureUserRolePermissionsService
-            .EnsurePermissionsSelectedAreValidForMarketRoleAsync(
-                request.UserRoleDto.Permissions.Select(x => (PermissionId)x),
-                request.UserRoleDto.EicFunction)
-            .ConfigureAwait(false);
-
-        if (!valid)
-            throw new ValidationException($"User role with name {request.UserRoleDto.Name} has permissions which are not valid for the market role selected {request.UserRoleDto.EicFunction}");
-
         var userRole = new UserRole(
             request.UserRoleDto.Name,
             request.UserRoleDto.Description,
             request.UserRoleDto.Status,
             request.UserRoleDto.Permissions.Select(x => (PermissionId)x),
             request.UserRoleDto.EicFunction);
+
+        await _allowedPermissionsForUserRoleRuleService
+            .ValidateUserRolePermissionsAsync(userRole)
+            .ConfigureAwait(false);
+
+        await _uniqueUserRoleNameRuleService
+            .ValidateUserRoleNameAsync(userRole)
+            .ConfigureAwait(false);
 
         var createdUserRoleId = await _userRoleRepository
             .AddAsync(userRole)
