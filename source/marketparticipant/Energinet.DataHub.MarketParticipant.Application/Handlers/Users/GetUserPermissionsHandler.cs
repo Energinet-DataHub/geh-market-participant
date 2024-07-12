@@ -94,9 +94,22 @@ public sealed class GetUserPermissionsHandler
 
         if (user.InvitationExpiresAt.HasValue)
         {
+            var waitTimeS = 1;
+
             var has2Fa = await _userIdentityAuthenticationService
                 .HasTwoFactorAuthenticationAsync(user.ExternalId)
                 .ConfigureAwait(false);
+
+            while (!has2Fa && waitTimeS <= 4)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(waitTimeS)).ConfigureAwait(false);
+
+                has2Fa = await _userIdentityAuthenticationService
+                    .HasTwoFactorAuthenticationAsync(user.ExternalId)
+                    .ConfigureAwait(false);
+
+                waitTimeS *= 2;
+            }
 
             if (has2Fa)
             {
