@@ -206,4 +206,43 @@ public sealed class ActorContactRepositoryTests
         Assert.Equal(testContact.Name, newContact.Name);
         Assert.Equal(testContact.Phone?.Number, newContact.Phone?.Number);
     }
+
+    [Fact]
+    public async Task GetAsync_CategorySupplied_ReturnsAllContactsWithSuppliedCategory()
+    {
+        // arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var actor = await _fixture.PrepareActorAsync();
+
+        await using var contextReadback = _fixture.DatabaseManager.CreateDbContext();
+        var writeRepo = new ActorContactRepository(context);
+        var readRepo = new ActorContactRepository(contextReadback);
+
+        var defaultContact = new ActorContact(
+            new ActorId(actor.Id),
+            "fake_value",
+            ContactCategory.Default,
+            new RandomlyGeneratedEmailAddress(),
+            new PhoneNumber("1234567"));
+
+        var chargesContact = new ActorContact(
+            new ActorId(actor.Id),
+            "fake_value",
+            ContactCategory.Charges,
+            new RandomlyGeneratedEmailAddress(),
+            new PhoneNumber("1234567"));
+
+        await writeRepo.AddAsync(defaultContact);
+        await writeRepo.AddAsync(chargesContact);
+
+        // act
+        var contacts = (await readRepo.GetAsync(ContactCategory.Default)).ToList();
+
+        // assert
+        Assert.NotEmpty(contacts);
+        Assert.All(contacts, x => Assert.Equal(ContactCategory.Default, x.Category));
+    }
 }

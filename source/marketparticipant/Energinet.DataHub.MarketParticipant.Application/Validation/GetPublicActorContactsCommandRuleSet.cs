@@ -12,17 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public interface IActorContactRepository
-{
-    Task<ActorContact?> GetAsync(ContactId contactId);
-    Task<IEnumerable<ActorContact>> GetAsync(ActorId actorId);
-    Task<IEnumerable<ActorContact>> GetAsync(ContactCategory category);
-    Task<ContactId> AddAsync(ActorContact contact);
-    Task RemoveAsync(ActorContact contact);
-}
+public sealed class GetPublicActorContactsCommandRuleSet : AbstractValidator<GetPublicActorContactsCommand>;
