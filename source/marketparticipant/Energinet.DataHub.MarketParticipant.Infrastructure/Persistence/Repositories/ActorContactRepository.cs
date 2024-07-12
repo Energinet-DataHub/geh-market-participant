@@ -61,6 +61,20 @@ public sealed class ActorContactRepository : IActorContactRepository
         return entities.Select(ActorContactMapper.MapFromEntity);
     }
 
+    public async Task<IEnumerable<ActorContact>> GetAsync(ContactCategory category)
+    {
+        var query =
+            from contact in _marketParticipantDbContext.ActorContacts
+            where contact.Category == category
+            select contact;
+
+        var entities = await query
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return entities.Select(ActorContactMapper.MapFromEntity);
+    }
+
     public async Task<ContactId> AddAsync(ActorContact contact)
     {
         ArgumentNullException.ThrowIfNull(contact, nameof(contact));

@@ -38,6 +38,18 @@ public sealed class ActorContactController : ControllerBase
         _userContext = userContext;
     }
 
+    [HttpGet("contacts/public")]
+    public async Task<ActionResult<IEnumerable<ActorContactDto>>> GetPublicActorContactsAsync()
+    {
+        var getOrganizationsCommand = new GetPublicActorContactsCommand();
+
+        var response = await _mediator
+            .Send(getOrganizationsCommand)
+            .ConfigureAwait(false);
+
+        return Ok(response.Contacts);
+    }
+
     [HttpGet("{actorId:guid}/contact")]
     [AuthorizeUser(PermissionId.ActorMasterDataManage)]
     public async Task<ActionResult<IEnumerable<ActorContactDto>>> ListAllAsync(Guid actorId)
