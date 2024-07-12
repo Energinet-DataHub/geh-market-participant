@@ -39,12 +39,12 @@ public interface IUserRoleRepository
     Task<UserRole?> GetAsync(UserRoleId userRoleId);
 
     /// <summary>
-    /// Gets the user role by name.
+    /// Gets the user roles by name.
     /// </summary>
-    /// <param name="userRoleName">The user role name.</param>
-    /// <param name="marketRole">Search for user role with market role related</param>
-    /// <returns>The role if it exists; otherwise null.</returns>
-    Task<UserRole?> GetByNameInMarketRoleAsync(string userRoleName, EicFunction marketRole);
+    /// <param name="userRoleName">The name to search for.</param>
+    /// <param name="marketRole">The market role to search for.</param>
+    /// <returns>A list of user roles with the specified name and market role.</returns>
+    Task<IEnumerable<UserRole>> GetByNameInMarketRoleAsync(string userRoleName, EicFunction marketRole);
 
     /// <summary>
     /// Gets user roles that support the specified EIC-functions.

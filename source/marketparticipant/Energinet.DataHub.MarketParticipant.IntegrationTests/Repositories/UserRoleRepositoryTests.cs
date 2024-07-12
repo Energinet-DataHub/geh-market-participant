@@ -198,20 +198,17 @@ public sealed class UserRoleRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRoleRepository = new UserRoleRepository(context);
 
-        var userRoleNameForUpdate = "Access1";
+        var userRoleNameForUpdate = Guid.NewGuid().ToString();
 
         var existingUserRole = TestPreparationEntities.ValidUserRole.Patch(e => e.Name = userRoleNameForUpdate);
         var userRole = await _fixture.PrepareUserRoleAsync(existingUserRole);
 
         // Act
-        var actual = await userRoleRepository.GetAsync(new UserRoleId(userRole.Id));
-
-        var useRoleUnderMarketRole = await userRoleRepository
+        var matchingNameAndMarketRole = await userRoleRepository
             .GetByNameInMarketRoleAsync(userRoleNameForUpdate, existingUserRole.EicFunctions.First().EicFunction);
 
         // Assert
-        Assert.NotNull(useRoleUnderMarketRole);
-        Assert.NotNull(actual);
+        var actual = matchingNameAndMarketRole.Single();
         Assert.Equal(userRole.Name, actual.Name);
         Assert.Equal(userRole.EicFunctions.First().EicFunction, actual.EicFunction);
     }
@@ -228,16 +225,13 @@ public sealed class UserRoleRepositoryTests
         var existingUserRole = TestPreparationEntities.ValidUserRole.Patch(e => e.Name = "Access1");
         existingUserRole.EicFunctions.Clear();
         existingUserRole.EicFunctions.Add(new UserRoleEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier });
-        var userRole = await _fixture.PrepareUserRoleAsync(existingUserRole);
+        await _fixture.PrepareUserRoleAsync(existingUserRole);
 
         // Act
-        var actual = await userRoleRepository.GetAsync(new UserRoleId(userRole.Id));
-
-        var useRoleUnderMarketRole = await userRoleRepository
-            .GetByNameInMarketRoleAsync("Access1", EicFunction.BillingAgent);
+        var matchingNameAndMarketRole = await userRoleRepository
+            .GetByNameInMarketRoleAsync(Guid.NewGuid().ToString(), EicFunction.BillingAgent);
 
         // Assert
-        Assert.Null(useRoleUnderMarketRole);
-        Assert.NotNull(actual);
+        Assert.Empty(matchingNameAndMarketRole);
     }
 }

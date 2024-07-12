@@ -28,16 +28,16 @@ public sealed class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizati
 {
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
-    private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
+    private readonly IUniqueOrganizationBusinessRegisterIdentifierRuleService _uniqueOrganizationBusinessRegisterIdentifierRuleService;
 
     public UpdateOrganizationHandler(
         IOrganizationRepository organizationRepository,
         IOrganizationExistsHelperService organizationExistsHelperService,
-        IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService)
+        IUniqueOrganizationBusinessRegisterIdentifierRuleService uniqueOrganizationBusinessRegisterIdentifierRuleService)
     {
         _organizationRepository = organizationRepository;
         _organizationExistsHelperService = organizationExistsHelperService;
-        _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
+        _uniqueOrganizationBusinessRegisterIdentifierRuleService = uniqueOrganizationBusinessRegisterIdentifierRuleService;
     }
 
     public async Task Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
@@ -52,7 +52,7 @@ public sealed class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizati
         organization.Status = Enum.Parse<OrganizationStatus>(request.Organization.Status, true);
         organization.Domain = new OrganizationDomain(request.Organization.Domain);
 
-        await _uniqueOrganizationBusinessRegisterIdentifierService
+        await _uniqueOrganizationBusinessRegisterIdentifierRuleService
             .EnsureUniqueBusinessRegisterIdentifierAsync(organization)
             .ConfigureAwait(false);
 

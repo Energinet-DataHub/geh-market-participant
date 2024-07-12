@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 
-public sealed class UniqueOrganizationBusinessRegisterIdentifierServiceTests
+public sealed class UniqueOrganizationBusinessRegisterIdentifierRuleServiceTests
 {
     [Fact]
     public async Task Ensure_BusinessRegisterIdentifierNotUnique_Throws()
@@ -48,7 +48,7 @@ public sealed class UniqueOrganizationBusinessRegisterIdentifierServiceTests
         var repository = new Mock<IOrganizationRepository>();
         repository.Setup(x => x.GetAsync()).ReturnsAsync(new[] { currentOrganizationToUpdate, anotherOrganizationToUpdateWithSameIdentifier });
 
-        var target = new UniqueOrganizationBusinessRegisterIdentifierService(repository.Object);
+        var target = new UniqueOrganizationBusinessRegisterIdentifierRuleService(repository.Object);
 
         // act + assert
         await Assert.ThrowsAsync<ValidationException>(
@@ -78,7 +78,7 @@ public sealed class UniqueOrganizationBusinessRegisterIdentifierServiceTests
             new OrganizationDomain("energinet.dk"),
             OrganizationStatus.Active);
 
-        var target = new UniqueOrganizationBusinessRegisterIdentifierService(repository.Object);
+        var target = new UniqueOrganizationBusinessRegisterIdentifierRuleService(repository.Object);
 
         // act + assert
         await target.EnsureUniqueBusinessRegisterIdentifierAsync(organization);

@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 
-public interface IEnsureUserRolePermissionsService
+/// <summary>
+/// Ensures that user roles within the same market role have unique names.
+/// </summary>
+public interface IUniqueUserRoleNameRuleService
 {
-    Task<bool> EnsurePermissionsSelectedAreValidForMarketRoleAsync(
-        IEnumerable<PermissionId> permissions,
-        EicFunction eicFunction);
+    /// <summary>
+    /// Ensures that provided user role is allowed to have the assigned name.
+    /// Throws an exception, if the name is already in use.
+    /// </summary>
+    /// <param name="userRole">The user role to validate.</param>
+    Task ValidateUserRoleNameAsync(UserRole userRole);
 }

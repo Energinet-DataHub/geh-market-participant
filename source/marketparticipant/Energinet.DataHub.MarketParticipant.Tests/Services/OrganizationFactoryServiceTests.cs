@@ -46,7 +46,7 @@ public sealed class OrganizationFactoryServiceTests
         var target = new OrganizationFactoryService(
             organizationRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
+            new Mock<IUniqueOrganizationBusinessRegisterIdentifierRuleService>().Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
@@ -64,7 +64,7 @@ public sealed class OrganizationFactoryServiceTests
         var target = new OrganizationFactoryService(
             organizationRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
+            new Mock<IUniqueOrganizationBusinessRegisterIdentifierRuleService>().Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
@@ -82,7 +82,7 @@ public sealed class OrganizationFactoryServiceTests
         var target = new OrganizationFactoryService(
             organizationRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
+            new Mock<IUniqueOrganizationBusinessRegisterIdentifierRuleService>().Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
@@ -100,7 +100,7 @@ public sealed class OrganizationFactoryServiceTests
         var target = new OrganizationFactoryService(
             organizationRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
+            new Mock<IUniqueOrganizationBusinessRegisterIdentifierRuleService>().Object);
 
         var orgId = new OrganizationId(Guid.NewGuid());
         var organization = new Organization(

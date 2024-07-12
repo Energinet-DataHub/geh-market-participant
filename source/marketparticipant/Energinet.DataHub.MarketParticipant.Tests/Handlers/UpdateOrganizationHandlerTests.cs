@@ -41,7 +41,7 @@ public sealed class UpdateOrganizationHandlerTests
         var target = new UpdateOrganizationHandler(
             organizationRepository.Object,
             organizationExistsHelperService.Object,
-            new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
+            new Mock<IUniqueOrganizationBusinessRegisterIdentifierRuleService>().Object);
 
         var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 
@@ -87,7 +87,7 @@ public sealed class UpdateOrganizationHandlerTests
         var target = new UpdateOrganizationHandler(
             organizationRepository.Object,
             organizationExistsHelperService.Object,
-            new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
+            new Mock<IUniqueOrganizationBusinessRegisterIdentifierRuleService>().Object);
 
         var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 
