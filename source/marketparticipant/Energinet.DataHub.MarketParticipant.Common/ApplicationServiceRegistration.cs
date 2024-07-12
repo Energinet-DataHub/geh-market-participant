@@ -51,6 +51,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<GetActorsCommand>, GetActorsCommandRuleSet>();
         services.AddScoped<IValidator<GetAllActorsCommand>, GetAllActorsCommandRuleSet>();
         services.AddScoped<IValidator<GetActorContactsCommand>, GetActorContactsCommandRuleSet>();
+        services.AddScoped<IValidator<GetPublicActorContactsCommand>, GetPublicActorContactsCommandRuleSet>();
         services.AddScoped<IValidator<CreateActorContactCommand>, CreateActorContactCommandRuleSet>();
         services.AddScoped<IValidator<DeleteActorContactCommand>, DeleteActorContactCommandRuleSet>();
         services.AddScoped<IValidator<CreateGridAreaCommand>, CreateGridAreaCommandRuleSet>();

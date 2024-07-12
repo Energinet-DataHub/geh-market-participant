@@ -13,16 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 
-public interface IActorContactRepository
-{
-    Task<ActorContact?> GetAsync(ContactId contactId);
-    Task<IEnumerable<ActorContact>> GetAsync(ActorId actorId);
-    Task<IEnumerable<ActorContact>> GetAsync(ContactCategory category);
-    Task<ContactId> AddAsync(ActorContact contact);
-    Task RemoveAsync(ActorContact contact);
-}
+public sealed record GetPublicActorContactsResponse(IEnumerable<ActorContactDto> Contacts);
