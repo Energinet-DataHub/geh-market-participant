@@ -19,6 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 
 public sealed record ActorContactDto(
     Guid ContactId,
+    Guid ActorId,
     ContactCategory Category,
     string Name,
     string Email,
