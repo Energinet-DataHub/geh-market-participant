@@ -25,6 +25,7 @@ public static class ActorContactMapper
         ArgumentNullException.ThrowIfNull(contact, nameof(contact));
         return new ActorContactDto(
             contact.Id.Value,
+            contact.ActorId.Value,
             contact.Category,
             contact.Name,
             contact.Email.Address,
