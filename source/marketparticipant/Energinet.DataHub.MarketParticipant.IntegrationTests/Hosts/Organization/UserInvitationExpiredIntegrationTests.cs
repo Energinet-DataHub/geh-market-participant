@@ -15,7 +15,9 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -51,6 +53,18 @@ public sealed class UserInvitationExpiredIntegrationTests
         var user2Expired = await _fixture.PrepareUserAsync(user2ExpiredSetup);
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(uir => uir.GetAsync(It.IsAny<ExternalUserId>()))
+            .ReturnsAsync((ExternalUserId externalUserId) => new UserIdentity(
+                externalUserId,
+                new RandomlyGeneratedEmailAddress(),
+                UserIdentityStatus.Active,
+                string.Empty,
+                string.Empty,
+                null,
+                DateTimeOffset.UtcNow,
+                AuthenticationMethod.Undetermined,
+                []));
 
         host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
         host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
@@ -63,8 +77,8 @@ public sealed class UserInvitationExpiredIntegrationTests
         await mediator.Send(command);
 
         // Assert
-        userIdentityRepository.Verify(x => x.DisableUserAccountAsync(new ExternalUserId(user1Expired.ExternalId)), Times.Never);
-        userIdentityRepository.Verify(x => x.DisableUserAccountAsync(new ExternalUserId(user2Expired.ExternalId)), Times.Never);
+        userIdentityRepository.Verify(x => x.DisableUserAccountAsync(It.Is<UserIdentity>(ident => ident.Id.Value == user1Expired.ExternalId)), Times.Never);
+        userIdentityRepository.Verify(x => x.DisableUserAccountAsync(It.Is<UserIdentity>(ident => ident.Id.Value == user2Expired.ExternalId)), Times.Never);
     }
 
     [Fact]
@@ -79,6 +93,18 @@ public sealed class UserInvitationExpiredIntegrationTests
         var user2Expired = await _fixture.PrepareUserAsync(user2ExpiredSetup);
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(uir => uir.GetAsync(It.IsAny<ExternalUserId>()))
+            .ReturnsAsync((ExternalUserId externalUserId) => new UserIdentity(
+                externalUserId,
+                new RandomlyGeneratedEmailAddress(),
+                UserIdentityStatus.Active,
+                string.Empty,
+                string.Empty,
+                null,
+                DateTimeOffset.UtcNow,
+                AuthenticationMethod.Undetermined,
+                []));
 
         host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
         host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
@@ -91,7 +117,7 @@ public sealed class UserInvitationExpiredIntegrationTests
         await mediator.Send(command);
 
         // Assert
-        userIdentityRepository.Verify(x => x.DisableUserAccountAsync(new ExternalUserId(user1Expired.ExternalId)), Times.Once);
-        userIdentityRepository.Verify(x => x.DisableUserAccountAsync(new ExternalUserId(user2Expired.ExternalId)), Times.Once);
+        userIdentityRepository.Verify(x => x.DisableUserAccountAsync(It.Is<UserIdentity>(ident => ident.Id.Value == user1Expired.ExternalId)), Times.Once);
+        userIdentityRepository.Verify(x => x.DisableUserAccountAsync(It.Is<UserIdentity>(ident => ident.Id.Value == user2Expired.ExternalId)), Times.Once);
     }
 }

@@ -120,22 +120,22 @@ public sealed class InMemoryUserIdentityRepository : IUserIdentityRepository
         return Task.CompletedTask;
     }
 
-    public Task DisableUserAccountAsync(ExternalUserId externalUserId)
+    public Task DisableUserAccountAsync(UserIdentity userIdentity)
     {
-        var userIdentity = _identities.First(x => x.Id == externalUserId);
+        var currentUserIdentity = _identities.First(x => x.Id == userIdentity.Id);
 
         var newIdentity = new UserIdentity(
-            userIdentity.Id,
-            userIdentity.Email,
+            currentUserIdentity.Id,
+            currentUserIdentity.Email,
             UserIdentityStatus.Inactive,
-            userIdentity.FirstName,
-            userIdentity.LastName,
-            userIdentity.PhoneNumber,
-            userIdentity.CreatedDate,
-            userIdentity.Authentication,
-            userIdentity.LoginIdentities);
+            currentUserIdentity.FirstName,
+            currentUserIdentity.LastName,
+            currentUserIdentity.PhoneNumber,
+            currentUserIdentity.CreatedDate,
+            currentUserIdentity.Authentication,
+            currentUserIdentity.LoginIdentities);
 
-        _identities.Remove(userIdentity);
+        _identities.Remove(currentUserIdentity);
         _identities.Add(newIdentity);
         return Task.CompletedTask;
     }

@@ -77,7 +77,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
             return;
 
         await _userIdentityRepository
-            .DisableUserAccountAsync(userIdentity.Id)
+            .DisableUserAccountAsync(userIdentity)
             .ConfigureAwait(false);
 
         if (user.InvitationExpiresAt.HasValue)
