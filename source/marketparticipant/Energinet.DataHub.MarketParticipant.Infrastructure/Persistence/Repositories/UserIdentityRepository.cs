@@ -297,12 +297,37 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
     public Task EnableUserAccountAsync(ExternalUserId externalUserId)
     {
-        return UpdateUserAccountStatusAsync(externalUserId, true);
+        ArgumentNullException.ThrowIfNull(externalUserId);
+
+        return _graphClient
+            .Users[externalUserId.Value.ToString()]
+            .PatchAsync(new User
+            {
+                AccountEnabled = true
+            });
     }
 
-    public Task DisableUserAccountAsync(ExternalUserId externalUserId)
+    public Task DisableUserAccountAsync(UserIdentity userIdentity)
     {
-        return UpdateUserAccountStatusAsync(externalUserId, false);
+        ArgumentNullException.ThrowIfNull(userIdentity);
+
+        return _graphClient
+            .Users[userIdentity.Id.ToString()]
+            .PatchAsync(new User
+            {
+                AccountEnabled = false,
+
+                // Because of the way Azure B2C works, need to remove all external identities for AccountEnabled to work properly.
+                Identities = userIdentity.LoginIdentities
+                    .Where(loginIdentity => loginIdentity.SignInType == "emailAddress")
+                    .Select(loginIdentity => new ObjectIdentity
+                    {
+                        SignInType = loginIdentity.SignInType,
+                        Issuer = loginIdentity.Issuer,
+                        IssuerAssignedId = loginIdentity.IssuerAssignedId
+                    })
+                    .ToList()
+            });
     }
 
     private static UserIdentity Map(User user, string? emailAddress = null)
@@ -358,18 +383,6 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return phoneMethods
             .FirstOrDefault(method => method.PhoneType == AuthenticationPhoneType.Mobile)?
             .Id;
-    }
-
-    private Task UpdateUserAccountStatusAsync(ExternalUserId externalUserId, bool enabled)
-    {
-        ArgumentNullException.ThrowIfNull(externalUserId);
-
-        return _graphClient
-            .Users[externalUserId.Value.ToString()]
-            .PatchAsync(new User
-            {
-                AccountEnabled = enabled
-            });
     }
 
     private async Task<User?> GetBySignInEmailAsync(EmailAddress email)

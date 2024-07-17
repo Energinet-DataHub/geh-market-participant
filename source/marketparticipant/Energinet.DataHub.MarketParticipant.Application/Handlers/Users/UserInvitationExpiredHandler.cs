@@ -46,7 +46,14 @@ public sealed class UserInvitationExpiredHandler : IRequestHandler<UserInvitatio
 
         foreach (var user in usersWithExpiredInvitation)
         {
-            await _userIdentityRepository.DisableUserAccountAsync(user.ExternalId).ConfigureAwait(false);
+            var userIdentity = await _userIdentityRepository
+                .GetAsync(user.ExternalId)
+                .ConfigureAwait(false);
+
+            await _userIdentityRepository
+                .DisableUserAccountAsync(userIdentity!)
+                .ConfigureAwait(false);
+
             _logger.LogInformation("User identity disabled for user with external id {ExternalId}", user.ExternalId);
         }
     }
