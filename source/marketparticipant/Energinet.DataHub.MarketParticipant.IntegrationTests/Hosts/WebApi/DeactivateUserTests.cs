@@ -252,7 +252,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase<Mark
         await mediator.Send(command);
 
         // Assert
-        userIdentityRepositoryMock.Verify(x => x.DisableUserAccountAsync(userIdentity.Id), Times.Once);
+        userIdentityRepositoryMock.Verify(x => x.DisableUserAccountAsync(userIdentity), Times.Once);
 
         var userIdentityAfterDisable = new UserIdentity(
             userIdentity.Id,
