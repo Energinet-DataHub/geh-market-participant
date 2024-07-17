@@ -52,7 +52,7 @@ public sealed class ActorClientSecretService : IActorClientSecretService
         {
             DisplayName = SecretDisplayName,
             StartDateTime = DateTimeOffset.UtcNow,
-            EndDateTime = DateTimeOffset.UtcNow.AddMonths(6),
+            EndDateTime = DateTimeOffset.UtcNow.AddMonths(12),
             KeyId = Guid.NewGuid(),
         };
 
