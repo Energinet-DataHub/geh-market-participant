@@ -13,10 +13,13 @@
 // limitations under the License.
 
 using Azure.Identity;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
-internal static class AzureCredentialsProvider
+internal static class TestConfigurationProvider
 {
-    public static DefaultAzureCredential Credentials { get; } = new DefaultAzureCredential();
+    public static DefaultAzureCredential Credentials { get; } = new();
+
+    public static IntegrationTestConfiguration Configuration { get; } = new(Credentials);
 }

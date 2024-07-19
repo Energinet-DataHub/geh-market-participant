@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure.Identity;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
@@ -34,7 +33,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 public sealed class GraphServiceClientFixture : IAsyncLifetime
 #pragma warning restore CA1001
 {
-    private readonly IntegrationTestConfiguration _integrationTestConfiguration = new(AzureCredentialsProvider.Credentials);
     private readonly List<ExternalUserId> _createdUsers = new();
     private GraphServiceClient? _graphClient;
 
@@ -42,10 +40,12 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 
     public Task InitializeAsync()
     {
+        var integrationTestConfig = TestConfigurationProvider.Configuration;
+
         var clientSecretCredential = new ClientSecretCredential(
-            _integrationTestConfiguration.B2CSettings.Tenant,
-            _integrationTestConfiguration.B2CSettings.ServicePrincipalId,
-            _integrationTestConfiguration.B2CSettings.ServicePrincipalSecret);
+            integrationTestConfig.B2CSettings.Tenant,
+            integrationTestConfig.B2CSettings.ServicePrincipalId,
+            integrationTestConfig.B2CSettings.ServicePrincipalSecret);
 
         _graphClient = new GraphServiceClient(
             clientSecretCredential,
@@ -54,9 +54,9 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                 "https://graph.microsoft.com/.default"
             });
 
-        Environment.SetEnvironmentVariable("AzureB2c:Tenant", _integrationTestConfiguration.B2CSettings.Tenant);
-        Environment.SetEnvironmentVariable("AzureB2c:SpnId", _integrationTestConfiguration.B2CSettings.ServicePrincipalId);
-        Environment.SetEnvironmentVariable("AzureB2c:SpnSecret", _integrationTestConfiguration.B2CSettings.ServicePrincipalSecret);
+        Environment.SetEnvironmentVariable("AzureB2c:Tenant", integrationTestConfig.B2CSettings.Tenant);
+        Environment.SetEnvironmentVariable("AzureB2c:SpnId", integrationTestConfig.B2CSettings.ServicePrincipalId);
+        Environment.SetEnvironmentVariable("AzureB2c:SpnSecret", integrationTestConfig.B2CSettings.ServicePrincipalSecret);
         Environment.SetEnvironmentVariable("AzureB2c:BackendObjectId", "fake_value");
         Environment.SetEnvironmentVariable("AzureB2c:BackendSpnObjectId", "fake_value");
         Environment.SetEnvironmentVariable("AzureB2c:BackendId", "fake_value");
@@ -136,7 +136,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                     "id",
                     "identities"
                 };
-                x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{_integrationTestConfiguration.B2CSettings.Tenant}' and id/issuerAssignedId eq '{testEmail}')";
+                x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{TestConfigurationProvider.Configuration.B2CSettings.Tenant}' and id/issuerAssignedId eq '{testEmail}')";
             })
             .ConfigureAwait(false);
 
@@ -259,7 +259,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                 new()
                 {
                     SignInType = "emailAddress",
-                    Issuer = _integrationTestConfiguration.B2CSettings.Tenant,
+                    Issuer = TestConfigurationProvider.Configuration.B2CSettings.Tenant,
                     IssuerAssignedId = testEmail
                 }
             }

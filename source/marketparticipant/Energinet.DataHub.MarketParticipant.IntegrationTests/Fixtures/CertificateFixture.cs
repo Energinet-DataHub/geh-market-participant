@@ -17,7 +17,6 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Azure;
-using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.Core.FunctionApp.TestCommon;
 using Energinet.DataHub.MarketParticipant.Application.Services;
@@ -37,7 +36,7 @@ public sealed class CertificateFixture : IAsyncLifetime
     public Task InitializeAsync()
     {
         var keyVaultUri = GetKeyVaultUri();
-        SecretClient = new SecretClient(keyVaultUri, AzureCredentialsProvider.Credentials);
+        SecretClient = new SecretClient(keyVaultUri, TestConfigurationProvider.Credentials);
 
         var certValidation = new Mock<ICertificateValidation>();
 
