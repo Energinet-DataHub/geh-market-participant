@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 public sealed class GraphServiceClientFixture : IAsyncLifetime
 #pragma warning restore CA1001
 {
-    private readonly IntegrationTestConfiguration _integrationTestConfiguration = new(AzureCredentialsProvider.Credentials);
+    private readonly IntegrationTestConfiguration _integrationTestConfiguration = AzureCredentialsProvider.Configuration;
     private readonly List<ExternalUserId> _createdUsers = new();
     private GraphServiceClient? _graphClient;
 

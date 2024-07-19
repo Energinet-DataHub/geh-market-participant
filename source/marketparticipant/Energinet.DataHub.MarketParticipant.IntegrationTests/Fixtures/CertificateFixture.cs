@@ -37,7 +37,7 @@ public sealed class CertificateFixture : IAsyncLifetime
     public Task InitializeAsync()
     {
         var keyVaultUri = GetKeyVaultUri();
-        SecretClient = new SecretClient(keyVaultUri, AzureCredentialsProvider.Credentials);
+        SecretClient = new SecretClient(keyVaultUri, new DefaultAzureCredential());
 
         var certValidation = new Mock<ICertificateValidation>();
 

@@ -32,7 +32,7 @@ public sealed class ActorClientSecretFixture : IAsyncLifetime
 
     public Task InitializeAsync()
     {
-        var integrationTestConfig = new IntegrationTestConfiguration(AzureCredentialsProvider.Credentials);
+        var integrationTestConfig = AzureCredentialsProvider.Configuration;
 
         _graphClient = new GraphServiceClient(
             new ClientSecretCredential(

@@ -32,7 +32,7 @@ public sealed class KeyClientFixture : IAsyncLifetime
     public Task InitializeAsync()
     {
         var keyVaultUri = GetKeyVaultUri();
-        KeyClient = new KeyClient(keyVaultUri, AzureCredentialsProvider.Credentials);
+        KeyClient = new KeyClient(keyVaultUri, new DefaultAzureCredential());
 
         var rsaKeyOptions = CreateTestKeyOptions();
         return KeyClient.CreateRsaKeyAsync(rsaKeyOptions);
