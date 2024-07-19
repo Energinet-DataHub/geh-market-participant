@@ -14,7 +14,6 @@
 
 using System.Threading.Tasks;
 using Azure.Identity;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -22,6 +21,7 @@ using Microsoft.Graph;
 using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+
 #pragma warning disable CA1001
 public sealed class ActorClientSecretFixture : IAsyncLifetime
 #pragma warning restore CA1001
@@ -32,7 +32,7 @@ public sealed class ActorClientSecretFixture : IAsyncLifetime
 
     public Task InitializeAsync()
     {
-        var integrationTestConfig = AzureCredentialsProvider.Configuration;
+        var integrationTestConfig = TestConfigurationProvider.Configuration;
 
         _graphClient = new GraphServiceClient(
             new ClientSecretCredential(
