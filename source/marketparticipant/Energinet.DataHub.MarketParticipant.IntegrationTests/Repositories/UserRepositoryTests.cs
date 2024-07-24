@@ -170,9 +170,9 @@ public sealed class UserRepositoryTests
         var list = actual.ToList();
 
         Assert.Equal(3, list.Count);
-        Assert.True(list.Any(user => user.Id.Value == userA.Id));
-        Assert.True(list.Any(user => user.Id.Value == userB.Id));
-        Assert.True(list.Any(user => user.Id.Value == userC.Id));
+        Assert.Contains(list, user => user.Id.Value == userA.Id);
+        Assert.Contains(list, user => user.Id.Value == userB.Id);
+        Assert.Contains(list, user => user.Id.Value == userC.Id);
     }
 
     [Fact]
