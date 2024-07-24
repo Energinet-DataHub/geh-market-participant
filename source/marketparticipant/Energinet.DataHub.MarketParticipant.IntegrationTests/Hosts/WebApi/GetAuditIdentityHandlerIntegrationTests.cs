@@ -84,13 +84,14 @@ public sealed class GetAuditIdentityHandlerIntegrationTests
     }
 
     [Fact]
-    public async Task GetAuditIdentity_MultipleIdentities_ReturnsMatchingDisplayNames()
+    public async Task GetAuditIdentity_MultipleIdentities_ReturnsBothDisplayNames()
     {
         // Arrange
-        var user = await _fixture.PrepareUserAsync();
+        var auditUser = await _fixture.PrepareUserAsync();
+        var loginUser = await _fixture.PrepareUserAsync();
 
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        host.ServiceCollection.MockFrontendUser(user.Id);
+        host.ServiceCollection.MockFrontendUser(loginUser.Id);
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -99,7 +100,7 @@ public sealed class GetAuditIdentityHandlerIntegrationTests
         var command = new GetAuditIdentityCommand(
         [
             KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value,
-            KnownAuditIdentityProvider.Migration.IdentityId.Value,
+            auditUser.Id,
         ]);
 
         var actual = await mediator.Send(command);
@@ -109,7 +110,7 @@ public sealed class GetAuditIdentityHandlerIntegrationTests
 
         Assert.Equal(2, auditIdentities.Count);
         Assert.Equal("DataHub", auditIdentities.Single(ident => ident.AuditIdentityId == KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value).DisplayName);
-        Assert.Equal("DataHub", auditIdentities.Single(ident => ident.AuditIdentityId == KnownAuditIdentityProvider.Migration.IdentityId.Value).DisplayName);
+        Assert.Equal(TestPreparationEntities.ValidOrganization.Name, auditIdentities.Single(ident => ident.AuditIdentityId == auditUser.Id).DisplayName);
     }
 
     [Fact]

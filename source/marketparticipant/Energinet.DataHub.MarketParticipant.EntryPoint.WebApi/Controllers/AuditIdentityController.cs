@@ -34,7 +34,7 @@ public sealed class AuditIdentityController : ControllerBase
     }
 
     [HttpGet("{auditIdentityId:guid}")]
-    public async Task<ActionResult<AuditIdentityDisplayName>> GetAsync(Guid auditIdentityId)
+    public async Task<ActionResult<AuditIdentityDto>> GetAsync(Guid auditIdentityId)
     {
         // NOTE: There is no permission attribute, as command itself filters results.
         var response = await _mediator
@@ -45,7 +45,7 @@ public sealed class AuditIdentityController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<IEnumerable<AuditIdentityDisplayName>>> GetMultipleAsync([FromBody] Guid[] auditIdentityId)
+    public async Task<ActionResult<IEnumerable<AuditIdentityDto>>> GetMultipleAsync([FromBody] Guid[] auditIdentityId)
     {
         // NOTE: There is no permission attribute, as command itself filters results.
         var response = await _mediator

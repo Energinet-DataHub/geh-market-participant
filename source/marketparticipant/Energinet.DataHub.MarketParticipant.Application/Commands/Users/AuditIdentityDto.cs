@@ -16,4 +16,4 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 
-public sealed record AuditIdentityDisplayName(Guid AuditIdentityId, string DisplayName);
+public sealed record AuditIdentityDto(Guid AuditIdentityId, string DisplayName);

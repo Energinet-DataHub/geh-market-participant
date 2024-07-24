@@ -16,4 +16,4 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 
-public sealed record GetAuditIdentityResponse(IEnumerable<AuditIdentityDisplayName> AuditIdentities);
+public sealed record GetAuditIdentityResponse(IEnumerable<AuditIdentityDto> AuditIdentities);

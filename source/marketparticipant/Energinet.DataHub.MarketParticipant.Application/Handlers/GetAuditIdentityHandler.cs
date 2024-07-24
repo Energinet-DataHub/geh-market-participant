@@ -73,9 +73,9 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
         return new GetAuditIdentityResponse(auditIdentityDisplayNames);
     }
 
-    private async Task<IEnumerable<AuditIdentityDisplayName>> HandleKnownAuditIdentitiesOrContinueAsync(IEnumerable<AuditIdentity> auditIdentities)
+    private async Task<IEnumerable<AuditIdentityDto>> HandleKnownAuditIdentitiesOrContinueAsync(IEnumerable<AuditIdentity> auditIdentities)
     {
-        var handledIdentities = new List<AuditIdentityDisplayName>();
+        var handledIdentities = new List<AuditIdentityDto>();
         var nextIdentities = new List<UserId>();
 
         foreach (var auditIdentity in auditIdentities)
@@ -83,8 +83,8 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
             if (_knownAuditIdentities.TryGetValue(auditIdentity, out var knownAuditIdentity))
             {
                 handledIdentities.Add(_userContext.CurrentUser.IsFas
-                    ? new AuditIdentityDisplayName(auditIdentity.Value, $"DataHub ({knownAuditIdentity.FriendlyName})")
-                    : new AuditIdentityDisplayName(auditIdentity.Value, "DataHub"));
+                    ? new AuditIdentityDto(auditIdentity.Value, $"DataHub ({knownAuditIdentity.FriendlyName})")
+                    : new AuditIdentityDto(auditIdentity.Value, "DataHub"));
             }
             else
             {
@@ -96,9 +96,9 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
         return handledIdentities.Concat(nextProcessing);
     }
 
-    private async Task<IEnumerable<AuditIdentityDisplayName>> HandleOrganizationNamesOrContinueAsync(IReadOnlyCollection<UserId> userIds)
+    private async Task<IEnumerable<AuditIdentityDto>> HandleOrganizationNamesOrContinueAsync(IReadOnlyCollection<UserId> userIds)
     {
-        var handledIdentities = new List<AuditIdentityDisplayName>();
+        var handledIdentities = new List<AuditIdentityDto>();
         var nextIdentities = new List<User>();
 
         var users = await _userRepository
@@ -131,7 +131,7 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
                         = organization?.Name ?? throw new InvalidOperationException($"Organization for actor {actor.Id} not found.");
                 }
 
-                handledIdentities.Add(new AuditIdentityDisplayName(userId.Value, organizationName));
+                handledIdentities.Add(new AuditIdentityDto(userId.Value, organizationName));
             }
             else
             {
@@ -143,9 +143,9 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
         return handledIdentities.Concat(nextProcessing);
     }
 
-    private async Task<IEnumerable<AuditIdentityDisplayName>> HandleUserNamesAsync(IReadOnlyCollection<User> users)
+    private async Task<IEnumerable<AuditIdentityDto>> HandleUserNamesAsync(IReadOnlyCollection<User> users)
     {
-        var foundIdentities = new List<AuditIdentityDisplayName>();
+        var foundIdentities = new List<AuditIdentityDto>();
 
         var userIdentities = await _userIdentityRepository
             .GetUserIdentitiesAsync(users.Select(user => user.ExternalId))
@@ -158,7 +158,7 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
             var userIdentity = lookup.GetValueOrDefault(user.ExternalId);
             NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value, $"No external identity found for user id {user.Id}.");
 
-            foundIdentities.Add(new AuditIdentityDisplayName(user.Id.Value, $"{userIdentity.FirstName} ({userIdentity.Email})"));
+            foundIdentities.Add(new AuditIdentityDto(user.Id.Value, $"{userIdentity.FirstName} ({userIdentity.Email})"));
         }
 
         return foundIdentities;
