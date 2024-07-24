@@ -69,7 +69,7 @@ markpartDomain = group "Market Participant" {
         }
 
         markpartUserOverviewController = component "UserOverviewController" {
-            description "Read-only API for filtered listing of users for frontend presentation"
+            description "Read-only API for filtered listing of users for frontend presentation."
 
             this -> markpartDb "uses" "EF Core"
             this -> markpartUserIdentityRepositoryInMarkpartApi "Accesses user information." "Microsoft.Graph/https"
