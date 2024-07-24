@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 
-public sealed record GetAuditIdentityCommand(IEnumerable<Guid> AuditIdentities) : IRequest<GetAuditIdentityResponse>;
+public sealed record AuditIdentityDisplayName(Guid AuditIdentityId, string DisplayName);

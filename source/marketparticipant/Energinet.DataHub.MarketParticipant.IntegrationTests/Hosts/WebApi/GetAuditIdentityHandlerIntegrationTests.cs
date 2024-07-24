@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Services;
@@ -55,11 +56,11 @@ public sealed class GetAuditIdentityHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // Act
-        var command = new GetAuditIdentityCommand(KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value);
+        var command = new GetAuditIdentityCommand([KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value]);
         var actual = await mediator.Send(command);
 
         // Assert
-        Assert.Equal("DataHub", actual.DisplayName);
+        Assert.Equal("DataHub", actual.AuditIdentities.Single().DisplayName);
     }
 
     [Fact]
@@ -75,11 +76,40 @@ public sealed class GetAuditIdentityHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // Act
-        var command = new GetAuditIdentityCommand(KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value);
+        var command = new GetAuditIdentityCommand([KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value]);
         var actual = await mediator.Send(command);
 
         // Assert
-        Assert.Equal($"DataHub ({KnownAuditIdentityProvider.OrganizationBackgroundService.FriendlyName})", actual.DisplayName);
+        Assert.Equal($"DataHub ({KnownAuditIdentityProvider.OrganizationBackgroundService.FriendlyName})", actual.AuditIdentities.Single().DisplayName);
+    }
+
+    [Fact]
+    public async Task GetAuditIdentity_MultipleIdentities_ReturnsMatchingDisplayNames()
+    {
+        // Arrange
+        var user = await _fixture.PrepareUserAsync();
+
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.MockFrontendUser(user.Id);
+
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        // Act
+        var command = new GetAuditIdentityCommand(
+        [
+            KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value,
+            KnownAuditIdentityProvider.Migration.IdentityId.Value,
+        ]);
+
+        var actual = await mediator.Send(command);
+
+        // Assert
+        var auditIdentities = actual.AuditIdentities.ToList();
+
+        Assert.Equal(2, auditIdentities.Count);
+        Assert.Equal("DataHub", auditIdentities.Single(ident => ident.AuditIdentityId == KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value).DisplayName);
+        Assert.Equal("DataHub", auditIdentities.Single(ident => ident.AuditIdentityId == KnownAuditIdentityProvider.Migration.IdentityId.Value).DisplayName);
     }
 
     [Fact]
@@ -96,11 +126,11 @@ public sealed class GetAuditIdentityHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // Act
-        var command = new GetAuditIdentityCommand(auditUser.Id);
+        var command = new GetAuditIdentityCommand([auditUser.Id]);
         var actual = await mediator.Send(command);
 
         // Assert
-        Assert.Equal(TestPreparationEntities.ValidOrganization.Name, actual.DisplayName);
+        Assert.Equal(TestPreparationEntities.ValidOrganization.Name, actual.AuditIdentities.Single().DisplayName);
     }
 
     [Fact]
@@ -127,8 +157,8 @@ public sealed class GetAuditIdentityHandlerIntegrationTests
             new List<LoginIdentity>());
 
         userIdentityMock
-            .Setup(repository => repository.GetAsync(externalUserId))
-            .ReturnsAsync(userIdentity);
+            .Setup(repository => repository.GetUserIdentitiesAsync(It.Is<IEnumerable<ExternalUserId>>(ids => ids.Contains(externalUserId))))
+            .ReturnsAsync([userIdentity]);
 
         host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
         host.ServiceCollection.AddScoped(_ => userIdentityMock.Object);
@@ -137,10 +167,10 @@ public sealed class GetAuditIdentityHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // Act
-        var command = new GetAuditIdentityCommand(auditUser.Id);
+        var command = new GetAuditIdentityCommand([auditUser.Id]);
         var actual = await mediator.Send(command);
 
         // Assert
-        Assert.Equal($"{userIdentity.FirstName} ({userIdentity.Email})", actual.DisplayName);
+        Assert.Equal($"{userIdentity.FirstName} ({userIdentity.Email})", actual.AuditIdentities.Single().DisplayName);
     }
 }

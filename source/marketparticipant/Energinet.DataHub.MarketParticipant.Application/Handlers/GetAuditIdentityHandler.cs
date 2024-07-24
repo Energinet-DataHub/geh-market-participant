@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -66,44 +67,101 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
         // The implementation is therefore required to check the current user context and filter the results.
         // - If user is FAS or belongs to organization, we can return all audit identity information.
         // - If user do not belong to the organization, we can only return audit identity organization name.
-        var auditIdentity = new AuditIdentity(request.AuditIdentityId);
+        var auditIdentities = request.AuditIdentities.Select(id => new AuditIdentity(id));
+        var auditIdentityDisplayNames = await HandleKnownAuditIdentitiesOrContinueAsync(auditIdentities).ConfigureAwait(false);
 
-        if (_knownAuditIdentities.TryGetValue(auditIdentity, out var knownAuditIdentity))
+        return new GetAuditIdentityResponse(auditIdentityDisplayNames);
+    }
+
+    private async Task<IEnumerable<AuditIdentityDisplayName>> HandleKnownAuditIdentitiesOrContinueAsync(IEnumerable<AuditIdentity> auditIdentities)
+    {
+        var handledIdentities = new List<AuditIdentityDisplayName>();
+        var nextIdentities = new List<UserId>();
+
+        foreach (var auditIdentity in auditIdentities)
         {
-            return _userContext.CurrentUser.IsFas
-                ? new GetAuditIdentityResponse($"DataHub ({knownAuditIdentity.FriendlyName})")
-                : new GetAuditIdentityResponse("DataHub");
+            if (_knownAuditIdentities.TryGetValue(auditIdentity, out var knownAuditIdentity))
+            {
+                handledIdentities.Add(_userContext.CurrentUser.IsFas
+                    ? new AuditIdentityDisplayName(auditIdentity.Value, $"DataHub ({knownAuditIdentity.FriendlyName})")
+                    : new AuditIdentityDisplayName(auditIdentity.Value, "DataHub"));
+            }
+            else
+            {
+                nextIdentities.Add(new UserId(auditIdentity.Value));
+            }
         }
 
-        var user = await _userRepository
-            .GetAsync(new UserId(auditIdentity.Value))
+        var nextProcessing = await HandleOrganizationNamesOrContinueAsync(nextIdentities).ConfigureAwait(false);
+        return handledIdentities.Concat(nextProcessing);
+    }
+
+    private async Task<IEnumerable<AuditIdentityDisplayName>> HandleOrganizationNamesOrContinueAsync(IReadOnlyCollection<UserId> userIds)
+    {
+        var handledIdentities = new List<AuditIdentityDisplayName>();
+        var nextIdentities = new List<User>();
+
+        var users = await _userRepository
+            .GetAsync(userIds)
             .ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(user, request.AuditIdentityId);
+        var lookup = users.ToDictionary(user => user.Id);
+        var organizationNames = new Dictionary<ActorId, string>();
 
-        var showOrganizationOnly = !HasCurrentUserAccessToUser(user);
-        if (showOrganizationOnly)
+        foreach (var userId in userIds)
         {
-            var actor = await _actorRepository
-                .GetAsync(user.AdministratedBy)
-                .ConfigureAwait(false) ?? throw new InvalidOperationException($"Actor for user {user.Id} not found.");
+            var user = lookup.GetValueOrDefault(userId);
+            NotFoundValidationException.ThrowIfNull(user, userId.Value);
 
-            var organization = await _organizationRepository
-                .GetAsync(actor.OrganizationId)
-                .ConfigureAwait(false);
+            var showOrganizationOnly = !HasCurrentUserAccessToUser(user);
+            if (showOrganizationOnly)
+            {
+                if (!organizationNames.TryGetValue(user.AdministratedBy, out var organizationName))
+                {
+                    var actor = await _actorRepository
+                        .GetAsync(user.AdministratedBy)
+                        .ConfigureAwait(false) ?? throw new InvalidOperationException($"Actor for user {user.Id} not found.");
 
-            return organization != null
-                ? new GetAuditIdentityResponse(organization.Name)
-                : throw new InvalidOperationException($"Organization for actor {actor.Id} not found.");
+                    var organization = await _organizationRepository
+                        .GetAsync(actor.OrganizationId)
+                        .ConfigureAwait(false);
+
+                    organizationNames[user.AdministratedBy]
+                        = organizationName
+                        = organization?.Name ?? throw new InvalidOperationException($"Organization for actor {actor.Id} not found.");
+                }
+
+                handledIdentities.Add(new AuditIdentityDisplayName(userId.Value, organizationName));
+            }
+            else
+            {
+                nextIdentities.Add(user);
+            }
         }
 
-        var userIdentity = await _userIdentityRepository
-            .GetAsync(user.ExternalId)
+        var nextProcessing = await HandleUserNamesAsync(nextIdentities).ConfigureAwait(false);
+        return handledIdentities.Concat(nextProcessing);
+    }
+
+    private async Task<IEnumerable<AuditIdentityDisplayName>> HandleUserNamesAsync(IReadOnlyCollection<User> users)
+    {
+        var foundIdentities = new List<AuditIdentityDisplayName>();
+
+        var userIdentities = await _userIdentityRepository
+            .GetUserIdentitiesAsync(users.Select(user => user.ExternalId))
             .ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(userIdentity, request.AuditIdentityId, $"No external identity found for id {request.AuditIdentityId}.");
+        var lookup = userIdentities.ToDictionary(user => user.Id);
 
-        return new GetAuditIdentityResponse($"{userIdentity.FirstName} ({userIdentity.Email})");
+        foreach (var user in users)
+        {
+            var userIdentity = lookup.GetValueOrDefault(user.ExternalId);
+            NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value, $"No external identity found for user id {user.Id}.");
+
+            foundIdentities.Add(new AuditIdentityDisplayName(user.Id.Value, $"{userIdentity.FirstName} ({userIdentity.Email})"));
+        }
+
+        return foundIdentities;
     }
 
     private bool HasCurrentUserAccessToUser(User user)
