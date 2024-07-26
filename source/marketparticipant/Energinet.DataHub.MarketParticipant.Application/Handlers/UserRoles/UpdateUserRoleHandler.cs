@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -29,15 +30,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
 public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleCommand>
 {
+    private readonly IRevisionActivityWriter _revisionActivityWriter;
     private readonly IUniqueUserRoleNameRuleService _uniqueUserRoleNameRuleService;
     private readonly IAllowedPermissionsForUserRoleRuleService _allowedPermissionsForUserRoleRuleService;
     private readonly IUserRoleRepository _userRoleRepository;
 
     public UpdateUserRoleHandler(
+        IRevisionActivityWriter revisionActivityWriter,
         IUniqueUserRoleNameRuleService uniqueUserRoleNameRuleService,
         IAllowedPermissionsForUserRoleRuleService allowedPermissionsForUserRoleRuleService,
         IUserRoleRepository userRoleRepository)
     {
+        _revisionActivityWriter = revisionActivityWriter;
         _uniqueUserRoleNameRuleService = uniqueUserRoleNameRuleService;
         _allowedPermissionsForUserRoleRuleService = allowedPermissionsForUserRoleRuleService;
         _userRoleRepository = userRoleRepository;
@@ -49,6 +53,10 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
 
         var userRoleToUpdate = await _userRoleRepository.GetAsync(new UserRoleId(request.UserRoleId)).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(userRoleToUpdate, request.UserRoleId);
+
+        await _revisionActivityWriter
+            .WriteAsync(userRoleToUpdate.ModifiedActivity)
+            .ConfigureAwait(false);
 
         if (userRoleToUpdate.Status == UserRoleStatus.Inactive)
             throw new ValidationException($"Cannot update inactive user role '{request.UserRoleUpdateDto.Name}'.");

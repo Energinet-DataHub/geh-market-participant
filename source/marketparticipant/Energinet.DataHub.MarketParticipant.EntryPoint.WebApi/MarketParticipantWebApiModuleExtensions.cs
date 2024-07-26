@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Azure.Identity;
+using Azure.Messaging.ServiceBus;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.MarketParticipant.Application.Services;
@@ -21,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Common.Options;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Options;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +37,11 @@ public static class MarketParticipantWebApiModuleExtensions
     public static IServiceCollection AddMarketParticipantWebApiModule(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMarketParticipantCore();
+
+        services
+            .AddOptions<ServiceBusOptions>()
+            .BindConfiguration(nameof(ServiceBusOptions))
+            .ValidateDataAnnotations();
 
         services
             .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
@@ -75,13 +82,25 @@ public static class MarketParticipantWebApiModuleExtensions
             return new CertificateService(certificateClient, certificateValidation, logger);
         });
 
+        services.AddSingleton<IRevisionActivityPublisher>(provider =>
+        {
+            var options = provider.GetRequiredService<IOptions<ServiceBusOptions>>();
+            var client = new ServiceBusClient(options.Value.ProducerConnectionString);
+            var sender = client.CreateSender(options.Value.SharedIntegrationEventTopic);
+            return new RevisionActivityServiceBusPublisher(sender);
+        });
+
         // Health check
         services
             .AddHealthChecks()
             .AddDbContextCheck<MarketParticipantDbContext>()
             .AddCheck<GraphApiHealthCheck>("Graph API Access")
             .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access")
-            .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access");
+            .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access")
+            .AddAzureServiceBusSubscription(
+                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.HealthConnectionString,
+                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.SharedIntegrationEventTopic,
+                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.IntegrationEventSubscription);
 
         return services;
     }

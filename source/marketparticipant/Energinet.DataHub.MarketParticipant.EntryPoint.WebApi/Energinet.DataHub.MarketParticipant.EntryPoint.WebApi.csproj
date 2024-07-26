@@ -23,6 +23,7 @@ limitations under the License.
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="8.0.1" />
     <PackageReference Include="Azure.Identity" Version="1.11.4" />
     <PackageReference Include="Azure.Security.KeyVault.Keys" Version="4.6.0" />
     <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="12.2.1" />
