@@ -113,7 +113,7 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
             var user = lookup.GetValueOrDefault(userId);
             NotFoundValidationException.ThrowIfNull(user, userId.Value);
 
-            var showOrganizationOnly = !HasCurrentUserAccessToUser(user);
+            var showOrganizationOnly = !HasCurrentUserAccessToActor(user);
             if (showOrganizationOnly)
             {
                 if (!organizationNames.TryGetValue(user.AdministratedBy, out var organizationName))
@@ -164,7 +164,7 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
         return foundIdentities;
     }
 
-    private bool HasCurrentUserAccessToUser(User user)
+    private bool HasCurrentUserAccessToActor(User user)
     {
         return _userContext.CurrentUser.IsFas ||
                _userContext.CurrentUser.IsAssignedToActor(user.AdministratedBy.Value) ||
