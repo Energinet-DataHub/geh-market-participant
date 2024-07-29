@@ -78,6 +78,20 @@ public sealed class UserRepository : IUserRepository
         return userEntity == null ? null : UserMapper.MapFromEntity(userEntity);
     }
 
+    public async Task<IEnumerable<User>> GetAsync(IEnumerable<UserId> userIds)
+    {
+        var guids = userIds
+            .Select(id => id.Value)
+            .ToList();
+
+        var userEntities = await BuildUserQuery()
+            .Where(x => guids.Contains(x.Id))
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return userEntities.Select(UserMapper.MapFromEntity);
+    }
+
     public async Task<IEnumerable<User>> GetToUserRoleAsync(UserRoleId userRoleId)
     {
         var userEntities = await BuildUserQuery()

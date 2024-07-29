@@ -45,6 +45,13 @@ public interface IUserRepository
     Task<User?> GetAsync(UserId userId);
 
     /// <summary>
+    /// Gets the users having the specified ids.
+    /// </summary>
+    /// <param name="userIds">A list of user ids.</param>
+    /// <returns>A list of users matching the given ids; if the user was not found, it will not be in the list.</returns>
+    Task<IEnumerable<User>> GetAsync(IEnumerable<UserId> userIds);
+
+    /// <summary>
     /// Gets the users having the specified user role
     /// </summary>
     /// <param name="userRoleId">The id of the user role.</param>
