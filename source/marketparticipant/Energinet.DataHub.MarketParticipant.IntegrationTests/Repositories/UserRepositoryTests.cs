@@ -144,6 +144,38 @@ public sealed class UserRepositoryTests
     }
 
     [Fact]
+    public async Task GetUserAsync_MultipleUsers_AllReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
+        var userRepository = new UserRepository(context, userIdentityRepository);
+
+        var userA = await _fixture.PrepareUserAsync();
+        var userB = await _fixture.PrepareUserAsync();
+        var userC = await _fixture.PrepareUserAsync();
+
+        // Act
+        var actual = await userRepository.GetAsync(
+        [
+            new UserId(userA.Id),
+            new UserId(userB.Id),
+            new UserId(userC.Id)
+        ]);
+
+        // Assert
+        var list = actual.ToList();
+
+        Assert.Equal(3, list.Count);
+        Assert.Contains(list, user => user.Id.Value == userA.Id);
+        Assert.Contains(list, user => user.Id.Value == userB.Id);
+        Assert.Contains(list, user => user.Id.Value == userC.Id);
+    }
+
+    [Fact]
     public async Task GetToUserRoleAsync_UserWithNoMatchingRole_ReturnsNull()
     {
         // Arrange

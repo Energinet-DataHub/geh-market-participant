@@ -21,7 +21,8 @@ public sealed class GetAuditIdentityCommandRuleSet : AbstractValidator<GetAuditI
 {
     public GetAuditIdentityCommandRuleSet()
     {
-        RuleFor(command => command.AuditIdentityId)
-            .NotEmpty();
+        RuleFor(command => command.AuditIdentities)
+            .NotEmpty()
+            .ForEach(auditIdentity => auditIdentity.NotEmpty());
     }
 }
