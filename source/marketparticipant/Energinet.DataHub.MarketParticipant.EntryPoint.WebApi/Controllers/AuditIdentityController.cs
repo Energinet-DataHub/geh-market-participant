@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using MediatR;
@@ -32,13 +34,24 @@ public sealed class AuditIdentityController : ControllerBase
     }
 
     [HttpGet("{auditIdentityId:guid}")]
-    public async Task<ActionResult<GetAuditIdentityResponse>> GetAsync(Guid auditIdentityId)
+    public async Task<ActionResult<AuditIdentityDto>> GetAsync(Guid auditIdentityId)
+    {
+        // NOTE: There is no permission attribute, as command itself filters results.
+        var response = await _mediator
+            .Send(new GetAuditIdentityCommand([auditIdentityId]))
+            .ConfigureAwait(false);
+
+        return Ok(response.AuditIdentities.Single());
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<IEnumerable<AuditIdentityDto>>> GetMultipleAsync([FromBody] Guid[] auditIdentityId)
     {
         // NOTE: There is no permission attribute, as command itself filters results.
         var response = await _mediator
             .Send(new GetAuditIdentityCommand(auditIdentityId))
             .ConfigureAwait(false);
 
-        return Ok(response);
+        return Ok(response.AuditIdentities);
     }
 }
