@@ -17,18 +17,24 @@ using System;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 
 [AttributeUsage(AttributeTargets.Method)]
-public sealed class RevisionAttribute : Attribute
+public sealed class EnableRevisionAttribute : Attribute
 {
-    public RevisionAttribute(string activityName, Type entityType, string entityKeyArgumentName)
+    public EnableRevisionAttribute(string activityName, Type entityType)
     {
         ActivityName = activityName;
         EntityType = entityType;
-        EntityKeyArgumentName = entityKeyArgumentName;
+    }
+
+    public EnableRevisionAttribute(string activityName, Type entityType, string keyRouteParam)
+    {
+        ActivityName = activityName;
+        EntityType = entityType;
+        KeyRouteParam = keyRouteParam;
     }
 
     public string ActivityName { get; }
 
     public Type EntityType { get; }
 
-    public string EntityKeyArgumentName { get; }
+    public string? KeyRouteParam { get; }
 }

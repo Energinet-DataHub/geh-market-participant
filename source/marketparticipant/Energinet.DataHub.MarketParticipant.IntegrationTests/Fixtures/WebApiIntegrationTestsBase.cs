@@ -13,9 +13,13 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
@@ -43,5 +47,14 @@ public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFacto
         builder.UseSetting("KeyVault:TokenSignKeyVault", "https://fake_value");
         builder.UseSetting("KeyVault:TokenSignKeyName", "fake_value");
         builder.UseSetting("KeyVault:CertificatesKeyVault", "https://fake_value");
+        builder.UseSetting("ServiceBusOptions:SharedIntegrationEventTopic", "fake_value");
+        builder.UseSetting("ServiceBusOptions:IntegrationEventSubscription", "fake_value");
+        builder.UseSetting("ServiceBusOptions:ProducerConnectionString", "fake_value");
+        builder.UseSetting("ServiceBusOptions:HealthConnectionString", "fake_value");
+
+        builder.ConfigureServices(services =>
+        {
+            services.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRevisionActivityPublisher>().Object));
+        });
     }
 }

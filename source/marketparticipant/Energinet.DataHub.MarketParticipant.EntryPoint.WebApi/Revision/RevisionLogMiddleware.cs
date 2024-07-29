@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -22,7 +23,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
@@ -48,18 +49,35 @@ public sealed class RevisionLogMiddleware : IMiddleware
             return;
         }
 
-        var revisionAttribute = endpoint.Metadata.GetMetadata<RevisionAttribute>();
+        var revisionAttribute = endpoint.Metadata.GetMetadata<EnableRevisionAttribute>();
         if (revisionAttribute == null)
         {
             await next(context).ConfigureAwait(false);
             return;
         }
 
-        var route = context.Request.Path + context.Request.QueryString;
-        var routeData = context.GetRouteData();
+        var httpRequest = context.Request;
 
-        var entityKey = routeData.Values[revisionAttribute.EntityKeyArgumentName];
-        var payload = routeData.Values;
+        var route = httpRequest.GetEncodedPathAndQuery();
+        var payload = "[no json body]";
+        var entityKey = "[no entity key]";
+
+        if (httpRequest.HasJsonContentType())
+        {
+            httpRequest.EnableBuffering();
+
+            using var streamReader = new StreamReader(httpRequest.Body, leaveOpen: true);
+            payload = await streamReader
+                .ReadToEndAsync()
+                .ConfigureAwait(false);
+
+            httpRequest.Body.Position = 0;
+        }
+
+        if (!string.IsNullOrEmpty(revisionAttribute.KeyRouteParam))
+        {
+            entityKey = httpRequest.RouteValues[revisionAttribute.KeyRouteParam]?.ToString() ?? "[null]";
+        }
 
         var message = new
         {

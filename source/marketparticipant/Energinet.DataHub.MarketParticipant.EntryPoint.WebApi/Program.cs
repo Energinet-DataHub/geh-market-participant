@@ -45,7 +45,8 @@ builder.Services
 builder.Services
     .AddJwtBearerAuthenticationForWebApp(builder.Configuration)
     .AddUserAuthenticationForWebApp<FrontendUser, FrontendUserProvider>()
-    .AddPermissionAuthorizationForWebApp();
+    .AddPermissionAuthorizationForWebApp()
+    .AddScoped<RevisionLogMiddleware>();
 
 builder.Services
     .AddMarketParticipantWebApiModule(builder.Configuration);
