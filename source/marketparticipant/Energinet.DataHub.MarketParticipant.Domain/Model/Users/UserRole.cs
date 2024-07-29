@@ -57,6 +57,4 @@ public sealed class UserRole
     public UserRoleStatus Status { get; set; }
     public IEnumerable<PermissionId> Permissions { get; set; }
     public EicFunction EicFunction { get; }
-
-    public RevisionActivity ModifiedActivity => RevisionActivity.Create(this, "UserRoleModified", Id.Value);
 }

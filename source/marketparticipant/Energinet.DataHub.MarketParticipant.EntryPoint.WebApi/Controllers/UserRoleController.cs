@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -98,6 +99,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpPut("{userRoleId:guid}")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
+    [Revision("ManageUserRole", typeof(UserRole), "userRoleId")]
     public async Task<ActionResult> UpdateAsync(Guid userRoleId, UpdateUserRoleDto userRole)
     {
         if (!_userContext.CurrentUser.IsFas)

@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 
-public interface IRevisionActivityWriter
+[AttributeUsage(AttributeTargets.Method)]
+public sealed class RevisionAttribute : Attribute
 {
-    Task WriteAsync(RevisionActivity entity);
+    public RevisionAttribute(string activityName, Type entityType, string entityKeyArgumentName)
+    {
+        ActivityName = activityName;
+        EntityType = entityType;
+        EntityKeyArgumentName = entityKeyArgumentName;
+    }
+
+    public string ActivityName { get; }
+
+    public Type EntityType { get; }
+
+    public string EntityKeyArgumentName { get; }
 }
