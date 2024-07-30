@@ -51,6 +51,12 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
             throw new NotSupportedException($"User with email {identityUserOpenId.Email} not found with expected signInType.");
         }
 
+        if (userIdentityInvitedOnEmail.Status != UserIdentityStatus.Active)
+        {
+            await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
+            throw new NotSupportedException($"User with email {identityUserOpenId.Email} is deactivated.");
+        }
+
         var userLocalIdentityByEmail = await _userRepository.GetAsync(userIdentityInvitedOnEmail.Id).ConfigureAwait(false);
         if (userLocalIdentityByEmail == null)
         {
