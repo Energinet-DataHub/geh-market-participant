@@ -88,7 +88,7 @@ public sealed class RevisionLogMiddleware : IMiddleware
 
             OccurredOn = SystemClock.Instance.GetCurrentInstant().ToString(),
             Activity = revisionAttribute.ActivityName,
-            Source = route,
+            Origin = route,
             Payload = payload,
 
             AffectedEntityType = revisionAttribute.EntityType.Name,
