@@ -125,6 +125,15 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
         return externalUserId;
     }
 
+    public async Task<ExternalUserId> CreateActiveUserAsync(string testEmail)
+    {
+        var newUser = CreateTestUserModel(testEmail);
+        newUser.AccountEnabled = true;
+
+        var externalUserId = await CreateUserAndAddToCleanUpListAsync(newUser);
+        return externalUserId;
+    }
+
     public async Task<User?> TryFindExternalUserAsync(string testEmail)
     {
         var usersRequest = await Client
@@ -245,7 +254,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
     {
         return new User
         {
-            AccountEnabled = true,
+            AccountEnabled = false,
             DisplayName = "User Integration Tests (Always safe to delete)",
             GivenName = "Test First Name",
             Surname = "Test Last Name",

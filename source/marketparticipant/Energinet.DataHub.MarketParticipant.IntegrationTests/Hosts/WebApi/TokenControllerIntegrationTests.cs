@@ -311,7 +311,7 @@ public sealed class TokenControllerIntegrationTests :
             },
         };
 
-        var invitedUserExternalId = await _graphServiceClientFixture.CreateUserAsync(TestUserInviteOpenIdEmail);
+        var invitedUserExternalId = await _graphServiceClientFixture.CreateActiveUserAsync(TestUserInviteOpenIdEmail);
         var openIdUserExternalUserId = await _graphServiceClientFixture.CreateUserAsync(TestUserInviteOpenIdEmail, openIdIdentity);
 
         await _marketParticipantDatabaseFixture
