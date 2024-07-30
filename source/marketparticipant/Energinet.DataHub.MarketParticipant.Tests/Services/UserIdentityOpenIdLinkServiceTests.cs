@@ -115,6 +115,44 @@ public sealed class UserIdentityOpenIdLinkServiceTests
     }
 
     [Fact]
+    public async Task ValidateAndSetupOpenIdAsync_InvitedUserDisabled_Throws()
+    {
+        // Arrange
+        var externalUserId = new ExternalUserId(Guid.NewGuid());
+        var email = new RandomlyGeneratedEmailAddress();
+
+        var userRepository = new Mock<IUserRepository>();
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
+            .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
+
+        var userToReturnFromService = new UserIdentity(
+            externalUserId,
+            email,
+            UserIdentityStatus.Inactive,
+            "fake_value",
+            "fake_value",
+            null,
+            DateTime.UtcNow,
+            AuthenticationMethod.Undetermined,
+            [new LoginIdentity("federated", "issuer", "issuerAssignedId")]);
+
+        userIdentityRepository
+            .Setup(u => u.GetAsync(email))
+            .ReturnsAsync(userToReturnFromService);
+
+        var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
+            userRepository.Object,
+            userIdentityRepository.Object);
+
+        // Act + Assert
+        await Assert.ThrowsAsync<NotSupportedException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
+        userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
+        userIdentityRepository.Verify(e => e.GetAsync(email));
+    }
+
+    [Fact]
     public async Task ValidateAndSetupOpenIdAsync_LocalUserNotFound_Throws()
     {
         // Arrange
