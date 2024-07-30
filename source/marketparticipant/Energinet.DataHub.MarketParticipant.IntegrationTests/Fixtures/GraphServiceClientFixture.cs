@@ -245,7 +245,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
     {
         return new User
         {
-            AccountEnabled = false,
+            AccountEnabled = true,
             DisplayName = "User Integration Tests (Always safe to delete)",
             GivenName = "Test First Name",
             Surname = "Test Last Name",
