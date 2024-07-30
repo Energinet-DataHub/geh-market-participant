@@ -25,6 +25,7 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.IdentityModel.JsonWebTokens;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 
@@ -85,7 +86,7 @@ public sealed class RevisionLogMiddleware : IMiddleware
             UserId = GetUserId(context.User.Claims),
             ActorId = GetActorId(context.User.Claims),
 
-            OccurredOn = DateTimeOffset.UtcNow.ToString("o", CultureInfo.InvariantCulture),
+            OccurredOn = SystemClock.Instance.GetCurrentInstant().ToString(),
             Activity = revisionAttribute.ActivityName,
             Source = route,
             Payload = payload,
