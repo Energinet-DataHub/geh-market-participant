@@ -85,6 +85,7 @@ public sealed class RevisionLogMiddleware : IMiddleware
             LogId = Guid.NewGuid(),
             UserId = GetUserId(context.User.Claims),
             ActorId = GetActorId(context.User.Claims),
+            SystemId = "DA19142E-D419-4ED2-9798-CE5546260F84",
 
             OccurredOn = SystemClock.Instance.GetCurrentInstant().ToString(),
             Activity = revisionAttribute.ActivityName,

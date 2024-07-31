@@ -90,7 +90,8 @@ public static class MarketParticipantWebApiModuleExtensions
             .AddDbContextCheck<MarketParticipantDbContext>()
             .AddCheck<GraphApiHealthCheck>("Graph API Access")
             .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access")
-            .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access");
+            .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access")
+            .AddCheck<RevisionLogHealthCheck>("Revision Log Live");
 
         return services;
     }
