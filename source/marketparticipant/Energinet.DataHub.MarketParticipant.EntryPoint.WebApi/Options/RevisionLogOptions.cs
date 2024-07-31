@@ -16,17 +16,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Options;
 
-public class ServiceBusOptions
+public class RevisionLogOptions
 {
     [Required]
-    public string SharedIntegrationEventTopic { get; set; } = string.Empty;
-
-    [Required]
-    public string IntegrationEventSubscription { get; set; } = string.Empty;
-
-    [Required]
-    public string ProducerConnectionString { get; set; } = string.Empty;
-
-    [Required]
-    public string HealthConnectionString { get; set; } = string.Empty;
+    public string ApiAddress { get; set; } = string.Empty;
 }

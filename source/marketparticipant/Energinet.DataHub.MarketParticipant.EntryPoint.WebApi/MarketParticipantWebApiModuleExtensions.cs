@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Azure.Identity;
-using Azure.Messaging.ServiceBus;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.MarketParticipant.Application.Services;
@@ -39,8 +38,8 @@ public static class MarketParticipantWebApiModuleExtensions
         services.AddMarketParticipantCore();
 
         services
-            .AddOptions<ServiceBusOptions>()
-            .BindConfiguration(nameof(ServiceBusOptions))
+            .AddOptions<RevisionLogOptions>()
+            .BindConfiguration(nameof(RevisionLogOptions))
             .ValidateDataAnnotations();
 
         services
@@ -82,13 +81,8 @@ public static class MarketParticipantWebApiModuleExtensions
             return new CertificateService(certificateClient, certificateValidation, logger);
         });
 
-        services.AddSingleton<IRevisionActivityPublisher>(provider =>
-        {
-            var options = provider.GetRequiredService<IOptions<ServiceBusOptions>>();
-            var client = new ServiceBusClient(options.Value.ProducerConnectionString);
-            var sender = client.CreateSender(options.Value.SharedIntegrationEventTopic);
-            return new RevisionActivityServiceBusPublisher(sender);
-        });
+        services.AddHttpClient("revision-log-http-client");
+        services.AddSingleton<IRevisionActivityPublisher, RevisionActivityHttpPublisher>();
 
         // Health check
         services
@@ -96,11 +90,7 @@ public static class MarketParticipantWebApiModuleExtensions
             .AddDbContextCheck<MarketParticipantDbContext>()
             .AddCheck<GraphApiHealthCheck>("Graph API Access")
             .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access")
-            .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access")
-            .AddAzureServiceBusSubscription(
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.HealthConnectionString,
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.SharedIntegrationEventTopic,
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.IntegrationEventSubscription);
+            .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access");
 
         return services;
     }
