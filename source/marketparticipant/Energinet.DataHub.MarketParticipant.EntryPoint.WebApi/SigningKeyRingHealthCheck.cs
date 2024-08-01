@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,12 +32,21 @@ public sealed class SigningKeyRingHealthCheck : IHealthCheck
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        var roles = await _signingKeyRing
+        var keys = await _signingKeyRing
             .GetKeysAsync()
             .ConfigureAwait(false);
 
-        return roles.Any()
-            ? HealthCheckResult.Healthy()
-            : HealthCheckResult.Unhealthy("Token signing keys are missing.");
+        try
+        {
+            await _signingKeyRing
+                .GetSigningClientAsync()
+                .ConfigureAwait(false);
+
+            return HealthCheckResult.Healthy();
+        }
+        catch (Exception)
+        {
+            return HealthCheckResult.Unhealthy($"Suitable signing key was not found. Searched keys: {string.Join(", ", keys.Select(k => k.Id))}.");
+        }
     }
 }
