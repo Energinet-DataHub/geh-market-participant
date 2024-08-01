@@ -25,12 +25,14 @@ internal static class DbContextRegistration
     public static void AddDbContexts(this IServiceCollection services)
     {
         services.AddOptions();
-        services.AddOptions<DatabaseOptions>().BindConfiguration(DatabaseOptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<DatabaseOptions>()
+            .BindConfiguration(DatabaseOptions.SectionName)
+            .ValidateDataAnnotations();
 
         services.AddDbContext<IMarketParticipantDbContext, MarketParticipantDbContext>((provider, options) =>
         {
             var databaseOptions = provider.GetRequiredService<IOptions<DatabaseOptions>>();
-            options.UseSqlServer(databaseOptions.Value.ConnectionString);
+            options.UseSqlServer(databaseOptions.Value.ConnectionString, builder => builder.UseAzureSqlDefaults());
         });
     }
 }
