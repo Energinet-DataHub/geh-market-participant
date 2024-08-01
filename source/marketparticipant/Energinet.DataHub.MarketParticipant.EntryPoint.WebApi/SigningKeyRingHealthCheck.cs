@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
@@ -31,12 +31,17 @@ public sealed class SigningKeyRingHealthCheck : IHealthCheck
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        var roles = await _signingKeyRing
-            .GetKeysAsync()
-            .ConfigureAwait(false);
+        try
+        {
+            await _signingKeyRing
+                .GetSigningClientAsync()
+                .ConfigureAwait(false);
 
-        return roles.Any()
-            ? HealthCheckResult.Healthy()
-            : HealthCheckResult.Unhealthy("Token signing keys are missing.");
+            return HealthCheckResult.Healthy();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return HealthCheckResult.Unhealthy("Token signing keys are missing.", ex);
+        }
     }
 }
