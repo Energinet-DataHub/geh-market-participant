@@ -51,25 +51,21 @@ public sealed class CheckEmailExistsHandler : IRequestHandler<CheckEmailExistsCo
             .GetAsync(new EmailAddress(request.EmailAddress))
             .ConfigureAwait(false);
 
-        if (userIdentity == null)
-            return false;
+        if (userIdentity == null) return false;
 
         var user = await _userRepository
             .GetAsync(userIdentity.Id)
             .ConfigureAwait(false);
 
-        if (user == null)
-            return false;
+        if (user == null) return false;
 
-        if (_userContext.CurrentUser.IsFas)
-            return true;
+        if (_userContext.CurrentUser.IsFas) return true;
 
         var actor = await _actorRepository
             .GetAsync(user.AdministratedBy)
             .ConfigureAwait(false);
 
-        if (actor == null)
-            return false;
+        if (actor == null) return false;
 
         return actor.OrganizationId.Value == _userContext.CurrentUser.OrganizationId;
     }
