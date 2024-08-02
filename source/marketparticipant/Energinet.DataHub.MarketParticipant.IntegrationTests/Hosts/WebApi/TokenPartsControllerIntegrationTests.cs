@@ -71,7 +71,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         var internalToken = await FetchTokenAsync(externalToken, testActor.Id);
 
         // Assert
-        Assert.Equal("https://datahub3.dk", internalToken.Issuer);
+        Assert.Equal("https://datahub.dk", internalToken.Issuer);
     }
 
     [Fact]
