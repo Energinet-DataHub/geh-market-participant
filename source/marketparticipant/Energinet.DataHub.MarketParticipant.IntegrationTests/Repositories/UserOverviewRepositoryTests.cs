@@ -434,7 +434,7 @@ public sealed class UserOverviewRepositoryTests
                 Task.FromResult(
                     x.Select(y => new UserIdentity(
                         y,
-                        new EmailAddress($"{y}@test.datahub.dk"),
+                        new EmailAddress($"{y}@test.datahub3.dk"),
                         UserIdentityStatus.Inactive,
                         y.ToString(),
                         y.ToString(),
@@ -454,7 +454,7 @@ public sealed class UserOverviewRepositoryTests
             .ReturnsAsync(userIdsToReturnFromSearch.Select(y =>
                 new UserIdentity(
                     y,
-                    new EmailAddress($"{y}@test.datahub.dk"),
+                    new EmailAddress($"{y}@test.datahub3.dk"),
                     UserIdentityStatus.Inactive,
                     y.ToString(),
                     y.ToString(),
@@ -470,7 +470,7 @@ public sealed class UserOverviewRepositoryTests
                     userIdsToReturnFromGet.Select(y =>
                         new UserIdentity(
                             y,
-                            new EmailAddress($"{y}@test.datahub.dk"),
+                            new EmailAddress($"{y}@test.datahub3.dk"),
                             UserIdentityStatus.Inactive,
                             y.ToString(),
                             y.ToString(),

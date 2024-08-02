@@ -21,6 +21,7 @@ using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,7 +45,8 @@ builder.Services
 builder.Services
     .AddJwtBearerAuthenticationForWebApp(builder.Configuration)
     .AddUserAuthenticationForWebApp<FrontendUser, FrontendUserProvider>()
-    .AddPermissionAuthorizationForWebApp();
+    .AddPermissionAuthorizationForWebApp()
+    .AddScoped<RevisionLogMiddleware>();
 
 builder.Services
     .AddMarketParticipantWebApiModule(builder.Configuration);
@@ -70,6 +72,7 @@ app.UseCommonExceptionHandling(exceptionBuilder =>
 app.UseLoggingScope();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<RevisionLogMiddleware>();
 app.UseUserMiddlewareForWebApp<FrontendUser>();
 app.MapControllers().RequireAuthorization();
 
