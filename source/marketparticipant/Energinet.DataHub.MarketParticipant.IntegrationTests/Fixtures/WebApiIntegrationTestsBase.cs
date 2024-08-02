@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFactory<TStartup>
     where TStartup : class
 {
-    private const string ValidTestIssuer = "https://test.datahub3.dk";
+    private const string ValidTestIssuer = "https://test.datahub.dk";
 
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
 

@@ -44,7 +44,7 @@ public sealed class TokenControllerIntegrationTests :
     IClassFixture<KeyClientFixture>,
     IAsyncLifetime
 {
-    private const string TestUserInviteOpenIdEmail = "invitation-openid-integration-test@datahub3.dk";
+    private const string TestUserInviteOpenIdEmail = "invitation-openid-integration-test@datahub.dk";
 
     private readonly KeyClientFixture _keyClientFixture;
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
@@ -86,7 +86,7 @@ public sealed class TokenControllerIntegrationTests :
 
         var configuration = Deserialize(rawConfiguration, expectedStructure);
         Assert.NotNull(configuration);
-        Assert.Equal("https://datahub3.dk", configuration.issuer);
+        Assert.Equal("https://datahub.dk", configuration.issuer);
         Assert.Equal("https://localhost/token/keys", configuration.jwks_uri);
     }
 

@@ -151,7 +151,7 @@ public sealed class EmailContentGeneratorTests
     [Fact]
     public async Task GenerateAsync_WithAdditionalParameters_ReplacesParamsInContent()
     {
-        const string inviteLink = "https://datahub3.dk";
+        const string inviteLink = "https://datahub.dk";
 
         // Arrange
         var emailContentGenerator = new EmailContentGenerator();
