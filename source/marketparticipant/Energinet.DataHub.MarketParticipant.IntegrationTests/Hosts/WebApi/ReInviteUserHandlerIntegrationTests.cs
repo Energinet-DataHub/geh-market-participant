@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [IntegrationTest]
 public sealed class ReInviteUserHandlerIntegrationTests : IAsyncLifetime
 {
-    private const string TestUserEmail = "re-invitation-integration-test@datahub3.dk";
+    private const string TestUserEmail = "re-invitation-integration-test@datahub.dk";
 
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
     private readonly GraphServiceClientFixture _graphServiceClientFixture;
@@ -53,7 +53,7 @@ public sealed class ReInviteUserHandlerIntegrationTests : IAsyncLifetime
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var actor = await _databaseFixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization.Patch(t => t.Domain = "a.datahub3.dk"),
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domain = "a.datahub.dk"),
             TestPreparationEntities.ValidActor,
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator));
 
@@ -61,12 +61,12 @@ public sealed class ReInviteUserHandlerIntegrationTests : IAsyncLifetime
         var targetUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u =>
         {
             u.AdministratedByActorId = actor.Id;
-            u.Email = $"{Guid.NewGuid()}@a.datahub3.dk";
+            u.Email = $"{Guid.NewGuid()}@a.datahub.dk";
             u.ExternalId = externalUserId.Value;
             u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(-1);
         });
 
-        var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@a.datahub3.dk");
+        var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@a.datahub.dk");
         var invitedByUser = await _databaseFixture.PrepareUserAsync(invitedByUserEntity);
         var targetUser = await _databaseFixture.PrepareUserAsync(targetUserEntity);
 

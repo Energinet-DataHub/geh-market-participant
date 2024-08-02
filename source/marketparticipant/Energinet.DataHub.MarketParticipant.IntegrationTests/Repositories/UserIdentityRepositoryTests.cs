@@ -44,8 +44,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 [IntegrationTest]
 public sealed class UserIdentityRepositoryTests : IAsyncLifetime
 {
-    private const string TestUserEmail = "invitation-integration-test@datahub3.dk";
-    private const string DisabledTestUserEmail = "disabled-invitation-integration-test@datahub3.dk";
+    private const string TestUserEmail = "invitation-integration-test@datahub.dk";
+    private const string DisabledTestUserEmail = "disabled-invitation-integration-test@datahub.dk";
 
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
     private readonly GraphServiceClientFixture _graphServiceClientFixture;

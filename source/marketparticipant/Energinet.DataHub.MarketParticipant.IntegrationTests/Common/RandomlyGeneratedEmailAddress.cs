@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
 public sealed class RandomlyGeneratedEmailAddress
 {
-    private readonly string _value = $"{Guid.NewGuid()}@test.datahub3.dk";
+    private readonly string _value = $"{Guid.NewGuid()}@test.datahub.dk";
 
     public static implicit operator string(RandomlyGeneratedEmailAddress mock)
     {

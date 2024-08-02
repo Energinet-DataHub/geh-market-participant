@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [IntegrationTest]
 public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
 {
-    private const string TestUserEmail = "invitation-integration-test@datahub3.dk";
+    private const string TestUserEmail = "invitation-integration-test@datahub.dk";
 
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
     private readonly GraphServiceClientFixture _graphServiceClientFixture;
@@ -49,7 +49,7 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
     public async Task InviteUser_ValidInvitation_UserCreated()
     {
         // Arrange
-        var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@datahub3.dk");
+        var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@datahub.dk");
         var invitedByUser = await _databaseFixture.PrepareUserAsync(invitedByUserEntity);
 
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
@@ -59,7 +59,7 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var actor = await _databaseFixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization.Patch(t => t.Domain = "datahub3.dk"),
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domain = "datahub.dk"),
             TestPreparationEntities.ValidActor,
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator));
 
