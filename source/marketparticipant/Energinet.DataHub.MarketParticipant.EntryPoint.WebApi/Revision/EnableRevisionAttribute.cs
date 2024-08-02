@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Microsoft.AspNetCore.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 
@@ -21,12 +22,16 @@ public sealed class EnableRevisionAttribute : Attribute
 {
     public EnableRevisionAttribute(string activityName, Type entityType)
     {
+        ArgumentNullException.ThrowIfNull(entityType);
+
         ActivityName = activityName;
         EntityType = entityType;
     }
 
     public EnableRevisionAttribute(string activityName, Type entityType, string keyRouteParam)
     {
+        ArgumentNullException.ThrowIfNull(entityType);
+
         ActivityName = activityName;
         EntityType = entityType;
         KeyRouteParam = keyRouteParam;
@@ -37,4 +42,12 @@ public sealed class EnableRevisionAttribute : Attribute
     public Type EntityType { get; }
 
     public string? KeyRouteParam { get; }
+
+    internal string LookupEntityKey(HttpRequest httpRequest)
+    {
+        if (KeyRouteParam == null)
+            return "[no entity key]";
+
+        return httpRequest.RouteValues[KeyRouteParam]?.ToString() ?? "[null]";
+    }
 }

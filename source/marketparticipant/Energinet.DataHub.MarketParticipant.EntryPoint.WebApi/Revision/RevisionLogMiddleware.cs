@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -26,11 +25,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.IdentityModel.JsonWebTokens;
 using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 
 public sealed class RevisionLogMiddleware : IMiddleware
 {
+    private static readonly Guid _currentSystemIdentifier = Guid.Parse("DA19142E-D419-4ED2-9798-CE5546260F84");
+    private static readonly JsonSerializerOptions _jsonSerializerOptions
+        = new JsonSerializerOptions().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+
     private readonly IRevisionActivityPublisher _revisionActivityPublisher;
 
     public RevisionLogMiddleware(IRevisionActivityPublisher revisionActivityPublisher)
@@ -57,51 +61,55 @@ public sealed class RevisionLogMiddleware : IMiddleware
             return;
         }
 
-        var httpRequest = context.Request;
+        var payload = await ReadPayloadAsync(context).ConfigureAwait(false);
+        var revisionLogEntry = CreateRevisionLogEntry(context, revisionAttribute, payload);
 
-        var route = httpRequest.GetEncodedPathAndQuery();
-        var payload = "[no json body]";
-        var entityKey = "[no entity key]";
-
-        if (httpRequest.HasJsonContentType())
-        {
-            httpRequest.EnableBuffering();
-
-            using var streamReader = new StreamReader(httpRequest.Body, leaveOpen: true);
-            payload = await streamReader
-                .ReadToEndAsync()
-                .ConfigureAwait(false);
-
-            httpRequest.Body.Position = 0;
-        }
-
-        if (!string.IsNullOrEmpty(revisionAttribute.KeyRouteParam))
-        {
-            entityKey = httpRequest.RouteValues[revisionAttribute.KeyRouteParam]?.ToString() ?? "[null]";
-        }
-
-        var message = new
-        {
-            LogId = Guid.NewGuid(),
-            UserId = GetUserId(context.User.Claims),
-            ActorId = GetActorId(context.User.Claims),
-            SystemId = "DA19142E-D419-4ED2-9798-CE5546260F84",
-
-            OccurredOn = SystemClock.Instance.GetCurrentInstant().ToString(),
-            Activity = revisionAttribute.ActivityName,
-            Origin = route,
-            Payload = payload,
-
-            AffectedEntityType = revisionAttribute.EntityType.Name,
-            AffectedEntityKey = entityKey
-        };
-
-        var serializedMessage = JsonSerializer.Serialize(message);
         await _revisionActivityPublisher
-            .PublishAsync(serializedMessage)
+            .PublishAsync(revisionLogEntry)
             .ConfigureAwait(false);
 
         await next(context).ConfigureAwait(false);
+    }
+
+    private static string CreateRevisionLogEntry(
+        HttpContext context,
+        EnableRevisionAttribute revisionAttribute,
+        string payload)
+    {
+        var message = new RevisionLogEntryDto(
+            Guid.NewGuid(),
+            GetUserId(context.User.Claims),
+            GetActorId(context.User.Claims),
+            _currentSystemIdentifier,
+            SystemClock.Instance.GetCurrentInstant(),
+            revisionAttribute.ActivityName,
+            context.Request.GetEncodedPathAndQuery(),
+            payload,
+            revisionAttribute.EntityType.Name,
+            revisionAttribute.LookupEntityKey(context.Request));
+
+        return JsonSerializer.Serialize(message, _jsonSerializerOptions);
+    }
+
+    private static async Task<string> ReadPayloadAsync(HttpContext context)
+    {
+        var httpRequest = context.Request;
+        var payload = "[no json body]";
+
+        if (!httpRequest.HasJsonContentType())
+        {
+            return payload;
+        }
+
+        httpRequest.EnableBuffering();
+
+        using var streamReader = new StreamReader(httpRequest.Body, leaveOpen: true);
+        payload = await streamReader
+            .ReadToEndAsync()
+            .ConfigureAwait(false);
+
+        httpRequest.Body.Position = 0;
+        return payload;
     }
 
     private static Guid GetUserId(IEnumerable<Claim> claims)

@@ -37,11 +37,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 [ApiController]
 public class TokenController : ControllerBase
 {
-    private const string Issuer = "https://datahub.dk";
+    private const string Issuer = "https://datahub3.dk";
     private const string RoleClaim = "role";
     private const string TokenClaim = "token";
-    private const string MembershipClaim = "membership";
-    private const string FasMembership = "fas";
     private const string ActorNumberClaim = "actornumber";
     private const string MarketRolesClaim = "marketroles";
     private const string MultiTenancyClaim = "multitenancy";
@@ -154,7 +152,6 @@ public class TokenController : ControllerBase
         if (grantedPermissions.IsFas)
         {
             dataHubTokenClaims = dataHubTokenClaims
-                .Append(new Claim(MembershipClaim, FasMembership))
                 .Append(new Claim(MultiTenancyClaim, "true", ClaimValueTypes.Boolean));
         }
 

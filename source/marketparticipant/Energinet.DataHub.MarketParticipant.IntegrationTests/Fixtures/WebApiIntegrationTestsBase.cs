@@ -13,33 +13,62 @@
 // limitations under the License.
 
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using Moq;
+using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
 public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFactory<TStartup>
     where TStartup : class
 {
-    private readonly MarketParticipantDatabaseFixture _marketParticipantDatabaseFixture;
+    private const string ValidTestIssuer = "https://test.datahub3.dk";
 
-    protected WebApiIntegrationTestsBase(MarketParticipantDatabaseFixture marketParticipantDatabaseFixture)
+    private readonly MarketParticipantDatabaseFixture _databaseFixture;
+
+    protected WebApiIntegrationTestsBase(MarketParticipantDatabaseFixture databaseFixture)
     {
-        _marketParticipantDatabaseFixture = marketParticipantDatabaseFixture;
+        _databaseFixture = databaseFixture;
     }
 
     protected static string TestBackendAppId => "7C39AF16-AEA0-4B00-B4DB-D3E7B2D90A2E";
+
+    protected static string CreateMockedTestToken(Guid userId, Guid actorId, params string[] permissions)
+    {
+        var roleClaims = permissions.Select(p => new Claim("role", p));
+
+        var dataHubTokenClaims = roleClaims
+            .Append(new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()))
+            .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
+            .Append(new Claim("multitenancy", "true", ClaimValueTypes.Boolean));
+
+        var dataHubToken = new JwtSecurityToken(
+            ValidTestIssuer,
+            TestBackendAppId,
+            dataHubTokenClaims,
+            DateTime.UtcNow.AddMinutes(-1),
+            DateTime.UtcNow.AddMinutes(10));
+
+        return new JwtSecurityTokenHandler().WriteToken(dataHubToken);
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.UseSetting("Database:ConnectionString", _marketParticipantDatabaseFixture.DatabaseManager.ConnectionString);
+        builder.UseSetting("Database:ConnectionString", _databaseFixture.DatabaseManager.ConnectionString);
         builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.MitIdExternalMetadataAddress)}", "fake_value");
         builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.ExternalMetadataAddress)}", "fake_value");
         builder.UseSetting($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.InternalMetadataAddress)}", "fake_value");
@@ -54,6 +83,31 @@ public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFacto
 
         builder.ConfigureServices(services =>
         {
+            services
+                .AddAuthentication()
+                .AddJwtBearer("bypass", options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+#pragma warning disable CA5404
+                        ValidIssuer = ValidTestIssuer,
+                        ValidAudience = TestBackendAppId,
+                        ValidateIssuerSigningKey = false,
+                        ValidateLifetime = false,
+                        RequireSignedTokens = false,
+                        SignatureValidator = (t, _) => new JsonWebToken(t),
+#pragma warning restore CA5404
+                    };
+                });
+
+            var authorizationPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme, "bypass")
+                .RequireAuthenticatedUser()
+                .Build();
+
+            services
+                .AddAuthorizationBuilder()
+                .SetDefaultPolicy(authorizationPolicy);
+
             services.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRevisionActivityPublisher>().Object));
         });
     }

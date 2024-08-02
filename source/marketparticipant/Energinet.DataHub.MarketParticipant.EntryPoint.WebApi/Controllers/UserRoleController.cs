@@ -99,7 +99,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpPut("{userRoleId:guid}")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
-    [EnableRevision("ManageUserRole", typeof(UserRole), "userRoleId")]
+    [EnableRevision(RevisionActivities.UserRoleEdited, typeof(UserRole), "userRoleId")]
     public async Task<ActionResult> UpdateAsync(Guid userRoleId, UpdateUserRoleDto userRole)
     {
         if (!_userContext.CurrentUser.IsFas)

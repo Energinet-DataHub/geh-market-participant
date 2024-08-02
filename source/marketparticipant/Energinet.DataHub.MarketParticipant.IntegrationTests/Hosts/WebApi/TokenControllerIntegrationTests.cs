@@ -44,10 +44,10 @@ public sealed class TokenControllerIntegrationTests :
     IClassFixture<KeyClientFixture>,
     IAsyncLifetime
 {
-    private const string TestUserInviteOpenIdEmail = "invitation-openid-integration-test@datahub.dk";
+    private const string TestUserInviteOpenIdEmail = "invitation-openid-integration-test@datahub3.dk";
 
     private readonly KeyClientFixture _keyClientFixture;
-    private readonly MarketParticipantDatabaseFixture _marketParticipantDatabaseFixture;
+    private readonly MarketParticipantDatabaseFixture _databaseFixture;
     private readonly GraphServiceClientFixture _graphServiceClientFixture;
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
@@ -57,12 +57,12 @@ public sealed class TokenControllerIntegrationTests :
 
     public TokenControllerIntegrationTests(
         KeyClientFixture keyClientFixture,
-        MarketParticipantDatabaseFixture marketParticipantDatabaseFixture,
+        MarketParticipantDatabaseFixture databaseFixture,
         GraphServiceClientFixture graphServiceClientFixture)
-        : base(marketParticipantDatabaseFixture)
+        : base(databaseFixture)
     {
         _keyClientFixture = keyClientFixture;
-        _marketParticipantDatabaseFixture = marketParticipantDatabaseFixture;
+        _databaseFixture = databaseFixture;
         _graphServiceClientFixture = graphServiceClientFixture;
     }
 
@@ -86,7 +86,7 @@ public sealed class TokenControllerIntegrationTests :
 
         var configuration = Deserialize(rawConfiguration, expectedStructure);
         Assert.NotNull(configuration);
-        Assert.Equal("https://datahub.dk", configuration.issuer);
+        Assert.Equal("https://datahub3.dk", configuration.issuer);
         Assert.Equal("https://localhost/token/keys", configuration.jwks_uri);
     }
 
@@ -131,7 +131,7 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var testUser = await _marketParticipantDatabaseFixture.PrepareUserAsync();
+        var testUser = await _databaseFixture.PrepareUserAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         var actorId = Guid.NewGuid();
@@ -159,8 +159,8 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var testUser = await _marketParticipantDatabaseFixture.PrepareUserAsync();
-        var testActor = await _marketParticipantDatabaseFixture.PrepareActorAsync();
+        var testUser = await _databaseFixture.PrepareUserAsync();
+        var testActor = await _databaseFixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         var actorId = testActor.Id;
@@ -192,9 +192,9 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var testUser = await _marketParticipantDatabaseFixture.PrepareUserAsync(
+        var testUser = await _databaseFixture.PrepareUserAsync(
             TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddHours(-25)));
-        var testActor = await _marketParticipantDatabaseFixture.PrepareActorAsync();
+        var testActor = await _databaseFixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         var actorId = testActor.Id;
@@ -245,8 +245,8 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var testUser = await _marketParticipantDatabaseFixture.PrepareUserAsync();
-        var testActor = await _marketParticipantDatabaseFixture.PrepareActorAsync();
+        var testUser = await _databaseFixture.PrepareUserAsync();
+        var testActor = await _databaseFixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         var actorId = testActor.Id;
@@ -314,7 +314,7 @@ public sealed class TokenControllerIntegrationTests :
         var invitedUserExternalId = await _graphServiceClientFixture.CreateActiveUserAsync(TestUserInviteOpenIdEmail);
         var openIdUserExternalUserId = await _graphServiceClientFixture.CreateUserAsync(TestUserInviteOpenIdEmail, openIdIdentity);
 
-        await _marketParticipantDatabaseFixture
+        await _databaseFixture
             .PrepareUserAsync(TestPreparationEntities
                 .UnconnectedUser.Patch(e =>
                 {
@@ -322,7 +322,7 @@ public sealed class TokenControllerIntegrationTests :
                     e.Email = TestUserInviteOpenIdEmail;
                 }));
 
-        var testActor = await _marketParticipantDatabaseFixture.PrepareActorAsync();
+        var testActor = await _databaseFixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(openIdUserExternalUserId.Value);
 
         var actorId = testActor.Id;
