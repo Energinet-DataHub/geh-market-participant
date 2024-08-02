@@ -61,7 +61,13 @@ public sealed class SigningKeyRing : ISigningKeyRing
         var latestKey = keyCache
             .Where(key => !key.Properties.NotBefore.HasValue || key.Properties.NotBefore <= currentTime)
             .Where(key => !key.Properties.ExpiresOn.HasValue || key.Properties.ExpiresOn > currentTime)
-            .First(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < currentTime.AddMinutes(-10) || MarketParticipantWebApiAssembly.EnableIntegrationTestKeys);
+            .FirstOrDefault(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < currentTime.AddMinutes(-10) || MarketParticipantWebApiAssembly.EnableIntegrationTestKeys);
+
+        if (latestKey == null)
+        {
+            var keyStrings = keyCache.Select(k => $"({k.Id}; NBF: {k.Properties.NotBefore}; EXP: {k.Properties.ExpiresOn}; CRE: {k.Properties.CreatedOn})");
+            throw new InvalidOperationException($"No suitable key found in key cache. Keys: {string.Join(", ", keyStrings)}");
+        }
 
         return _keyClient.GetCryptographyClient(_keyName, latestKey.Properties.Version);
     }
@@ -72,7 +78,7 @@ public sealed class SigningKeyRing : ISigningKeyRing
         return keyCache.Select(vaultKey => vaultKey.Key);
     }
 
-    private async Task<IEnumerable<KeyVaultKey>> LoadKeysAsync()
+    private async Task<IReadOnlyCollection<KeyVaultKey>> LoadKeysAsync()
     {
         if (IsCacheValid())
             return _keyCache;

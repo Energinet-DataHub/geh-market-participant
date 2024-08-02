@@ -29,7 +29,7 @@ public sealed class UserInvitationExpiredTimerTrigger
     }
 
     [Function(nameof(UserInvitationExpiredTimerTrigger))]
-    public Task RunAsync([TimerTrigger("*/1 * * * *")] FunctionContext context)
+    public Task RunAsync([TimerTrigger("* */30 * * * *")] FunctionContext context)
     {
         return _mediator.Send(new UserInvitationExpiredCommand());
     }
