@@ -114,7 +114,6 @@ public sealed class RevisionLogMiddleware : IMiddleware
 
     private static Guid GetUserId(IEnumerable<Claim> claims)
     {
-        // The use of 'ClaimTypes.NameIdentifier' is explained here: https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/issues/415
         var userId = claims.Single(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
         return Guid.Parse(userId);
     }
