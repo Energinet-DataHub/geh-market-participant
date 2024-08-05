@@ -35,6 +35,7 @@ markpartDomain = group "Market Participant" {
         this -> markpartDb "Reads and writes actor/user data." "EF Core"
         this -> markpartKeyVault "Signs, and reads public key for, tokens." "Microsoft.Graph/https"
         this -> markpartCertKeyVault "Manages active DH2 certificates used for B2B authentication." "Microsoft.Graph/https"
+        this -> revLogIngestion "submits logs" "HTTP"
 
         markpartUserIdentityRepositoryInMarkpartApi = component "UserIdentityRepository" {
             description "Manages access to B2C user data through GraphAPI."
