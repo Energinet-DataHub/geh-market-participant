@@ -6,10 +6,7 @@ CREATE TABLE #ActorIdToGridAreaCodeLookup
 );
 
 INSERT INTO #ActorIdToGridAreaCodeLookup (ActorNumber, GridAreaCode)
-VALUES ('5790000610099', '144'),
-       ('5790000610099', '145'),
-       ('5790000610099', '232'),
-       ('5790000610099', '233');
+VALUES ('5790000610099', '233');
 
 DECLARE
     @Id INT = 1,
