@@ -52,7 +52,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             include actorB2BSystem ediApi bffApi frontendSinglePageApplication dh3User
             exclude wholesaleApi
         }
-        
+
         component markpartApi "MarketParticipantAPIs" {
             title "[Component] DataHub 3.0 - Market Participant User Web API"
             include markpartUserIdentityRepositoryInMarkpartApi->
