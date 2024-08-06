@@ -21,7 +21,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             # hence domains that doesn't depend on others, should be listed first.
 
             # Include Revision Log model
-            !include https://raw.githubusercontent.com/Energinet-DataHub/opengeh-revision-log/main/docs/diagrams/c4-model/model.dsl?token=GHSAT0AAAAAACGAKLTETFXSE4SIW66TGTZ4ZVQ4XZQ
+            !include https://raw.githubusercontent.com/Energinet-DataHub/opengeh-revision-log/main/docs/diagrams/c4-model/model.dsl?token=GHSAT0AAAAAACGAKLTEFXP6E2QI3O2FPKUAZVSHY4A
 
             # Include Market Participant model
             !include model.dsl
