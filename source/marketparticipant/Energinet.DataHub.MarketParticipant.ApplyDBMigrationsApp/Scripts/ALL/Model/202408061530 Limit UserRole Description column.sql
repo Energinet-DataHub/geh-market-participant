@@ -1,5 +1,6 @@
 ALTER TABLE [dbo].[UserRole]
 ADD [Description_tmp] [nvarchar](2000) NULL;
+GO
 
 UPDATE [dbo].[UserRole]
 SET [Description_tmp] = LEFT([Description], 2000);
