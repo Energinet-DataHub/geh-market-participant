@@ -19,24 +19,20 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions.Dep
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
+    .ConfigureFunctionsWorkerDefaults()
     .ConfigureServices((context, services) =>
     {
         services.AddApplicationInsightsForIsolatedWorker("mark-part");
         services.AddHealthChecksForIsolatedWorker();
         services.AddScoped<HealthCheckEndpoint>();
 
-        services.AddFunctionLoggingScope("mark-part");
-
         services.AddMarketParticipantOrganizationModule(context.Configuration);
     })
     .ConfigureLogging((hostingContext, logging) =>
     {
         logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
-        logging.AddApplicationInsights();
         logging.SetApplicationInsightLogLevel();
     })
     .Build();

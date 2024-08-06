@@ -19,17 +19,14 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.
 using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Monitor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
+    .ConfigureFunctionsWorkerDefaults()
     .ConfigureServices((context, services) =>
     {
         services.AddApplicationInsightsForIsolatedWorker("mark-part");
         services.AddHealthChecksForIsolatedWorker();
         services.AddScoped<HealthCheckEndpoint>();
-
-        services.AddFunctionLoggingScope("mark-part");
 
         services
             .AddCertificatesHttpClient()
@@ -38,7 +35,6 @@ var host = new HostBuilder()
     .ConfigureLogging((hostingContext, logging) =>
     {
         logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
-        logging.AddApplicationInsights();
         logging.SetApplicationInsightLogLevel();
     })
     .Build();
