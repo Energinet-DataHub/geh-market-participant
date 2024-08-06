@@ -65,20 +65,33 @@ internal static class ActorMapper
         switch (from.Credentials)
         {
             case ActorClientSecretCredentials credentials:
-                to.ClientSecretCredential = new ActorClientSecretCredentialsEntity
+                if (to.ClientSecretCredential == null ||
+                    to.ClientSecretCredential.ClientSecretIdentifier != credentials.SecretIdentifier.ToString() ||
+                    to.ClientSecretCredential.ExpirationDate != credentials.ExpirationDate.ToDateTimeOffset())
                 {
-                    ClientSecretIdentifier = credentials.SecretIdentifier.ToString(),
-                    ExpirationDate = credentials.ExpirationDate.ToDateTimeOffset(),
-                };
+                    to.ClientSecretCredential = new ActorClientSecretCredentialsEntity
+                    {
+                        ClientSecretIdentifier = credentials.SecretIdentifier.ToString(),
+                        ExpirationDate = credentials.ExpirationDate.ToDateTimeOffset(),
+                    };
+                }
+
                 to.CertificateCredential = null;
                 break;
             case ActorCertificateCredentials credentials:
-                to.CertificateCredential = new ActorCertificateCredentialsEntity
+                if (to.CertificateCredential == null ||
+                    to.CertificateCredential.CertificateThumbprint != credentials.CertificateThumbprint ||
+                    to.CertificateCredential.KeyVaultSecretIdentifier != credentials.KeyVaultSecretIdentifier ||
+                    to.CertificateCredential.ExpirationDate != credentials.ExpirationDate.ToDateTimeOffset())
                 {
-                    CertificateThumbprint = credentials.CertificateThumbprint,
-                    KeyVaultSecretIdentifier = credentials.KeyVaultSecretIdentifier,
-                    ExpirationDate = credentials.ExpirationDate.ToDateTimeOffset(),
-                };
+                    to.CertificateCredential = new ActorCertificateCredentialsEntity
+                    {
+                        CertificateThumbprint = credentials.CertificateThumbprint,
+                        KeyVaultSecretIdentifier = credentials.KeyVaultSecretIdentifier,
+                        ExpirationDate = credentials.ExpirationDate.ToDateTimeOffset(),
+                    };
+                }
+
                 to.ClientSecretCredential = null;
                 break;
             case null:
