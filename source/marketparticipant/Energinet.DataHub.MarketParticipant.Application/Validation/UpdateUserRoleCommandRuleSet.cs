@@ -38,8 +38,7 @@ public sealed class UpdateUserRoleCommandRuleSet : AbstractValidator<UpdateUserR
 
                 validator
                     .RuleFor(role => role.Description)
-                    .NotEmpty()
-                    .Length(1, 2000);
+                    .Length(0, 2000);
 
                 validator
                     .RuleFor(role => role.Status)
