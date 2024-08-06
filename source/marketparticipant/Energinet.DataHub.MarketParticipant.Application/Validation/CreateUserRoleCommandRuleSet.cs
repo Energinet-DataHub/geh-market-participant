@@ -33,6 +33,11 @@ public sealed class CreateUserRoleCommandRuleSet : AbstractValidator<CreateUserR
                     .Length(1, 250);
 
                 validator
+                    .RuleFor(role => role.Description)
+                    .NotEmpty()
+                    .Length(1, 2000);
+
+                validator
                     .RuleFor(role => role.EicFunction)
                     .IsInEnum();
 
