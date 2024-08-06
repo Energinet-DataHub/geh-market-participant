@@ -89,6 +89,30 @@ public sealed class CreateUserRoleCommandRuleSetTests
         }
     }
 
+    [Fact]
+    public async Task Validate_Description_ValidatesProperty()
+    {
+        // Arrange
+        const string propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.Description)}";
+
+        var createGridAreaDto = new CreateUserRoleDto(
+            ValidName,
+            new string('a', 2001),
+            ValidStatus,
+            ValidEicFunction,
+            new Collection<int> { ValidPermission });
+
+        var target = new CreateUserRoleCommandRuleSet();
+        var command = new CreateUserRoleCommand(createGridAreaDto);
+
+        // Act
+        var result = await target.ValidateAsync(command);
+
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+    }
+
     [Theory]
     [InlineData((int)UserRoleStatus.Active, true)]
     [InlineData((int)UserRoleStatus.Inactive, true)]

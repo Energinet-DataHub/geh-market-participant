@@ -37,6 +37,10 @@ public sealed class UpdateUserRoleCommandRuleSet : AbstractValidator<UpdateUserR
                     .Length(1, 250);
 
                 validator
+                    .RuleFor(role => role.Description)
+                    .Length(0, 2000);
+
+                validator
                     .RuleFor(role => role.Status)
                     .IsInEnum();
 
