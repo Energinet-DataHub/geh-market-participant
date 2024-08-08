@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
@@ -30,14 +31,16 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 public sealed class ActiveDirectoryB2CServiceTests
 {
     private readonly IActiveDirectoryB2CService _sut;
+    private readonly IActiveDirectoryB2BRolesProvider _rolesProvider;
     private readonly GraphServiceClientFixture _graphServiceClientFixture;
 
     public ActiveDirectoryB2CServiceTests(GraphServiceClientFixture graphServiceClientFixture, B2CFixture b2CFixture)
     {
+        ArgumentNullException.ThrowIfNull(b2CFixture);
+
         _graphServiceClientFixture = graphServiceClientFixture;
-#pragma warning disable CA1062
         _sut = b2CFixture.B2CService;
-#pragma warning restore CA1062
+        _rolesProvider = b2CFixture.B2CRolesProvider;
     }
 
     [Fact]
@@ -78,12 +81,18 @@ public sealed class ActiveDirectoryB2CServiceTests
         {
             await _sut.AssignApplicationRegistrationAsync(actor);
 
+            var appRoles = await _rolesProvider.GetB2BRolesAsync();
+            var systemOperatorRole = appRoles.EicRolesMapped[EicFunction.SystemOperator];
+            var meteredDataResponsibleRole = appRoles.EicRolesMapped[EicFunction.MeteredDataResponsible];
+
             // Act
             var app = await _graphServiceClientFixture.GetExistingAppRegistrationAsync(actor.ExternalActorId!.ToString());
 
             // Assert
-            Assert.Equal("d82c211d-cce0-e95e-bd80-c2aedf99f32b", app.AppRoles.First().RoleId);
-            Assert.Equal("00e32df2-b846-2e18-328f-702cec8f1260", app.AppRoles.ElementAt(1).RoleId);
+            var actual = app.AppRoles.ToList();
+            Assert.Equal(2, actual.Count);
+            Assert.Contains(systemOperatorRole.ToString(), actual.Select(x => x.RoleId));
+            Assert.Contains(meteredDataResponsibleRole.ToString(), actual.Select(x => x.RoleId));
         }
         finally
         {
