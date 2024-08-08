@@ -18,25 +18,31 @@ using System.Text;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Services;
 
 public sealed class RevisionActivityHttpPublisher : IRevisionActivityPublisher
 {
+    private readonly ILogger<RevisionActivityHttpPublisher> _logger;
     private readonly IOptions<RevisionLogOptions> _revisionLogOptions;
     private readonly IHttpClientFactory _httpClientFactory;
 
     public RevisionActivityHttpPublisher(
+        ILogger<RevisionActivityHttpPublisher> logger,
         IOptions<RevisionLogOptions> revisionLogOptions,
         IHttpClientFactory httpClientFactory)
     {
+        _logger = logger;
         _revisionLogOptions = revisionLogOptions;
         _httpClientFactory = httpClientFactory;
     }
 
     public async Task PublishAsync(string message)
     {
+        _logger.LogInformation("Posting message: " + message);
+
         using var logRequest = new HttpRequestMessage(HttpMethod.Post, _revisionLogOptions.Value.ApiAddress);
         logRequest.Content = new StringContent(message, Encoding.UTF8, MediaTypeNames.Application.Json);
 
