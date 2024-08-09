@@ -82,6 +82,7 @@ public sealed class RevisionLogMiddleware : IMiddleware
             GetActorId(context.User.Claims),
             _currentSystemIdentifier,
             SystemClock.Instance.GetCurrentInstant(),
+            GetPermissions(context.User.Claims),
             revisionAttribute.ActivityName,
             context.Request.GetEncodedPathAndQuery(),
             payload,
@@ -122,5 +123,12 @@ public sealed class RevisionLogMiddleware : IMiddleware
     {
         var actorId = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Azp).Value;
         return Guid.Parse(actorId);
+    }
+
+    private static string GetPermissions(IEnumerable<Claim> claims)
+    {
+        return string.Join(",", claims
+            .Where(claim => claim.Type == ClaimTypes.Role)
+            .Select(claim => claim.Value));
     }
 }

@@ -36,6 +36,7 @@ using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Xunit;
 using Xunit.Categories;
+using static Google.Api.Distribution.Types;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
@@ -62,7 +63,7 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
             TestPreparationEntities.ValidOrganization,
             TestPreparationEntities.ValidActor.Patch(a => a.Status = ActorStatus.Active),
             TestPreparationEntities.ValidMarketRole);
-        var token = CreateMockedTestToken(testUser.Id, testActor.Id, "user-roles:manage");
+        var token = CreateMockedTestToken(testUser.Id, testActor.Id, "user-roles:manage", "users:manage");
 
         var targetUserRole = await _databaseFixture.PrepareUserRoleAsync();
         var updateUserRoleDto = new UpdateUserRoleDto("new_name", "new_description", UserRoleStatus.Active, []);
@@ -97,6 +98,7 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
         Assert.NotEqual(Guid.Empty, revisionLogEntry.LogId);
         Assert.Equal(testUser.Id, revisionLogEntry.UserId);
         Assert.Equal(testActor.Id, revisionLogEntry.ActorId);
+        Assert.Equal("user-roles:manage,users:manage", revisionLogEntry.Permissions);
         Assert.Equal(RevisionActivities.UserRoleEdited, revisionLogEntry.Activity);
         Assert.Equal(routeWithRevisionEnabled, revisionLogEntry.Origin);
         Assert.Equal(await httpContent.ReadAsStringAsync(), revisionLogEntry.Payload);
@@ -115,7 +117,7 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
             TestPreparationEntities.ValidOrganization,
             TestPreparationEntities.ValidActor.Patch(a => a.Status = ActorStatus.Active),
             TestPreparationEntities.ValidMarketRole);
-        var token = CreateMockedTestToken(testUser.Id, testActor.Id, "user-roles:manage");
+        var token = CreateMockedTestToken(testUser.Id, testActor.Id, "user-roles:manage", "users:manage");
 
         var targetUserRole = await _databaseFixture.PrepareUserRoleAsync();
         var updateUserRoleDto = new UpdateUserRoleDto(new string('a', 1024), "new_description", UserRoleStatus.Active, []);
@@ -150,6 +152,7 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
         Assert.NotEqual(Guid.Empty, revisionLogEntry.LogId);
         Assert.Equal(testUser.Id, revisionLogEntry.UserId);
         Assert.Equal(testActor.Id, revisionLogEntry.ActorId);
+        Assert.Equal("user-roles:manage,users:manage", revisionLogEntry.Permissions);
         Assert.Equal(RevisionActivities.UserRoleEdited, revisionLogEntry.Activity);
         Assert.Equal(routeWithRevisionEnabled, revisionLogEntry.Origin);
         Assert.Equal(await httpContent.ReadAsStringAsync(), revisionLogEntry.Payload);
