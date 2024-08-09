@@ -31,6 +31,7 @@ public sealed class B2CFixture : IAsyncLifetime
     private GraphServiceClient? _graphClient;
 
     public IActiveDirectoryB2CService B2CService { get; private set; } = null!;
+    public IActiveDirectoryB2BRolesProvider B2CRolesProvider { get; private set; } = null!;
 
     public Task InitializeAsync()
     {
@@ -57,13 +58,12 @@ public sealed class B2CFixture : IAsyncLifetime
         });
 
         // Active Directory Roles
-        var activeDirectoryB2CRoles =
-            new ActiveDirectoryB2BRolesProvider(_graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
+        B2CRolesProvider = new ActiveDirectoryB2BRolesProvider(_graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
 
         B2CService = new ActiveDirectoryB2CService(
             _graphClient,
             config,
-            activeDirectoryB2CRoles);
+            B2CRolesProvider);
 
         return Task.CompletedTask;
     }
