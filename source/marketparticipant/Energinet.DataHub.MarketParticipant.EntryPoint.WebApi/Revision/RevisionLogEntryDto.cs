@@ -25,6 +25,7 @@ public sealed class RevisionLogEntryDto
         Guid actorId,
         Guid systemId,
         Instant occurredOn,
+        string permissions,
         string activity,
         string origin,
         string payload,
@@ -35,6 +36,7 @@ public sealed class RevisionLogEntryDto
         UserId = userId;
         ActorId = actorId;
         SystemId = systemId;
+        Permissions = permissions;
         OccurredOn = occurredOn;
         Activity = activity;
         Origin = origin;
@@ -48,6 +50,7 @@ public sealed class RevisionLogEntryDto
     public Guid UserId { get; }
     public Guid ActorId { get; }
     public Guid SystemId { get; }
+    public string Permissions { get; }
 
     public Instant OccurredOn { get; }
     public string Activity { get; }
