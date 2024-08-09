@@ -36,7 +36,6 @@ using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Xunit;
 using Xunit.Categories;
-using static Google.Api.Distribution.Types;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
