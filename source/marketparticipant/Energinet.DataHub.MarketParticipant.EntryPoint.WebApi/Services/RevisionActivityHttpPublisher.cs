@@ -41,7 +41,7 @@ public sealed class RevisionActivityHttpPublisher : IRevisionActivityPublisher
 
     public async Task PublishAsync(string message)
     {
-        _logger.LogInformation("Posting message: " + message);
+        _logger.LogError("Posting message: " + message);
 
         using var logRequest = new HttpRequestMessage(HttpMethod.Post, _revisionLogOptions.Value.ApiAddress);
         logRequest.Content = new StringContent(message, Encoding.UTF8, MediaTypeNames.Application.Json);
