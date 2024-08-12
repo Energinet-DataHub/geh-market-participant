@@ -142,7 +142,7 @@ public sealed class RevisionLogMiddleware : IMiddleware
             if (read == 0)
                 return sb.ToString();
 
-            sb.Append(buf);
+            sb.Append(buf[..read]);
         }
         while (sb.Length < 100 * 1024 * 1024);
 
