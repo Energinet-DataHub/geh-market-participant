@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -105,6 +106,48 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
         Assert.Equal(targetUserRole.Id, Guid.Parse(revisionLogEntry.AffectedEntityKey));
 
         _revisionActivityPublisherMock.Verify(pub => pub.PublishAsync(actual), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateUserRole_LargePayload_IsLimited()
+    {
+        // Arrange
+        var testUser = await _databaseFixture.PrepareUserAsync();
+        var testActor = await _databaseFixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(a => a.Status = ActorStatus.Active),
+            TestPreparationEntities.ValidMarketRole);
+        var token = CreateMockedTestToken(testUser.Id, testActor.Id, "user-roles:manage", "users:manage");
+
+        var updateUserRoleDto = new UpdateUserRoleDto("new_name", new string('a', 101 * 1024 * 1024), UserRoleStatus.Active, []);
+        var routeWithRevisionEnabled = $"/user-roles/{Guid.NewGuid()}";
+
+        using var httpContent = new StringContent(
+            JsonSerializer.Serialize(updateUserRoleDto),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        var actual = string.Empty;
+
+        _revisionActivityPublisherMock
+            .Setup(pub => pub.PublishAsync(It.IsAny<string>()))
+            .Callback(new Action<string>(message => actual = message));
+
+        // Act
+        using var client = CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        using var response = await client.PutAsync(new Uri(routeWithRevisionEnabled, UriKind.Relative), httpContent);
+
+        // Assert
+        Assert.False(string.IsNullOrEmpty(actual));
+
+        var revisionLogEntry = JsonSerializer.Deserialize<RevisionLogEntryDto>(
+            actual,
+            new JsonSerializerOptions().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb));
+
+        Assert.NotNull(revisionLogEntry);
+        Assert.Equal(100 * 1024 * 1024, revisionLogEntry.Payload.Length);
     }
 
     [Fact]

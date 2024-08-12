@@ -64,7 +64,7 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
             throw new NotSupportedException($"User with id {userIdentityInvitedOnEmail.Id} not found.");
         }
 
-        if (userLocalIdentityByEmail.MitIdSignupInitiatedAt < DateTimeOffset.UtcNow.AddMinutes(-15))
+        if (userLocalIdentityByEmail.MitIdSignupInitiatedAt.GetValueOrDefault() < DateTimeOffset.UtcNow.AddMinutes(-15))
         {
             await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
             throw new UnauthorizedAccessException($"OpenId signup initiated at {userLocalIdentityByEmail.MitIdSignupInitiatedAt} is expired.");
