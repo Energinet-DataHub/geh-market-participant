@@ -27,6 +27,8 @@ on:
         value: ${{ jobs.changes.outputs.dotnet }}
       render_c4model_views:
         value: ${{ jobs.changes.outputs.render_c4model_views }}
+      db_migrations:
+        value: ${{ jobs.changes.outputs.db_migrations }}
 
 jobs:
   changes:
@@ -36,6 +38,7 @@ jobs:
     outputs:
       dotnet: ${{ steps.filter.outputs.dotnet }}
       render_c4model_views: ${{ steps.filter.outputs.render_c4model_views }}
+      db_migrations: ${{ steps.filter.outputs.db_migrations }}
     steps:
       # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
       - name: Checkout repository
@@ -51,7 +54,9 @@ jobs:
               - '.github/workflows/cd.yml'
               - '.github/workflows/ci-dotnet.yml'
               - '.github/actions/dotnet-*/**'
-              - 'source/marketparticipant/**'
+              - 'source/marketparticipant/!(Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp/**)**'
+            db_migrations:
+              - 'source/marketparticipant/Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp/**'
             render_c4model_views:
               - 'docs/diagrams/c4-model/views.dsl'
               - 'docs/diagrams/c4-model/views.json'
