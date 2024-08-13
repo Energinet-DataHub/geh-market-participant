@@ -34,4 +34,5 @@ public enum PermissionId
     BalanceResponsibilityView = 18,
     RequestWholesaleSettlement = 19,
     CalculationsView = 20,
+    ImbalancePricesView = 21,
 }
