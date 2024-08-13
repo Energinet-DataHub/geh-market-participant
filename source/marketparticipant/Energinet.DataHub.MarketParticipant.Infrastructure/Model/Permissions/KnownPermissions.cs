@@ -166,7 +166,7 @@ public static class KnownPermissions
         {
             EicFunction.DataHubAdministrator
         }),
-        new(PermissionId.ImbalancePricesView, "imbalance-prices:view", InstantPattern.ExtendedIso.Parse("2024-08-09T00:00:00Z").Value, new[]
+        new(PermissionId.ImbalancePricesView, "imbalance-prices:view", InstantPattern.ExtendedIso.Parse("2024-08-13T00:00:00Z").Value, new[]
         {
             EicFunction.BalanceResponsibleParty,
             EicFunction.BillingAgent,
