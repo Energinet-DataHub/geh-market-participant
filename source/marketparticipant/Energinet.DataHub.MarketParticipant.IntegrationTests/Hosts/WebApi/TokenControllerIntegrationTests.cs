@@ -320,6 +320,7 @@ public sealed class TokenControllerIntegrationTests :
                 {
                     e.ExternalId = invitedUserExternalId.Value;
                     e.Email = TestUserInviteOpenIdEmail;
+                    e.MitIdSignupInitiatedAt = DateTime.UtcNow;
                 }));
 
         var testActor = await _databaseFixture.PrepareActorAsync();

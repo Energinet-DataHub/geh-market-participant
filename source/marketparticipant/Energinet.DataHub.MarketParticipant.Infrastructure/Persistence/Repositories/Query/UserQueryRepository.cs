@@ -86,7 +86,7 @@ public sealed class UserQueryRepository : IUserQueryRepository
             .ConfigureAwait(false))
             .ToDictionary(p => p.Id);
 
-        var finalPermissions = new List<Permission>();
+        var finalPermissions = new HashSet<Permission>();
 
         foreach (var userRole in userRoles)
         {

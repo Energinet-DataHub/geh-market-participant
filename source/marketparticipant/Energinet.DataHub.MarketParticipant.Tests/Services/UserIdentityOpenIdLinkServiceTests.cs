@@ -219,6 +219,39 @@ public sealed class UserIdentityOpenIdLinkServiceTests
     }
 
     [Fact]
+    public async Task ValidateAndSetupOpenIdAsync_OpenIdSetupNotEnabled_Throws()
+    {
+        // Arrange
+        var externalUserId = new ExternalUserId(Guid.NewGuid());
+        var email = new RandomlyGeneratedEmailAddress();
+
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
+            .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
+
+        var userToReturnFromService = GetUserIdentity(externalUserId, email, "emailAddress");
+        userIdentityRepository
+            .Setup(u => u.GetAsync(email))
+            .ReturnsAsync(userToReturnFromService);
+
+        var localDbUser = GetUser(externalUserId);
+        var userRepository = new Mock<IUserRepository>();
+        userRepository
+            .Setup(e => e.GetAsync(externalUserId))
+            .ReturnsAsync(localDbUser);
+
+        var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
+            userRepository.Object,
+            userIdentityRepository.Object);
+
+        // Act + Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
+        userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
+        userRepository.Verify(e => e.GetAsync(userToReturnFromService.Id));
+    }
+
+    [Fact]
     public async Task UnlinkOpenIdAsync_UserLinked_NoLongerHasOpenId()
     {
         // Arrange
@@ -255,7 +288,7 @@ public sealed class UserIdentityOpenIdLinkServiceTests
             [new LoginIdentity(signInType, "issuer", "issuerAssignedId")]);
     }
 
-    private static User GetUser(ExternalUserId externalUserId, DateTimeOffset mitIdInitiatedAt)
+    private static User GetUser(ExternalUserId externalUserId, DateTimeOffset? mitIdInitiatedAt = null)
     {
         var user = new User(
             new UserId(Guid.Empty),
