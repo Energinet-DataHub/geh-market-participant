@@ -140,6 +140,7 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
         using var response = await client.PutAsync(new Uri(routeWithRevisionEnabled, UriKind.Relative), httpContent);
 
         // Assert
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
         Assert.False(string.IsNullOrEmpty(actual));
 
         var revisionLogEntry = JsonSerializer.Deserialize<RevisionLogEntryDto>(

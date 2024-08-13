@@ -32,6 +32,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 
 public sealed class RevisionLogMiddleware : IMiddleware
 {
+    private const int MaxFileSize = 100 * 1024 * 1024;
+
     private static readonly Guid _currentSystemIdentifier = Guid.Parse("DA19142E-D419-4ED2-9798-CE5546260F84");
     private static readonly JsonSerializerOptions _jsonSerializerOptions
         = new JsonSerializerOptions().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
@@ -68,6 +70,13 @@ public sealed class RevisionLogMiddleware : IMiddleware
         await _revisionActivityPublisher
             .PublishAsync(revisionLogEntry)
             .ConfigureAwait(false);
+
+        // If we hit the limit, we log what we have, but also deny the request.
+        if (payload.Length == MaxFileSize)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.RequestEntityTooLarge;
+            return;
+        }
 
         await next(context).ConfigureAwait(false);
     }
@@ -144,7 +153,7 @@ public sealed class RevisionLogMiddleware : IMiddleware
 
             sb.Append(buf[..read]);
         }
-        while (sb.Length < 100 * 1024 * 1024);
+        while (sb.Length < MaxFileSize);
 
         return sb.ToString();
     }
