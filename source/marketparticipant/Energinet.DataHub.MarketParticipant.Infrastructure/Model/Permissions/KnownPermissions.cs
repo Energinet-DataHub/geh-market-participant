@@ -166,5 +166,23 @@ public static class KnownPermissions
         {
             EicFunction.DataHubAdministrator
         }),
+        new(PermissionId.ImbalancePricesView, "imbalance-prices:view", InstantPattern.ExtendedIso.Parse("2024-08-13T00:00:00Z").Value, new[]
+        {
+            EicFunction.BalanceResponsibleParty,
+            EicFunction.BillingAgent,
+            EicFunction.EnergySupplier,
+            EicFunction.GridAccessProvider,
+            EicFunction.ImbalanceSettlementResponsible,
+            EicFunction.MeteredDataAdministrator,
+            EicFunction.MeteredDataResponsible,
+            EicFunction.MeteringPointAdministrator,
+            EicFunction.SystemOperator,
+            EicFunction.DanishEnergyAgency,
+            EicFunction.DataHubAdministrator,
+            EicFunction.IndependentAggregator,
+            EicFunction.SerialEnergyTrader,
+            EicFunction.MeterOperator,
+            EicFunction.ItSupplier,
+        }),
     };
 }
