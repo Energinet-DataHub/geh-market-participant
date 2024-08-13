@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
@@ -31,6 +32,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 
 public sealed class RevisionLogMiddleware : IMiddleware
 {
+    private const int MaxFileSize = 100 * 1024 * 1024;
+
     private static readonly Guid _currentSystemIdentifier = Guid.Parse("DA19142E-D419-4ED2-9798-CE5546260F84");
     private static readonly JsonSerializerOptions _jsonSerializerOptions
         = new JsonSerializerOptions().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
@@ -67,6 +70,13 @@ public sealed class RevisionLogMiddleware : IMiddleware
         await _revisionActivityPublisher
             .PublishAsync(revisionLogEntry)
             .ConfigureAwait(false);
+
+        // If we hit the limit, we log what we have, but also deny the request.
+        if (payload.Length == MaxFileSize)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.RequestEntityTooLarge;
+            return;
+        }
 
         await next(context).ConfigureAwait(false);
     }
@@ -105,9 +115,7 @@ public sealed class RevisionLogMiddleware : IMiddleware
         httpRequest.EnableBuffering();
 
         using var streamReader = new StreamReader(httpRequest.Body, leaveOpen: true);
-        payload = await streamReader
-            .ReadToEndAsync()
-            .ConfigureAwait(false);
+        payload = await LimitedReadAsync(streamReader).ConfigureAwait(false);
 
         httpRequest.Body.Position = 0;
         return payload;
@@ -130,5 +138,23 @@ public sealed class RevisionLogMiddleware : IMiddleware
         return string.Join(",", claims
             .Where(claim => claim.Type == ClaimTypes.Role)
             .Select(claim => claim.Value));
+    }
+
+    private static async Task<string> LimitedReadAsync(StreamReader source)
+    {
+        var sb = new StringBuilder(1 * 1024 * 1024);
+        Memory<char> buf = new char[4096];
+
+        do
+        {
+            var read = await source.ReadBlockAsync(buf).ConfigureAwait(false);
+            if (read == 0)
+                return sb.ToString();
+
+            sb.Append(buf[..read]);
+        }
+        while (sb.Length < MaxFileSize);
+
+        return sb.ToString();
     }
 }
