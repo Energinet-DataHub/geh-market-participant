@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -365,5 +366,45 @@ public sealed class ActorRepositoryTests
         // Assert
         Assert.NotNull(actual);
         Assert.Single(actual);
+    }
+
+    [Fact]
+    public async Task GetActorTokenDataAsync_ByActorId_CanReadBack()
+    {
+        // arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var actorRepository = new ActorRepository(context, _lock);
+
+        var gridArea = await _fixture.PrepareGridAreaAsync();
+
+        var marketRole = new MarketRoleEntity
+        {
+            Function = EicFunction.GridAccessProvider,
+            GridAreas =
+            {
+                new MarketRoleGridAreaEntity
+                {
+                    GridAreaId = gridArea.Id,
+                },
+            },
+        };
+
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActiveActor,
+            marketRole);
+
+        // act
+        var actual = await actorRepository.GetActorTokenDataAsync(new ActorId(actor.Id));
+
+        // assert
+        Assert.NotNull(actual);
+        Assert.Equal(actor.Id, actual.ActorId);
+        Assert.Equal(actor.ActorNumber, actual.ActorNumber);
+        Assert.Equal(marketRole.Function, actual.MarketRoles.Single().Function);
+        Assert.Equal(gridArea.Id, actual.MarketRoles.Single().GridAreas.Single().GridAreaId);
+        Assert.Equal(gridArea.Code, actual.MarketRoles.Single().GridAreas.Single().GridAreaCode);
     }
 }
