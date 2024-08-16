@@ -24,4 +24,5 @@ public sealed record UserOverviewItemDto(
     string LastName,
     string Email,
     string? PhoneNumber,
-    DateTimeOffset CreatedDate);
+    DateTimeOffset CreatedDate,
+    Guid AdministratedBy);
