@@ -56,4 +56,11 @@ public interface IActorRepository
     /// <param name="organizationId">The organization to get the actors for.</param>
     /// <returns>A list of actors.</returns>
     Task<IEnumerable<Actor>> GetActorsAsync(OrganizationId organizationId);
+
+    /// <summary>
+    /// Gets actor data needed to create a token.
+    /// </summary>
+    /// <param name="actorId">The id of the actor.</param>
+    /// <returns>Data needed to create a token.</returns>
+    Task<ActorTokenData?> GetActorTokenDataAsync(ActorId actorId);
 }
