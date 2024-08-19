@@ -25,7 +25,6 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Common.Options;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -43,7 +42,6 @@ public class TokenController : ControllerBase
     private const string TokenClaim = "token";
     private const string ActorNumberClaim = "actornumber";
     private const string MarketRolesClaim = "marketroles";
-    private const string GridAreasClaim = "gridareas";
     private const string MultiTenancyClaim = "multitenancy";
 
     private readonly IExternalTokenValidator _externalTokenValidator;
@@ -120,7 +118,7 @@ public class TokenController : ControllerBase
         var issuedAt = EpochTime.GetIntDate(DateTime.UtcNow);
 
         GetUserPermissionsResponse grantedPermissions;
-        GetActorTokenDataResponse actorResponse;
+        GetSingleActorResponse actorResponse;
 
         try
         {
@@ -129,7 +127,7 @@ public class TokenController : ControllerBase
                 .ConfigureAwait(false);
 
             actorResponse = await _mediator
-                .Send(new GetActorTokenDataCommand(actorId))
+                .Send(new GetSingleActorCommand(actorId))
                 .ConfigureAwait(false);
         }
         catch (NotFoundValidationException)
@@ -148,14 +146,8 @@ public class TokenController : ControllerBase
             .Append(new Claim(JwtRegisteredClaimNames.Sub, grantedPermissions.UserId.ToString()))
             .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
             .Append(new Claim(TokenClaim, tokenRequest.ExternalToken))
-            .Append(new Claim(ActorNumberClaim, actorResponse.ActorTokenData.ActorNumber))
-            .Append(new Claim(MarketRolesClaim, string.Join(',', actorResponse.ActorTokenData.MarketRoles.Select(x => x.Function))));
-
-        if (actorResponse.ActorTokenData.MarketRoles.FirstOrDefault(x => x.Function == EicFunction.GridAccessProvider) is { } gridAccessProvider)
-        {
-            dataHubTokenClaims = dataHubTokenClaims
-                .Append(new Claim(GridAreasClaim, string.Join(',', gridAccessProvider.GridAreas.Select(x => x.GridAreaCode))));
-        }
+            .Append(new Claim(ActorNumberClaim, actorResponse.Actor.ActorNumber.Value))
+            .Append(new Claim(MarketRolesClaim, string.Join(',', actorResponse.Actor.MarketRoles.Select(x => x.EicFunction))));
 
         if (grantedPermissions.IsFas)
         {
