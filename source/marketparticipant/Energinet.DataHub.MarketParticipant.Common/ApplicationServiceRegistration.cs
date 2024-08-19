@@ -48,6 +48,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<UpdateActorCommand>, UpdateActorCommandRuleSet>();
         services.AddScoped<IValidator<GetSingleOrganizationCommand>, GetSingleOrganizationCommandRuleSet>();
         services.AddScoped<IValidator<GetSingleActorCommand>, GetSingleActorCommandRuleSet>();
+        services.AddScoped<IValidator<GetActorTokenDataCommand>, GetActorTokenDataCommandRuleSet>();
         services.AddScoped<IValidator<GetActorsCommand>, GetActorsCommandRuleSet>();
         services.AddScoped<IValidator<GetAllActorsCommand>, GetAllActorsCommandRuleSet>();
         services.AddScoped<IValidator<GetActorContactsCommand>, GetActorContactsCommandRuleSet>();
