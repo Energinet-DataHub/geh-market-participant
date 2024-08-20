@@ -47,6 +47,13 @@ public sealed class GetActorTokenDataHandler : IRequestHandler<GetActorTokenData
             new ActorTokenDataDto(
                 actorTokenData.ActorId,
                 actorTokenData.ActorNumber,
-                actorTokenData.MarketRoles.Select(x => (x.Function, x.GridAreas.Select(y => (y.GridAreaId, y.GridAreaCode))))));
+                actorTokenData.MarketRoles.Select(x => new ActorTokenDataMarketRoleDto
+                {
+                    Function = x.Function,
+                    GridAreas = x.GridAreas.Select(y => new ActorTokenDataGridAreaDto
+                    {
+                        GridAreaCode = y.GridAreaCode,
+                    }),
+                })));
     }
 }

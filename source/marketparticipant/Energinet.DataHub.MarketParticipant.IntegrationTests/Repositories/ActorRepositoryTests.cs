@@ -404,7 +404,6 @@ public sealed class ActorRepositoryTests
         Assert.Equal(actor.Id, actual.ActorId);
         Assert.Equal(actor.ActorNumber, actual.ActorNumber);
         Assert.Equal(marketRole.Function, actual.MarketRoles.Single().Function);
-        Assert.Equal(gridArea.Id, actual.MarketRoles.Single().GridAreas.Single().GridAreaId);
         Assert.Equal(gridArea.Code, actual.MarketRoles.Single().GridAreas.Single().GridAreaCode);
     }
 }

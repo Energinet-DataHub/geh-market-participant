@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
-public sealed record ActorTokenDataDto(
-    Guid ActorId,
-    string ActorNumber,
-    IEnumerable<ActorTokenDataMarketRoleDto> MarketRoles);
+public sealed class ActorTokenDataGridAreaDto
+{
+    public string GridAreaCode { get; set; } = null!;
+}

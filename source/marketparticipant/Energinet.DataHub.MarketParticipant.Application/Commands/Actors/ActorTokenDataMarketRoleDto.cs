@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
-public sealed record ActorTokenDataDto(
-    Guid ActorId,
-    string ActorNumber,
-    IEnumerable<ActorTokenDataMarketRoleDto> MarketRoles);
+public sealed class ActorTokenDataMarketRoleDto
+{
+    public EicFunction Function { get; set; }
+    public IEnumerable<ActorTokenDataGridAreaDto> GridAreas { get; set; } = [];
+}
