@@ -89,12 +89,12 @@ public sealed class GetActorTokenDataHandlerIntegrationTests
 
             var actualGridAccessProvider = actual.ActorTokenData.MarketRoles.Single(x => x.Function == EicFunction.GridAccessProvider);
             Assert.Equal(2, actualGridAccessProvider.GridAreas.Count());
-            Assert.Single(actualGridAccessProvider.GridAreas, x => x.GridAreaId == gridAccessProviderGa1.Id);
-            Assert.Single(actualGridAccessProvider.GridAreas, x => x.GridAreaId == gridAccessProviderGa2.Id);
+            Assert.Single(actualGridAccessProvider.GridAreas, x => x.GridAreaCode == gridAccessProviderGa1.Code);
+            Assert.Single(actualGridAccessProvider.GridAreas, x => x.GridAreaCode == gridAccessProviderGa2.Code);
 
             var actualEnergySupplier = actual.ActorTokenData.MarketRoles.Single(x => x.Function == EicFunction.EnergySupplier);
             Assert.Single(actualEnergySupplier.GridAreas);
-            Assert.Single(actualEnergySupplier.GridAreas, x => x.GridAreaId == energySupplierGa.Id);
+            Assert.Single(actualEnergySupplier.GridAreas, x => x.GridAreaCode == energySupplierGa.Code);
         }
     }
 
