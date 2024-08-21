@@ -65,8 +65,15 @@ public class CertificateService : ICertificateService
     {
         ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
 
-        var opr = await _keyVault.StartDeleteSecretAsync(certificateLookupIdentifier).ConfigureAwait(false);
-        await opr.WaitForCompletionAsync().ConfigureAwait(false);
+        try
+        {
+            var opr = await _keyVault.StartDeleteSecretAsync(certificateLookupIdentifier).ConfigureAwait(false);
+            await opr.WaitForCompletionAsync().ConfigureAwait(false);
+        }
+        catch (RequestFailedException e) when (e.Status == (int)HttpStatusCode.NotFound)
+        {
+            _logger.LogDebug(e, "Certificate secret was not found in Key Vault, inner message: {EInnerException}", e.InnerException);
+        }
     }
 
     public X509Certificate2 CreateAndValidateX509Certificate(Stream certificate)
