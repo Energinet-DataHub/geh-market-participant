@@ -99,7 +99,7 @@ public class ActorController : ControllerBase
     }
 
     [HttpPut("{actorId:guid}/name")]
-    [AuthorizeUser(PermissionId.ActorMasterDataManage)]
+    [AuthorizeUser(PermissionId.ActorsManage)]
     public async Task<ActionResult> UpdateActorNameAsync(Guid actorId, ActorNameDto actorNameDto)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
