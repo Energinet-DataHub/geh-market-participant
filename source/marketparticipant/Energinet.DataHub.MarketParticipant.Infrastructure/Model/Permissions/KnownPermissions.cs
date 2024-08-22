@@ -49,7 +49,8 @@ public static class KnownPermissions
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader,
-            EicFunction.MeterOperator
+            EicFunction.MeterOperator,
+            EicFunction.ItSupplier
         }),
         new(PermissionId.UsersView, "users:view", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
         {
@@ -133,7 +134,8 @@ public static class KnownPermissions
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader,
             EicFunction.MeterOperator,
-            EicFunction.EnergySupplier
+            EicFunction.EnergySupplier,
+            EicFunction.ItSupplier
         }),
         new(PermissionId.DelegationManage, "delegation:manage", InstantPattern.ExtendedIso.Parse("2024-03-05T00:00:00Z").Value, new[]
         {
