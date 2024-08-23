@@ -25,5 +25,5 @@ public sealed record GetUserResponse(
     string LastName,
     string Email,
     string? PhoneNumber,
-    bool AdministratedBy,
+    Guid AdministratedBy,
     DateTimeOffset CreatedDate);
