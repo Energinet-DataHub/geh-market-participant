@@ -37,19 +37,29 @@ public sealed class RevisionLogHealthCheck : IHealthCheck
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        var healthAddress = new UriBuilder(_revisionLogOptions.Value.ApiAddress)
+        Uri? uri = null;
+        try
         {
-            Path = "api/monitor/live"
-        };
+            var healthAddress = new UriBuilder(_revisionLogOptions.Value.ApiAddress)
+            {
+                Path = "api/monitor/live"
+            };
 
-        using var logRequest = new HttpRequestMessage(HttpMethod.Get, healthAddress.Uri);
+            uri = healthAddress.Uri;
 
-        using var httpClient = _httpClientFactory.CreateClient("revision-log-http-client");
-        using var response = await httpClient
-            .SendAsync(logRequest, cancellationToken)
-            .ConfigureAwait(false);
+            using var logRequest = new HttpRequestMessage(HttpMethod.Get, uri);
 
-        response.EnsureSuccessStatusCode();
-        return HealthCheckResult.Healthy();
+            using var httpClient = _httpClientFactory.CreateClient("revision-log-http-client");
+            using var response = await httpClient
+                .SendAsync(logRequest, cancellationToken)
+                .ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+            return HealthCheckResult.Healthy();
+        }
+        catch (UriFormatException e)
+        {
+            throw new UriFormatException($"Rev log health check uri is not valid. URI: {uri?.ToString() ?? "NULL"}. Endpoint: {_revisionLogOptions.Value.ApiAddress}", e);
+        }
     }
 }
