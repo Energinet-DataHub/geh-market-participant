@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
@@ -46,6 +47,8 @@ public class GetUserProfileHandler : IRequestHandler<GetUserProfileCommand, GetU
         var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value, $"The specified user identity {user.ExternalId} was not found.");
 
-        return new GetUserProfileResponse(userIdentity.FirstName, userIdentity.LastName, userIdentity.PhoneNumber?.Number ?? string.Empty);
+        var hasFederatedLogin = userIdentity.LoginIdentities.Any(x => x.SignInType == "federated");
+
+        return new GetUserProfileResponse(userIdentity.FirstName, userIdentity.LastName, userIdentity.PhoneNumber?.Number ?? string.Empty, hasFederatedLogin);
     }
 }

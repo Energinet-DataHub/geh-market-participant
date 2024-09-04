@@ -14,4 +14,4 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 
-public sealed record GetUserProfileResponse(string FirstName, string LastName, string PhoneNumber);
+public sealed record GetUserProfileResponse(string FirstName, string LastName, string PhoneNumber, bool HasFederatedLogin);
