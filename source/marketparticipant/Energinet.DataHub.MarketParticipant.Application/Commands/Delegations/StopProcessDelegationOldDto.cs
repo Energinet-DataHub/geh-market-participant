@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Options;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 
-public class RevisionLogOptions
-{
-    [Required]
-    public string ApiAddress { get; set; } = string.Empty;
-}
+// TODO: Delete.
+public sealed record StopProcessDelegationOldDto(
+    Guid Id,
+    Guid PeriodId,
+    DateTimeOffset? StopsAt);

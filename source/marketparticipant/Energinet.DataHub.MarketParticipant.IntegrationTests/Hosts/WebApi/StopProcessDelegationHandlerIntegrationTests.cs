@@ -55,11 +55,10 @@ public sealed class StopProcessDelegationHandlerIntegrationTests(MarketParticipa
         var response = await mediator.Send(fetchCommand);
 
         var stopProcessDelegationDto = new StopProcessDelegationDto(
-            response.Delegations.First().Id,
             response.Delegations.First().Periods.First().Id,
             DateTimeOffset.UtcNow.AddMonths(5));
 
-        var stopCommand = new StopProcessDelegationCommand(stopProcessDelegationDto);
+        var stopCommand = new StopProcessDelegationCommand(response.Delegations.First().Id, stopProcessDelegationDto);
 
         // Act + Assert
         await mediator.Send(stopCommand);

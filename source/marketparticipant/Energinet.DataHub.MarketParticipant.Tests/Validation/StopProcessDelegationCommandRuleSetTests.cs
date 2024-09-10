@@ -25,13 +25,30 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation;
 public sealed class StopProcessDelegationCommandRuleSetTests
 {
     [Fact]
+    public async Task Validate_DelegationId_ValidatesProperty()
+    {
+        // Arrange
+        const string propertyName = nameof(StopProcessDelegationCommand.DelegationId);
+
+        var target = new StopProcessDelegationCommandRuleSet();
+        var command = new StopProcessDelegationCommand(Guid.Empty, new StopProcessDelegationDto(Guid.NewGuid(), DateTimeOffset.UtcNow.Date.AddDays(5)));
+
+        // Act
+        var result = await target.ValidateAsync(command);
+
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+    }
+
+    [Fact]
     public async Task Validate_StopProcessDelegationDto_ValidatesProperty()
     {
         // Arrange
         const string propertyName = nameof(StopProcessDelegationCommand.StopProcessDelegation);
 
         var target = new StopProcessDelegationCommandRuleSet();
-        var command = new StopProcessDelegationCommand(null!);
+        var command = new StopProcessDelegationCommand(Guid.NewGuid(), null!);
 
         // Act
         var result = await target.ValidateAsync(command);
@@ -58,11 +75,10 @@ public sealed class StopProcessDelegationCommandRuleSetTests
             const string propertyName = $"{nameof(StopProcessDelegationCommand.StopProcessDelegation)}.{nameof(StopProcessDelegationDto.StopsAt)}";
             var delegationDto = new StopProcessDelegationDto(
                 Guid.NewGuid(),
-                Guid.NewGuid(),
                 testCase.Time);
 
             var target = new StopProcessDelegationCommandRuleSet();
-            var command = new StopProcessDelegationCommand(delegationDto);
+            var command = new StopProcessDelegationCommand(Guid.NewGuid(), delegationDto);
 
             // Act
             var result = await target.ValidateAsync(command);

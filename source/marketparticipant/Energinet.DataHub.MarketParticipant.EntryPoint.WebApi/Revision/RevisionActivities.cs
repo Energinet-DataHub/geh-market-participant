@@ -16,5 +16,25 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 
 public static class RevisionActivities
 {
+    public const string PublicActorContactsRetrieved = "PublicActorContactsRetrieved";
+    public const string AllContactsForActorRetrieved = "AllContactsForActorRetrieved";
+    public const string CreateContactForActor = "CreateContactForActor";
+    public const string DeleteContactForActor = "DeleteContactForActor";
+
+    public const string AllActorsRetrieved = "AllActorsRetrieved";
+    public const string ActorRetrieved = "ActorRetrieved";
+    public const string ActorCreated = "ActorCreated";
+    public const string ActorEdited = "ActorEdited";
+    public const string ActorAuditLogViewed = "ActorAuditLogViewed";
+
+    public const string ActorCredentialsViewed = "ActorCredentialsViewed";
+    public const string ActorCredentialsRemoved = "ActorCredentialsRemoved";
+    public const string ActorCertificateAssigned = "ActorCertificateAssigned";
+    public const string ActorClientSecretAssigned = "ActorClientSecretAssigned";
+
+    public const string DelegationsForActorViewed = "DelegationsForActorViewed";
+    public const string ActorDelegationStarted = "ActorDelegationStarted";
+    public const string ActorDelegationStopped = "ActorDelegationStopped";
+
     public const string UserRoleEdited = "UserRoleEdited";
 }

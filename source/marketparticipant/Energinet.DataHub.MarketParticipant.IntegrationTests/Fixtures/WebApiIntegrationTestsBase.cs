@@ -16,8 +16,8 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Options;
+using Energinet.DataHub.RevisionLog.Integration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -108,7 +108,7 @@ public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFacto
                 .AddAuthorizationBuilder()
                 .SetDefaultPolicy(authorizationPolicy);
 
-            services.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRevisionActivityPublisher>().Object));
+            services.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRevisionLogClient>().Object));
         });
     }
 }

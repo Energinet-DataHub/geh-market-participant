@@ -22,14 +22,13 @@ public sealed class StopProcessDelegationCommandRuleSet : AbstractValidator<Stop
 {
     public StopProcessDelegationCommandRuleSet()
     {
+        RuleFor(delegation => delegation.DelegationId)
+            .NotEmpty();
+
         RuleFor(command => command.StopProcessDelegation)
             .NotEmpty()
             .ChildRules(validator =>
             {
-                validator
-                    .RuleFor(delegation => delegation.Id)
-                    .NotEmpty();
-
                 validator
                     .RuleFor(delegation => delegation.PeriodId)
                     .NotEmpty();
