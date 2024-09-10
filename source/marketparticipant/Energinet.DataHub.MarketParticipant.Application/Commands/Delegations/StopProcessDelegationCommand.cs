@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 
-public sealed record StopProcessDelegationCommand(StopProcessDelegationDto StopProcessDelegation) : IRequest;
+public sealed record StopProcessDelegationCommand(Guid DelegationId, StopProcessDelegationDto StopProcessDelegation) : IRequest;

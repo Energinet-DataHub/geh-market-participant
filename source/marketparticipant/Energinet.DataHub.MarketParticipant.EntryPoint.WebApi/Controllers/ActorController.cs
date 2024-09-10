@@ -21,8 +21,11 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +46,7 @@ public class ActorController : ControllerBase
     }
 
     [HttpGet]
+    [EnableRevision(RevisionActivities.AllActorsRetrieved, typeof(Actor))]
     public async Task<ActionResult<IEnumerable<ActorDto>>> GetActorsAsync()
     {
         var getAllActorsCommand = new GetAllActorsCommand();
@@ -55,6 +59,7 @@ public class ActorController : ControllerBase
     }
 
     [HttpGet("{actorId:guid}")]
+    [EnableRevision(RevisionActivities.ActorRetrieved, typeof(Actor), "actorId")]
     public async Task<ActionResult<ActorDto>> GetSingleActorAsync(Guid actorId)
     {
         var getSingleActorCommand = new GetSingleActorCommand(actorId);
@@ -68,6 +73,7 @@ public class ActorController : ControllerBase
 
     [HttpPost]
     [AuthorizeUser(PermissionId.ActorsManage)]
+    [EnableRevision(RevisionActivities.ActorCreated, typeof(Actor), "actorId")]
     public async Task<ActionResult<Guid>> CreateActorAsync(CreateActorDto actorDto)
     {
         if (!_userContext.CurrentUser.IsFas)
@@ -84,6 +90,7 @@ public class ActorController : ControllerBase
 
     [HttpPut("{actorId:guid}")]
     [AuthorizeUser(PermissionId.ActorsManage)]
+    [EnableRevision(RevisionActivities.ActorEdited, typeof(Actor), "actorId")]
     public async Task<ActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
@@ -100,6 +107,7 @@ public class ActorController : ControllerBase
 
     [HttpPut("{actorId:guid}/name")]
     [AuthorizeUser(PermissionId.ActorsManage)]
+    [EnableRevision(RevisionActivities.ActorEdited, typeof(Actor), "actorId")]
     public async Task<ActionResult> UpdateActorNameAsync(Guid actorId, ActorNameDto actorNameDto)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
@@ -116,6 +124,7 @@ public class ActorController : ControllerBase
 
     [HttpGet("{actorId:guid}/credentials")]
     [AuthorizeUser(PermissionId.ActorCredentialsManage)]
+    [EnableRevision(RevisionActivities.ActorCredentialsViewed, typeof(Actor), "actorId")]
     public async Task<ActionResult<ActorCredentialsDto>> GetActorCredentialsAsync(Guid actorId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
@@ -134,6 +143,7 @@ public class ActorController : ControllerBase
 
     [HttpPost("{actorId:guid}/credentials/certificate")]
     [AuthorizeUser(PermissionId.ActorCredentialsManage)]
+    [EnableRevision(RevisionActivities.ActorCertificateAssigned, typeof(Actor), "actorId")]
     [RequestSizeLimit(10485760)]
     public async Task<ActionResult> AssignActorCredentialsAsync(Guid actorId, IFormFile certificate)
     {
@@ -153,6 +163,7 @@ public class ActorController : ControllerBase
 
     [HttpDelete("{actorId:guid}/credentials")]
     [AuthorizeUser(PermissionId.ActorCredentialsManage)]
+    [EnableRevision(RevisionActivities.ActorCredentialsRemoved, typeof(Actor), "actorId")]
     public async Task<ActionResult> RemoveActorCredentialsAsync(Guid actorId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
@@ -169,6 +180,7 @@ public class ActorController : ControllerBase
 
     [HttpPost("{actorId:guid}/credentials/secret")]
     [AuthorizeUser(PermissionId.ActorCredentialsManage)]
+    [EnableRevision(RevisionActivities.ActorClientSecretAssigned, typeof(Actor), "actorId")]
     public async Task<ActionResult<ActorClientSecretDto>> ActorRequestSecretAsync(Guid actorId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
@@ -185,6 +197,7 @@ public class ActorController : ControllerBase
 
     [HttpGet("{actorId:guid}/audit")]
     [AuthorizeUser(PermissionId.ActorsManage)]
+    [EnableRevision(RevisionActivities.ActorAuditLogViewed, typeof(Actor), "actorId")]
     public async Task<ActionResult<IEnumerable<AuditLogDto<ActorAuditedChange>>>> GetAuditAsync(Guid actorId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
@@ -199,8 +212,60 @@ public class ActorController : ControllerBase
         return Ok(response.AuditLogs);
     }
 
+    // TODO: Delete.
     [HttpGet("{actorId:guid}/delegation")]
     [AuthorizeUser(PermissionId.DelegationView)]
+    public async Task<ActionResult<GetDelegationsForActorResponse>> GetDelegationsForActorOldAsync(Guid actorId)
+    {
+        ArgumentNullException.ThrowIfNull(actorId);
+
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
+
+        var result = await _mediator
+            .Send(new GetDelegationsForActorCommand(actorId))
+            .ConfigureAwait(false);
+
+        return Ok(result);
+    }
+
+    // TODO: Delete.
+    [HttpPost("delegation")]
+    [AuthorizeUser(PermissionId.DelegationManage)]
+    public async Task<ActionResult> CreateDelegationOldAsync([FromBody] CreateProcessDelegationsDto delegationDto)
+    {
+        if (!_userContext.CurrentUser.IsFas)
+            return Unauthorized();
+
+        var createDelegationCommand = new CreateProcessDelegationCommand(delegationDto);
+
+        await _mediator
+            .Send(createDelegationCommand)
+            .ConfigureAwait(false);
+
+        return Ok();
+    }
+
+    // TODO: Delete.
+    [HttpPut("delegation")]
+    [AuthorizeUser(PermissionId.DelegationManage)]
+    public async Task<ActionResult> StopDelegationOldAsync([FromBody] StopProcessDelegationOldDto delegationDto)
+    {
+        if (!_userContext.CurrentUser.IsFas)
+            return Unauthorized();
+
+        var stopMessageDelegationCommand = new StopProcessDelegationCommand(delegationDto.Id, new StopProcessDelegationDto(delegationDto.PeriodId, delegationDto.StopsAt));
+
+        await _mediator
+            .Send(stopMessageDelegationCommand)
+            .ConfigureAwait(false);
+
+        return Ok();
+    }
+
+    [HttpGet("{actorId:guid}/delegations")]
+    [AuthorizeUser(PermissionId.DelegationView)]
+    [EnableRevision(RevisionActivities.DelegationsForActorViewed, typeof(Actor), "actorId")]
     public async Task<ActionResult<GetDelegationsForActorResponse>> GetDelegationsForActorAsync(Guid actorId)
     {
         ArgumentNullException.ThrowIfNull(actorId);
@@ -215,8 +280,9 @@ public class ActorController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("delegation")]
+    [HttpPost("delegations")]
     [AuthorizeUser(PermissionId.DelegationManage)]
+    [EnableRevision(RevisionActivities.ActorDelegationStarted, typeof(ProcessDelegation))]
     public async Task<ActionResult> CreateDelegationAsync([FromBody] CreateProcessDelegationsDto delegationDto)
     {
         if (!_userContext.CurrentUser.IsFas)
@@ -231,14 +297,15 @@ public class ActorController : ControllerBase
         return Ok();
     }
 
-    [HttpPut("delegation")]
+    [HttpPut("delegations/{delegationId:guid}")]
     [AuthorizeUser(PermissionId.DelegationManage)]
-    public async Task<ActionResult> StopDelegationAsync([FromBody] StopProcessDelegationDto delegationDto)
+    [EnableRevision(RevisionActivities.ActorDelegationStopped, typeof(ProcessDelegation), "delegationId")]
+    public async Task<ActionResult> StopDelegationAsync(Guid delegationId, [FromBody] StopProcessDelegationDto delegationDto)
     {
         if (!_userContext.CurrentUser.IsFas)
             return Unauthorized();
 
-        var stopMessageDelegationCommand = new StopProcessDelegationCommand(delegationDto);
+        var stopMessageDelegationCommand = new StopProcessDelegationCommand(delegationId, delegationDto);
 
         await _mediator
             .Send(stopMessageDelegationCommand)

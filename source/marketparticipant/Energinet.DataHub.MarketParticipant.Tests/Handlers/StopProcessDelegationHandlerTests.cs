@@ -63,10 +63,9 @@ public sealed class StopProcessDelegationHandlerTests
             .Setup(x => x.GetAsync(It.Is<ProcessDelegationId>(match => match.Value == processDelegation.Id.Value)))
             .ReturnsAsync(processDelegation);
 
-        var command = new StopProcessDelegationCommand(new StopProcessDelegationDto(
+        var command = new StopProcessDelegationCommand(
             processDelegation.Id.Value,
-            delegationPeriod.Id.Value,
-            DateTimeOffset.UtcNow));
+            new StopProcessDelegationDto(delegationPeriod.Id.Value, DateTimeOffset.UtcNow));
 
         // Act + Assert
         await target.Handle(command, CancellationToken.None);
@@ -103,10 +102,9 @@ public sealed class StopProcessDelegationHandlerTests
             .ReturnsAsync(processDelegation);
 
         var testDelegationId = new ProcessDelegationId(Guid.NewGuid());
-        var command = new StopProcessDelegationCommand(new StopProcessDelegationDto(
+        var command = new StopProcessDelegationCommand(
             testDelegationId.Value,
-            delegationPeriod.Id.Value,
-            DateTimeOffset.UtcNow));
+            new StopProcessDelegationDto(delegationPeriod.Id.Value, DateTimeOffset.UtcNow));
 
         // Act
         var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
@@ -151,10 +149,9 @@ public sealed class StopProcessDelegationHandlerTests
             .ReturnsAsync(processDelegation);
 
         var testPeriodId = new DelegationPeriodId(Guid.NewGuid());
-        var command = new StopProcessDelegationCommand(new StopProcessDelegationDto(
+        var command = new StopProcessDelegationCommand(
             processDelegation.Id.Value,
-            testPeriodId.Value,
-            DateTimeOffset.UtcNow));
+            new StopProcessDelegationDto(testPeriodId.Value, DateTimeOffset.UtcNow));
 
         // Act
         var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
@@ -198,10 +195,9 @@ public sealed class StopProcessDelegationHandlerTests
             .Setup(x => x.GetAsync(It.Is<ProcessDelegationId>(match => match.Value == processDelegation.Id.Value)))
             .ReturnsAsync(processDelegation);
 
-        var command = new StopProcessDelegationCommand(new StopProcessDelegationDto(
+        var command = new StopProcessDelegationCommand(
             processDelegation.Id.Value,
-            delegationPeriod.Id.Value,
-            DateTimeOffset.UtcNow));
+            new StopProcessDelegationDto(delegationPeriod.Id.Value, DateTimeOffset.UtcNow));
 
         // Act
         await target.Handle(command, CancellationToken.None);

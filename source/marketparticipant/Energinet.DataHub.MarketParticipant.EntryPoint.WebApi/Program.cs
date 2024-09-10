@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Asp.Versioning;
@@ -21,12 +22,15 @@ using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
+using Energinet.DataHub.RevisionLog.Integration.Extensions.DependencyInjection;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
+using Energinet.DataHub.RevisionLog.Integration.WebApi.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 const string subsystemName = "mark-part";
+const string subsystemIdentifier = "DA19142E-D419-4ED2-9798-CE5546260F84";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,7 +50,8 @@ builder.Services
     .AddJwtBearerAuthenticationForWebApp(builder.Configuration)
     .AddUserAuthenticationForWebApp<FrontendUser, FrontendUserProvider>()
     .AddPermissionAuthorizationForWebApp()
-    .AddScoped<RevisionLogMiddleware>();
+    .AddRevisionLogIntegrationModule(builder.Configuration)
+    .AddRevisionLogIntegrationWebApiModule<DefaultRevisionLogEntryHandler>(Guid.Parse(subsystemIdentifier));
 
 builder.Services
     .AddMarketParticipantWebApiModule(builder.Configuration);
@@ -72,7 +77,7 @@ app.UseCommonExceptionHandling(exceptionBuilder =>
 app.UseLoggingScope();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<RevisionLogMiddleware>();
+app.UseRevisionLogIntegrationWebApiModule();
 app.UseUserMiddlewareForWebApp<FrontendUser>();
 app.MapControllers().RequireAuthorization();
 

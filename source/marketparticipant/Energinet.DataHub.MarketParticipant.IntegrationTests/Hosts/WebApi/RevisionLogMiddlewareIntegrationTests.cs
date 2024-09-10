@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -22,19 +21,17 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Energinet.DataHub.RevisionLog.Integration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
-using NodaTime;
-using NodaTime.Serialization.SystemTextJson;
 using Xunit;
 using Xunit.Categories;
 
@@ -45,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTestsBase<MarketParticipantWebApiAssembly>
 {
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
-    private readonly Mock<IRevisionActivityPublisher> _revisionActivityPublisherMock = new();
+    private readonly Mock<IRevisionLogClient> _revisionLogClientMock = new();
 
     public RevisionLogMiddlewareIntegrationTests(
         MarketParticipantDatabaseFixture databaseFixture)
@@ -74,11 +71,11 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
             Encoding.UTF8,
             MediaTypeNames.Application.Json);
 
-        var actual = string.Empty;
+        RevisionLogEntry? revisionLogEntry = null;
 
-        _revisionActivityPublisherMock
-            .Setup(pub => pub.PublishAsync(It.IsAny<string>()))
-            .Callback(new Action<string>(message => actual = message));
+        _revisionLogClientMock
+            .Setup(pub => pub.LogAsync(It.IsAny<RevisionLogEntry>()))
+            .Callback(new Action<RevisionLogEntry>(message => revisionLogEntry = message));
 
         // Act
         using var client = CreateClient();
@@ -88,12 +85,6 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.False(string.IsNullOrEmpty(actual));
-
-        var revisionLogEntry = JsonSerializer.Deserialize<RevisionLogEntryDto>(
-            actual,
-            new JsonSerializerOptions().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb));
-
         Assert.NotNull(revisionLogEntry);
         Assert.NotEqual(Guid.Empty, revisionLogEntry.LogId);
         Assert.Equal(testUser.Id, revisionLogEntry.UserId);
@@ -105,7 +96,7 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
         Assert.Equal(nameof(UserRole), revisionLogEntry.AffectedEntityType);
         Assert.Equal(targetUserRole.Id, Guid.Parse(revisionLogEntry.AffectedEntityKey));
 
-        _revisionActivityPublisherMock.Verify(pub => pub.PublishAsync(actual), Times.Once);
+        _revisionLogClientMock.Verify(pub => pub.LogAsync(revisionLogEntry), Times.Once);
     }
 
     [Fact]
@@ -127,11 +118,11 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
             Encoding.UTF8,
             MediaTypeNames.Application.Json);
 
-        var actual = string.Empty;
+        RevisionLogEntry? revisionLogEntry = null;
 
-        _revisionActivityPublisherMock
-            .Setup(pub => pub.PublishAsync(It.IsAny<string>()))
-            .Callback(new Action<string>(message => actual = message));
+        _revisionLogClientMock
+            .Setup(pub => pub.LogAsync(It.IsAny<RevisionLogEntry>()))
+            .Callback(new Action<RevisionLogEntry>(message => revisionLogEntry = message));
 
         // Act
         using var client = CreateClient();
@@ -141,12 +132,6 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
 
         // Assert
         Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
-        Assert.False(string.IsNullOrEmpty(actual));
-
-        var revisionLogEntry = JsonSerializer.Deserialize<RevisionLogEntryDto>(
-            actual,
-            new JsonSerializerOptions().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb));
-
         Assert.NotNull(revisionLogEntry);
         Assert.Equal(100 * 1024 * 1024, revisionLogEntry.Payload.Length);
     }
@@ -171,11 +156,11 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
             Encoding.UTF8,
             MediaTypeNames.Application.Json);
 
-        var actual = string.Empty;
+        RevisionLogEntry? revisionLogEntry = null;
 
-        _revisionActivityPublisherMock
-            .Setup(pub => pub.PublishAsync(It.IsAny<string>()))
-            .Callback(new Action<string>(message => actual = message));
+        _revisionLogClientMock
+            .Setup(pub => pub.LogAsync(It.IsAny<RevisionLogEntry>()))
+            .Callback(new Action<RevisionLogEntry>(message => revisionLogEntry = message));
 
         // Act
         using var client = CreateClient();
@@ -185,11 +170,6 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.False(string.IsNullOrEmpty(actual));
-
-        var revisionLogEntry = JsonSerializer.Deserialize<RevisionLogEntryDto>(
-            actual,
-            new JsonSerializerOptions().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb));
 
         Assert.NotNull(revisionLogEntry);
         Assert.NotEqual(Guid.Empty, revisionLogEntry.LogId);
@@ -202,7 +182,7 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
         Assert.Equal(nameof(UserRole), revisionLogEntry.AffectedEntityType);
         Assert.Equal(targetUserRole.Id, Guid.Parse(revisionLogEntry.AffectedEntityKey));
 
-        _revisionActivityPublisherMock.Verify(pub => pub.PublishAsync(actual), Times.Once);
+        _revisionLogClientMock.Verify(pub => pub.LogAsync(revisionLogEntry), Times.Once);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -213,7 +193,7 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
 
         builder.ConfigureServices(services =>
         {
-            services.Replace(ServiceDescriptor.Scoped(_ => _revisionActivityPublisherMock.Object));
+            services.Replace(ServiceDescriptor.Scoped(_ => _revisionLogClientMock.Object));
         });
     }
 }
