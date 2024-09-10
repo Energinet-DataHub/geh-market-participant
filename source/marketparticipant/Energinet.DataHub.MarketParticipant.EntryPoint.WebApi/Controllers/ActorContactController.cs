@@ -18,7 +18,9 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +41,7 @@ public sealed class ActorContactController : ControllerBase
     }
 
     [HttpGet("contacts/public")]
+    [EnableRevision(RevisionActivities.PublicActorContactsRetrieved, typeof(ActorContact))]
     public async Task<ActionResult<IEnumerable<ActorContactDto>>> GetPublicActorContactsAsync()
     {
         var getOrganizationsCommand = new GetPublicActorContactsCommand();
@@ -52,6 +55,7 @@ public sealed class ActorContactController : ControllerBase
 
     [HttpGet("{actorId:guid}/contact")]
     [AuthorizeUser(PermissionId.ActorMasterDataManage)]
+    [EnableRevision(RevisionActivities.AllContactsForActorRetrieved, typeof(ActorContact), "actorId")]
     public async Task<ActionResult<IEnumerable<ActorContactDto>>> ListAllAsync(Guid actorId)
     {
         var getOrganizationsCommand = new GetActorContactsCommand(actorId);
@@ -65,6 +69,7 @@ public sealed class ActorContactController : ControllerBase
 
     [HttpPost("{actorId:guid}/contact")]
     [AuthorizeUser(PermissionId.ActorMasterDataManage)]
+    [EnableRevision(RevisionActivities.CreateContactForActor, typeof(ActorContact), "actorId")]
     public async Task<ActionResult<Guid>> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
@@ -81,6 +86,7 @@ public sealed class ActorContactController : ControllerBase
 
     [HttpDelete("{actorId:guid}/contact/{contactId:guid}")]
     [AuthorizeUser(PermissionId.ActorMasterDataManage)]
+    [EnableRevision(RevisionActivities.DeleteContactForActor, typeof(ActorContact), "contactId")]
     public async Task<ActionResult> DeleteContactAsync(Guid actorId, Guid contactId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))

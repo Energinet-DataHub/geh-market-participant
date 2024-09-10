@@ -46,10 +46,10 @@ public sealed class StopProcessDelegationHandler : IRequestHandler<StopProcessDe
         ArgumentNullException.ThrowIfNull(request);
 
         var processDelegation = await _delegationRepository
-            .GetAsync(new(request.StopProcessDelegation.Id))
+            .GetAsync(new(request.DelegationId))
             .ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(processDelegation, request.StopProcessDelegation.Id);
+        NotFoundValidationException.ThrowIfNull(processDelegation, request.DelegationId);
 
         var periodToStop = processDelegation
             .Delegations

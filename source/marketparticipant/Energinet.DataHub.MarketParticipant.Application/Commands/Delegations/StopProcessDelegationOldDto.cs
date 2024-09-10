@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
-using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 
-public sealed record StopProcessDelegationCommand(Guid DelegationId, StopProcessDelegationDto StopProcessDelegation) : IRequest;
+// TODO: Delete.
+public sealed record StopProcessDelegationOldDto(
+    Guid Id,
+    Guid PeriodId,
+    DateTimeOffset? StopsAt);
