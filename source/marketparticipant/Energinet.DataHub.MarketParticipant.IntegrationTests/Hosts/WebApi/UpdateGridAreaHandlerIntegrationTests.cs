@@ -52,7 +52,7 @@ public sealed class UpdateGridAreaHandlerIntegrationTests
         var gridArea = await _fixture.PrepareGridAreaAsync();
         var newName = "NewGridAreaName";
 
-        var updateCommand = new UpdateGridAreaCommand(gridArea.Id, new ChangeGridAreaDto(gridArea.Id, newName));
+        var updateCommand = new UpdateGridAreaCommand(gridArea.Id, new ChangeGridAreaDto(newName));
 
         // Act
         await mediator.Send(updateCommand);
@@ -75,13 +75,13 @@ public sealed class UpdateGridAreaHandlerIntegrationTests
         var gridArea = await _fixture.PrepareGridAreaAsync();
 
         // Act
-        var updateCommand1 = new UpdateGridAreaCommand(gridArea.Id, new ChangeGridAreaDto(gridArea.Id, "NewGridAreaName1"));
+        var updateCommand1 = new UpdateGridAreaCommand(gridArea.Id, new ChangeGridAreaDto("NewGridAreaName1"));
         await mediator.Send(updateCommand1);
 
-        var updateCommand2 = new UpdateGridAreaCommand(gridArea.Id, new ChangeGridAreaDto(gridArea.Id, "NewGridAreaName2"));
+        var updateCommand2 = new UpdateGridAreaCommand(gridArea.Id, new ChangeGridAreaDto("NewGridAreaName2"));
         await mediator.Send(updateCommand2);
 
-        var updateCommand3 = new UpdateGridAreaCommand(gridArea.Id, new ChangeGridAreaDto(gridArea.Id, "NewGridAreaName3"));
+        var updateCommand3 = new UpdateGridAreaCommand(gridArea.Id, new ChangeGridAreaDto("NewGridAreaName3"));
         await mediator.Send(updateCommand3);
 
         // Assert
