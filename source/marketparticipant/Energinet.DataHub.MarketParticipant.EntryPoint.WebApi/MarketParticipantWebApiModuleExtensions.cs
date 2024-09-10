@@ -21,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Common.Options;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Options;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -36,11 +35,6 @@ public static class MarketParticipantWebApiModuleExtensions
     public static IServiceCollection AddMarketParticipantWebApiModule(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMarketParticipantCore();
-
-        services
-            .AddOptions<RevisionLogOptions>()
-            .BindConfiguration(nameof(RevisionLogOptions))
-            .ValidateDataAnnotations();
 
         services
             .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
@@ -81,17 +75,13 @@ public static class MarketParticipantWebApiModuleExtensions
             return new CertificateService(certificateClient, certificateValidation, logger);
         });
 
-        services.AddHttpClient("revision-log-http-client");
-        services.AddSingleton<IRevisionActivityPublisher, RevisionActivityHttpPublisher>();
-
         // Health check
         services
             .AddHealthChecks()
             .AddDbContextCheck<MarketParticipantDbContext>()
             .AddCheck<GraphApiHealthCheck>("Graph API Access")
             .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access")
-            .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access")
-            .AddCheck<RevisionLogHealthCheck>("Revision Log Live");
+            .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access");
 
         return services;
     }
