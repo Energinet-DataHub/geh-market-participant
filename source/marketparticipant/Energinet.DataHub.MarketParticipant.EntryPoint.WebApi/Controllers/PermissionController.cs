@@ -20,7 +20,9 @@ using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +45,7 @@ public class PermissionController : ControllerBase
     }
 
     [HttpGet("{permissionId:int}")]
+    [EnableRevision(RevisionActivities.PermissionViewed, typeof(Permission), "permissionId")]
     public async Task<ActionResult<PermissionDto>> GetPermissionAsync(int permissionId)
     {
         var getPermissionCommand = new GetPermissionCommand(permissionId);
@@ -53,6 +56,7 @@ public class PermissionController : ControllerBase
     }
 
     [HttpGet]
+    [EnableRevision(RevisionActivities.AllPermissionsViewed, typeof(Permission))]
     public async Task<ActionResult<IEnumerable<PermissionDto>>> ListAllAsync()
     {
         var getPermissionsCommand = new GetPermissionsCommand();
@@ -62,9 +66,10 @@ public class PermissionController : ControllerBase
         return Ok(response.Permissions);
     }
 
+    // TODO: Delete.
     [HttpPut]
     [AuthorizeUser(PermissionId.UserRolesManage)]
-    public async Task<ActionResult> UpdateAsync(UpdatePermissionDto updatePermissionDto)
+    public async Task<ActionResult> UpdateAsync(UpdatePermissionOldDto updatePermissionDto)
     {
         ArgumentNullException.ThrowIfNull(updatePermissionDto);
 
@@ -80,8 +85,28 @@ public class PermissionController : ControllerBase
         return Ok();
     }
 
+    [HttpPut("{permissionId:int}")]
+    [AuthorizeUser(PermissionId.UserRolesManage)]
+    [EnableRevision(RevisionActivities.PermissionEdited, typeof(Permission), "permissionId")]
+    public async Task<ActionResult> UpdateAsync(int permissionId, UpdatePermissionDto updatePermissionDto)
+    {
+        ArgumentNullException.ThrowIfNull(updatePermissionDto);
+
+        if (!_userContext.CurrentUser.IsFas)
+            return Unauthorized();
+
+        var command = new UpdatePermissionCommand(permissionId, updatePermissionDto.Description);
+
+        await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok();
+    }
+
     [HttpGet("{permissionId:int}/audit")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
+    [EnableRevision(RevisionActivities.PermissionAuditLogViewed, typeof(Permission), "permissionId")]
     public async Task<ActionResult<IEnumerable<AuditLogDto<PermissionAuditedChange>>>> GetAuditAsync(int permissionId)
     {
         var command = new GetPermissionAuditLogsCommand(permissionId);
@@ -97,6 +122,7 @@ public class PermissionController : ControllerBase
     [AuthorizeUser(PermissionId.UserRolesManage)]
     [Produces("application/octet-stream")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+    [EnableRevision(RevisionActivities.PermissionOverview, typeof(Permission))]
     public async Task<ActionResult> GetPermissionsRelationAsync()
     {
         if (!_userContext.CurrentUser.IsFas)

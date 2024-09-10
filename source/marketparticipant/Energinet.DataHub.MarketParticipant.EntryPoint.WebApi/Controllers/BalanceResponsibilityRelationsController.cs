@@ -18,8 +18,11 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,6 +43,7 @@ public sealed class BalanceResponsibilityRelationsController : ControllerBase
 
     [HttpGet("{actorId:guid}")]
     [AuthorizeUser(PermissionId.BalanceResponsibilityView)]
+    [EnableRevision(RevisionActivities.BalanceResponsibilityRelationsForActorViewed, typeof(Actor), "actorId")]
     public async Task<ActionResult<IEnumerable<BalanceResponsibilityRelationDto>>> GetBalanceResponsibilityRelationsAsync(Guid actorId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
