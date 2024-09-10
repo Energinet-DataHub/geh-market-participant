@@ -281,7 +281,7 @@ public class ActorController : ControllerBase
 
     [HttpPost("delegations")]
     [AuthorizeUser(PermissionId.DelegationManage)]
-    [EnableRevision(RevisionActivities.ActorDelegationStarted, typeof(DelegationPeriod))]
+    [EnableRevision(RevisionActivities.ActorDelegationStarted, typeof(ProcessDelegation))]
     public async Task<ActionResult> CreateDelegationAsync([FromBody] CreateProcessDelegationsDto delegationDto)
     {
         if (!_userContext.CurrentUser.IsFas)
@@ -298,7 +298,7 @@ public class ActorController : ControllerBase
 
     [HttpPut("delegations/{delegationId:guid}")]
     [AuthorizeUser(PermissionId.DelegationManage)]
-    [EnableRevision(RevisionActivities.ActorDelegationStopped, typeof(DelegationPeriod), "delegationId")]
+    [EnableRevision(RevisionActivities.ActorDelegationStopped, typeof(ProcessDelegation), "delegationId")]
     public async Task<ActionResult> StopDelegationAsync(Guid delegationId, [FromBody] StopProcessDelegationDto delegationDto)
     {
         if (!_userContext.CurrentUser.IsFas)
