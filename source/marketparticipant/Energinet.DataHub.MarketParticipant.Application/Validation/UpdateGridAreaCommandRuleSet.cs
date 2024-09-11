@@ -21,6 +21,9 @@ public sealed class UpdateGridAreaCommandRuleSet : AbstractValidator<UpdateGridA
 {
     public UpdateGridAreaCommandRuleSet()
     {
+        RuleFor(command => command.Id)
+            .NotEmpty();
+
         RuleFor(command => command.GridAreaDto)
             .NotNull()
             .ChildRules(validator =>

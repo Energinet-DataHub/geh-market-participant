@@ -24,7 +24,9 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -83,6 +85,7 @@ public class UserController : ControllerBase
 
     [HttpGet("{userId:guid}")]
     [AuthorizeUser(PermissionId.UsersView, PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserRetrieved, typeof(User), "userId")]
     public async Task<ActionResult<GetUserResponse>> GetAsync(Guid userId)
     {
         if (await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false) == IdentityUserPermission.None)
@@ -99,6 +102,7 @@ public class UserController : ControllerBase
 
     [HttpGet("{userId:guid}/actors")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserActorsRetrieved, typeof(User), "userId")]
     public async Task<ActionResult<GetActorsAssociatedWithUserResponse>> GetUserActorsAsync(Guid userId)
     {
         var associatedActors = await _mediator
@@ -121,6 +125,7 @@ public class UserController : ControllerBase
 
     [HttpGet("{userId:guid}/audit")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserAuditLogViewed, typeof(User), "userId")]
     public async Task<ActionResult<IEnumerable<AuditLogDto<UserAuditedChange>>>> GetAuditAsync(Guid userId)
     {
         var command = new GetUserAuditLogsCommand(userId);
@@ -134,9 +139,8 @@ public class UserController : ControllerBase
 
     [HttpPut("{userId:guid}/useridentity")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<ActionResult> UpdateUserIdentityAsync(
-        Guid userId,
-        UserIdentityUpdateDto userIdentityUpdateDto)
+    [EnableRevision(RevisionActivities.UserEdited, typeof(User), "userId")]
+    public async Task<ActionResult> UpdateUserIdentityAsync(Guid userId, UserIdentityUpdateDto userIdentityUpdateDto)
     {
         if (await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false) == IdentityUserPermission.None)
             return Unauthorized();
@@ -162,6 +166,7 @@ public class UserController : ControllerBase
 
     [HttpPut("userprofile")]
     [Authorize]
+    [EnableRevision(RevisionActivities.UserProfileEdited, typeof(User))]
     public async Task<ActionResult> UpdateUserProfileAsync(UserProfileUpdateDto userProfileUpdateDto)
     {
         ArgumentNullException.ThrowIfNull(userProfileUpdateDto);
@@ -178,6 +183,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("initiate-mitid-signup")]
+    [EnableRevision(RevisionActivities.UserProfileFederate, typeof(User))]
     public async Task<ActionResult> InitiateMitIdSignupAsync()
     {
         var command = new InitiateMitIdSignupCommand(_userContext.CurrentUser.UserId);
@@ -190,6 +196,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("reset-mitid")]
+    [EnableRevision(RevisionActivities.UserProfileRemoveFederation, typeof(User))]
     public async Task<ActionResult> ResetMitIdAsync()
     {
         var command = new ResetMitIdCommand(_userContext.CurrentUser.UserId);
@@ -203,6 +210,7 @@ public class UserController : ControllerBase
 
     [HttpPut("{userId:guid}/deactivate")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserDeactivated, typeof(User), "userId")]
     public async Task<ActionResult> DeactivateAsync(Guid userId)
     {
         var identityUserPermission = await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false);
@@ -221,6 +229,7 @@ public class UserController : ControllerBase
 
     [HttpPut("{userId:guid}/reactivate")]
     [AuthorizeUser(PermissionId.UsersReActivate)]
+    [EnableRevision(RevisionActivities.UserReactivated, typeof(User), "userId")]
     public async Task<ActionResult> ReActivateAsync(Guid userId)
     {
         var identityUserPermission = await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false);
@@ -239,6 +248,7 @@ public class UserController : ControllerBase
 
     [HttpPut("{userId:guid}/reset-2fa")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserResetMfa, typeof(User), "userId")]
     public async Task<ActionResult> ResetTwoFactorAuthenticationAsync(Guid userId)
     {
         if (await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false) == IdentityUserPermission.None)
@@ -255,6 +265,7 @@ public class UserController : ControllerBase
 
     [HttpGet("{emailAddress}/exists")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserEmailLookup)]
     public async Task<ActionResult<bool>> CheckEmailExistsAsync(string emailAddress)
     {
         var command = new CheckEmailExistsCommand(emailAddress);

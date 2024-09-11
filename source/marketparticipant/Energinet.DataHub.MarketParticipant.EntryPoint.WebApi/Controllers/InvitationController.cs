@@ -19,7 +19,10 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,6 +44,7 @@ public sealed class InvitationController : ControllerBase
 
     [HttpPost("users/invite")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserInvited, typeof(User))]
     public async Task<ActionResult> InviteUserAsync([FromBody] UserInvitationDto userInvitation)
     {
         ArgumentNullException.ThrowIfNull(userInvitation);
@@ -57,6 +61,7 @@ public sealed class InvitationController : ControllerBase
 
     [HttpPut("users/{userId:guid}/reinvite")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserReInvited, typeof(User), "userId")]
     public async Task<ActionResult> ReInviteUserAsync(Guid userId)
     {
         if (!_userContext.CurrentUser.IsFas)

@@ -212,57 +212,6 @@ public class ActorController : ControllerBase
         return Ok(response.AuditLogs);
     }
 
-    // TODO: Delete.
-    [HttpGet("{actorId:guid}/delegation")]
-    [AuthorizeUser(PermissionId.DelegationView)]
-    public async Task<ActionResult<GetDelegationsForActorResponse>> GetDelegationsForActorOldAsync(Guid actorId)
-    {
-        ArgumentNullException.ThrowIfNull(actorId);
-
-        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-            return Unauthorized();
-
-        var result = await _mediator
-            .Send(new GetDelegationsForActorCommand(actorId))
-            .ConfigureAwait(false);
-
-        return Ok(result);
-    }
-
-    // TODO: Delete.
-    [HttpPost("delegation")]
-    [AuthorizeUser(PermissionId.DelegationManage)]
-    public async Task<ActionResult> CreateDelegationOldAsync([FromBody] CreateProcessDelegationsDto delegationDto)
-    {
-        if (!_userContext.CurrentUser.IsFas)
-            return Unauthorized();
-
-        var createDelegationCommand = new CreateProcessDelegationCommand(delegationDto);
-
-        await _mediator
-            .Send(createDelegationCommand)
-            .ConfigureAwait(false);
-
-        return Ok();
-    }
-
-    // TODO: Delete.
-    [HttpPut("delegation")]
-    [AuthorizeUser(PermissionId.DelegationManage)]
-    public async Task<ActionResult> StopDelegationOldAsync([FromBody] StopProcessDelegationOldDto delegationDto)
-    {
-        if (!_userContext.CurrentUser.IsFas)
-            return Unauthorized();
-
-        var stopMessageDelegationCommand = new StopProcessDelegationCommand(delegationDto.Id, new StopProcessDelegationDto(delegationDto.PeriodId, delegationDto.StopsAt));
-
-        await _mediator
-            .Send(stopMessageDelegationCommand)
-            .ConfigureAwait(false);
-
-        return Ok();
-    }
-
     [HttpGet("{actorId:guid}/delegations")]
     [AuthorizeUser(PermissionId.DelegationView)]
     [EnableRevision(RevisionActivities.DelegationsForActorViewed, typeof(Actor), "actorId")]

@@ -14,4 +14,4 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 
-public record UpdatePermissionDto(int Id, string Description);
+public record UpdatePermissionDto(string Description);
