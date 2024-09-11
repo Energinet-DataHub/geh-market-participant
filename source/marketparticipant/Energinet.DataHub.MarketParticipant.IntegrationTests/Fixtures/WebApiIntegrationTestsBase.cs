@@ -17,6 +17,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using Energinet.DataHub.MarketParticipant.Common.Options;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.RevisionLog.Integration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -52,6 +54,8 @@ public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFacto
         var dataHubTokenClaims = roleClaims
             .Append(new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()))
             .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
+            .Append(new Claim("actornumber", new MockedGln()))
+            .Append(new Claim("marketroles", "gridaccessprovider"))
             .Append(new Claim("multitenancy", "true", ClaimValueTypes.Boolean));
 
         var dataHubToken = new JwtSecurityToken(
