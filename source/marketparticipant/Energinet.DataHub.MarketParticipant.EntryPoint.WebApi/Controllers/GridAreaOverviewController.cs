@@ -15,6 +15,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,6 +35,7 @@ public sealed class GridAreaOverviewController : ControllerBase
     }
 
     [HttpGet]
+    [EnableRevision(RevisionActivities.PublicGridAreasRetrieved, typeof(GridArea))]
     public async Task<ActionResult<IEnumerable<GridAreaOverviewItemDto>>> GetGridAreaOverviewAsync()
     {
         var command = new GetGridAreaOverviewCommand();

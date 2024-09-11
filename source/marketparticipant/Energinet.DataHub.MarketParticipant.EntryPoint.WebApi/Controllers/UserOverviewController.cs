@@ -19,9 +19,13 @@ using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using UserOverviewSortProperty = Energinet.DataHub.MarketParticipant.Application.Commands.Query.Users.UserOverviewSortProperty;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
@@ -42,6 +46,7 @@ public sealed class UserOverviewController : ControllerBase
 
     [HttpPost("users/search")]
     [AuthorizeUser(PermissionId.UsersView, PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UsersRetrieved, typeof(User))]
     public async Task<ActionResult<GetUserOverviewResponse>> SearchUsersAsync(
         int pageNumber,
         int pageSize,

@@ -18,8 +18,12 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,6 +45,7 @@ public sealed class UserRoleAssignmentController : ControllerBase
 
     [HttpGet("actors/{actorId:guid}/users/{userId:guid}/roles")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserRoleAssignmentsViewed, typeof(User), "userId")]
     public async Task<ActionResult<IEnumerable<UserRoleDto>>> GetAsync(Guid actorId, Guid userId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
@@ -57,6 +62,7 @@ public sealed class UserRoleAssignmentController : ControllerBase
 
     [HttpGet("actors/{actorId:guid}/roles")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.PossibleUserRoleAssignmentsViewed, typeof(Actor), "actor")]
     public async Task<ActionResult<IEnumerable<UserRoleDto>>> GetAssignableAsync(Guid actorId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
@@ -73,6 +79,7 @@ public sealed class UserRoleAssignmentController : ControllerBase
 
     [HttpPut("actors/{actorId:guid}/users/{userId:guid}/roles")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserRolesAssigned, typeof(User), "userId")]
     public async Task<ActionResult> UpdateUserRoleAssignmentsAsync(
         Guid actorId,
         Guid userId,

@@ -48,6 +48,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.AllUserRolesRetrieved, typeof(UserRole))]
     public async Task<ActionResult<IEnumerable<UserRoleDto>>> GetAsync()
     {
         var command = new GetAllUserRolesCommand();
@@ -61,6 +62,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet("{userRoleId:guid}")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserRoleRetrieved, typeof(UserRole), "userRoleId")]
     public async Task<ActionResult<UserRoleWithPermissionsDto>> GetAsync(Guid userRoleId)
     {
         var command = new GetUserRoleCommand(userRoleId);
@@ -74,6 +76,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet("assignedtopermission")]
     [AuthorizeUser(PermissionId.UsersManage)]
+    [EnableRevision(RevisionActivities.UserRolesAssignedToPermission, typeof(UserRole))]
     public async Task<ActionResult<IEnumerable<UserRoleDto>>> AssignedToPermissionAsync(int permissionId)
     {
         var command = new GetUserRolesToPermissionCommand(permissionId);
@@ -87,6 +90,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpPost]
     [AuthorizeUser(PermissionId.UserRolesManage)]
+    [EnableRevision(RevisionActivities.UserRoleCreated, typeof(UserRole))]
     public async Task<ActionResult<Guid>> CreateAsync(CreateUserRoleDto userRole)
     {
         var command = new CreateUserRoleCommand(userRole);
@@ -115,6 +119,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet("{userRoleId:guid}/audit")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
+    [EnableRevision(RevisionActivities.UserRoleAuditLogViewed, typeof(UserRole), "userRoleId")]
     public async Task<ActionResult<IEnumerable<AuditLogDto<UserRoleAuditedChange>>>> GetAuditAsync(Guid userRoleId)
     {
         var command = new GetUserRoleAuditLogsCommand(userRoleId);
@@ -128,6 +133,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet("permissions")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
+    [EnableRevision(RevisionActivities.PermissionDetailsViewed, typeof(Permission))]
     public async Task<ActionResult<IEnumerable<PermissionDetailsDto>>> GetPermissionDetailsAsync(EicFunction eicFunction)
     {
         var command = new GetPermissionDetailsCommand(eicFunction);
@@ -141,6 +147,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpPut("{userRoleId:guid}/deactivate")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
+    [EnableRevision(RevisionActivities.UserRoleDeactivated, typeof(UserRole), "userRoleId")]
     public async Task<ActionResult> DeactivateUserRoleAsync(Guid userRoleId)
     {
         var command = new DeactivateUserRoleCommand(userRoleId, _userContext.CurrentUser.UserId);
