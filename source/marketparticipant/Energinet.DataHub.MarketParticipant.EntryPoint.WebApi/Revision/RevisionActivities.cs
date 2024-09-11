@@ -16,8 +16,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 
 public static class RevisionActivities
 {
-    public const string LoginAssignedActorsRetrieved = "LoginAssignedActorsRetrieved";
-
     public const string PublicActorContactsRetrieved = "PublicActorContactsRetrieved";
     public const string AllContactsForActorRetrieved = "AllContactsForActorRetrieved";
     public const string CreateContactForActor = "CreateContactForActor";

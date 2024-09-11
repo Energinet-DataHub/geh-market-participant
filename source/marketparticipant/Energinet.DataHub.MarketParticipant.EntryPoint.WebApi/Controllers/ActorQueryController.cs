@@ -17,8 +17,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Security;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
-using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,7 +38,6 @@ public sealed class ActorQueryController : ControllerBase
     }
 
     [HttpGet("selection-actors")]
-    [EnableRevision(RevisionActivities.LoginAssignedActorsRetrieved)]
     public async Task<ActionResult<IEnumerable<SelectionActorDto>>> GetSelectionActorsAsync()
     {
         var command = new GetSelectionActorsQueryCommand(_userContext.CurrentUser.UserId);
