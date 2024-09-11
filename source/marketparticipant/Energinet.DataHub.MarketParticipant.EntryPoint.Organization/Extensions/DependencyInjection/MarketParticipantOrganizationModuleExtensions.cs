@@ -15,7 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Identity;
+using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Energinet.DataHub.MarketParticipant.Application.Contracts;
 using Energinet.DataHub.MarketParticipant.Application.Options;
@@ -116,8 +119,8 @@ internal static class MarketParticipantOrganizationModuleExtensions
         services
             .AddHealthChecks()
             .AddDbContextCheck<MarketParticipantDbContext>()
-            .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEventsAsync, name: "expired_events")
-            .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEmailsAsync, name: "expired_emails")
+            .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEventsAsync, name: "expired_events", tags: [HealthChecksConstants.StatusHealthCheckTag])
+            .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEmailsAsync, name: "expired_emails", tags: [HealthChecksConstants.StatusHealthCheckTag])
             .AddAzureServiceBusSubscription(
                 provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.HealthConnectionString,
                 provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.SharedIntegrationEventTopic,
