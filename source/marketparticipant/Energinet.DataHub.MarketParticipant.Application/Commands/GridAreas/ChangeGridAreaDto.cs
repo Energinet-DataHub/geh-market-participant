@@ -16,4 +16,4 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 
-public sealed record ChangeGridAreaDto(Guid Id, string Name);
+public sealed record ChangeGridAreaDto(string Name);

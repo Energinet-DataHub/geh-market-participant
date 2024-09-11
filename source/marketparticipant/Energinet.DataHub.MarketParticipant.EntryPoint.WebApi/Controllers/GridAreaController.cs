@@ -19,7 +19,9 @@ using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,6 +40,7 @@ public sealed class GridAreaController : ControllerBase
 
     [HttpPost]
     [AuthorizeUser(PermissionId.GridAreasManage)]
+    [EnableRevision(RevisionActivities.GridAreaCreated, typeof(GridArea))]
     public async Task<ActionResult<Guid>> CreateGridAreaAsync(CreateGridAreaDto gridAreaDto)
     {
         var createGridAreaCommand = new CreateGridAreaCommand(gridAreaDto);
@@ -49,13 +52,14 @@ public sealed class GridAreaController : ControllerBase
         return Ok(response.GridAreaId);
     }
 
-    [HttpPut]
+    [HttpPut("{gridAreaId:guid}")]
     [AuthorizeUser(PermissionId.GridAreasManage)]
-    public async Task<ActionResult> UpdateGridAreaAsync(ChangeGridAreaDto gridAreaDto)
+    [EnableRevision(RevisionActivities.GridAreaEdited, typeof(GridArea), "gridAreaId")]
+    public async Task<ActionResult> UpdateGridAreaAsync(Guid gridAreaId, ChangeGridAreaDto gridAreaDto)
     {
         ArgumentNullException.ThrowIfNull(gridAreaDto);
 
-        var updateGridAreaCommand = new UpdateGridAreaCommand(gridAreaDto.Id, gridAreaDto);
+        var updateGridAreaCommand = new UpdateGridAreaCommand(gridAreaId, gridAreaDto);
 
         await _mediator
             .Send(updateGridAreaCommand)
@@ -65,6 +69,7 @@ public sealed class GridAreaController : ControllerBase
     }
 
     [HttpGet]
+    [EnableRevision(RevisionActivities.PublicGridAreasRetrieved, typeof(GridArea))]
     public async Task<ActionResult<IEnumerable<GridAreaDto>>> GetGridAreasAsync()
     {
         var command = new GetGridAreasCommand();
@@ -73,6 +78,7 @@ public sealed class GridAreaController : ControllerBase
     }
 
     [HttpGet("{gridAreaId:guid}")]
+    [EnableRevision(RevisionActivities.PublicGridAreasRetrieved, typeof(GridArea), "gridAreaId")]
     public async Task<ActionResult<GridAreaDto>> GetGridAreaAsync(Guid gridAreaId)
     {
         var command = new GetGridAreaCommand(gridAreaId);
@@ -82,6 +88,7 @@ public sealed class GridAreaController : ControllerBase
 
     [HttpGet("{gridAreaId:guid}/audit")]
     [AuthorizeUser(PermissionId.GridAreasManage)]
+    [EnableRevision(RevisionActivities.GridAreaAuditLogViewed, typeof(GridArea), "gridAreaId")]
     public async Task<ActionResult<IEnumerable<AuditLogDto<GridAreaAuditedChange>>>> GetAuditAsync(Guid gridAreaId)
     {
         var command = new GetGridAreaAuditLogsCommand(gridAreaId);

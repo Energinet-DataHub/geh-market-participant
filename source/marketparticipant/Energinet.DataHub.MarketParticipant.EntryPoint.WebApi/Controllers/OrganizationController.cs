@@ -22,7 +22,9 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,6 +44,7 @@ public class OrganizationController : ControllerBase
     }
 
     [HttpGet]
+    [EnableRevision(RevisionActivities.AllOrganizationsRetrieved, typeof(Organization))]
     public async Task<ActionResult<IEnumerable<OrganizationDto>>> ListAllAsync()
     {
         var getOrganizationsCommand = new GetOrganizationsCommand(null);
@@ -54,6 +57,7 @@ public class OrganizationController : ControllerBase
     }
 
     [HttpGet("{organizationId:guid}")]
+    [EnableRevision(RevisionActivities.OrganizationRetrieved, typeof(Organization), "organizationId")]
     public async Task<ActionResult<OrganizationDto>> GetSingleOrganizationAsync(Guid organizationId)
     {
         var getSingleOrganizationCommand = new GetSingleOrganizationCommand(organizationId);
@@ -67,6 +71,7 @@ public class OrganizationController : ControllerBase
 
     [HttpPost]
     [AuthorizeUser(PermissionId.ActorsManage)]
+    [EnableRevision(RevisionActivities.OrganizationCreated, typeof(Organization))]
     public async Task<ActionResult<Guid>> CreateOrganizationAsync(CreateOrganizationDto organization)
     {
         if (!_userContext.CurrentUser.IsFas)
@@ -83,9 +88,8 @@ public class OrganizationController : ControllerBase
 
     [HttpPut("{organizationId:guid}")]
     [AuthorizeUser(PermissionId.ActorsManage)]
-    public async Task<ActionResult> UpdateOrganizationAsync(
-        Guid organizationId,
-        ChangeOrganizationDto organization)
+    [EnableRevision(RevisionActivities.OrganizationEdited, typeof(Organization), "organizationId")]
+    public async Task<ActionResult> UpdateOrganizationAsync(Guid organizationId, ChangeOrganizationDto organization)
     {
         if (!_userContext.CurrentUser.IsFas)
             return Unauthorized();
@@ -101,6 +105,7 @@ public class OrganizationController : ControllerBase
     }
 
     [HttpGet("{organizationId:guid}/actor")]
+    [EnableRevision(RevisionActivities.OrganizationActorsRetrieved, typeof(Organization), "organizationId")]
     public async Task<ActionResult<IEnumerable<ActorDto>>> GetActorsAsync(Guid organizationId)
     {
         var getActorsCommand = new GetActorsCommand(organizationId);
@@ -114,6 +119,7 @@ public class OrganizationController : ControllerBase
 
     [HttpGet("{organizationId:guid}/audit")]
     [AuthorizeUser(PermissionId.ActorsManage)]
+    [EnableRevision(RevisionActivities.OrganizationAuditLogViewed, typeof(Organization), "organizationId")]
     public async Task<ActionResult<IEnumerable<AuditLogDto<OrganizationAuditedChange>>>> GetAuditAsync(Guid organizationId)
     {
         var command = new GetOrganizationAuditLogsCommand(organizationId);

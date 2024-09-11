@@ -32,9 +32,57 @@ public static class RevisionActivities
     public const string ActorCertificateAssigned = "ActorCertificateAssigned";
     public const string ActorClientSecretAssigned = "ActorClientSecretAssigned";
 
+    public const string BalanceResponsibilityRelationsForActorViewed = "BalanceResponsibilityRelationsForActorViewed";
     public const string DelegationsForActorViewed = "DelegationsForActorViewed";
     public const string ActorDelegationStarted = "ActorDelegationStarted";
     public const string ActorDelegationStopped = "ActorDelegationStopped";
 
+    public const string AuditIdentityLookup = "AuditIdentityLookup";
+
+    public const string UserInvited = "UserInvited";
+    public const string UserReInvited = "UserReInvited";
+    public const string UserEmailLookup = "UserEmailLookup";
+
+    public const string UserRetrieved = "UserRetrieved";
+    public const string UsersRetrieved = "UsersRetrieved";
+    public const string UserActorsRetrieved = "UserActorsRetrieved";
+    public const string UserEdited = "UserEdited";
+    public const string UserDeactivated = "UserDeactivated";
+    public const string UserReactivated = "UserReactivated";
+    public const string UserResetMfa = "UserResetMfa";
+    public const string UserProfileEdited = "UserProfileEdited";
+    public const string UserProfileFederate = "UserProfileFederate";
+    public const string UserProfileRemoveFederation = "UserProfileRemoveFederation";
+    public const string UserAuditLogViewed = "UserAuditLogViewed";
+
+    public const string PublicGridAreasRetrieved = "PublicGridAreasRetrieved";
+    public const string GridAreaCreated = "GridAreaCreated";
+    public const string GridAreaEdited = "GridAreaEdited";
+    public const string GridAreaAuditLogViewed = "GridAreaAuditLogViewed";
+
+    public const string AllOrganizationsRetrieved = "AllOrganizationsRetrieved";
+    public const string OrganizationActorsRetrieved = "OrganizationActorsRetrieved";
+    public const string OrganizationRetrieved = "OrganizationRetrieved";
+    public const string OrganizationCreated = "OrganizationCreated";
+    public const string OrganizationEdited = "OrganizationEdited";
+    public const string OrganizationAuditLogViewed = "OrganizationAuditLogViewed";
+
+    public const string AllPermissionsViewed = "AllPermissionsViewed";
+    public const string PermissionOverview = "PermissionOverview";
+    public const string PermissionViewed = "PermissionViewed";
+    public const string PermissionEdited = "PermissionEdited";
+    public const string PermissionAuditLogViewed = "PermissionAuditLogViewed";
+    public const string PermissionDetailsViewed = "PermissionDetailsViewed";
+
+    public const string PossibleUserRoleAssignmentsViewed = "PossibleUserRoleAssignmentsViewed";
+    public const string UserRoleAssignmentsViewed = "UserRoleAssignmentsViewed";
+    public const string UserRolesAssigned = "UserRolesAssigned";
+
+    public const string AllUserRolesRetrieved = "AllUserRolesRetrieved";
+    public const string UserRoleRetrieved = "UserRoleRetrieved";
+    public const string UserRoleCreated = "UserRoleCreated";
     public const string UserRoleEdited = "UserRoleEdited";
+    public const string UserRoleAuditLogViewed = "UserRoleAuditLogViewed";
+    public const string UserRoleDeactivated = "UserRoleDeactivated";
+    public const string UserRolesAssignedToPermission = "UserRolesAssignedToPermission";
 }

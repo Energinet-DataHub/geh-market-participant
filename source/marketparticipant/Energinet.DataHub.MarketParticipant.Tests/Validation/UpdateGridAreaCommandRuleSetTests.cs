@@ -25,6 +25,25 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation;
 [UnitTest]
 public sealed class UpdateGridAreaCommandRuleSetTests
 {
+    [Fact]
+    public async Task Validate_Id_ValidatesProperty()
+    {
+        // Arrange
+        const string propertyName = nameof(UpdateGridAreaCommand.Id);
+
+        var updateGridAreaDto = new ChangeGridAreaDto("fake_value");
+
+        var target = new UpdateGridAreaCommandRuleSet();
+        var command = new UpdateGridAreaCommand(Guid.Empty, updateGridAreaDto);
+
+        // Act
+        var result = await target.ValidateAsync(command);
+
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+    }
+
     [Theory]
     [InlineData("", false)]
     [InlineData(null, false)]
@@ -39,7 +58,7 @@ public sealed class UpdateGridAreaCommandRuleSetTests
         var propertyName = $"{nameof(UpdateGridAreaCommand.GridAreaDto)}.{nameof(ChangeGridAreaDto.Name)}";
         var gridAreaId = Guid.NewGuid();
 
-        var updateGridAreaDto = new ChangeGridAreaDto(gridAreaId, newName!);
+        var updateGridAreaDto = new ChangeGridAreaDto(newName!);
 
         var target = new UpdateGridAreaCommandRuleSet();
         var command = new UpdateGridAreaCommand(gridAreaId, updateGridAreaDto);

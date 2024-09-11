@@ -17,6 +17,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
+using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,6 +37,7 @@ public sealed class AuditIdentityController : ControllerBase
     }
 
     [HttpGet("{auditIdentityId:guid}")]
+    [EnableRevision(RevisionActivities.AuditIdentityLookup, typeof(AuditIdentity))]
     public async Task<ActionResult<AuditIdentityDto>> GetAsync(Guid auditIdentityId)
     {
         // NOTE: There is no permission attribute, as command itself filters results.
@@ -45,6 +49,7 @@ public sealed class AuditIdentityController : ControllerBase
     }
 
     [HttpPost]
+    [EnableRevision(RevisionActivities.AuditIdentityLookup, typeof(AuditIdentity))]
     public async Task<ActionResult<IEnumerable<AuditIdentityDto>>> GetMultipleAsync([FromBody] Guid[] auditIdentityId)
     {
         // NOTE: There is no permission attribute, as command itself filters results.
