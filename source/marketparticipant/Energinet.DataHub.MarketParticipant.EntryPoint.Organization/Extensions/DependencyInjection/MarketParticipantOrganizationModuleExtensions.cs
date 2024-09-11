@@ -126,13 +126,6 @@ internal static class MarketParticipantOrganizationModuleExtensions
                 provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.SharedIntegrationEventTopic,
                 provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.IntegrationEventSubscription)
             .AddSendGrid()
-            .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check")
-            .AddServiceBusTopicSubscriptionDeadLetter(
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.HealthConnectionString,
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.SharedIntegrationEventTopic,
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.IntegrationEventSubscription,
-                _ => new DefaultAzureCredential(),
-                "service_bus_dead_letter",
-                [HealthChecksConstants.StatusHealthCheckTag]);
+            .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check");
     }
 }
