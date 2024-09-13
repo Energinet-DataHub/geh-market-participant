@@ -28,6 +28,11 @@ public interface IMarketParticipantDbContext
     /// <summary>
     ///     Represent access to the organization database table
     /// </summary>
+    DbSet<DownloadTokenEntity> DownloadTokens { get; }
+
+    /// <summary>
+    ///     Represent access to the organization database table
+    /// </summary>
     DbSet<OrganizationEntity> Organizations { get; }
 
     /// <summary>
