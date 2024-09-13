@@ -103,4 +103,23 @@ public sealed class DownloadTokensRepositoryTests
         // Assert
         Assert.Equal(authorization, string.Empty);
     }
+
+    [Fact]
+    public async Task Get_And_Use_Download_Token_Used_Returns_Empty()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var downloadTokensRepository = new DownloadTokenRespository(context);
+        var id = await downloadTokensRepository.CreateDownloadTokenAsync("accessToken");
+
+        await downloadTokensRepository.GetAndUseDownloadTokenAsync(id);
+
+        // Act
+        var authorization = await downloadTokensRepository.GetAndUseDownloadTokenAsync(id);
+
+        // Assert
+        Assert.Equal(authorization, string.Empty);
+    }
 }

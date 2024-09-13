@@ -68,10 +68,13 @@ public sealed class DownloadTokenRespository : IDownloadTokenRespository
         if (downloadTokenEntity == null)
             return string.Empty;
 
+        var authorization = downloadTokenEntity.Authorization;
+
         downloadTokenEntity.Used = true;
+        downloadTokenEntity.Authorization = string.Empty;
 
         await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        return downloadTokenEntity.Authorization;
+        return authorization;
     }
 }
