@@ -70,8 +70,6 @@ public sealed class GetUserPermissionsHandler
             user = await _userRepository
                 .GetAsync(new ExternalUserId(userIdentity.Id.Value))
                 .ConfigureAwait(false);
-
-
         }
 
         await ValidateOrClearLogonRequirementsAsync(user!).ConfigureAwait(false);
