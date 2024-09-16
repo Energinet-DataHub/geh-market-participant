@@ -25,7 +25,7 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="13.2.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.23.0" />
-    <PackageReference Include="FluentValidation" Version="11.9.2" />
+    <PackageReference Include="FluentValidation" Version="11.10.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="SendGrid.Extensions.DependencyInjection" Version="1.0.1" />
   </ItemGroup>
