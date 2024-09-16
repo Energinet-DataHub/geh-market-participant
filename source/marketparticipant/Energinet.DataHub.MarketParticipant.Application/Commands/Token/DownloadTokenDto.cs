@@ -11,10 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System;
-using MediatR;
-
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Token;
 
-public sealed record GetAndUseDownloadTokenCommand(Guid Token) : IRequest<DownloadTokenDto>;
+public sealed record DownloadTokenDto(string AccessToken);

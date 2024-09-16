@@ -191,7 +191,8 @@ public class TokenController : ControllerBase
     }
 
     [HttpPost("getAndUseDownloadToken/{token}")]
-    public async Task<ActionResult<string>> GetAndUseDownloadTokenAsync(Guid token)
+    [AllowAnonymous]
+    public async Task<ActionResult<DownloadTokenDto>> GetAndUseDownloadTokenAsync(Guid token)
     {
         var command = new GetAndUseDownloadTokenCommand(token);
 
