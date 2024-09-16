@@ -29,11 +29,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class InitiateMitIdSignupHandlerTests
+public sealed class InitiateMitIdSignupHandlerIntegrationTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public InitiateMitIdSignupHandlerTests(MarketParticipantDatabaseFixture fixture)
+    public InitiateMitIdSignupHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -41,8 +41,12 @@ public sealed class InitiateMitIdSignupHandlerTests
     [Fact]
     public async Task Handle_UserFound_InitiatesMitIdSignup()
     {
+        var frontendUser = await _fixture.PrepareUserAsync();
+
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+
         await using var scope = host.BeginScope();
 
         var user = await _fixture.PrepareUserAsync();
@@ -62,8 +66,12 @@ public sealed class InitiateMitIdSignupHandlerTests
     [Fact]
     public async Task Handle_SignupInitiated_IsAudited()
     {
+        var frontendUser = await _fixture.PrepareUserAsync();
+
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+
         await using var scope = host.BeginScope();
 
         var user = await _fixture.PrepareUserAsync();
