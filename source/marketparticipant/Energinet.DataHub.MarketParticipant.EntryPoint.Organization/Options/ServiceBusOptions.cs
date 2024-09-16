@@ -21,6 +21,9 @@ public class ServiceBusOptions
     public const string SectionName = "ServiceBus";
 
     [Required]
+    public string FullyQualifiedNamespace { get; set; } = string.Empty;
+
+    [Required]
     public string SharedIntegrationEventTopic { get; set; } = string.Empty;
 
     [Required]
