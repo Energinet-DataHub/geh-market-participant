@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Users;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -47,7 +48,7 @@ public sealed class InitiateMitIdSignupHandlerTests
         userRepositoryMock.Setup(x => x.GetAsync(new UserId(userId)))
             .ReturnsAsync(user);
 
-        var target = new InitiateMitIdSignupHandler(userRepositoryMock.Object);
+        var target = new InitiateMitIdSignupHandler(userRepositoryMock.Object, new Mock<IUserIdentityAuditLogRepository>().Object, new Mock<IAuditIdentityProvider>().Object);
 
         var inviteUserCommand = new InitiateMitIdSignupCommand(userId);
 
@@ -69,7 +70,7 @@ public sealed class InitiateMitIdSignupHandlerTests
         userRepositoryMock.Setup(x => x.GetAsync(new UserId(userId)))
             .ReturnsAsync((User?)null);
 
-        var target = new InitiateMitIdSignupHandler(userRepositoryMock.Object);
+        var target = new InitiateMitIdSignupHandler(userRepositoryMock.Object, new Mock<IUserIdentityAuditLogRepository>().Object, new Mock<IAuditIdentityProvider>().Object);
 
         var inviteUserCommand = new InitiateMitIdSignupCommand(userId);
 

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -24,13 +25,19 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
+    private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
 
     public UserIdentityOpenIdLinkService(
         IUserRepository userRepository,
-        IUserIdentityRepository userIdentityRepository)
+        IUserIdentityRepository userIdentityRepository,
+        IUserIdentityAuditLogRepository userIdentityAuditLogRepository,
+        IAuditIdentityProvider auditIdentityProvider)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
+        _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
+        _auditIdentityProvider = auditIdentityProvider;
     }
 
     public async Task<UserIdentity> ValidateAndSetupOpenIdAsync(ExternalUserId requestExternalUserId)
@@ -76,6 +83,15 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
 
         await _userIdentityRepository
             .AssignUserLoginIdentitiesAsync(userIdentityInvitedOnEmail)
+            .ConfigureAwait(false);
+
+        await _userIdentityAuditLogRepository
+            .AuditAsync(
+                userLocalIdentityByEmail.Id,
+                _auditIdentityProvider.IdentityId,
+                UserAuditedChange.UserLoginFederated,
+                string.Join(",", identityUserOpenId.LoginIdentities.Select(ident => ident.Issuer)),
+                null)
             .ConfigureAwait(false);
 
         return userIdentityInvitedOnEmail;

@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -26,10 +27,17 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Users;
 public sealed class InitiateMitIdSignupHandler : IRequestHandler<InitiateMitIdSignupCommand>
 {
     private readonly IUserRepository _userRepository;
+    private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
 
-    public InitiateMitIdSignupHandler(IUserRepository userRepository)
+    public InitiateMitIdSignupHandler(
+        IUserRepository userRepository,
+        IUserIdentityAuditLogRepository userIdentityAuditLogRepository,
+        IAuditIdentityProvider auditIdentityProvider)
     {
         _userRepository = userRepository;
+        _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
+        _auditIdentityProvider = auditIdentityProvider;
     }
 
     public async Task Handle(InitiateMitIdSignupCommand request, CancellationToken cancellationToken)
@@ -41,5 +49,9 @@ public sealed class InitiateMitIdSignupHandler : IRequestHandler<InitiateMitIdSi
 
         user.InitiateMitIdSignup();
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
+
+        await _userIdentityAuditLogRepository
+            .AuditAsync(user.Id, _auditIdentityProvider.IdentityId, UserAuditedChange.UserLoginFederationRequested, null, null)
+            .ConfigureAwait(false);
     }
 }
