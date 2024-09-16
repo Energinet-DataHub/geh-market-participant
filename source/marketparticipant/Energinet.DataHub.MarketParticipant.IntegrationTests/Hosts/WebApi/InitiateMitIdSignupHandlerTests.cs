@@ -16,6 +16,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -55,5 +57,27 @@ public sealed class InitiateMitIdSignupHandlerTests
 
         // assert
         Assert.True(actual.MitIdSignupInitiatedAt > DateTimeOffset.UtcNow.AddMinutes(-1));
+    }
+
+    [Fact]
+    public async Task Handle_SignupInitiated_IsAudited()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+
+        var user = await _fixture.PrepareUserAsync();
+
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        var command = new InitiateMitIdSignupCommand(user.Id);
+
+        // Act
+        await mediator.Send(command);
+
+        // Assert
+        var userIdentityAuditLogRepository = scope.ServiceProvider.GetRequiredService<IUserIdentityAuditLogRepository>();
+        var actual = await userIdentityAuditLogRepository.GetAsync(new UserId(user.Id));
+
+        Assert.Contains(actual, log => log.Change == UserAuditedChange.UserLoginFederationRequested);
     }
 }
