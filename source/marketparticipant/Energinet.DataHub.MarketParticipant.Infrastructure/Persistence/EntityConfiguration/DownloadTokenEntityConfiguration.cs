@@ -27,8 +27,6 @@ public class DownloadTokenEntityConfiguration : IEntityTypeConfiguration<Downloa
 
         builder.ToTable("DownloadTokens");
         builder.HasKey(x => x.Token);
-        builder.Property(x => x.Authorization);
         builder.Property(p => p.Token).ValueGeneratedOnAdd();
-        builder.Property(p => p.Created);
     }
 }

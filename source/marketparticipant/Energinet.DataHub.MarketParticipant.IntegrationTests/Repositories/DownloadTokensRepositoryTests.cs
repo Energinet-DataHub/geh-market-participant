@@ -60,7 +60,7 @@ public sealed class DownloadTokensRepositoryTests
         var id = await downloadTokensRepository.CreateDownloadTokenAsync("accessToken");
 
         // Act
-        var authorization = await downloadTokensRepository.GetAndUseDownloadTokenAsync(id);
+        var authorization = await downloadTokensRepository.ExchangeDownloadTokenAsync(id);
 
         // Assert
         Assert.Equal("accessToken", authorization);
@@ -77,8 +77,8 @@ public sealed class DownloadTokensRepositoryTests
         var id = await downloadTokensRepository.CreateDownloadTokenAsync("accessToken");
 
         // Act
-        await downloadTokensRepository.GetAndUseDownloadTokenAsync(id);
-        var authorization = await downloadTokensRepository.GetAndUseDownloadTokenAsync(id);
+        await downloadTokensRepository.ExchangeDownloadTokenAsync(id);
+        var authorization = await downloadTokensRepository.ExchangeDownloadTokenAsync(id);
 
         // Assert
         Assert.Equal(authorization, string.Empty);
@@ -94,11 +94,11 @@ public sealed class DownloadTokensRepositoryTests
         var downloadTokensRepository = new DownloadTokenRespository(context);
         var id = await downloadTokensRepository.CreateDownloadTokenAsync("accessToken");
 
-        (await context.DownloadTokens.FindAsync(id)).Created = DateTime.UtcNow.AddMinutes(-6);
+        (await context.DownloadTokens.FindAsync(id))!.Created = DateTime.UtcNow.AddMinutes(-6);
         await context.SaveChangesAsync();
 
         // Act
-        var authorization = await downloadTokensRepository.GetAndUseDownloadTokenAsync(id);
+        var authorization = await downloadTokensRepository.ExchangeDownloadTokenAsync(id);
 
         // Assert
         Assert.Equal(authorization, string.Empty);
@@ -114,10 +114,10 @@ public sealed class DownloadTokensRepositoryTests
         var downloadTokensRepository = new DownloadTokenRespository(context);
         var id = await downloadTokensRepository.CreateDownloadTokenAsync("accessToken");
 
-        await downloadTokensRepository.GetAndUseDownloadTokenAsync(id);
+        await downloadTokensRepository.ExchangeDownloadTokenAsync(id);
 
         // Act
-        var authorization = await downloadTokensRepository.GetAndUseDownloadTokenAsync(id);
+        var authorization = await downloadTokensRepository.ExchangeDownloadTokenAsync(id);
 
         // Assert
         Assert.Equal(authorization, string.Empty);

@@ -190,7 +190,7 @@ public class TokenController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("getAndUseDownloadToken/{token}")]
+    [HttpPost("exchangeDownloadToken/{token}")]
     [AllowAnonymous]
     public async Task<ActionResult<ExchangeDownloadTokenDto>> ExchangeDownloadTokenAsync(Guid token)
     {

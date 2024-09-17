@@ -36,19 +36,19 @@ public sealed class ExchangeDownloadTokenHandlerIntegrationTests
     }
 
     [Fact]
-    public async Task GetAndUseDownloadTokenWhenCalledReturnsAccessTokenAsync()
+    public async Task ExchangeDownloadTokenWhenCalledReturnsAccessTokenAsync()
     {
         var accessToken = "accessToken";
         // arrange
-        var downloadTokenEntity = await _databaseFixture.PrepareDownloadTokenAsync(accessToken);
-
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
         var target = scope.ServiceProvider.GetRequiredService<IMediator>();
 
+        var downloadToken = await target.Send(new CreateDownloadTokenCommand(accessToken));
+
         // act
-        var actual = await target.Send(new ExchangeDownloadTokenCommand(downloadTokenEntity.Token));
+        var actual = await target.Send(new ExchangeDownloadTokenCommand(downloadToken));
 
         // assert
         Assert.Equal(accessToken, actual.AccessToken);

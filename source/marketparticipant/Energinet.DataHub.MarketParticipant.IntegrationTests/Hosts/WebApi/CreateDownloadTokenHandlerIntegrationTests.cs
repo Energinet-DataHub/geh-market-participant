@@ -37,7 +37,7 @@ public sealed class CreateDownloadTokenHandlerIntegrationTests
     }
 
     [Fact]
-    public async Task GetAndUseDownloadTokenWhenCalledReturnsAccessTokenAsync()
+    public async Task CreateDownloadTokenWhenCalledReturnsAccessTokenAsync()
     {
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);

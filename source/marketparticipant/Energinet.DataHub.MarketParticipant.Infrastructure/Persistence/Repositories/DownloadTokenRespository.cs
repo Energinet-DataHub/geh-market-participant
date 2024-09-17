@@ -50,20 +50,21 @@ public sealed class DownloadTokenRespository : IDownloadTokenRespository
         return downloadTokenEntity.Token;
     }
 
-    public async Task<string> GetAndUseDownloadTokenAsync(Guid downloadToken)
+    public async Task<string> ExchangeDownloadTokenAsync(Guid downloadToken)
     {
         ArgumentNullException.ThrowIfNull(downloadToken);
+        var now = SystemClock.Instance
+                                .GetCurrentInstant()
+                                .Minus(Duration.FromMinutes(5))
+                                .ToDateTimeOffset();
 
         var downloadTokenEntity = await _marketParticipantDbContext
             .DownloadTokens
-            .Where(x => x.Used == false &&
-                x.Token == downloadToken &&
-                x.Created > SystemClock.Instance
-                                .GetCurrentInstant()
-                                .Minus(Duration.FromMinutes(5))
-                                .ToDateTimeOffset())
-
-            .FirstOrDefaultAsync().ConfigureAwait(false);
+                .FirstOrDefaultAsync(
+                    x => x.Used == false &&
+                    x.Token == downloadToken &&
+                    x.Created > now)
+            .ConfigureAwait(false);
 
         if (downloadTokenEntity == null)
             return string.Empty;
