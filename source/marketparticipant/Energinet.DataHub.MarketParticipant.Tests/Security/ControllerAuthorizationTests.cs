@@ -49,6 +49,8 @@ public sealed class ControllerAuthorizationTests
             $"{nameof(UserController)}.{nameof(UserController.UpdateUserProfileAsync)}",
             $"{nameof(AuditIdentityController)}.{nameof(AuditIdentityController.GetAsync)}",
             $"{nameof(AuditIdentityController)}.{nameof(AuditIdentityController.GetMultipleAsync)}",
+            $"{nameof(TokenController)}.{nameof(TokenController.ExchangeDownloadTokenAsync)}",
+            $"{nameof(TokenController)}.{nameof(TokenController.CreateDownloadTokenAsync)}",
         };
 
         // act
