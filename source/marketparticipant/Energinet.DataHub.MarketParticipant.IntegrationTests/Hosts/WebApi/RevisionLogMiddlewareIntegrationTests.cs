@@ -94,7 +94,7 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
         Assert.Equal(routeWithRevisionEnabled, revisionLogEntry.Origin);
         Assert.Equal(await httpContent.ReadAsStringAsync(), revisionLogEntry.Payload);
         Assert.Equal(nameof(UserRole), revisionLogEntry.AffectedEntityType);
-        Assert.Equal(targetUserRole.Id, Guid.Parse(revisionLogEntry.AffectedEntityKey));
+        Assert.Equal(targetUserRole.Id, Guid.Parse(revisionLogEntry.AffectedEntityKey!));
 
         _revisionLogClientMock.Verify(pub => pub.LogAsync(revisionLogEntry), Times.Once);
     }
@@ -180,7 +180,7 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
         Assert.Equal(routeWithRevisionEnabled, revisionLogEntry.Origin);
         Assert.Equal(await httpContent.ReadAsStringAsync(), revisionLogEntry.Payload);
         Assert.Equal(nameof(UserRole), revisionLogEntry.AffectedEntityType);
-        Assert.Equal(targetUserRole.Id, Guid.Parse(revisionLogEntry.AffectedEntityKey));
+        Assert.Equal(targetUserRole.Id, Guid.Parse(revisionLogEntry.AffectedEntityKey!));
 
         _revisionLogClientMock.Verify(pub => pub.LogAsync(revisionLogEntry), Times.Once);
     }

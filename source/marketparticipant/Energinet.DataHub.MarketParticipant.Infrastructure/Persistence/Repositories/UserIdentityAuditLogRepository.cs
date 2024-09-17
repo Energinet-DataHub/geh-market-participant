@@ -91,6 +91,8 @@ public sealed class UserIdentityAuditLogRepository : IUserIdentityAuditLogReposi
                 UserIdentityAuditLogField.LastName => UserAuditedChange.LastName,
                 UserIdentityAuditLogField.PhoneNumber => UserAuditedChange.PhoneNumber,
                 UserIdentityAuditLogField.Status => UserAuditedChange.Status,
+                UserIdentityAuditLogField.UserLoginFederated => UserAuditedChange.UserLoginFederated,
+                UserIdentityAuditLogField.UserLoginFederationRequested => UserAuditedChange.UserLoginFederationRequested,
                 _ => throw new ArgumentOutOfRangeException(nameof(field)),
             };
         }
@@ -127,6 +129,8 @@ public sealed class UserIdentityAuditLogRepository : IUserIdentityAuditLogReposi
                 UserAuditedChange.LastName => UserIdentityAuditLogField.LastName,
                 UserAuditedChange.PhoneNumber => UserIdentityAuditLogField.PhoneNumber,
                 UserAuditedChange.Status => UserIdentityAuditLogField.Status,
+                UserAuditedChange.UserLoginFederationRequested => UserIdentityAuditLogField.UserLoginFederationRequested,
+                UserAuditedChange.UserLoginFederated => UserIdentityAuditLogField.UserLoginFederated,
                 _ => throw new ArgumentOutOfRangeException(nameof(change)),
             };
         }
