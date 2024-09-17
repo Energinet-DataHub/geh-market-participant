@@ -20,4 +20,6 @@ public enum UserIdentityAuditLogField
     LastName = 2,
     PhoneNumber = 3,
     Status = 4,
+    UserLoginFederationRequested = 5,
+    UserLoginFederated = 6
 }

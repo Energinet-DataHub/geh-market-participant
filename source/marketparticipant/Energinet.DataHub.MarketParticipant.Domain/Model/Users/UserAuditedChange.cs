@@ -24,4 +24,6 @@ public enum UserAuditedChange
     UserRoleAssigned = 6,
     UserRoleRemoved = 7,
     UserRoleRemovedDueToDeactivation = 8,
+    UserLoginFederationRequested = 9,
+    UserLoginFederated = 10
 }

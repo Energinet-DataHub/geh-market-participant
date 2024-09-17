@@ -53,9 +53,14 @@ public sealed class UserIdentityOpenIdLinkServiceTests
             .Setup(e => e.GetAsync(externalUserId))
             .ReturnsAsync(GetUser(externalUserId, DateTimeOffset.UtcNow));
 
+        var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
+
         var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
             userRepository.Object,
-            userIdentityRepository.Object);
+            userIdentityRepository.Object,
+            userIdentityAuditLogRepository.Object,
+            auditIdentityProvider.Object);
 
         // Act
         var userIdentity = await userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId);
@@ -65,6 +70,50 @@ public sealed class UserIdentityOpenIdLinkServiceTests
         Assert.Equal(2, userIdentity.LoginIdentities.Count);
         userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
         userIdentityRepository.Verify(e => e.AssignUserLoginIdentitiesAsync(userToReturnFromService));
+    }
+
+    [Fact]
+    public async Task ValidateAndSetupOpenIdAsync_CompletedFlow_IsAudited()
+    {
+        // Arrange
+        var externalUserId = new ExternalUserId(Guid.NewGuid());
+        var email = new RandomlyGeneratedEmailAddress();
+
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
+            .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
+
+        var userToReturnFromService = GetUserIdentity(externalUserId, email, "emailAddress");
+        userIdentityRepository
+            .Setup(u => u.GetAsync(email))
+            .ReturnsAsync(userToReturnFromService);
+
+        var expectedUser = GetUser(externalUserId, DateTimeOffset.UtcNow);
+        var expectedIdent = new AuditIdentity(Guid.NewGuid());
+
+        var userRepository = new Mock<IUserRepository>();
+        userRepository
+            .Setup(e => e.GetAsync(externalUserId))
+            .ReturnsAsync(expectedUser);
+
+        var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
+        auditIdentityProvider
+            .Setup(provider => provider.IdentityId)
+            .Returns(expectedIdent);
+
+        var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
+            userRepository.Object,
+            userIdentityRepository.Object,
+            userIdentityAuditLogRepository.Object,
+            auditIdentityProvider.Object);
+
+        // Act
+        await userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId);
+
+        // Assert
+        userIdentityAuditLogRepository.Verify(logRepo => logRepo.AuditAsync(expectedUser.Id, expectedIdent, UserAuditedChange.UserLoginFederated, It.IsAny<string>(), null), Times.Once);
     }
 
     [Fact]
@@ -79,9 +128,14 @@ public sealed class UserIdentityOpenIdLinkServiceTests
             .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
             .ReturnsAsync((UserIdentity?)null);
 
+        var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
+
         var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
             userRepository.Object,
-            userIdentityRepository.Object);
+            userIdentityRepository.Object,
+            userIdentityAuditLogRepository.Object,
+            auditIdentityProvider.Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<NotFoundValidationException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
@@ -104,9 +158,14 @@ public sealed class UserIdentityOpenIdLinkServiceTests
             .Setup(u => u.GetAsync(email))
             .ReturnsAsync((UserIdentity?)null);
 
+        var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
+
         var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
             userRepository.Object,
-            userIdentityRepository.Object);
+            userIdentityRepository.Object,
+            userIdentityAuditLogRepository.Object,
+            auditIdentityProvider.Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<NotSupportedException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
@@ -142,9 +201,14 @@ public sealed class UserIdentityOpenIdLinkServiceTests
             .Setup(u => u.GetAsync(email))
             .ReturnsAsync(userToReturnFromService);
 
+        var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
+
         var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
             userRepository.Object,
-            userIdentityRepository.Object);
+            userIdentityRepository.Object,
+            userIdentityAuditLogRepository.Object,
+            auditIdentityProvider.Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<NotSupportedException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
@@ -174,9 +238,14 @@ public sealed class UserIdentityOpenIdLinkServiceTests
             .Setup(e => e.GetAsync(userToReturnFromService.Id))
             .ReturnsAsync((User?)null);
 
+        var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
+
         var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
             userRepository.Object,
-            userIdentityRepository.Object);
+            userIdentityRepository.Object,
+            userIdentityAuditLogRepository.Object,
+            auditIdentityProvider.Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<NotSupportedException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
@@ -208,9 +277,14 @@ public sealed class UserIdentityOpenIdLinkServiceTests
             .Setup(e => e.GetAsync(externalUserId))
             .ReturnsAsync(localDbUser);
 
+        var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
+
         var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
             userRepository.Object,
-            userIdentityRepository.Object);
+            userIdentityRepository.Object,
+            userIdentityAuditLogRepository.Object,
+            auditIdentityProvider.Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
@@ -241,9 +315,14 @@ public sealed class UserIdentityOpenIdLinkServiceTests
             .Setup(e => e.GetAsync(externalUserId))
             .ReturnsAsync(localDbUser);
 
+        var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
+
         var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
             userRepository.Object,
-            userIdentityRepository.Object);
+            userIdentityRepository.Object,
+            userIdentityAuditLogRepository.Object,
+            auditIdentityProvider.Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
@@ -262,9 +341,14 @@ public sealed class UserIdentityOpenIdLinkServiceTests
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         var userRepository = new Mock<IUserRepository>();
 
+        var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
+
         var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
             userRepository.Object,
-            userIdentityRepository.Object);
+            userIdentityRepository.Object,
+            userIdentityAuditLogRepository.Object,
+            auditIdentityProvider.Object);
 
         // Act
         await userIdentityOpenIdLinkService.UnlinkOpenIdAsync(userIdentity);
