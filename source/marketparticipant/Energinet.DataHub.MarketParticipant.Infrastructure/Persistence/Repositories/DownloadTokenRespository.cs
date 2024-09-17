@@ -53,7 +53,7 @@ public sealed class DownloadTokenRespository : IDownloadTokenRespository
     public async Task<string> ExchangeDownloadTokenAsync(Guid downloadToken)
     {
         ArgumentNullException.ThrowIfNull(downloadToken);
-        var now = SystemClock.Instance
+        var onlyValidForFiveMinutes = SystemClock.Instance
                                 .GetCurrentInstant()
                                 .Minus(Duration.FromMinutes(5))
                                 .ToDateTimeOffset();
@@ -63,7 +63,7 @@ public sealed class DownloadTokenRespository : IDownloadTokenRespository
                 .FirstOrDefaultAsync(
                     x => x.Used == false &&
                     x.Token == downloadToken &&
-                    x.Created > now)
+                    x.Created > onlyValidForFiveMinutes)
             .ConfigureAwait(false);
 
         if (downloadTokenEntity == null)

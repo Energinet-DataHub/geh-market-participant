@@ -23,19 +23,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Token;
 
 public sealed class ExchangeDownloadTokenHandler : IRequestHandler<ExchangeDownloadTokenCommand, ExchangeDownloadTokenDto>
 {
-    private readonly IDownloadTokenRespository _createDownloadTokenRespository;
+    private readonly IDownloadTokenRespository _downloadTokenRespository;
 
     public ExchangeDownloadTokenHandler(
-        IDownloadTokenRespository createDownloadTokenRespository)
+        IDownloadTokenRespository downloadTokenRespository)
     {
-        _createDownloadTokenRespository = createDownloadTokenRespository;
+        _downloadTokenRespository = downloadTokenRespository;
     }
 
     public async Task<ExchangeDownloadTokenDto> Handle(ExchangeDownloadTokenCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var accessToken = await _createDownloadTokenRespository.ExchangeDownloadTokenAsync(request.Token).ConfigureAwait(false);
+        var accessToken = await _downloadTokenRespository.ExchangeDownloadTokenAsync(request.Token).ConfigureAwait(false);
 
         return new ExchangeDownloadTokenDto(accessToken);
     }
