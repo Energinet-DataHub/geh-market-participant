@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Token;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
@@ -109,6 +110,8 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<StopProcessDelegationCommand>, StopProcessDelegationCommandRuleSet>();
         services.AddScoped<IValidator<ReActivateUserCommand>, ReActivateUserCommandRuleSet>();
         services.AddScoped<IValidator<GetBalanceResponsibilityRelationsCommand>, GetBalanceResponsibilityRelationsCommandRuleSet>();
+        services.AddScoped<IValidator<CreateDownloadTokenCommand>, CreateDownloadTokenCommandRuleSet>();
+        services.AddScoped<IValidator<ExchangeDownloadTokenCommand>, ExchangeDownloadTokenCommandRuleSet>();
 
         services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
         services.AddScoped<IActorClientSecretService, ActorClientSecretService>();

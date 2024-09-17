@@ -26,6 +26,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 public interface IMarketParticipantDbContext
 {
     /// <summary>
+    ///     Represent access to the download tokens table
+    /// </summary>
+    DbSet<DownloadTokenEntity> DownloadTokens { get; }
+
+    /// <summary>
     ///     Represent access to the organization database table
     /// </summary>
     DbSet<OrganizationEntity> Organizations { get; }

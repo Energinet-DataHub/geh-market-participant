@@ -52,6 +52,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         ChangeTracker.StateChanged += (_, e) => OnEntityStateChanged(e.Entry);
     }
 
+    public DbSet<DownloadTokenEntity> DownloadTokens { get; private set; } = null!;
     public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
     public DbSet<ActorEntity> Actors { get; private set; } = null!;
     public DbSet<GridAreaEntity> GridAreas { get; private set; } = null!;
@@ -120,6 +121,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
+        modelBuilder.ApplyConfiguration(new DownloadTokenEntityConfiguration());
         modelBuilder.ApplyConfiguration(new OrganizationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
         modelBuilder.ApplyConfiguration(new MarketRoleEntityConfiguration());

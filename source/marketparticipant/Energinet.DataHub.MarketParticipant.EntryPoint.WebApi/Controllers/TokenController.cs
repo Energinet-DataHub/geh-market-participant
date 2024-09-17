@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Token;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Common.Options;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -174,6 +175,32 @@ public class TokenController : ControllerBase
 
         var finalToken = await CreateSignedTokenAsync(dataHubToken).ConfigureAwait(false);
         return Ok(new TokenResponse(finalToken));
+    }
+
+    [HttpPost("createDownloadToken")]
+    public async Task<ActionResult<Guid>> CreateDownloadTokenAsync()
+    {
+        var authToken = Request.Headers["Authorization"].ToString();
+        var command = new CreateDownloadTokenCommand(authToken);
+
+        var response = await _mediator
+           .Send(command)
+           .ConfigureAwait(false);
+
+        return Ok(response);
+    }
+
+    [HttpPost("exchangeDownloadToken/{token}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ExchangeDownloadTokenDto>> ExchangeDownloadTokenAsync(Guid token)
+    {
+        var command = new ExchangeDownloadTokenCommand(token);
+
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok(response);
     }
 
     private static Guid GetExternalUserId(IEnumerable<Claim> claims)
