@@ -26,11 +26,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class GetAndUseDownloadTokenHandlerIntegrationTests
+public sealed class ExchangeDownloadTokenHandlerIntegrationTests
 {
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
 
-    public GetAndUseDownloadTokenHandlerIntegrationTests(MarketParticipantDatabaseFixture databaseFixture)
+    public ExchangeDownloadTokenHandlerIntegrationTests(MarketParticipantDatabaseFixture databaseFixture)
     {
         _databaseFixture = databaseFixture;
     }
@@ -48,7 +48,7 @@ public sealed class GetAndUseDownloadTokenHandlerIntegrationTests
         var target = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // act
-        var actual = await target.Send(new GetAndUseDownloadTokenCommand(downloadTokenEntity.Token));
+        var actual = await target.Send(new ExchangeDownloadTokenCommand(downloadTokenEntity.Token));
 
         // assert
         Assert.Equal(accessToken, actual.AccessToken);

@@ -13,4 +13,4 @@
 // limitations under the License.
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Token;
 
-public sealed record DownloadTokenDto(string AccessToken);
+public sealed record ExchangeDownloadTokenDto(string AccessToken);

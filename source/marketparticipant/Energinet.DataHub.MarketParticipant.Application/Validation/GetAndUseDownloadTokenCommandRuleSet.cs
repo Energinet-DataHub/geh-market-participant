@@ -17,11 +17,11 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class GetAndUseDownloadTokenCommandRuleSet : AbstractValidator<GetAndUseDownloadTokenCommand>
+public sealed class ExchangeDownloadTokenCommandRuleSet : AbstractValidator<ExchangeDownloadTokenCommand>
 {
-    public GetAndUseDownloadTokenCommandRuleSet()
+    public ExchangeDownloadTokenCommandRuleSet()
     {
         RuleFor(command => command.Token)
-            .NotNull();
+            .NotEmpty();
     }
 }

@@ -192,9 +192,9 @@ public class TokenController : ControllerBase
 
     [HttpPost("getAndUseDownloadToken/{token}")]
     [AllowAnonymous]
-    public async Task<ActionResult<DownloadTokenDto>> GetAndUseDownloadTokenAsync(Guid token)
+    public async Task<ActionResult<ExchangeDownloadTokenDto>> ExchangeDownloadTokenAsync(Guid token)
     {
-        var command = new GetAndUseDownloadTokenCommand(token);
+        var command = new ExchangeDownloadTokenCommand(token);
 
         var response = await _mediator
             .Send(command)

@@ -17,4 +17,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Token;
 
-public sealed record GetAndUseDownloadTokenCommand(Guid Token) : IRequest<DownloadTokenDto>;
+public sealed record ExchangeDownloadTokenCommand(Guid Token) : IRequest<ExchangeDownloadTokenDto>;

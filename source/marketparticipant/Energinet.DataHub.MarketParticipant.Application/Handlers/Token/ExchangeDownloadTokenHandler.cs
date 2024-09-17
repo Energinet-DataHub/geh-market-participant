@@ -21,22 +21,22 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Token;
 
-public sealed class GetAndUseDownloadHandler : IRequestHandler<GetAndUseDownloadTokenCommand, DownloadTokenDto>
+public sealed class ExchangeDownloadTokenHandler : IRequestHandler<ExchangeDownloadTokenCommand, ExchangeDownloadTokenDto>
 {
     private readonly IDownloadTokenRespository _createDownloadTokenRespository;
 
-    public GetAndUseDownloadHandler(
+    public ExchangeDownloadTokenHandler(
         IDownloadTokenRespository createDownloadTokenRespository)
     {
         _createDownloadTokenRespository = createDownloadTokenRespository;
     }
 
-    public async Task<DownloadTokenDto> Handle(GetAndUseDownloadTokenCommand request, CancellationToken cancellationToken)
+    public async Task<ExchangeDownloadTokenDto> Handle(ExchangeDownloadTokenCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var accessToken = await _createDownloadTokenRespository.GetAndUseDownloadTokenAsync(request.Token).ConfigureAwait(false);
+        var accessToken = await _createDownloadTokenRespository.ExchangeDownloadTokenAsync(request.Token).ConfigureAwait(false);
 
-        return new DownloadTokenDto(accessToken);
+        return new ExchangeDownloadTokenDto(accessToken);
     }
 }

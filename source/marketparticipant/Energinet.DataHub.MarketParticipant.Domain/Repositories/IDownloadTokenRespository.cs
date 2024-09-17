@@ -20,5 +20,5 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IDownloadTokenRespository
 {
     Task<Guid> CreateDownloadTokenAsync(string authorization);
-    Task<string> GetAndUseDownloadTokenAsync(Guid downloadToken);
+    Task<string> ExchangeDownloadTokenAsync(Guid downloadToken);
 }
