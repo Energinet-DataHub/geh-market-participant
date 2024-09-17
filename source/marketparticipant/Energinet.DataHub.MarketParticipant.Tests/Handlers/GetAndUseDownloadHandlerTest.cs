@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Token;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Token;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -39,9 +40,9 @@ public sealed class GetAndUseDownloadHandlerTest
         var target = new GetAndUseDownloadHandler(repositoryMock.Object);
 
         // act
-        var actual = await target.Handle(new Application.Commands.Token.GetAndUseDownloadTokenCommand(Guid.NewGuid()), CancellationToken.None);
+        var actual = await target.Handle(new GetAndUseDownloadTokenCommand(Guid.NewGuid()), CancellationToken.None);
 
         // assert
-        Assert.Equal(accessToken, actual);
+        Assert.Equal(accessToken, actual.AccessToken);
     }
 }

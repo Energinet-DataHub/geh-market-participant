@@ -51,6 +51,6 @@ public sealed class GetAndUseDownloadTokenHandlerIntegrationTests
         var actual = await target.Send(new GetAndUseDownloadTokenCommand(downloadTokenEntity.Token));
 
         // assert
-        Assert.Equal(accessToken, actual);
+        Assert.Equal(accessToken, actual.AccessToken);
     }
 }
