@@ -16,8 +16,6 @@ using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Extensions.DependencyInjection;
-using Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Monitor;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
@@ -26,7 +24,6 @@ var host = new HostBuilder()
     {
         services.AddApplicationInsightsForIsolatedWorker("mark-part");
         services.AddHealthChecksForIsolatedWorker();
-        services.AddScoped<HealthCheckEndpoint>();
 
         services
             .AddCertificatesHttpClient()
