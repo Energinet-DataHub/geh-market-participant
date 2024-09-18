@@ -26,18 +26,15 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
-    private readonly IAuditIdentityProvider _auditIdentityProvider;
 
     public UserIdentityOpenIdLinkService(
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
-        IUserIdentityAuditLogRepository userIdentityAuditLogRepository,
-        IAuditIdentityProvider auditIdentityProvider)
+        IUserIdentityAuditLogRepository userIdentityAuditLogRepository)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
         _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
-        _auditIdentityProvider = auditIdentityProvider;
     }
 
     public async Task<UserIdentity> ValidateAndSetupOpenIdAsync(ExternalUserId requestExternalUserId)
@@ -88,7 +85,7 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
         await _userIdentityAuditLogRepository
             .AuditAsync(
                 userLocalIdentityByEmail.Id,
-                _auditIdentityProvider.IdentityId,
+                new AuditIdentity(userLocalIdentityByEmail.Id),
                 UserAuditedChange.UserLoginFederated,
                 string.Join(",", identityUserOpenId.LoginIdentities.Select(ident => ident.Issuer)),
                 null)
