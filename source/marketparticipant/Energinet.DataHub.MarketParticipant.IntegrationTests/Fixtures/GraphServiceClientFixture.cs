@@ -212,6 +212,31 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             appRoles);
     }
 
+    private static User CreateTestUserModel(string testEmail)
+    {
+        return new User
+        {
+            AccountEnabled = false,
+            DisplayName = "User Integration Tests (Always safe to delete)",
+            GivenName = "Test First Name",
+            Surname = "Test Last Name",
+            PasswordProfile = new PasswordProfile
+            {
+                ForceChangePasswordNextSignIn = true,
+                Password = Guid.NewGuid().ToString()
+            },
+            Identities = new List<ObjectIdentity>()
+            {
+                new()
+                {
+                    SignInType = "emailAddress",
+                    Issuer = TestConfigurationProvider.Configuration.B2CSettings.Tenant,
+                    IssuerAssignedId = testEmail
+                }
+            }
+        };
+    }
+
     private async Task<IEnumerable<ActiveDirectoryRole>> GetRolesAsync(string servicePrincipalObjectId)
     {
         var response = await _graphClient!.ServicePrincipals[servicePrincipalObjectId]
@@ -248,30 +273,5 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
         _createdUsers.Add(externalUserId);
 
         return externalUserId;
-    }
-
-    private User CreateTestUserModel(string testEmail)
-    {
-        return new User
-        {
-            AccountEnabled = false,
-            DisplayName = "User Integration Tests (Always safe to delete)",
-            GivenName = "Test First Name",
-            Surname = "Test Last Name",
-            PasswordProfile = new PasswordProfile
-            {
-                ForceChangePasswordNextSignIn = true,
-                Password = Guid.NewGuid().ToString()
-            },
-            Identities = new List<ObjectIdentity>()
-            {
-                new()
-                {
-                    SignInType = "emailAddress",
-                    Issuer = TestConfigurationProvider.Configuration.B2CSettings.Tenant,
-                    IssuerAssignedId = testEmail
-                }
-            }
-        };
     }
 }
