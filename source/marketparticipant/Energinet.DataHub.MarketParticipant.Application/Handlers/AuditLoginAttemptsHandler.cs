@@ -26,7 +26,7 @@ using NodaTime.Serialization.SystemTextJson;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers;
 
-public sealed class AuditLogLoginAttemptLogEntriesHandler : IRequestHandler<AuditLogLoginAttemptLogEntriesCommand>
+public sealed class AuditLoginAttemptsHandler : IRequestHandler<AuditLoginAttemptsCommand>
 {
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
         .ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
@@ -35,14 +35,14 @@ public sealed class AuditLogLoginAttemptLogEntriesHandler : IRequestHandler<Audi
     private readonly ICutoffRepository _cutoffRepository;
     private readonly IRevisionLogClient _revisionLogClient;
 
-    public AuditLogLoginAttemptLogEntriesHandler(IB2CLogRepository b2CLogRepository, ICutoffRepository cutoffRepository, IRevisionLogClient revisionLogClient)
+    public AuditLoginAttemptsHandler(IB2CLogRepository b2CLogRepository, ICutoffRepository cutoffRepository, IRevisionLogClient revisionLogClient)
     {
         _b2CLogRepository = b2CLogRepository;
         _cutoffRepository = cutoffRepository;
         _revisionLogClient = revisionLogClient;
     }
 
-    public async Task Handle(AuditLogLoginAttemptLogEntriesCommand request, CancellationToken cancellationToken)
+    public async Task Handle(AuditLoginAttemptsCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 

@@ -33,7 +33,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
 
 [UnitTest]
-public sealed class AuditLogLoginAttemptLogEntriesHandlerTests
+public sealed class AuditLoginAttemptsHandlerTests
 {
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
         .ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
@@ -52,10 +52,10 @@ public sealed class AuditLogLoginAttemptLogEntriesHandlerTests
         var cutoffRepository = new Mock<ICutoffRepository>();
         var revisionLogClient = new Mock<IRevisionLogClient>();
 
-        var target = new AuditLogLoginAttemptLogEntriesHandler(b2CLogRepository.Object, cutoffRepository.Object, revisionLogClient.Object);
+        var target = new AuditLoginAttemptsHandler(b2CLogRepository.Object, cutoffRepository.Object, revisionLogClient.Object);
 
         // act
-        await target.Handle(new AuditLogLoginAttemptLogEntriesCommand(), CancellationToken.None);
+        await target.Handle(new AuditLoginAttemptsCommand(), CancellationToken.None);
 
         // assert
         revisionLogClient.Verify(
@@ -89,10 +89,10 @@ public sealed class AuditLogLoginAttemptLogEntriesHandlerTests
         var cutoffRepository = new Mock<ICutoffRepository>();
         var revisionLogClient = new Mock<IRevisionLogClient>();
 
-        var target = new AuditLogLoginAttemptLogEntriesHandler(b2CLogRepository.Object, cutoffRepository.Object, revisionLogClient.Object);
+        var target = new AuditLoginAttemptsHandler(b2CLogRepository.Object, cutoffRepository.Object, revisionLogClient.Object);
 
         // act
-        await target.Handle(new AuditLogLoginAttemptLogEntriesCommand(), CancellationToken.None);
+        await target.Handle(new AuditLoginAttemptsCommand(), CancellationToken.None);
 
         // assert
         cutoffRepository.Verify(x => x.UpdateCutoffAsync(CutoffType.B2CLoginAttempt, expected), Times.Once);

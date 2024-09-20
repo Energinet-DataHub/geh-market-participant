@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands;
-using FluentValidation;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands;
 
-public sealed class AuditLogLoginAttemptLogEntriesCommandRuleSet : AbstractValidator<AuditLogLoginAttemptLogEntriesCommand>;
+public sealed record AuditLoginAttemptsCommand : IRequest;

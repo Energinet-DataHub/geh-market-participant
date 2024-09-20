@@ -20,19 +20,19 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 
-public sealed class AuditLogLoginAttemptsTrigger
+public sealed class AuditLoginAttemptsTrigger
 {
     private readonly IMediator _mediator;
 
-    public AuditLogLoginAttemptsTrigger(IMediator mediator)
+    public AuditLoginAttemptsTrigger(IMediator mediator)
     {
         _mediator = mediator;
     }
 
-    [Function(nameof(AuditLogLoginAttemptsTrigger))]
+    [Function(nameof(AuditLoginAttemptsTrigger))]
     public Task RunAsync([TimerTrigger("0 */12 * * *")] FunctionContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
-        return _mediator.Send(new AuditLogLoginAttemptLogEntriesCommand());
+        return _mediator.Send(new AuditLoginAttemptsCommand());
     }
 }
