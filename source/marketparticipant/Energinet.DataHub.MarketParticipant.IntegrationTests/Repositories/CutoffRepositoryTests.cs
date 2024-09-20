@@ -15,8 +15,10 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
@@ -39,14 +41,10 @@ public sealed class CutoffRepositoryTests
     public async Task GetCutoff_NeverSet_ReturnsUnixEpoch()
     {
         // arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-
-        var target = new CutoffRepository(context);
+        await using var target = await CreateTarget();
 
         // act
-        var result = await target.GetCutoffAsync((CutoffType)256);
+        var result = await target.Value.GetCutoffAsync((CutoffType)256);
 
         // assert
         Assert.Equal(Instant.FromUnixTimeTicks(0), result);
@@ -56,18 +54,36 @@ public sealed class CutoffRepositoryTests
     public async Task GetCutoff_PreviouslySet_ReturnsSetCutoff()
     {
         // arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var target = await CreateTarget();
 
-        var target = new CutoffRepository(context);
         var expected = DateTimeOffset.Now.ToInstant();
-        await target.UpdateCutoffAsync((CutoffType)512, expected);
+        await target.Value.UpdateCutoffAsync((CutoffType)512, expected);
 
         // act
-        var result = await target.GetCutoffAsync((CutoffType)512);
+        var result = await target.Value.GetCutoffAsync((CutoffType)512);
 
         // assert
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public async Task UpdateCutoff_AlreadyBeingUpdated_HandlesConcurrency()
+    {
+        // arrange
+        await using var targetOne = await CreateTarget();
+        await using var targetTwo = await CreateTarget();
+
+        _ = await targetOne.Value.GetCutoffAsync((CutoffType)1024);
+        _ = await targetTwo.Value.GetCutoffAsync((CutoffType)1024);
+
+        // act, assert
+        await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
+        {
+            await targetOne.Value.UpdateCutoffAsync((CutoffType)1024, DateTime.UtcNow.ToInstant().Plus(Duration.FromMinutes(1)));
+            await targetTwo.Value.UpdateCutoffAsync((CutoffType)1024, DateTime.UtcNow.ToInstant().Plus(Duration.FromMinutes(2)));
+        });
+    }
+
+    private async Task<RepositoryTarget<ICutoffRepository>> CreateTarget() =>
+        await RepositoryTarget<ICutoffRepository>.CreateAsync(_fixture, c => new CutoffRepository(c));
 }
