@@ -21,5 +21,5 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface ICutoffRepository
 {
     Task<Instant> GetCutoffAsync(CutoffType type);
-    Task<Instant> UpdateCutoffAsync(CutoffType type, Instant timestamp);
+    Task UpdateCutoffAsync(CutoffType type, Instant timestamp);
 }

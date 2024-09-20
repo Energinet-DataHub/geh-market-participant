@@ -43,21 +43,19 @@ public sealed class CutoffRepository : ICutoffRepository
         return cutoff.Timestamp.ToInstant();
     }
 
-    public async Task<Instant> UpdateCutoffAsync(CutoffType type, Instant timestamp)
+    public async Task UpdateCutoffAsync(CutoffType type, Instant timestamp)
     {
         var cutoff = await _context.Cutoffs.SingleOrDefaultAsync(x => x.Type == (int)type).ConfigureAwait(false);
 
         if (cutoff == null)
         {
-            cutoff = await InsertCutoffAsync(type, timestamp).ConfigureAwait(false);
+            await InsertCutoffAsync(type, timestamp).ConfigureAwait(false);
         }
         else
         {
             cutoff.Timestamp = timestamp.ToDateTimeOffset();
             await _context.SaveChangesAsync().ConfigureAwait(false);
         }
-
-        return cutoff.Timestamp.ToInstant();
     }
 
     private async Task<CutoffEntity> InsertCutoffAsync(CutoffType type, Instant timestamp)
