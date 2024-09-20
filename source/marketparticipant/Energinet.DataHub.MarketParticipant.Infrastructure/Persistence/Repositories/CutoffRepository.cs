@@ -37,7 +37,7 @@ public sealed class CutoffRepository : ICutoffRepository
 
         if (cutoff == null)
         {
-            return await UpdateCutoffAsync(type, Instant.FromUnixTimeTicks(0)).ConfigureAwait(false);
+            cutoff = await InsertCutoffAsync(type, Instant.FromUnixTimeTicks(0)).ConfigureAwait(false);
         }
 
         return cutoff.Timestamp.ToInstant();
@@ -47,21 +47,28 @@ public sealed class CutoffRepository : ICutoffRepository
     {
         var cutoff = await _context.Cutoffs.SingleOrDefaultAsync(x => x.Type == (int)type).ConfigureAwait(false);
 
-        if (cutoff != null)
+        if (cutoff == null)
         {
-            cutoff.Timestamp = timestamp.ToDateTimeOffset();
+            cutoff = await InsertCutoffAsync(type, timestamp).ConfigureAwait(false);
         }
         else
         {
-            _context.Cutoffs.Add(new CutoffEntity
-            {
-                Type = (int)type,
-                Timestamp = timestamp.ToDateTimeOffset(),
-            });
+            cutoff.Timestamp = timestamp.ToDateTimeOffset();
+            await _context.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        await _context.SaveChangesAsync().ConfigureAwait(false);
+        return cutoff.Timestamp.ToInstant();
+    }
 
-        return timestamp;
+    private async Task<CutoffEntity> InsertCutoffAsync(CutoffType type, Instant timestamp)
+    {
+        var cutoff = new CutoffEntity
+        {
+            Type = (int)type,
+            Timestamp = timestamp.ToDateTimeOffset(),
+        };
+        _context.Cutoffs.Add(cutoff);
+        await _context.SaveChangesAsync().ConfigureAwait(false);
+        return cutoff;
     }
 }

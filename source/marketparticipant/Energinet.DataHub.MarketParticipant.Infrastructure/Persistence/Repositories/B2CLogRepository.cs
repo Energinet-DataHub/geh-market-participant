@@ -64,7 +64,7 @@ public sealed class B2CLogRepository : IB2CLogRepository
     {
         return _graphClient.AuditLogs
             .SignIns
-            .GetAsync(x => x.QueryParameters.Filter = $"createdDateTime gt {cutoff.ToString("g", CultureInfo.InvariantCulture)}");
+            .GetAsync(x => x.QueryParameters.Filter = $"createdDateTime ge {cutoff.ToString("g", CultureInfo.InvariantCulture)}");
     }
 
     private Task<SignInCollectionResponse?> GetNextPageAsync(SignInCollectionResponse previousResponse)
