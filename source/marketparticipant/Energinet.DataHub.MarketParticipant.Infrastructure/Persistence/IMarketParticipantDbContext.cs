@@ -156,6 +156,11 @@ public interface IMarketParticipantDbContext
     DbSet<BalanceResponsibilityRelationEntity> BalanceResponsibilityRelations { get; }
 
     /// <summary>
+    ///     Represent access to the Cutoff database table
+    /// </summary>
+    DbSet<CutoffEntity> Cutoffs { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();

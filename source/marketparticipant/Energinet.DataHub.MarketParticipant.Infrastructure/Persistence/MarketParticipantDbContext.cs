@@ -78,6 +78,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<DelegationPeriodEntity> DelegationPeriods { get; private set; } = null!;
     public DbSet<BalanceResponsibilityRequestEntity> BalanceResponsibilityRequests { get; private set; } = null!;
     public DbSet<BalanceResponsibilityRelationEntity> BalanceResponsibilityRelations { get; private set; } = null!;
+    public DbSet<CutoffEntity> Cutoffs { get; private set; } = null!;
 
     public async Task<int> SaveChangesAsync()
     {
@@ -147,6 +148,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new DelegationPeriodEntityConfiguration());
         modelBuilder.ApplyConfiguration(new BalanceResponsibilityRequestEntityConfiguration());
         modelBuilder.ApplyConfiguration(new BalanceResponsibilityRelationEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new CutoffEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 
