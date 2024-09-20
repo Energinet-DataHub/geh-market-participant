@@ -18,9 +18,6 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-/// <summary>
-/// Gives access to b2c logs
-/// </summary>
 public interface IB2CLogRepository
 {
     IAsyncEnumerable<B2CLoginAttemptLogEntry> GetLoginAttempsAsync(Instant cutoff);
