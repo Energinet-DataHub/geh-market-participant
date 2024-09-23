@@ -47,7 +47,8 @@ public sealed class GetGridAreaOverviewHandlerTests
                     null,
                     null,
                     null,
-                    null)
+                    null,
+                    GridAreaType.Distribution)
             });
 
         var target = new GetGridAreaOverviewHandler(repositoryMock.Object);

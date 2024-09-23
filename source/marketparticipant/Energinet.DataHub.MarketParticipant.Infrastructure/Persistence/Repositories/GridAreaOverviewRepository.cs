@@ -79,7 +79,8 @@ public class GridAreaOverviewRepository : IGridAreaOverviewRepository
                 actor != null ? ActorNumber.Create(actor.ActorNumber) : null,
                 actor != null ? new ActorName(actor.Name) : null,
                 organization?.Name,
-                gridArea.FullFlexDate);
+                gridArea.FullFlexDate,
+                gridArea.Type);
         });
     }
 }

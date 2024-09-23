@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 
@@ -26,4 +27,5 @@ public sealed record GridAreaOverviewItemDto(
     string? ActorNumber,
     string? ActorName,
     string? OrganizationName,
-    DateTimeOffset? FullFlexDate);
+    DateTimeOffset? FullFlexDate,
+    GridAreaType Type);

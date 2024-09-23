@@ -46,6 +46,7 @@ public sealed class GridAreaAuditLogRepositoryTests
             new GridAreaName("name"),
             new GridAreaCode("100"),
             PriceAreaCode.Dk1,
+            GridAreaType.Distribution,
             DateTimeOffset.MinValue,
             null);
 
@@ -57,6 +58,7 @@ public sealed class GridAreaAuditLogRepositoryTests
             new GridAreaName("different name"),
             new GridAreaCode("100"),
             PriceAreaCode.Dk1,
+            GridAreaType.Distribution,
             DateTimeOffset.MinValue,
             null);
 

@@ -125,6 +125,7 @@ public sealed class ActorRepositoryTests
             new GridAreaName("fake_value"),
             new GridAreaCode("000"),
             PriceAreaCode.Dk1,
+            GridAreaType.Distribution,
             DateTimeOffset.MinValue,
             DateTimeOffset.MaxValue));
 

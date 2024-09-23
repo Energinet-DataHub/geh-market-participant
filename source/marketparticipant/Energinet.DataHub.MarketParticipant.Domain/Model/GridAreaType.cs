@@ -16,12 +16,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public enum GridAreaType
 {
+    NotSet = 0,
     Transmission = 1,
     Distribution = 2,
     Other = 3,
     Test = 4,
     GridLossDK = 5,
     GridLossAbroad = 6,
-    Aboard = 7,
-    NotSet = 8
+    Aboard = 7
 }

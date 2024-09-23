@@ -64,6 +64,7 @@ public sealed class GridAreaRepositoryTests
             new GridAreaName("Test Grid Area"),
             new GridAreaCode("801"),
             PriceAreaCode.Dk1,
+            GridAreaType.Distribution,
             validFrom,
             validTo);
 
@@ -95,6 +96,7 @@ public sealed class GridAreaRepositoryTests
             new GridAreaName("Test Grid Area"),
             new GridAreaCode("801"),
             PriceAreaCode.Dk1,
+            GridAreaType.Distribution,
             validFrom,
             validTo);
 
@@ -105,6 +107,7 @@ public sealed class GridAreaRepositoryTests
             new GridAreaName("NewName"),
             new GridAreaCode("234"),
             PriceAreaCode.Dk2,
+            GridAreaType.Distribution,
             validFrom.AddYears(2),
             validTo.AddYears(2));
 
@@ -138,6 +141,7 @@ public sealed class GridAreaRepositoryTests
             new GridAreaName("Test Grid Area"),
             new GridAreaCode("801"),
             PriceAreaCode.Dk1,
+            GridAreaType.Distribution,
             validFrom,
             validTo);
 
@@ -148,6 +152,7 @@ public sealed class GridAreaRepositoryTests
             new GridAreaName("NewName"),
             new GridAreaCode("234"),
             PriceAreaCode.Dk2,
+            GridAreaType.Distribution,
             validFrom.AddYears(2),
             validTo.AddYears(2));
 
@@ -179,6 +184,7 @@ public sealed class GridAreaRepositoryTests
             new GridAreaName("Test Grid Area"),
             new GridAreaCode("801"),
             PriceAreaCode.Dk1,
+            GridAreaType.Distribution,
             validFrom,
             validTo);
 
