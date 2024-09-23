@@ -39,7 +39,6 @@ internal static class DomainServiceRegistration
 
         services.AddScoped<IActorFactoryService, ActorFactoryService>();
         services.AddScoped<IOrganizationFactoryService, OrganizationFactoryService>();
-        services.AddScoped<IGridAreaFactoryService, GridAreaFactoryService>();
 
         services.AddScoped<IUserInvitationService, UserInvitationService>();
         services.AddScoped<IOrganizationDomainValidationService, OrganizationDomainValidationService>();
