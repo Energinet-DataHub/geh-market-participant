@@ -110,6 +110,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<GetBalanceResponsibilityRelationsCommand>, GetBalanceResponsibilityRelationsCommandRuleSet>();
         services.AddScoped<IValidator<CreateDownloadTokenCommand>, CreateDownloadTokenCommandRuleSet>();
         services.AddScoped<IValidator<ExchangeDownloadTokenCommand>, ExchangeDownloadTokenCommandRuleSet>();
+        services.AddScoped<IValidator<AuditLoginAttemptsCommand>, AuditLoginAttemptsCommandRuleSet>();
 
         services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
         services.AddScoped<IActorClientSecretService, ActorClientSecretService>();
