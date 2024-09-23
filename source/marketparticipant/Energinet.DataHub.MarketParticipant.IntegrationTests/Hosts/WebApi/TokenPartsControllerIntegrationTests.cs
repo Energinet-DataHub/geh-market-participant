@@ -117,7 +117,7 @@ public sealed class TokenPartsControllerIntegrationTests :
 
         // Assert
         Assert.Equal(testActor.Id.ToString(), internalToken.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Azp).Value);
-        Assert.Empty(internalToken.Claims.Where(c => c.Type == "role"));
+        Assert.DoesNotContain(internalToken.Claims, c => c.Type == "role");
     }
 
     [Fact]
