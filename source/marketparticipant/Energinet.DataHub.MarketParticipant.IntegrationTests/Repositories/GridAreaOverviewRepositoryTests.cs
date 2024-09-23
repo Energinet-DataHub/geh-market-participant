@@ -170,6 +170,7 @@ public sealed class GridAreaOverviewRepositoryTests
             new GridAreaName("name"),
             new GridAreaCode("1234"),
             PriceAreaCode.Dk1,
+            GridAreaType.Distribution,
             DateTimeOffset.MinValue,
             null));
 

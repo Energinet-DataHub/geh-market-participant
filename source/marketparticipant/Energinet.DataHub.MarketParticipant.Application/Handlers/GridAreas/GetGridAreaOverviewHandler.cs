@@ -46,6 +46,7 @@ public sealed class GetGridAreaOverviewHandler : IRequestHandler<GetGridAreaOver
             gridArea.ActorNumber?.Value,
             gridArea.ActorName?.Value,
             gridArea.OrganizationName,
-            gridArea.FullFlexDate)));
+            gridArea.FullFlexDate,
+            gridArea.Type)));
     }
 }

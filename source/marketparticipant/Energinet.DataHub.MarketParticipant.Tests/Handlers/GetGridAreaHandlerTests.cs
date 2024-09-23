@@ -38,6 +38,7 @@ public sealed class GetGridAreaHandlerTests
                 new GridAreaName("name"),
                 new GridAreaCode("101"),
                 PriceAreaCode.Dk1,
+                GridAreaType.Distribution,
                 DateTimeOffset.MinValue,
                 null));
 

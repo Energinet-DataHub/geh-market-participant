@@ -118,6 +118,7 @@ public sealed class MarketRoleAndGridAreaForActorReservationServiceTests
             new GridAreaName("fake_value"),
             new GridAreaCode("123"),
             PriceAreaCode.Dk1,
+            GridAreaType.Aboard,
             DateTimeOffset.MinValue,
             null);
 
