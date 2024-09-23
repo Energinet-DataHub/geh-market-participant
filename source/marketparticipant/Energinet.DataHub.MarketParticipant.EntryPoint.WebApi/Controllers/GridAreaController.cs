@@ -38,36 +38,6 @@ public sealed class GridAreaController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost]
-    [AuthorizeUser(PermissionId.GridAreasManage)]
-    [EnableRevision(RevisionActivities.GridAreaCreated, typeof(GridArea))]
-    public async Task<ActionResult<Guid>> CreateGridAreaAsync(CreateGridAreaDto gridAreaDto)
-    {
-        var createGridAreaCommand = new CreateGridAreaCommand(gridAreaDto);
-
-        var response = await _mediator
-            .Send(createGridAreaCommand)
-            .ConfigureAwait(false);
-
-        return Ok(response.GridAreaId);
-    }
-
-    [HttpPut("{gridAreaId:guid}")]
-    [AuthorizeUser(PermissionId.GridAreasManage)]
-    [EnableRevision(RevisionActivities.GridAreaEdited, typeof(GridArea), "gridAreaId")]
-    public async Task<ActionResult> UpdateGridAreaAsync(Guid gridAreaId, ChangeGridAreaDto gridAreaDto)
-    {
-        ArgumentNullException.ThrowIfNull(gridAreaDto);
-
-        var updateGridAreaCommand = new UpdateGridAreaCommand(gridAreaId, gridAreaDto);
-
-        await _mediator
-            .Send(updateGridAreaCommand)
-            .ConfigureAwait(false);
-
-        return Ok();
-    }
-
     [HttpGet]
     [EnableRevision(RevisionActivities.PublicGridAreasRetrieved, typeof(GridArea))]
     public async Task<ActionResult<IEnumerable<GridAreaDto>>> GetGridAreasAsync()
