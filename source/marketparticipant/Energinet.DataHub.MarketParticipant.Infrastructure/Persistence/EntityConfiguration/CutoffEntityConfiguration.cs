@@ -13,8 +13,20 @@
 // limitations under the License.
 
 using System;
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 
-public record UpdateGridAreaCommand(Guid Id, ChangeGridAreaDto GridAreaDto) : IRequest;
+public class CutoffEntityConfiguration : IEntityTypeConfiguration<CutoffEntity>
+{
+    public void Configure(EntityTypeBuilder<CutoffEntity> builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        builder.ToTable("Cutoff");
+        builder.HasKey(x => x.Type);
+        builder.Property(x => x.Version).IsRowVersion();
+    }
+}

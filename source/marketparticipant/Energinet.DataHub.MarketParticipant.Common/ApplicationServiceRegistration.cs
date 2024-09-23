@@ -56,8 +56,6 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<GetPublicActorContactsCommand>, GetPublicActorContactsCommandRuleSet>();
         services.AddScoped<IValidator<CreateActorContactCommand>, CreateActorContactCommandRuleSet>();
         services.AddScoped<IValidator<DeleteActorContactCommand>, DeleteActorContactCommandRuleSet>();
-        services.AddScoped<IValidator<CreateGridAreaCommand>, CreateGridAreaCommandRuleSet>();
-        services.AddScoped<IValidator<UpdateGridAreaCommand>, UpdateGridAreaCommandRuleSet>();
         services.AddScoped<IValidator<GetGridAreasCommand>, GetGridAreasCommandRuleSet>();
         services.AddScoped<IValidator<GetGridAreaCommand>, GetGridAreaCommandRuleSet>();
         services.AddScoped<IValidator<GetGridAreaOverviewCommand>, GetGridAreaOverviewCommandRuleSet>();
@@ -112,6 +110,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<GetBalanceResponsibilityRelationsCommand>, GetBalanceResponsibilityRelationsCommandRuleSet>();
         services.AddScoped<IValidator<CreateDownloadTokenCommand>, CreateDownloadTokenCommandRuleSet>();
         services.AddScoped<IValidator<ExchangeDownloadTokenCommand>, ExchangeDownloadTokenCommandRuleSet>();
+        services.AddScoped<IValidator<AuditLoginAttemptsCommand>, AuditLoginAttemptsCommandRuleSet>();
 
         services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
         services.AddScoped<IActorClientSecretService, ActorClientSecretService>();

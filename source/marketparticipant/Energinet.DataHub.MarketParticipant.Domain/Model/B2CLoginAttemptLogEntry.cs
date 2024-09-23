@@ -12,8 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public sealed record CreateGridAreaCommand(CreateGridAreaDto GridArea) : IRequest<CreateGridAreaResponse>;
+public sealed record B2CLoginAttemptLogEntry(
+    string Id,
+    Instant AttemptedAt,
+    string IpAddress,
+    string Region,
+    string UserId,
+    string UserName,
+    string ResourceId,
+    string ResourceDisplayName,
+    int? ErrorCode,
+    string? ErrorMessage);

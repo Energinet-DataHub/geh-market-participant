@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands;
 
-public sealed record CreateGridAreaResponse(GridAreaId GridAreaId);
+public sealed record AuditLoginAttemptsCommand : IRequest;
