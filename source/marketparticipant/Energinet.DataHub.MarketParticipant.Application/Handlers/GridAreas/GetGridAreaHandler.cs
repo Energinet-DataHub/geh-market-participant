@@ -45,6 +45,7 @@ public sealed class GetGridAreaHandler : IRequestHandler<GetGridAreaCommand, Get
             gridArea.Code.Value,
             gridArea.Name.Value,
             gridArea.PriceAreaCode.ToString(),
+            gridArea.Type,
             gridArea.ValidFrom,
             gridArea.ValidTo));
     }

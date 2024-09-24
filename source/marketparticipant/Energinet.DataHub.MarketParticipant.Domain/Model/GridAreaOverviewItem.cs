@@ -26,4 +26,5 @@ public sealed record GridAreaOverviewItem(
     ActorNumber? ActorNumber,
     ActorName? ActorName,
     string? OrganizationName,
-    DateTimeOffset? FullFlexDate);
+    DateTimeOffset? FullFlexDate,
+    GridAreaType Type);

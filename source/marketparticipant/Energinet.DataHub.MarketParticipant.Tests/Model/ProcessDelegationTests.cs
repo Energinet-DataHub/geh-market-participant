@@ -329,6 +329,7 @@ public sealed class ProcessDelegationTests
             new GridAreaName("Mock"),
             new GridAreaCode("001"),
             PriceAreaCode.Dk2,
+            GridAreaType.Distribution,
             DateTimeOffset.UtcNow,
             DateTimeOffset.UtcNow.AddYears(1));
         return (actorFrom, actorTo, gridArea);

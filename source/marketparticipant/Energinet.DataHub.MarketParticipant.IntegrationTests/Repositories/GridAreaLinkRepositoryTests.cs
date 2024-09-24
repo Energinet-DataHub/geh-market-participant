@@ -63,6 +63,7 @@ public sealed class GridAreaLinkRepositoryTests
             new GridAreaName("Test Grid Area"),
             new GridAreaCode("801"),
             PriceAreaCode.Dk1,
+            GridAreaType.Distribution,
             DateTimeOffset.MinValue,
             null);
 

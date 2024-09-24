@@ -12,20 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
-
-public sealed record GridAreaOverviewItemDto(
-    Guid Id,
-    string Code,
-    string Name,
-    string PriceAreaCode,
-    DateTimeOffset ValidFrom,
-    DateTimeOffset? ValidTo,
-    string? ActorNumber,
-    string? ActorName,
-    string? OrganizationName,
-    DateTimeOffset? FullFlexDate,
-    GridAreaType Type);
+public enum GridAreaType
+{
+    NotSet = 0,
+    Transmission = 1,
+    Distribution = 2,
+    Other = 3,
+    Test = 4,
+    GridLossDK = 5,
+    GridLossAbroad = 6,
+    Aboard = 7
+}

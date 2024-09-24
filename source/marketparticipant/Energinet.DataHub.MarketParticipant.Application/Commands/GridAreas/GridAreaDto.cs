@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 
@@ -21,5 +22,6 @@ public sealed record GridAreaDto(
     string Code,
     string Name,
     string PriceAreaCode,
+    GridAreaType Type,
     DateTimeOffset ValidFrom,
     DateTimeOffset? ValidTo);

@@ -22,6 +22,7 @@ public sealed class GridAreaEntity : IAuditedEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
+    public GridAreaType Type { get; set; }
     public string Code { get; set; } = null!;
     public PriceAreaCode PriceAreaCode { get; set; }
     public DateTimeOffset ValidFrom { get; set; }

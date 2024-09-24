@@ -27,6 +27,7 @@ internal sealed class GridAreaMapper
         to.PriceAreaCode = from.PriceAreaCode;
         to.ValidFrom = from.ValidFrom;
         to.ValidTo = from.ValidTo;
+        to.Type = from.Type;
     }
 
     public static GridArea MapFromEntity(GridAreaEntity from)
@@ -36,6 +37,7 @@ internal sealed class GridAreaMapper
             new GridAreaName(from.Name),
             new GridAreaCode(from.Code),
             from.PriceAreaCode,
+            from.Type,
             from.ValidFrom,
             from.ValidTo);
     }
