@@ -49,6 +49,7 @@ public sealed class GetActorsAssociatedWithUserHandler
         var actorAssignments = user
             .RoleAssignments
             .Select(roleAssignment => roleAssignment.ActorId.Value)
+            .Append(user.AdministratedBy.Value)
             .Distinct();
 
         return new GetActorsAssociatedWithUserResponse(user.AdministratedBy.Value, actorAssignments);

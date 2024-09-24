@@ -57,8 +57,9 @@ public sealed class GetActorsAssociatedWithUserHandlerIntegrationTests
         var actual = await mediator.Send(command);
 
         // assert
-        Assert.Single(actual.ActorIds);
-        Assert.Equal(actor.Id, actual.ActorIds.Single());
+        Assert.Equal(2, actual.ActorIds.Count());
+        Assert.Contains(actor.Id, actual.ActorIds);
+        Assert.Contains(user.AdministratedByActorId, actual.ActorIds);
         Assert.Equal(user.AdministratedByActorId, actual.AdministratedBy);
     }
 
