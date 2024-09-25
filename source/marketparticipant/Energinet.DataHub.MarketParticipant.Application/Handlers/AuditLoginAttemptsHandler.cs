@@ -53,7 +53,7 @@ public sealed class AuditLoginAttemptsHandler : IRequestHandler<AuditLoginAttemp
 
         await foreach (var logEntry in _b2CLogRepository.GetLoginAttempsAsync(cutoff).WithCancellation(cancellationToken).ConfigureAwait(false))
         {
-            var user = await _userRepository.GetAsync(new ExternalUserId(logEntry.UserId)).ConfigureAwait(false);
+            var user = await _userRepository.GetAsync(logEntry.UserId).ConfigureAwait(false);
             var revisionLogEntry = CreateRevisionLogEntry(logEntry, user);
 
             await _revisionLogClient.LogAsync(
@@ -71,7 +71,7 @@ public sealed class AuditLoginAttemptsHandler : IRequestHandler<AuditLoginAttemp
     private static RevisionLogEntry CreateRevisionLogEntry(B2CLoginAttemptLogEntry logEntry, User? user)
     {
         return new RevisionLogEntry(
-            logId: Guid.Parse(logEntry.Id),
+            logId: logEntry.Id,
             systemId: SubsystemInformation.Id,
             userId: user?.Id.Value ?? default,
             activity: "LoginAttempt",

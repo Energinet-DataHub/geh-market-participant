@@ -61,7 +61,7 @@ public sealed class AuditLoginAttemptsHandlerTests
         // assert
         revisionLogClient.Verify(
             x => x.LogAsync(It.Is<RevisionLogEntry>(y =>
-                y.LogId == Guid.Parse(expected.Id) &&
+                y.LogId == expected.Id &&
                 y.OccurredOn == expected.AttemptedAt &&
                 y.SystemId == SubsystemInformation.Id &&
                 y.Activity == "LoginAttempt" &&
@@ -75,7 +75,7 @@ public sealed class AuditLoginAttemptsHandlerTests
     {
         // arrange
         var expected = CreateB2CLogEntry();
-        var expectedUser = new User(new UserId(Guid.NewGuid()), new ActorId(Guid.NewGuid()), new ExternalUserId(expected.UserId), [], null, null);
+        var expectedUser = new User(new UserId(Guid.NewGuid()), new ActorId(Guid.NewGuid()), expected.UserId, [], null, null);
 
         var b2CLogRepository = new Mock<IB2CLogRepository>();
         b2CLogRepository
@@ -87,7 +87,7 @@ public sealed class AuditLoginAttemptsHandlerTests
 
         var userRepository = new Mock<IUserRepository>();
         userRepository
-            .Setup(x => x.GetAsync(new ExternalUserId(expected.UserId)))
+            .Setup(x => x.GetAsync(expected.UserId))
             .ReturnsAsync(expectedUser);
 
         var target = new AuditLoginAttemptsHandler(b2CLogRepository.Object, cutoffRepository.Object, revisionLogClient.Object, userRepository.Object);
@@ -98,7 +98,7 @@ public sealed class AuditLoginAttemptsHandlerTests
         // assert
         revisionLogClient.Verify(
             x => x.LogAsync(It.Is<RevisionLogEntry>(y =>
-                y.LogId == Guid.Parse(expected.Id) &&
+                y.LogId == expected.Id &&
                 y.OccurredOn == expected.AttemptedAt &&
                 y.SystemId == SubsystemInformation.Id &&
                 y.UserId == expectedUser.Id.Value &&
@@ -140,11 +140,11 @@ public sealed class AuditLoginAttemptsHandlerTests
     private static B2CLoginAttemptLogEntry CreateB2CLogEntry(Instant? attemptedAt = null)
     {
         return new B2CLoginAttemptLogEntry(
-            Guid.NewGuid().ToString(),
+            Guid.NewGuid(),
             attemptedAt ?? DateTimeOffset.Now.ToInstant(),
             "127.0.0.1",
             "DK",
-            Guid.NewGuid().ToString(),
+            new ExternalUserId(Guid.NewGuid()),
             "jd@629FF37F-B4B9-4111-B2E2-B81D3EE1CD6A.com",
             Guid.NewGuid().ToString(),
             "resource",

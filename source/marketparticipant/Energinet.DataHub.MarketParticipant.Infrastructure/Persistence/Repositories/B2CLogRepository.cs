@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
@@ -44,11 +46,11 @@ public sealed class B2CLogRepository : IB2CLogRepository
                 var errorCode = signIn.Status!.ErrorCode!.Value;
 
                 yield return new B2CLoginAttemptLogEntry(
-                    signIn.Id!,
+                    Guid.Parse(signIn.Id!),
                     signIn.CreatedDateTime!.Value.ToInstant(),
                     signIn.IpAddress!,
                     signIn.Location!.CountryOrRegion!,
-                    signIn.UserId!,
+                    new ExternalUserId(Guid.Parse(signIn.UserId!)),
                     signIn.UserPrincipalName!,
                     signIn.ResourceId!,
                     signIn.ResourceDisplayName!,
