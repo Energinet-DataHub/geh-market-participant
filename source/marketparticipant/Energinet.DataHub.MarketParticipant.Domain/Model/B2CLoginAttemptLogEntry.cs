@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed record B2CLoginAttemptLogEntry(
-    string Id,
+    Guid Id,
     Instant AttemptedAt,
     string IpAddress,
     string Region,
-    string UserId,
+    ExternalUserId UserId,
     string UserName,
     string ResourceId,
     string ResourceDisplayName,
