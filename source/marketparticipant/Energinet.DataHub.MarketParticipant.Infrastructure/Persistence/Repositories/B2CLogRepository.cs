@@ -50,7 +50,7 @@ public sealed class B2CLogRepository : IB2CLogRepository
                     signIn.CreatedDateTime!.Value.ToInstant(),
                     signIn.IpAddress!,
                     signIn.Location!.CountryOrRegion!,
-                    new ExternalUserId(Guid.Parse(signIn.UserId!)),
+                    new ExternalUserId(signIn.UserId!),
                     signIn.UserPrincipalName!,
                     signIn.ResourceId!,
                     signIn.ResourceDisplayName!,
