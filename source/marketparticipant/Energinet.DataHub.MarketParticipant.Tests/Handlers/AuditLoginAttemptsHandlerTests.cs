@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.RevisionLog.Integration;
 using Moq;
@@ -52,7 +53,7 @@ public sealed class AuditLoginAttemptsHandlerTests
         var cutoffRepository = new Mock<ICutoffRepository>();
         var revisionLogClient = new Mock<IRevisionLogClient>();
 
-        var target = new AuditLoginAttemptsHandler(b2CLogRepository.Object, cutoffRepository.Object, revisionLogClient.Object);
+        var target = new AuditLoginAttemptsHandler(b2CLogRepository.Object, cutoffRepository.Object, revisionLogClient.Object, new Mock<IUserRepository>().Object);
 
         // act
         await target.Handle(new AuditLoginAttemptsCommand(), CancellationToken.None);
@@ -60,9 +61,47 @@ public sealed class AuditLoginAttemptsHandlerTests
         // assert
         revisionLogClient.Verify(
             x => x.LogAsync(It.Is<RevisionLogEntry>(y =>
-                y.LogId == Guid.Parse(expected.Id) &&
+                y.LogId == expected.Id &&
                 y.OccurredOn == expected.AttemptedAt &&
                 y.SystemId == SubsystemInformation.Id &&
+                y.Activity == "LoginAttempt" &&
+                y.Origin == "B2C Login Audit Log" &&
+                y.Payload == JsonSerializer.Serialize(expected, _jsonSerializerOptions))),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_LoginAttemptsWithKnownUserFound_LogsToRevisionWithInternalUserIdLogApi()
+    {
+        // arrange
+        var expected = CreateB2CLogEntry();
+        var expectedUser = new User(new UserId(Guid.NewGuid()), new ActorId(Guid.NewGuid()), expected.UserId, [], null, null);
+
+        var b2CLogRepository = new Mock<IB2CLogRepository>();
+        b2CLogRepository
+            .Setup(x => x.GetLoginAttempsAsync(It.IsAny<Instant>()))
+            .Returns(ToAsyncEnumerable([expected]));
+
+        var cutoffRepository = new Mock<ICutoffRepository>();
+        var revisionLogClient = new Mock<IRevisionLogClient>();
+
+        var userRepository = new Mock<IUserRepository>();
+        userRepository
+            .Setup(x => x.GetAsync(expected.UserId))
+            .ReturnsAsync(expectedUser);
+
+        var target = new AuditLoginAttemptsHandler(b2CLogRepository.Object, cutoffRepository.Object, revisionLogClient.Object, userRepository.Object);
+
+        // act
+        await target.Handle(new AuditLoginAttemptsCommand(), CancellationToken.None);
+
+        // assert
+        revisionLogClient.Verify(
+            x => x.LogAsync(It.Is<RevisionLogEntry>(y =>
+                y.LogId == expected.Id &&
+                y.OccurredOn == expected.AttemptedAt &&
+                y.SystemId == SubsystemInformation.Id &&
+                y.UserId == expectedUser.Id.Value &&
                 y.Activity == "LoginAttempt" &&
                 y.Origin == "B2C Login Audit Log" &&
                 y.Payload == JsonSerializer.Serialize(expected, _jsonSerializerOptions))),
@@ -89,7 +128,7 @@ public sealed class AuditLoginAttemptsHandlerTests
         var cutoffRepository = new Mock<ICutoffRepository>();
         var revisionLogClient = new Mock<IRevisionLogClient>();
 
-        var target = new AuditLoginAttemptsHandler(b2CLogRepository.Object, cutoffRepository.Object, revisionLogClient.Object);
+        var target = new AuditLoginAttemptsHandler(b2CLogRepository.Object, cutoffRepository.Object, revisionLogClient.Object, new Mock<IUserRepository>().Object);
 
         // act
         await target.Handle(new AuditLoginAttemptsCommand(), CancellationToken.None);
@@ -101,11 +140,11 @@ public sealed class AuditLoginAttemptsHandlerTests
     private static B2CLoginAttemptLogEntry CreateB2CLogEntry(Instant? attemptedAt = null)
     {
         return new B2CLoginAttemptLogEntry(
-            Guid.NewGuid().ToString(),
+            Guid.NewGuid(),
             attemptedAt ?? DateTimeOffset.Now.ToInstant(),
             "127.0.0.1",
             "DK",
-            Guid.NewGuid().ToString(),
+            new ExternalUserId(Guid.NewGuid()),
             "jd@629FF37F-B4B9-4111-B2E2-B81D3EE1CD6A.com",
             Guid.NewGuid().ToString(),
             "resource",

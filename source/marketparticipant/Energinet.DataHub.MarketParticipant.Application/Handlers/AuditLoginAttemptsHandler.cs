@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.RevisionLog.Integration;
 using MediatR;
@@ -34,12 +35,14 @@ public sealed class AuditLoginAttemptsHandler : IRequestHandler<AuditLoginAttemp
     private readonly IB2CLogRepository _b2CLogRepository;
     private readonly ICutoffRepository _cutoffRepository;
     private readonly IRevisionLogClient _revisionLogClient;
+    private readonly IUserRepository _userRepository;
 
-    public AuditLoginAttemptsHandler(IB2CLogRepository b2CLogRepository, ICutoffRepository cutoffRepository, IRevisionLogClient revisionLogClient)
+    public AuditLoginAttemptsHandler(IB2CLogRepository b2CLogRepository, ICutoffRepository cutoffRepository, IRevisionLogClient revisionLogClient, IUserRepository userRepository)
     {
         _b2CLogRepository = b2CLogRepository;
         _cutoffRepository = cutoffRepository;
         _revisionLogClient = revisionLogClient;
+        _userRepository = userRepository;
     }
 
     public async Task Handle(AuditLoginAttemptsCommand request, CancellationToken cancellationToken)
@@ -50,21 +53,27 @@ public sealed class AuditLoginAttemptsHandler : IRequestHandler<AuditLoginAttemp
 
         await foreach (var logEntry in _b2CLogRepository.GetLoginAttempsAsync(cutoff).WithCancellation(cancellationToken).ConfigureAwait(false))
         {
+            var user = await _userRepository.GetAsync(logEntry.UserId).ConfigureAwait(false);
+            var revisionLogEntry = CreateRevisionLogEntry(logEntry, user);
+
             await _revisionLogClient.LogAsync(
-                    CreateRevisionLogEntry(logEntry))
+                    revisionLogEntry)
                 .ConfigureAwait(false);
 
-            cutoff = Instant.Max(cutoff, logEntry.AttemptedAt);
+            if (cutoff < logEntry.AttemptedAt)
+            {
+                cutoff = logEntry.AttemptedAt;
+                await _cutoffRepository.UpdateCutoffAsync(CutoffType.B2CLoginAttempt, cutoff).ConfigureAwait(false);
+            }
         }
-
-        await _cutoffRepository.UpdateCutoffAsync(CutoffType.B2CLoginAttempt, cutoff).ConfigureAwait(false);
     }
 
-    private static RevisionLogEntry CreateRevisionLogEntry(B2CLoginAttemptLogEntry logEntry)
+    private static RevisionLogEntry CreateRevisionLogEntry(B2CLoginAttemptLogEntry logEntry, User? user)
     {
         return new RevisionLogEntry(
-            logId: Guid.Parse(logEntry.Id),
+            logId: logEntry.Id,
             systemId: SubsystemInformation.Id,
+            userId: user?.Id.Value ?? default,
             activity: "LoginAttempt",
             occurredOn: logEntry.AttemptedAt,
             origin: "B2C Login Audit Log",
