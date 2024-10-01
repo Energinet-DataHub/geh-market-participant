@@ -22,6 +22,7 @@ public sealed record LockableEntity
     }
 
     public static LockableEntity Actor => new("Actor");
+    public static LockableEntity User => new("User");
 
     public string Name { get; }
 }
