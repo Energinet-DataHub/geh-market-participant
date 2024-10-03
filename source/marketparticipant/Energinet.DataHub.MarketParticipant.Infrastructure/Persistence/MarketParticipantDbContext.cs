@@ -115,7 +115,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
             throw new InvalidOperationException("A transaction is required");
 
 #pragma warning disable EF1002
-        await Database.ExecuteSqlRawAsync($"SELECT TOP 0 NULL FROM {lockableEntity.Name} WITH (TABLOCKX)").ConfigureAwait(false);
+        await Database.ExecuteSqlRawAsync($"SELECT TOP 0 NULL FROM [{lockableEntity.Name}] WITH (TABLOCKX)").ConfigureAwait(false);
 #pragma warning restore EF1002
     }
 
