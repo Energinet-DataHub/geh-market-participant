@@ -70,8 +70,6 @@ public sealed class UserInvitationExpiredHandler : IRequestHandler<UserInvitatio
 
             await using (unitOfWork.ConfigureAwait(false))
             {
-                await _entityLock.LockAsync(LockableEntity.User).ConfigureAwait(false);
-
                 try
                 {
                     var userIdentity = await _userIdentityRepository
@@ -82,6 +80,8 @@ public sealed class UserInvitationExpiredHandler : IRequestHandler<UserInvitatio
                     {
                         continue;
                     }
+
+                    await _entityLock.LockAsync(LockableEntity.User).ConfigureAwait(false);
 
                     await _userIdentityRepository
                         .DisableUserAccountAsync(userIdentity)
