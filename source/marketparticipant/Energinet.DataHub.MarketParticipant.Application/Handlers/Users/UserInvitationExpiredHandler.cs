@@ -108,9 +108,7 @@ public sealed class UserInvitationExpiredHandler : IRequestHandler<UserInvitatio
 
                     _logger.LogInformation("User identity disabled for user with external id {ExternalId}", user.ExternalId);
                 }
-#pragma warning disable CA1031
                 catch (Exception e)
-#pragma warning restore CA1031
                 {
                     _logger.LogError(e, "An error occured when trying to deactivate user identity with external id {ExternalId}", user.ExternalId);
                     throw;
