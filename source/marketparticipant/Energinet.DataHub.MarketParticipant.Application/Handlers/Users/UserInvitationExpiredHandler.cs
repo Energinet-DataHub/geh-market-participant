@@ -20,8 +20,10 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.RevisionLog.Integration;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Users;
 
@@ -34,6 +36,7 @@ public sealed class UserInvitationExpiredHandler : IRequestHandler<UserInvitatio
     private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
     private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly ILogger<UserInvitationExpiredHandler> _logger;
+    private readonly IRevisionLogClient _revisionLogClient;
 
     public UserInvitationExpiredHandler(
         IUnitOfWorkProvider unitOfWorkProvider,
@@ -42,7 +45,8 @@ public sealed class UserInvitationExpiredHandler : IRequestHandler<UserInvitatio
         IUserIdentityRepository userIdentityRepository,
         IUserIdentityAuditLogRepository userIdentityAuditLogRepository,
         IAuditIdentityProvider auditIdentityProvider,
-        ILogger<UserInvitationExpiredHandler> logger)
+        ILogger<UserInvitationExpiredHandler> logger,
+        IRevisionLogClient revisionLogClient)
     {
         _unitOfWorkProvider = unitOfWorkProvider;
         _entityLock = entityLock;
@@ -51,22 +55,23 @@ public sealed class UserInvitationExpiredHandler : IRequestHandler<UserInvitatio
         _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
         _auditIdentityProvider = auditIdentityProvider;
         _logger = logger;
+        _revisionLogClient = revisionLogClient;
     }
 
     public async Task Handle(UserInvitationExpiredCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var unitOfWork = await _unitOfWorkProvider.NewUnitOfWorkAsync().ConfigureAwait(false);
+        var usersWithExpiredInvitation = await _userRepository.FindUsersWithExpiredInvitationAsync().ConfigureAwait(false);
 
-        await using (unitOfWork.ConfigureAwait(false))
+        foreach (var user in usersWithExpiredInvitation)
         {
-            await _entityLock.LockAsync(LockableEntity.User).ConfigureAwait(false);
+            var unitOfWork = await _unitOfWorkProvider.NewUnitOfWorkAsync().ConfigureAwait(false);
 
-            var usersWithExpiredInvitation = await _userRepository.FindUsersWithExpiredInvitationAsync().ConfigureAwait(false);
-
-            foreach (var user in usersWithExpiredInvitation)
+            await using (unitOfWork.ConfigureAwait(false))
             {
+                await _entityLock.LockAsync(LockableEntity.User).ConfigureAwait(false);
+
                 try
                 {
                     var userIdentity = await _userIdentityRepository
@@ -91,6 +96,16 @@ public sealed class UserInvitationExpiredHandler : IRequestHandler<UserInvitatio
                             userIdentity.Status.ToString())
                         .ConfigureAwait(false);
 
+                    await _revisionLogClient.LogAsync(new RevisionLogEntry(
+                        logId: Guid.NewGuid(),
+                        systemId: SubsystemInformation.Id,
+                        activity: "DeactivateUserWithExpiredInvitation",
+                        occurredOn: SystemClock.Instance.GetCurrentInstant(),
+                        origin: "UserInvitationExpired",
+                        affectedEntityType: nameof(UserIdentity),
+                        affectedEntityKey: user.ExternalId.ToString(),
+                        payload: string.Empty)).ConfigureAwait(false);
+
                     _logger.LogInformation("User identity disabled for user with external id {ExternalId}", user.ExternalId);
                 }
 #pragma warning disable CA1031
@@ -98,10 +113,11 @@ public sealed class UserInvitationExpiredHandler : IRequestHandler<UserInvitatio
 #pragma warning restore CA1031
                 {
                     _logger.LogError(e, "An error occured when trying to deactivate user identity with external id {ExternalId}", user.ExternalId);
+                    throw;
                 }
-            }
 
-            await unitOfWork.CommitAsync().ConfigureAwait(false);
+                await unitOfWork.CommitAsync().ConfigureAwait(false);
+            }
         }
     }
 }
