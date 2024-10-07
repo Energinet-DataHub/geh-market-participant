@@ -14,9 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Options;
 using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
@@ -26,13 +27,13 @@ public sealed class ReceiveIntegrationEventsTrigger(ISubscriber subscriber)
     [Function(nameof(ReceiveIntegrationEventsTrigger))]
     public Task RunAsync(
         [ServiceBusTrigger(
-            $"%{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SharedIntegrationEventTopic)}%",
-            $"%{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.IntegrationEventSubscription)}%",
-            Connection = $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ConsumerConnectionString)}")]
-        byte[] message,
+            $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}%",
+            $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}%",
+            Connection = $"{ServiceBusNamespaceOptions.SectionName}")]
+        ServiceBusReceivedMessage message,
         FunctionContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
-        return subscriber.HandleAsync(IntegrationEventServiceBusMessage.Create(message, context.BindingContext.BindingData!));
+        return subscriber.HandleAsync(IntegrationEventServiceBusMessage.Create(message));
     }
 }

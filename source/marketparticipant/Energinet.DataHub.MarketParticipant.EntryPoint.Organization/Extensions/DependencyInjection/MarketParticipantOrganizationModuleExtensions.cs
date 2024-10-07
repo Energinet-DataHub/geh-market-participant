@@ -19,7 +19,8 @@ using Azure.Identity;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
-using Energinet.DataHub.Core.Messaging.Communication.Publisher;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.MarketParticipant.Application.Contracts;
 using Energinet.DataHub.MarketParticipant.Application.Options;
 using Energinet.DataHub.MarketParticipant.Application.Services;
@@ -27,9 +28,9 @@ using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Integration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Google.Api;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,7 +51,8 @@ internal static class MarketParticipantOrganizationModuleExtensions
 
         services.AddOptions();
         services.AddOptions<SendGridOptions>().BindConfiguration(SendGridOptions.SectionName).ValidateDataAnnotations();
-        services.AddOptions<ServiceBusOptions>().BindConfiguration(ServiceBusOptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<IntegrationEventsOptions>().BindConfiguration(IntegrationEventsOptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<ServiceBusNamespaceOptions>().BindConfiguration(ServiceBusNamespaceOptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<CvrUpdateOptions>().BindConfiguration(CvrUpdateOptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<BalanceResponsibleChangedOptions>().BindConfiguration(BalanceResponsibleChangedOptions.SectionName).ValidateDataAnnotations();
 
@@ -67,12 +69,7 @@ internal static class MarketParticipantOrganizationModuleExtensions
         services.AddScoped<ReceiveIntegrationEventsTrigger>();
         services.AddScoped<OrganizationIdentityUpdateTrigger>();
 
-        services.AddPublisher<IntegrationEventProvider>();
-        services.Configure<PublisherOptions>(options =>
-        {
-            options.ServiceBusConnectionString = configuration.GetValue($"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ProducerConnectionString)}", defaultValue: string.Empty)!;
-            options.TopicName = configuration.GetValue($"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SharedIntegrationEventTopic)}", defaultValue: string.Empty)!;
-        });
+        services.AddIntegrationEventsPublisher<IntegrationEventProvider>(configuration);
 
         services.AddSubscriber<IntegrationEventSubscriptionHandler>(new[]
         {
@@ -116,20 +113,22 @@ internal static class MarketParticipantOrganizationModuleExtensions
 
         services.AddScoped<HealthCheckEndpoint>();
 
+        var defaultAzureCredential = new DefaultAzureCredential();
         services
             .AddHealthChecks()
             .AddDbContextCheck<MarketParticipantDbContext>()
             .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEventsAsync, name: "expired_events", tags: [HealthChecksConstants.StatusHealthCheckTag])
             .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEmailsAsync, name: "expired_emails", tags: [HealthChecksConstants.StatusHealthCheckTag])
             .AddAzureServiceBusSubscription(
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.HealthConnectionString,
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.SharedIntegrationEventTopic,
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.IntegrationEventSubscription)
+                provider => provider.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                provider => provider.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.TopicName,
+                provider => provider.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.SubscriptionName,
+                _ => defaultAzureCredential)
             .AddServiceBusTopicSubscriptionDeadLetter(
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.FullyQualifiedNamespace,
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.SharedIntegrationEventTopic,
-                provider => provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.IntegrationEventSubscription,
-                _ => new DefaultAzureCredential(),
+                provider => provider.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                provider => provider.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.TopicName,
+                provider => provider.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.SubscriptionName,
+                _ => defaultAzureCredential,
                 "Dead letter integration events",
                 [HealthChecksConstants.StatusHealthCheckTag])
             .AddSendGrid()
