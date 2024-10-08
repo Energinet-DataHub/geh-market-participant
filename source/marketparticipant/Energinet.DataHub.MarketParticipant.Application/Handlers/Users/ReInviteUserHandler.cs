@@ -16,9 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 
@@ -27,25 +25,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Users;
 public sealed class ReInviteUserHandler : IRequestHandler<ReInviteUserCommand>
 {
     private readonly IUserInvitationService _userInvitationService;
-    private readonly IUserRepository _userRepository;
 
-    public ReInviteUserHandler(
-        IUserInvitationService userInvitationService,
-        IUserRepository userRepository)
+    public ReInviteUserHandler(IUserInvitationService userInvitationService)
     {
         _userInvitationService = userInvitationService;
-        _userRepository = userRepository;
     }
 
     public async Task Handle(ReInviteUserCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var user = await _userRepository.GetAsync(new UserId(request.UserId)).ConfigureAwait(false);
-        NotFoundValidationException.ThrowIfNull(user, request.UserId);
-
         await _userInvitationService
-            .ReInviteUserAsync(user, new UserId(request.InvitedByUserId))
+            .ReInviteUserAsync(new UserId(request.UserId), new UserId(request.InvitedByUserId))
             .ConfigureAwait(false);
     }
 }

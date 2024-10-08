@@ -32,7 +32,7 @@ public interface IUserInvitationService
     /// <summary>
     /// Sends a new invitation to the specified user.
     /// </summary>
-    /// <param name="user">The user to send the invitation to.</param>
+    /// <param name="userId">The id of the user to whom the invitation will be sent.</param>
     /// <param name="invitationSentByUserId">The user responsible for sending the new invitation.</param>
-    Task ReInviteUserAsync(User user, UserId invitationSentByUserId);
+    Task ReInviteUserAsync(UserId userId, UserId invitationSentByUserId);
 }
