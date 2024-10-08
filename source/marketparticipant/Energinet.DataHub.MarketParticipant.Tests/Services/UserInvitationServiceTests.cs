@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
@@ -50,7 +51,7 @@ public sealed class UserInvitationServiceTests
         new ExternalActorId(Guid.NewGuid()),
         new MockedGln(),
         ActorStatus.Active,
-        new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
+        [new ActorMarketRole(EicFunction.BalanceResponsibleParty)],
         new ActorName("Actor Name"),
         null);
 
@@ -62,8 +63,7 @@ public sealed class UserInvitationServiceTests
             new PhoneNumber("+45 00000000"),
             new SmsAuthenticationMethod(new PhoneNumber("+45 00000000"))),
         _validActor,
-        new[]
-        {
+        [
             new UserRole(
                 new UserRoleId(Guid.NewGuid()),
                 "fake_value",
@@ -71,7 +71,7 @@ public sealed class UserInvitationServiceTests
                 UserRoleStatus.Active,
                 Array.Empty<PermissionId>(),
                 EicFunction.BalanceResponsibleParty),
-        });
+        ]);
 
     private readonly UserId _validInvitedByUserId = new(Guid.NewGuid());
 
@@ -88,6 +88,7 @@ public sealed class UserInvitationServiceTests
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
 
         var target = new UserInvitationService(
             userRepositoryMock.Object,
@@ -99,7 +100,8 @@ public sealed class UserInvitationServiceTests
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            userStatusCalculator);
+            userStatusCalculator,
+            entityLock.Object);
 
         organizationRepositoryMock
             .Setup(organizationRepository => organizationRepository.GetAsync(_validOrganization.Id))
@@ -133,6 +135,7 @@ public sealed class UserInvitationServiceTests
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
 
         organizationDomainValidationServiceMock
             .Setup(organizationDomainValidationService =>
@@ -151,7 +154,8 @@ public sealed class UserInvitationServiceTests
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            userStatusCalculator);
+            userStatusCalculator,
+            entityLock.Object);
 
         organizationRepositoryMock
             .Setup(organizationRepository => organizationRepository.GetAsync(_validOrganization.Id))
@@ -192,6 +196,7 @@ public sealed class UserInvitationServiceTests
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
 
         organizationDomainValidationServiceMock
             .Setup(organizationDomainValidationService =>
@@ -241,7 +246,8 @@ public sealed class UserInvitationServiceTests
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            userStatusCalculator);
+            userStatusCalculator,
+            entityLock.Object);
 
         organizationRepositoryMock
             .Setup(organizationRepository => organizationRepository.GetAsync(_validOrganization.Id))
@@ -280,6 +286,7 @@ public sealed class UserInvitationServiceTests
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
 
         userIdentityRepositoryMock
             .Setup(userIdentityRepository => userIdentityRepository.GetAsync(_validInvitation.Email))
@@ -304,7 +311,8 @@ public sealed class UserInvitationServiceTests
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            userStatusCalculator);
+            userStatusCalculator,
+            entityLock.Object);
 
         organizationRepositoryMock
             .Setup(organizationRepository => organizationRepository.GetAsync(_validOrganization.Id))
@@ -338,6 +346,7 @@ public sealed class UserInvitationServiceTests
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
 
@@ -380,7 +389,8 @@ public sealed class UserInvitationServiceTests
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            userStatusCalculator);
+            userStatusCalculator,
+            entityLock.Object);
 
         organizationRepositoryMock
             .Setup(organizationRepository => organizationRepository.GetAsync(_validOrganization.Id))
@@ -412,6 +422,7 @@ public sealed class UserInvitationServiceTests
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
 
@@ -421,7 +432,7 @@ public sealed class UserInvitationServiceTests
                 new UserId(Guid.NewGuid()),
                 new ActorId(Guid.Empty),
                 externalId,
-                new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+                [new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid()))],
                 null,
                 null));
 
@@ -454,7 +465,8 @@ public sealed class UserInvitationServiceTests
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            userStatusCalculator);
+            userStatusCalculator,
+            entityLock.Object);
 
         organizationRepositoryMock
             .Setup(organizationRepository => organizationRepository.GetAsync(_validOrganization.Id))
@@ -494,6 +506,7 @@ public sealed class UserInvitationServiceTests
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
 
@@ -503,7 +516,7 @@ public sealed class UserInvitationServiceTests
                 new UserId(Guid.NewGuid()),
                 new ActorId(Guid.Empty),
                 externalId,
-                new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+                [new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())),],
                 null,
                 null));
 
@@ -536,7 +549,8 @@ public sealed class UserInvitationServiceTests
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            userStatusCalculator);
+            userStatusCalculator,
+            entityLock.Object);
 
         organizationRepositoryMock
             .Setup(organizationRepository => organizationRepository.GetAsync(_validOrganization.Id))
@@ -559,6 +573,90 @@ public sealed class UserInvitationServiceTests
     }
 
     [Fact]
+    public async Task ReInviteUserAsync_NoUser_Throws()
+    {
+        // arrange
+        var userRepositoryMock = new Mock<IUserRepository>();
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
+
+        var mockedUser = TestPreparationModels.MockedUser(Guid.NewGuid());
+
+        userRepositoryMock
+            .Setup(u => u.GetAsync(mockedUser.Id))
+            .ReturnsAsync((User?)null);
+
+        var target = new UserInvitationService(
+            userRepositoryMock.Object,
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator,
+            entityLock.Object);
+
+        // act + assert
+        var actual = await Assert.ThrowsAsync<NotFoundValidationException>(() =>
+            target.ReInviteUserAsync(mockedUser.Id, _validInvitedByUserId));
+
+        Assert.Contains(mockedUser.Id.ToString(), actual.Message, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    [Fact]
+    public async Task ReInviteUserAsync_LocksBeforeRetrievingUser()
+    {
+        // arrange
+        var userRepositoryMock = new Mock<IUserRepository>();
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        var organizationRepositoryMock = new Mock<IOrganizationRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
+        entityLock.Setup(x => x.LockAsync(LockableEntity.User)).ThrowsAsync(new InvalidOperationException("Break the flow"));
+
+        var mockedUser = TestPreparationModels.MockedUser(Guid.NewGuid());
+
+        userRepositoryMock
+            .Setup(u => u.GetAsync(mockedUser.Id))
+            .ReturnsAsync((User?)null);
+
+        var target = new UserInvitationService(
+            userRepositoryMock.Object,
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            actorRepositoryMock.Object,
+            organizationRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator,
+            entityLock.Object);
+
+        // act + assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            target.ReInviteUserAsync(mockedUser.Id, _validInvitedByUserId));
+
+        userRepositoryMock.Verify(x => x.GetAsync(It.IsAny<UserId>()), Times.Never);
+        userIdentityRepositoryMock.Verify(x => x.GetAsync(It.IsAny<ExternalUserId>()), Times.Never);
+    }
+
+    [Fact]
     public async Task ReInviteUserAsync_NoUserIdentity_Throws()
     {
         // arrange
@@ -571,8 +669,13 @@ public sealed class UserInvitationServiceTests
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
 
         var mockedUser = TestPreparationModels.MockedUser(Guid.NewGuid());
+
+        userRepositoryMock
+            .Setup(u => u.GetAsync(mockedUser.Id))
+            .ReturnsAsync(mockedUser);
 
         userIdentityRepositoryMock
             .Setup(u => u.GetAsync(It.IsAny<ExternalUserId>()))
@@ -588,11 +691,12 @@ public sealed class UserInvitationServiceTests
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            userStatusCalculator);
+            userStatusCalculator,
+            entityLock.Object);
 
         // act + assert
         await Assert.ThrowsAsync<NotFoundValidationException>(() =>
-            target.ReInviteUserAsync(mockedUser, _validInvitedByUserId));
+            target.ReInviteUserAsync(mockedUser.Id, _validInvitedByUserId));
 
         userIdentityRepositoryMock.Verify(e => e.GetAsync(mockedUser.ExternalId), Times.Once);
     }
@@ -610,12 +714,13 @@ public sealed class UserInvitationServiceTests
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
 
         var user = new User(
             new UserId(Guid.NewGuid()),
             new ActorId(Guid.NewGuid()),
             new ExternalUserId(Guid.NewGuid()),
-            new UserRoleAssignment[] { new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+            [new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid()))],
             null,
             null);
 
@@ -629,6 +734,10 @@ public sealed class UserInvitationServiceTests
             DateTimeOffset.UtcNow,
             AuthenticationMethod.Undetermined,
             new List<LoginIdentity>());
+
+        userRepositoryMock
+            .Setup(u => u.GetAsync(user.Id))
+            .ReturnsAsync(new User(new ActorId(Guid.NewGuid()), new SharedUserReferenceId(), new ExternalUserId(Guid.NewGuid())));
 
         userIdentityRepositoryMock
             .Setup(u => u.GetAsync(It.IsAny<ExternalUserId>()))
@@ -644,11 +753,12 @@ public sealed class UserInvitationServiceTests
             userInviteAuditLogEntryRepository.Object,
             userIdentityAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            userStatusCalculator);
+            userStatusCalculator,
+            entityLock.Object);
 
         // act + assert
         await Assert.ThrowsAsync<ValidationException>(() =>
-            target.ReInviteUserAsync(user, _validInvitedByUserId));
+            target.ReInviteUserAsync(user.Id, _validInvitedByUserId));
     }
 
     [Fact]
@@ -664,12 +774,13 @@ public sealed class UserInvitationServiceTests
         var userInviteAuditLogRepository = new Mock<IUserInviteAuditLogRepository>();
         var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
+        var entityLock = new Mock<IEntityLock>();
 
         var user = new User(
             new UserId(Guid.NewGuid()),
             _validActor.Id,
             new ExternalUserId(Guid.NewGuid()),
-            new UserRoleAssignment[] { new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+            [new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid()))],
             null,
             DateTimeOffset.UtcNow.AddDays(-1));
 
@@ -702,7 +813,8 @@ public sealed class UserInvitationServiceTests
             userInviteAuditLogRepository.Object,
             userIdentityAuditLogRepository.Object,
             UnitOfWorkProviderMock.Create(),
-            userStatusCalculator);
+            userStatusCalculator,
+            entityLock.Object);
 
         organizationRepositoryMock
             .Setup(organizationRepository => organizationRepository.GetAsync(_validOrganization.Id))
@@ -712,7 +824,7 @@ public sealed class UserInvitationServiceTests
             .Setup(actorRepository => actorRepository.GetAsync(_validActor.Id))
             .ReturnsAsync(_validActor);
 
-        await target.ReInviteUserAsync(user, _validInvitedByUserId);
+        await target.ReInviteUserAsync(user.Id, _validInvitedByUserId);
 
         // act + assert
         userIdentityRepositoryMock
