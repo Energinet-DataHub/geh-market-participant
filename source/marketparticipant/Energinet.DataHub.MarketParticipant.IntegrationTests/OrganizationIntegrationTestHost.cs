@@ -19,6 +19,7 @@ using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using FluentAssertions.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -79,6 +80,7 @@ public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
             new("BalanceResponsibleChanged:NotificationToEmail", "fake_value@fake_value_test.dk"),
             new($"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}", "fake_value"),
             new($"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}", "fake_value"),
+            new($"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}", "fake_value"),
         };
 
         return new ConfigurationBuilder()
