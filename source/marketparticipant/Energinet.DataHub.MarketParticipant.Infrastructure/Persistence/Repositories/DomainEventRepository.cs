@@ -76,6 +76,20 @@ public sealed class DomainEventRepository : IDomainEventRepository
         domainEvents.ClearPublishedDomainEvents();
     }
 
+    public async Task EnqueueAsync(NotificationEvent notification)
+    {
+        ArgumentNullException.ThrowIfNull(notification);
+
+        await _marketParticipantDbContext
+            .DomainEvents
+            .AddAsync(Map(notification.EventId, typeof(NotificationEvent), notification))
+            .ConfigureAwait(false);
+
+        await _marketParticipantDbContext
+            .SaveChangesAsync()
+            .ConfigureAwait(false);
+    }
+
     private DomainEventEntity Map(Guid aggregateId, Type aggregateType, DomainEvent domainEvent)
     {
         return new DomainEventEntity

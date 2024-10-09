@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -139,5 +140,28 @@ public sealed class DomainEventRepositoryTests
             domainEvent.EventTypeName == "GridAreaOwnershipAssigned");
 
         Assert.Equal(2, events.Count());
+    }
+
+    [Fact]
+    public async Task EnqueueAsync_NotificationEvent_EventsSaved()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var target = scope.ServiceProvider.GetRequiredService<IDomainEventRepository>();
+        var notification = new BalanceResponsibilityValidationFailed(new MockedGln(), true);
+
+        // Act
+        await target.EnqueueAsync(notification);
+
+        // Assert
+        var events = context.DomainEvents.Where(domainEvent =>
+            domainEvent.EntityId == notification.EventId &&
+            domainEvent.EntityType == nameof(NotificationEvent) &&
+            domainEvent.EventTypeName == "BalanceResponsibilityValidationFailed");
+
+        Assert.Single(events);
     }
 }

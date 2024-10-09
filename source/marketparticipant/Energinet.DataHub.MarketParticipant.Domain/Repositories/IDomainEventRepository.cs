@@ -37,4 +37,10 @@ public interface IDomainEventRepository
     /// <param name="aggregateId">The id of the aggregate containing the domain events.</param>
     Task EnqueueAsync<T>(T aggregate, Guid aggregateId)
         where T : IPublishDomainEvents;
+
+    /// <summary>
+    /// Enqueue a notification for publishing.
+    /// </summary>
+    /// <param name="notification">The notification to publish.</param>
+    Task EnqueueAsync(NotificationEvent notification);
 }

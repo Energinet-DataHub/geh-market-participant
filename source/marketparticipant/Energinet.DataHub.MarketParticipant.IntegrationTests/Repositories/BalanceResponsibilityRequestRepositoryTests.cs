@@ -330,6 +330,7 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
 
         Assert.Equal(balanceResponsibilityRequestB.ValidFrom.ToDateTimeOffset(), actual.ValidFrom);
         Assert.Equal(balanceResponsibilityRequestB.ValidTo?.ToDateTimeOffset(), actual.ValidTo);
+        Assert.NotNull(actual.ValidToAssignedAt);
     }
 
     [Fact]
@@ -429,6 +430,60 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
         {
             await Assert.ThrowsAsync<ValidationException>(() => target.ProcessNextRequestsAsync(new ActorId(actorA.Id)));
         }
+    }
+
+    [Fact]
+    public async Task GetUnrecognizedActorsAsync_HasNoUnrecognizedActors_ReturnsNothing()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var target = scope.ServiceProvider.GetRequiredService<IBalanceResponsibilityRequestRepository>();
+        var gridArea = await _fixture.PrepareGridAreaAsync();
+
+        var actorA = await PrepareActorAsync(EicFunction.EnergySupplier);
+        var actorB = await PrepareActorAsync(EicFunction.BalanceResponsibleParty);
+
+        var balanceResponsibilityRequest = CreateBalanceResponsibilityRequest(ActorNumber.Create(actorA.ActorNumber), ActorNumber.Create(actorB.ActorNumber), new GridAreaCode(gridArea.Code));
+
+        await target.EnqueueAsync(balanceResponsibilityRequest);
+
+        // Act
+        var unrecognizedActors = (await target.GetUnrecognizedActorsAsync()).ToList();
+
+        // Assert
+        unrecognizedActors.Should().NotContain(balanceResponsibilityRequest.EnergySupplier);
+        unrecognizedActors.Should().NotContain(balanceResponsibilityRequest.BalanceResponsibleParty);
+    }
+
+    [Fact]
+    public async Task GetUnrecognizedActorsAsync_HasUnrecognizedActor_ReturnsActorNumber()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var target = scope.ServiceProvider.GetRequiredService<IBalanceResponsibilityRequestRepository>();
+        var gridArea = await _fixture.PrepareGridAreaAsync();
+
+        var actor = await PrepareActorAsync(EicFunction.EnergySupplier);
+
+        var balanceResponsibilityRequest = CreateBalanceResponsibilityRequest(
+            ActorNumber.Create(actor.ActorNumber),
+            new MockedGln(),
+            new GridAreaCode(gridArea.Code));
+
+        await target.EnqueueAsync(balanceResponsibilityRequest);
+
+        // Act
+        var unrecognizedActors = (await target.GetUnrecognizedActorsAsync()).ToList();
+
+        // Assert
+        unrecognizedActors.Should().NotContain(balanceResponsibilityRequest.EnergySupplier);
+        unrecognizedActors.Should().Contain(balanceResponsibilityRequest.BalanceResponsibleParty);
     }
 
     private static BalanceResponsibilityRequest CreateBalanceResponsibilityRequest(

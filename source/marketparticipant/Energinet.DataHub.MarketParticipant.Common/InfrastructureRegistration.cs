@@ -40,5 +40,6 @@ internal static class InfrastructureRegistration
         services.AddScoped<IIntegrationEventFactory<ActorCertificateCredentialsRemoved>, ActorCertificateCredentialsRemovedIntegrationEventFactory>();
         services.AddScoped<IIntegrationEventFactory<GridAreaOwnershipAssigned>, GridAreaOwnershipAssignedIntegrationEventFactory>();
         services.AddScoped<IIntegrationEventFactory<ProcessDelegationConfigured>, ProcessDelegationConfiguredIntegrationEventFactory>();
+        services.AddScoped<IIntegrationEventFactory<BalanceResponsibilityValidationFailed>, BalanceResponsibilityValidationFailedIntegrationEventFactory>();
     }
 }
