@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -19,6 +20,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 public interface IBalanceResponsibilityRequestRepository
 {
+    Task<IEnumerable<ActorNumber>> GetUnrecognizedActorsAsync();
+
     Task EnqueueAsync(BalanceResponsibilityRequest balanceResponsibilityRequest);
     Task ProcessNextRequestsAsync(ActorId affectedActorId);
 }

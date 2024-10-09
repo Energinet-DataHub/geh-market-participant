@@ -12,18 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 
-public sealed class BalanceResponsibilityRelationEntity
-{
-    public Guid Id { get; set; }
-    public Guid EnergySupplierId { get; set; }
-    public Guid BalanceResponsiblePartyId { get; set; }
-    public Guid GridAreaId { get; set; }
-    public int MeteringPointType { get; set; }
-    public DateTimeOffset ValidFrom { get; set; }
-    public DateTimeOffset? ValidTo { get; set; }
-    public DateTimeOffset? ValidToAssignedAt { get; set; }
-}
+public sealed record ValidateBalanceResponsibilitiesCommand : IRequest;

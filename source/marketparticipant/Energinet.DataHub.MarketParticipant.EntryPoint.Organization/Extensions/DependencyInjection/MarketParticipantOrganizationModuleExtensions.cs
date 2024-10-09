@@ -48,17 +48,10 @@ internal static class MarketParticipantOrganizationModuleExtensions
         services.AddScoped<IAuditIdentityProvider>(_ => KnownAuditIdentityProvider.OrganizationBackgroundService);
         services.AddFeatureManagement();
 
-        services.AddOptions();
         services.AddOptions<SendGridOptions>().BindConfiguration(SendGridOptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<ServiceBusOptions>().BindConfiguration(ServiceBusOptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<CvrUpdateOptions>().BindConfiguration(CvrUpdateOptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<BalanceResponsibleChangedOptions>().BindConfiguration(BalanceResponsibleChangedOptions.SectionName).ValidateDataAnnotations();
-
-        services.AddScoped<SynchronizeActorsTimerTrigger>();
-        services.AddScoped<EmailEventTimerTrigger>();
-        services.AddScoped<UserInvitationExpiredTimerTrigger>();
-        services.AddScoped<DispatchIntegrationEventsTrigger>();
-        services.AddScoped<ReceiveIntegrationEventsTrigger>();
 
         services.AddScoped<SynchronizeActorsTimerTrigger>();
         services.AddScoped<EmailEventTimerTrigger>();

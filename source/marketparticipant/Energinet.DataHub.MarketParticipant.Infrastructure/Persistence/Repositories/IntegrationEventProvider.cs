@@ -34,7 +34,7 @@ public sealed class IntegrationEventProvider : IIntegrationEventProvider
     private static readonly IReadOnlyDictionary<string, Type> _integrationEvents = typeof(DomainEvent)
         .Assembly
         .GetTypes()
-        .Where(domainEventType => domainEventType.IsSubclassOf(typeof(DomainEvent)))
+        .Where(domainEventType => domainEventType.IsSubclassOf(typeof(DomainEvent)) && !domainEventType.IsAbstract)
         .ToDictionary(x => x.Name);
 
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;

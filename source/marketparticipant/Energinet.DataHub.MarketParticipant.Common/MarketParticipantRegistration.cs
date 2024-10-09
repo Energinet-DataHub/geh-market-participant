@@ -16,6 +16,7 @@ using Energinet.DataHub.MarketParticipant.Application;
 using Energinet.DataHub.MarketParticipant.Application.Options;
 using Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Common.Email;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +28,7 @@ public static class MarketParticipantRegistration
     public static void AddMarketParticipantCore(this IServiceCollection services)
     {
         services.AddDbContexts();
+        services.AddSingleton(Clock.Instance);
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>));
         services.AddMediatR(config =>
@@ -34,7 +36,6 @@ public static class MarketParticipantRegistration
             config.RegisterServicesFromAssemblyContaining<ApplicationAssemblyReference>();
         });
 
-        services.AddOptions();
         services.AddOptions<AzureB2COptions>().BindConfiguration(AzureB2COptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<UserInviteOptions>().BindConfiguration(UserInviteOptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<EnvironmentOptions>().BindConfiguration(EnvironmentOptions.SectionName).ValidateDataAnnotations();
