@@ -37,7 +37,7 @@ message UserNotificationTriggered {
        */
       string target_user_id = 2;
 
-       /*
+      /*
        * The unique identifier of the group of users having the specified permission that should receive the notification.
        */
       string target_permissions = 3;
