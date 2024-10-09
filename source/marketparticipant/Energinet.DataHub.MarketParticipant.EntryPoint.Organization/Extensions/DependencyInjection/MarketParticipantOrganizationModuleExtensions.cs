@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Identity;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
@@ -31,6 +32,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -63,6 +65,21 @@ internal static class MarketParticipantOrganizationModuleExtensions
         services.AddScoped<OrganizationIdentityUpdateTrigger>();
 
         services.AddIntegrationEventsPublisher<IntegrationEventProvider>(configuration);
+        services.AddAzureClients(builder =>
+        {
+            var integrationEventsOptions =
+                configuration
+                    .GetRequiredSection(IntegrationEventsOptions.SectionName)
+                    .Get<IntegrationEventsOptions>()
+                ?? throw new InvalidOperationException("Missing Integration Events configuration.");
+
+            builder
+                .AddClient<ServiceBusProcessor, ServiceBusClientOptions>((_, _, provider) =>
+                    provider
+                        .GetRequiredService<ServiceBusClient>()
+                        .CreateProcessor(integrationEventsOptions.TopicName, integrationEventsOptions.SubscriptionName))
+                .WithName(integrationEventsOptions.SubscriptionName);
+        });
 
         services.AddSubscriber<IntegrationEventSubscriptionHandler>(new[]
         {
