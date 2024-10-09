@@ -94,8 +94,6 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             new("AzureB2c:BackendObjectId", "fake_value"),
             new("AzureB2c:BackendSpnObjectId", "fake_value"),
             new("AzureB2c:BackendId", "fake_value"),
-            new($"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}", "fake_value"),
-            new($"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}", "fake_value"),
         };
 
         return new ConfigurationBuilder()
