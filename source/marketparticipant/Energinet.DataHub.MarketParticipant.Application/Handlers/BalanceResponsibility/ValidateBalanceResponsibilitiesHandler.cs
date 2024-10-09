@@ -120,7 +120,7 @@ public sealed class ValidateBalanceResponsibilitiesHandler : IRequestHandler<Val
 
             // If ValidTo has been assigned recently (but ValidTo is not today), then notifications are skipped.
             // This "cooldown period" is to give the system time to receive new relations entered by users.
-            if (now - activeRelation.ValidToAssignedAt < Duration.FromDays(1) && activeRelation.ValidTo - now > Duration.FromDays(1))
+            if (now - activeRelation.ValidToAssignedAt < Duration.FromHours(2) && activeRelation.ValidTo - now > Duration.FromDays(1))
                 continue;
 
             var hasOpenEndedRelation = false;
