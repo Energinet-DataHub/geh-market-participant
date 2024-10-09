@@ -28,8 +28,7 @@ public static class MarketParticipantRegistration
     public static void AddMarketParticipantCore(this IServiceCollection services)
     {
         services.AddDbContexts();
-
-        services.AddSingleton(Clock.Instance); // TODO: Register proper.
+        services.AddSingleton(Clock.Instance);
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>));
         services.AddMediatR(config =>

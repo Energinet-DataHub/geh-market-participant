@@ -13,9 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
+using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
@@ -23,6 +27,24 @@ public sealed class BalanceResponsibilityValidationFailedIntegrationEventFactory
 {
     public Task<IntegrationEvent> CreateAsync(BalanceResponsibilityValidationFailed domainEvent, int sequenceNumber)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(domainEvent);
+
+        var now = DateTime.UtcNow;
+        var permission = KnownPermissions.All.Single(p => p.Id == PermissionId.BalanceResponsibilityView).Claim;
+
+        var integrationEvent = new IntegrationEvent(
+            domainEvent.EventId,
+            Model.Contracts.UserNotificationTriggered.EventName,
+            Model.Contracts.UserNotificationTriggered.CurrentMinorVersion,
+            new Model.Contracts.UserNotificationTriggered
+            {
+                ReasonIdentifier = domainEvent.IsActorUnrecognized ? "BalanceResponsibilityActorUnrecognized" : "BalanceResponsibilityValidationFailed",
+                TargetPermissions = permission,
+                RelatedId = domainEvent.ActorNumber.Value,
+                OccurredAt = now.ToTimestamp(),
+                ExpiresAt = now.AddHours(23).ToTimestamp(),
+            });
+
+        return Task.FromResult(integrationEvent);
     }
 }

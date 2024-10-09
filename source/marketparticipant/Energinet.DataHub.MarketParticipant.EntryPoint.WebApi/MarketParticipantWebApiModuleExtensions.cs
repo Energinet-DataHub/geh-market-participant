@@ -18,7 +18,6 @@ using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Options;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Options;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
@@ -27,6 +26,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
@@ -55,8 +55,9 @@ public static class MarketParticipantWebApiModuleExtensions
         {
             var tokenCredentials = new DefaultAzureCredential();
             var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
+            var clock = provider.GetRequiredService<IClock>();
             var keyClient = new KeyClient(options.Value.TokenSignKeyVault, tokenCredentials);
-            return new SigningKeyRing(Clock.Instance, keyClient, options.Value.TokenSignKeyName);
+            return new SigningKeyRing(clock, keyClient, options.Value.TokenSignKeyName);
         });
 
         services.AddSingleton(provider =>

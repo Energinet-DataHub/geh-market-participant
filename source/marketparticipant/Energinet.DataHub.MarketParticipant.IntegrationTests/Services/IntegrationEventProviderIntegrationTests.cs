@@ -71,7 +71,7 @@ public sealed class IntegrationEventProviderIntegrationTests
         var allIntegrationEvents = typeof(DomainEvent)
             .Assembly
             .GetTypes()
-            .Where(domainEventType => domainEventType.IsSubclassOf(typeof(DomainEvent)))
+            .Where(domainEventType => domainEventType.IsSubclassOf(typeof(DomainEvent)) && !domainEventType.IsAbstract)
             .ToDictionary(x => x.Name);
 
         foreach (var (eventName, eventType) in allIntegrationEvents)
@@ -88,8 +88,21 @@ public sealed class IntegrationEventProviderIntegrationTests
 
             // Assert
             Assert.Single(integrationEvents);
-            Assert.Equal(eventName, integrationEvents[0].EventName);
+
+            Assert.Equal(
+                eventType.IsSubclassOf(typeof(NotificationEvent))
+                    ? "UserNotificationTriggered"
+                    : eventName,
+                integrationEvents[0].EventName);
         }
+    }
+
+    private static async Task PrepareBalanceResponsibilityValidationFailedEventAsync(IServiceProvider scope)
+    {
+        var notification = new BalanceResponsibilityValidationFailed(new MockedGln(), true);
+
+        var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
+        await domainEventRepository.EnqueueAsync(notification);
     }
 
     private static Task PrepareActorActivatedEventAsync(IServiceProvider scope)
@@ -224,6 +237,7 @@ public sealed class IntegrationEventProviderIntegrationTests
             nameof(ActorCertificateCredentialsRemoved) => PrepareActorCertificateCredentialsRemovedEventAsync(scope),
             nameof(GridAreaOwnershipAssigned) => PrepareGridAreaOwnershipAssignedEventAsync(scope),
             nameof(ProcessDelegationConfigured) => PrepareProcessDelegationConfiguredEventAsync(scope),
+            nameof(BalanceResponsibilityValidationFailed) => PrepareBalanceResponsibilityValidationFailedEventAsync(scope),
             _ => throw new NotSupportedException($"Domain event {domainEvent.Name} is missing a test.")
         };
     }

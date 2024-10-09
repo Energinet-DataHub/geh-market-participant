@@ -26,7 +26,6 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.BalanceResponsibility;
 
-// TODO: Test
 public sealed class ValidateBalanceResponsibilitiesHandler : IRequestHandler<ValidateBalanceResponsibilitiesCommand>
 {
     private readonly IClock _clock;
@@ -127,19 +126,22 @@ public sealed class ValidateBalanceResponsibilitiesHandler : IRequestHandler<Val
             var hasOpenEndedRelation = false;
             var latestValidTo = activeRelation.ValidTo;
 
+            // The check is to go through all relations - from current to final - and make sure that:
+            // - There are no gaps.
+            // - The last relation is open-ended/has no ValidTo.
             foreach (var nextRelation in groupedRelations.OrderBy(relation => relation.ValidFrom).SkipWhile(relation => relation != activeRelation))
             {
+                // There is an open-ended relation, but more relations are present.
                 if (hasOpenEndedRelation)
                 {
                     hasOpenEndedRelation = false;
                     break;
                 }
 
-                // There is a gap or more than one balance responsible party is currently active.
+                // There is a gap.
                 if (nextRelation != activeRelation && nextRelation.ValidFrom != latestValidTo)
                     break;
 
-                // There is an open relation.
                 if (nextRelation.ValidTo == null)
                 {
                     hasOpenEndedRelation = true;
