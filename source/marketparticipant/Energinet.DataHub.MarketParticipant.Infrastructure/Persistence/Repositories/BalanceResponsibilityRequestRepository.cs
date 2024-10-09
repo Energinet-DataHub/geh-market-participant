@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,15 +22,20 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
 public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibilityRequestRepository
 {
+    private readonly IClock _clock;
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
-    public BalanceResponsibilityRequestRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public BalanceResponsibilityRequestRepository(
+        IClock clock,
+        IMarketParticipantDbContext marketParticipantDbContext)
     {
+        _clock = clock;
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
@@ -66,6 +72,36 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
             await InsertAndHandleOverlapAsync(next).ConfigureAwait(false);
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
+    }
+
+    public async Task<IEnumerable<ActorNumber>> GetUnrecognizedActorsAsync()
+    {
+        var unrecognizedEnergySuppliers =
+            from balanceResponsibleRequest in _marketParticipantDbContext.BalanceResponsibilityRequests
+            join energySupplier in _marketParticipantDbContext.Actors on
+                new { ActorNumber = balanceResponsibleRequest.EnergySupplier, Function = EicFunction.EnergySupplier }
+                equals
+                new { energySupplier.ActorNumber, energySupplier.MarketRoles.Single().Function } into energySupplierJoin
+            from energySupplier in energySupplierJoin.DefaultIfEmpty()
+            where energySupplier == null
+            select balanceResponsibleRequest.EnergySupplier;
+
+        var unrecognizedBalanceResponsibleParties =
+            from balanceResponsibleRequest in _marketParticipantDbContext.BalanceResponsibilityRequests
+            join balanceResponsibleParty in _marketParticipantDbContext.Actors on
+                new { ActorNumber = balanceResponsibleRequest.BalanceResponsibleParty, Function = EicFunction.BalanceResponsibleParty }
+                equals
+                new { balanceResponsibleParty.ActorNumber, balanceResponsibleParty.MarketRoles.Single().Function } into balanceResponsiblePartyJoin
+            from balanceResponsibleParty in balanceResponsiblePartyJoin.DefaultIfEmpty()
+            where balanceResponsibleParty == null
+            select balanceResponsibleRequest.BalanceResponsibleParty;
+
+        var filtered = await unrecognizedEnergySuppliers
+            .Union(unrecognizedBalanceResponsibleParties)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return filtered.Select(ActorNumber.Create);
     }
 
     private async Task<BalanceResponsibilityRelationEntity?> DequeueNextAsync(ActorId affectedActorId)
@@ -110,6 +146,7 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
             MeteringPointType = nextBalanceResponsibleRequest.Request.MeteringPointType,
             ValidFrom = nextBalanceResponsibleRequest.Request.ValidFrom,
             ValidTo = nextBalanceResponsibleRequest.Request.ValidTo,
+            ValidToAssignedAt = nextBalanceResponsibleRequest.Request.ValidTo.HasValue ? _clock.GetCurrentInstant().ToDateTimeOffset() : null,
         };
     }
 
@@ -153,6 +190,7 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
             if (supportedOverlapEndDateSet)
             {
                 overlap.ValidTo = entity.ValidTo;
+                overlap.ValidToAssignedAt = entity.ValidToAssignedAt;
                 _marketParticipantDbContext.BalanceResponsibilityRelations.Update(overlap);
                 return;
             }

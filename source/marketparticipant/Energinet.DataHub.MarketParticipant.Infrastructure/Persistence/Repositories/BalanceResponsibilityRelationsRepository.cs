@@ -83,6 +83,7 @@ public sealed class BalanceResponsibilityRelationsRepository : IBalanceResponsib
             new GridAreaId(relation.GridAreaId),
             (MeteringPointType)relation.MeteringPointType,
             relation.ValidFrom.ToInstant(),
-            relation.ValidTo?.ToInstant());
+            relation.ValidTo?.ToInstant(),
+            relation.ValidToAssignedAt?.ToInstant());
     }
 }
