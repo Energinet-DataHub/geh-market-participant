@@ -57,15 +57,9 @@ internal static class MarketParticipantOrganizationModuleExtensions
 
         services.AddScoped<SynchronizeActorsTimerTrigger>();
         services.AddScoped<EmailEventTimerTrigger>();
+        services.AddScoped<ReceiveIntegrationEventsTrigger>();
         services.AddScoped<UserInvitationExpiredTimerTrigger>();
         services.AddScoped<DispatchIntegrationEventsTrigger>();
-        services.AddScoped<ReceiveIntegrationEventsTrigger>();
-
-        services.AddScoped<SynchronizeActorsTimerTrigger>();
-        services.AddScoped<EmailEventTimerTrigger>();
-        services.AddScoped<UserInvitationExpiredTimerTrigger>();
-        services.AddScoped<DispatchIntegrationEventsTrigger>();
-        services.AddScoped<ReceiveIntegrationEventsTrigger>();
         services.AddScoped<OrganizationIdentityUpdateTrigger>();
 
         services.AddIntegrationEventsPublisher<IntegrationEventProvider>(configuration);
