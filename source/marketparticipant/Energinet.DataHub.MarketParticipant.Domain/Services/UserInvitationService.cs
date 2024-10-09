@@ -35,6 +35,7 @@ public sealed class UserInvitationService : IUserInvitationService
     private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IUserStatusCalculator _userStatusCalculator;
+    private readonly IEntityLock _entityLock;
 
     public UserInvitationService(
         IUserRepository userRepository,
@@ -46,7 +47,8 @@ public sealed class UserInvitationService : IUserInvitationService
         IUserInviteAuditLogRepository userInviteAuditLogRepository,
         IUserIdentityAuditLogRepository userIdentityAuditLogRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
-        IUserStatusCalculator userStatusCalculator)
+        IUserStatusCalculator userStatusCalculator,
+        IEntityLock entityLock)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
@@ -58,6 +60,7 @@ public sealed class UserInvitationService : IUserInvitationService
         _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _userStatusCalculator = userStatusCalculator;
+        _entityLock = entityLock;
     }
 
     public async Task InviteUserAsync(UserInvitation invitation, UserId invitationSentByUserId)
@@ -150,39 +153,9 @@ public sealed class UserInvitationService : IUserInvitationService
         }
     }
 
-    public async Task ReInviteUserAsync(User user, UserId invitationSentByUserId)
+    public async Task ReInviteUserAsync(UserId userId, UserId invitationSentByUserId)
     {
-        ArgumentNullException.ThrowIfNull(user);
-
-        var userIdentity = await _userIdentityRepository
-            .GetAsync(user.ExternalId)
-            .ConfigureAwait(false);
-
-        NotFoundValidationException.ThrowIfNull(
-            userIdentity,
-            user.ExternalId.Value,
-            $"The specified user identity {user.ExternalId} was not found.");
-
-        var userStatus = _userStatusCalculator.CalculateUserStatus(user, userIdentity);
-        if (userStatus != UserStatus.Invited && userStatus != UserStatus.InviteExpired)
-        {
-            throw new ValidationException($"The current user invitation for user {user.Id} is not expired and cannot be re-invited.")
-                .WithErrorCode("user.invite.not_expired");
-        }
-
-        var actor = await _actorRepository
-            .GetAsync(user.AdministratedBy)
-            .ConfigureAwait(false) ?? throw new InvalidOperationException($"Actor {user.AdministratedBy.Value} was not found.");
-
-        var organization = await _organizationRepository
-            .GetAsync(actor.OrganizationId)
-            .ConfigureAwait(false) ?? throw new InvalidOperationException($"Organization {actor.OrganizationId.Value} was not found.");
-
-        user.ActivateUserExpiration();
-
-        await _userIdentityRepository
-            .EnableUserAccountAsync(userIdentity.Id)
-            .ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(userId);
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()
@@ -190,6 +163,41 @@ public sealed class UserInvitationService : IUserInvitationService
 
         await using (uow.ConfigureAwait(false))
         {
+            await _entityLock.LockAsync(LockableEntity.User).ConfigureAwait(false);
+
+            var user = await _userRepository.GetAsync(userId).ConfigureAwait(false);
+            NotFoundValidationException.ThrowIfNull(user, userId.Value);
+
+            var userIdentity = await _userIdentityRepository
+                .GetAsync(user.ExternalId)
+                .ConfigureAwait(false);
+
+            NotFoundValidationException.ThrowIfNull(
+                userIdentity,
+                user.ExternalId.Value,
+                $"The specified user identity {user.ExternalId} was not found.");
+
+            var userStatus = _userStatusCalculator.CalculateUserStatus(user, userIdentity);
+            if (userStatus != UserStatus.Invited && userStatus != UserStatus.InviteExpired)
+            {
+                throw new ValidationException($"The current user invitation for user {user.Id} is not expired and cannot be re-invited.")
+                    .WithErrorCode("user.invite.not_expired");
+            }
+
+            var actor = await _actorRepository
+                .GetAsync(user.AdministratedBy)
+                .ConfigureAwait(false) ?? throw new InvalidOperationException($"Actor {user.AdministratedBy.Value} was not found.");
+
+            var organization = await _organizationRepository
+                .GetAsync(actor.OrganizationId)
+                .ConfigureAwait(false) ?? throw new InvalidOperationException($"Organization {actor.OrganizationId.Value} was not found.");
+
+            user.ActivateUserExpiration();
+
+            await _userIdentityRepository
+                .EnableUserAccountAsync(userIdentity.Id)
+                .ConfigureAwait(false);
+
             await _userRepository
                 .AddOrUpdateAsync(user)
                 .ConfigureAwait(false);

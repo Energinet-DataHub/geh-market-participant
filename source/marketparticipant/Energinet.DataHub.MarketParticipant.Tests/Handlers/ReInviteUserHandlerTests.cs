@@ -16,11 +16,8 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -33,39 +30,14 @@ public sealed class ReInviteUserHandlerTests
     private static readonly Guid _validInvitedByUserId = Guid.NewGuid();
 
     [Fact]
-    public async Task Handle_MissingUser_ThrowsException()
-    {
-        // Arrange
-        var userInvitationServiceMock = new Mock<IUserInvitationService>();
-        var userRepositoryMock = new Mock<IUserRepository>();
-
-        var target = new ReInviteUserHandler(
-            userInvitationServiceMock.Object,
-            userRepositoryMock.Object);
-
-        var inviteUserCommand = new ReInviteUserCommand(Guid.Empty, _validInvitedByUserId);
-
-        // Act + Assert
-        await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(inviteUserCommand, default));
-    }
-
-    [Fact]
     public async Task Handle_ExistingUser_SendsInvitationAgain()
     {
         // Arrange
         var userInvitationServiceMock = new Mock<IUserInvitationService>();
-        var userRepositoryMock = new Mock<IUserRepository>();
 
-        var target = new ReInviteUserHandler(
-            userInvitationServiceMock.Object,
-            userRepositoryMock.Object);
+        var target = new ReInviteUserHandler(userInvitationServiceMock.Object);
 
         var userId = Guid.NewGuid();
-        var mockedUser = TestPreparationModels.MockedUser(userId);
-
-        userRepositoryMock
-            .Setup(x => x.GetAsync(new UserId(userId)))
-            .ReturnsAsync(mockedUser);
 
         var inviteUserCommand = new ReInviteUserCommand(userId, _validInvitedByUserId);
 
@@ -73,6 +45,6 @@ public sealed class ReInviteUserHandlerTests
         await target.Handle(inviteUserCommand, default);
 
         // Assert
-        userInvitationServiceMock.Verify(x => x.ReInviteUserAsync(mockedUser, new UserId(_validInvitedByUserId)), Times.Once);
+        userInvitationServiceMock.Verify(x => x.ReInviteUserAsync(new UserId(userId), new UserId(_validInvitedByUserId)), Times.Once);
     }
 }
