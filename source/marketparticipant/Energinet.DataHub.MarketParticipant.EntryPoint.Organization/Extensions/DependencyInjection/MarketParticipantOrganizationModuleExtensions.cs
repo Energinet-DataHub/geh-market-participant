@@ -64,22 +64,8 @@ internal static class MarketParticipantOrganizationModuleExtensions
         services.AddScoped<DispatchIntegrationEventsTrigger>();
         services.AddScoped<OrganizationIdentityUpdateTrigger>();
 
+        services.AddServiceBusClientForApplication(configuration);
         services.AddIntegrationEventsPublisher<IntegrationEventProvider>(configuration);
-        services.AddAzureClients(builder =>
-        {
-            var integrationEventsOptions =
-                configuration
-                    .GetRequiredSection(IntegrationEventsOptions.SectionName)
-                    .Get<IntegrationEventsOptions>()
-                ?? throw new InvalidOperationException("Missing Integration Events configuration.");
-
-            builder
-                .AddClient<ServiceBusProcessor, ServiceBusClientOptions>((_, _, provider) =>
-                    provider
-                        .GetRequiredService<ServiceBusClient>()
-                        .CreateProcessor(integrationEventsOptions.TopicName, integrationEventsOptions.SubscriptionName))
-                .WithName(integrationEventsOptions.SubscriptionName);
-        });
 
         services.AddSubscriber<IntegrationEventSubscriptionHandler>(new[]
         {
