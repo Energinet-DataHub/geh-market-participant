@@ -13,17 +13,16 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
-public sealed class BalanceResponsibilityRelationEntity
+public sealed class BalanceResponsibilityValidationFailedIntegrationEventFactory : IIntegrationEventFactory<BalanceResponsibilityValidationFailed>
 {
-    public Guid Id { get; set; }
-    public Guid EnergySupplierId { get; set; }
-    public Guid BalanceResponsiblePartyId { get; set; }
-    public Guid GridAreaId { get; set; }
-    public int MeteringPointType { get; set; }
-    public DateTimeOffset ValidFrom { get; set; }
-    public DateTimeOffset? ValidTo { get; set; }
-    public DateTimeOffset? ValidToAssignedAt { get; set; }
+    public Task<IntegrationEvent> CreateAsync(BalanceResponsibilityValidationFailed domainEvent, int sequenceNumber)
+    {
+        throw new NotImplementedException();
+    }
 }

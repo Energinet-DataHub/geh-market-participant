@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -23,11 +24,20 @@ public sealed record BalanceResponsibilityRelation(ActorId EnergySupplier, GridA
         GridAreaId gridArea,
         MeteringPointType meteringPointType,
         Instant validFrom,
-        Instant? validTo)
+        Instant? validTo,
+        Instant? validToAssignedAt)
             : this(energySupplier, gridArea, meteringPointType, validFrom)
     {
+        if (validTo.HasValue != validToAssignedAt.HasValue)
+        {
+            ArgumentNullException.ThrowIfNull(validTo);
+            ArgumentNullException.ThrowIfNull(validToAssignedAt);
+        }
+
         ValidTo = validTo;
+        ValidToAssignedAt = validToAssignedAt;
     }
 
     public Instant? ValidTo { get; init; }
+    public Instant? ValidToAssignedAt { get; init; }
 }

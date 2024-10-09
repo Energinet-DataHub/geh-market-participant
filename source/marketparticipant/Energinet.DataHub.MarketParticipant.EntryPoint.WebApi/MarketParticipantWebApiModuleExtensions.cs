@@ -40,7 +40,6 @@ public static class MarketParticipantWebApiModuleExtensions
             .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
             .AddScoped<IAuditIdentityProvider, FrontendUserAuditIdentityProvider>();
 
-        services.AddOptions();
         services.AddOptions<UserAuthentication>().BindConfiguration(nameof(UserAuthentication)).ValidateDataAnnotations();
         services.AddOptions<KeyVaultOptions>().BindConfiguration(KeyVaultOptions.SectionName).ValidateDataAnnotations();
 

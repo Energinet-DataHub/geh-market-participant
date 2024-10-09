@@ -48,7 +48,6 @@ internal static class MarketParticipantOrganizationModuleExtensions
         services.AddScoped<IAuditIdentityProvider>(_ => KnownAuditIdentityProvider.OrganizationBackgroundService);
         services.AddFeatureManagement();
 
-        services.AddOptions();
         services.AddOptions<SendGridOptions>().BindConfiguration(SendGridOptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<ServiceBusOptions>().BindConfiguration(ServiceBusOptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<CvrUpdateOptions>().BindConfiguration(CvrUpdateOptions.SectionName).ValidateDataAnnotations();
