@@ -100,8 +100,8 @@ BEGIN
                 '' as DESCRIPTION,
                 '' as STATUS,
                 case
-                    when user_role_permission.PermissionId = 1 then 'OrganizationView'
-                    when user_role_permission.PermissionId = 2 then 'OrganizationManage'
+                    when user_role_permission.PermissionId = 1 then 'DEPRECATED_OrganizationView'
+                    when user_role_permission.PermissionId = 2 then 'DEPRECATED_OrganizationManage'
                     when user_role_permission.PermissionId = 3 then 'GridAreasManage'
                     when user_role_permission.PermissionId = 4 then 'ActorsManage'
                     when user_role_permission.PermissionId = 5 then 'UsersManage'
@@ -166,8 +166,8 @@ BEGIN
                 '' as DESCRIPTION,
                 '' as STATUS,
                 case
-                    when user_role_permission_history.PermissionId = 1 then 'OrganizationView'
-                    when user_role_permission_history.PermissionId = 2 then 'OrganizationManage'
+                    when user_role_permission_history.PermissionId = 1 then 'DEPRECATED_OrganizationView'
+                    when user_role_permission_history.PermissionId = 2 then 'DEPRECATED_OrganizationManage'
                     when user_role_permission_history.PermissionId = 3 then 'GridAreasManage'
                     when user_role_permission_history.PermissionId = 4 then 'ActorsManage'
                     when user_role_permission_history.PermissionId = 5 then 'UsersManage'
