@@ -54,6 +54,8 @@ public class UpdateOrganizationIdentityHandler : IRequestHandler<UpdateOrganisat
 
     public async Task Handle(UpdateOrganisationIdentityCommand request, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         var allOrganizations = await _organizationRepository
             .GetAsync()
             .ConfigureAwait(false);
@@ -87,7 +89,10 @@ public class UpdateOrganizationIdentityHandler : IRequestHandler<UpdateOrganisat
 
             _logger.LogInformation($"Organization identity updated for organization with id {organization.Id} from {current} to {newName}");
 
-            await SendNotificationEmailAsync(organization, current).ConfigureAwait(false);
+            if (request.ShouldNotify)
+            {
+                await SendNotificationEmailAsync(organization, current).ConfigureAwait(false);
+            }
         }
     }
 
