@@ -16,8 +16,8 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.MarketParticipant.Common.Options;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.RevisionLog.Integration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -80,10 +80,6 @@ public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFacto
         builder.UseSetting("KeyVault:TokenSignKeyVault", "https://fake_value");
         builder.UseSetting("KeyVault:TokenSignKeyName", "fake_value");
         builder.UseSetting("KeyVault:CertificatesKeyVault", "https://fake_value");
-        builder.UseSetting("ServiceBusOptions:SharedIntegrationEventTopic", "fake_value");
-        builder.UseSetting("ServiceBusOptions:IntegrationEventSubscription", "fake_value");
-        builder.UseSetting("ServiceBusOptions:ProducerConnectionString", "fake_value");
-        builder.UseSetting("ServiceBusOptions:HealthConnectionString", "fake_value");
 
         builder.ConfigureServices(services =>
         {

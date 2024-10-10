@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Options;
@@ -93,10 +94,6 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             new("AzureB2c:BackendObjectId", "fake_value"),
             new("AzureB2c:BackendSpnObjectId", "fake_value"),
             new("AzureB2c:BackendId", "fake_value"),
-            new("ServiceBusOptions:SharedIntegrationEventTopic", "fake_value"),
-            new("ServiceBusOptions:IntegrationEventSubscription", "fake_value"),
-            new("ServiceBusOptions:ProducerConnectionString", "fake_value"),
-            new("ServiceBusOptions:HealthConnectionString", "fake_value"),
         };
 
         return new ConfigurationBuilder()
