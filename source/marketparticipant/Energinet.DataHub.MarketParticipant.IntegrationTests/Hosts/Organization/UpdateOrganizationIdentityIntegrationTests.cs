@@ -60,7 +60,7 @@ public sealed class UpdateOrganizationIdentityIntegrationTests
         host.ServiceCollection.AddScoped(_ => orgIdentityRepository.Object);
 
         await using var scope = host.BeginScope();
-        var command = new UpdateOrganisationIdentityCommand();
+        var command = new UpdateOrganisationIdentityCommand(true);
 
         // Act
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -99,7 +99,7 @@ public sealed class UpdateOrganizationIdentityIntegrationTests
         host.ServiceCollection.AddScoped(_ => orgIdentityRepository.Object);
 
         await using var scope = host.BeginScope();
-        var command = new UpdateOrganisationIdentityCommand();
+        var command = new UpdateOrganisationIdentityCommand(true);
 
         // Act
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();

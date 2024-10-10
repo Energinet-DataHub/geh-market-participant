@@ -41,10 +41,10 @@ public class OrganizationIdentityUpdateTrigger
     public async Task RunAsync([TimerTrigger("0 2 * * *")] FunctionContext context)
     {
         var isEnabled = await _featureManager.IsEnabledAsync("EnabledOrganizationIdentityUpdateTrigger").ConfigureAwait(false);
-
         if (isEnabled)
         {
-            await _mediator.Send(new UpdateOrganisationIdentityCommand()).ConfigureAwait(false);
+            var shouldNotify = await _featureManager.IsEnabledAsync("EnabledOrganizationIdentityUpdateEmail").ConfigureAwait(false);
+            await _mediator.Send(new UpdateOrganisationIdentityCommand(shouldNotify)).ConfigureAwait(false);
         }
         else
         {
