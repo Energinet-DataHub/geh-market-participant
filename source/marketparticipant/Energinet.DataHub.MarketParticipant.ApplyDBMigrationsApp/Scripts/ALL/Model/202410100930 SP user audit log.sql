@@ -17,7 +17,7 @@ BEGIN
                     when user_identity_audit_log.Field = 4 then 'UPDATED_STATUS'
                     when user_identity_audit_log.Field = 5 then 'UPDATED_USER_LOGIN_FEDERATED_REQUESTED'
                     when user_identity_audit_log.Field = 6 then 'UPDATED_USER_LOGIN_FEDERATED'
-                    else 'unknown'
+                    else CAST(user_identity_audit_log.Field as varchar)
                   end as [ACTION],
                   user_identity_audit_log.NewValue as VALUE_TO,
                   user_identity_audit_log.Timestamp as OCCURRED_ON,
