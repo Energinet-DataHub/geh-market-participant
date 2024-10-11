@@ -14,11 +14,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -42,7 +45,19 @@ public sealed class UserRoleAuditLogRepository : IUserRoleAuditLogRepository
         var permissionAuditLogs = await GetPermissionChangesAsync(userRoleId)
             .ConfigureAwait(false);
 
+        permissionAuditLogs = permissionAuditLogs.Where(log => ShouldDisplayPermission(log.CurrentValue) && ShouldDisplayPermission(log.PreviousValue));
+
         return userRoleAuditLogs.Concat(permissionAuditLogs);
+
+        static bool ShouldDisplayPermission(string? value)
+        {
+            if (value == null)
+                return true;
+
+            // Skip permissions that are deprecated.
+            var permission = (PermissionId)int.Parse(value, CultureInfo.InvariantCulture);
+            return KnownPermissions.All.Any(kp => kp.Id == permission);
+        }
     }
 
     private Task<IEnumerable<AuditLog<UserRoleAuditedChange>>> GetUserRoleChangesAsync(UserRoleId userRoleId)
