@@ -75,7 +75,7 @@ public sealed class AuditLoginAttemptsHandlerTests
     {
         // arrange
         var expected = CreateB2CLogEntry();
-        var expectedUser = new User(new UserId(Guid.NewGuid()), new ActorId(Guid.NewGuid()), expected.UserId, [], null, null);
+        var expectedUser = new User(new UserId(Guid.NewGuid()), new ActorId(Guid.NewGuid()), expected.UserId, [], null, null, null);
 
         var b2CLogRepository = new Mock<IB2CLogRepository>();
         b2CLogRepository

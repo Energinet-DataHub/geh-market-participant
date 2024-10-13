@@ -215,6 +215,7 @@ public sealed class UserInvitationServiceTests
                 externalId,
                 Array.Empty<UserRoleAssignment>(),
                 null,
+                null,
                 null));
 
         var userIdentity = new UserIdentity(
@@ -358,6 +359,7 @@ public sealed class UserInvitationServiceTests
                 externalId,
                 Array.Empty<UserRoleAssignment>(),
                 null,
+                null,
                 null));
 
         var userIdentity = new UserIdentity(
@@ -433,6 +435,7 @@ public sealed class UserInvitationServiceTests
                 new ActorId(Guid.Empty),
                 externalId,
                 [new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid()))],
+                null,
                 null,
                 null));
 
@@ -517,6 +520,7 @@ public sealed class UserInvitationServiceTests
                 new ActorId(Guid.Empty),
                 externalId,
                 [new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())),],
+                null,
                 null,
                 null));
 
@@ -722,6 +726,7 @@ public sealed class UserInvitationServiceTests
             new ExternalUserId(Guid.NewGuid()),
             [new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid()))],
             null,
+            null,
             null);
 
         var userIdentity = new UserIdentity(
@@ -782,7 +787,8 @@ public sealed class UserInvitationServiceTests
             new ExternalUserId(Guid.NewGuid()),
             [new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid()))],
             null,
-            DateTimeOffset.UtcNow.AddDays(-1));
+            DateTimeOffset.UtcNow.AddDays(-1),
+            null);
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
