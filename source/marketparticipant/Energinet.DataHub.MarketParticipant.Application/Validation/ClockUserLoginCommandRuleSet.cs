@@ -12,17 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed record UserOverviewItem(
-    UserId Id,
-    UserStatus Status,
-    string FirstName,
-    string LastName,
-    EmailAddress Email,
-    PhoneNumber? PhoneNumber,
-    DateTimeOffset CreatedDate,
-    Guid AdministratedBy,
-    DateTimeOffset? LatestLoginAt);
+public sealed class ClockUserLoginCommandRuleSet : AbstractValidator<ClockUserLoginCommand>
+{
+    public ClockUserLoginCommandRuleSet()
+    {
+        RuleFor(command => command.UserId)
+            .NotEmpty();
+
+        RuleFor(command => command.Timestamp)
+            .NotEmpty();
+    }
+}

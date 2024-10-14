@@ -71,6 +71,7 @@ internal static class TestPreparationModels
             new ExternalUserId(Guid.NewGuid()),
             Array.Empty<UserRoleAssignment>(),
             null,
+            null,
             null);
 
     public static User MockedUser(Guid userId, Guid externalId) => new(
@@ -78,6 +79,7 @@ internal static class TestPreparationModels
         new ActorId(Guid.NewGuid()),
         new ExternalUserId(externalId),
         Array.Empty<UserRoleAssignment>(),
+        null,
         null,
         null);
 

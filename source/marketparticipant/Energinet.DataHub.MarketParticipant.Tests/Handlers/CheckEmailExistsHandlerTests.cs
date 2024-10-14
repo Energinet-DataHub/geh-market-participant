@@ -136,6 +136,7 @@ public sealed class CheckEmailExistsHandlerTests
             userIdentity.Id,
             Array.Empty<UserRoleAssignment>(),
             null,
+            null,
             null);
 
         var userRepositoryMock = new Mock<IUserRepository>();

@@ -90,7 +90,8 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                 user.Email.Address,
                 user.PhoneNumber?.Number,
                 user.CreatedDate,
-                user.AdministratedBy))
+                user.AdministratedBy,
+                user.LatestLoginAt))
             .ToList();
 
         return new GetUserOverviewResponse(mappedUsers, userCount);
