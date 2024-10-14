@@ -172,6 +172,4 @@ public interface IMarketParticipantDbContext
         where TEntity : class;
 
     Task CreateLockAsync(LockableEntity lockableEntity);
-
-    Task<int> ExecuteSqlRawAsync(string sql);
 }

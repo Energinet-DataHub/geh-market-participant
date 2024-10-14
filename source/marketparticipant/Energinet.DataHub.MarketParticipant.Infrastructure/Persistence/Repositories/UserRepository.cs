@@ -113,10 +113,11 @@ public sealed class UserRepository : IUserRepository
         return userEntities.Select(UserMapper.MapFromEntity);
     }
 
-    public async Task ClockUserLoginAsync(UserId userId, Instant timestamp)
+    public Task ClockUserLoginAsync(UserId userId, Instant timestamp)
     {
-        await _marketParticipantDbContext.ExecuteSqlRawAsync(
-            $"UPDATE [dbo].[User] SET {nameof(User.LatestLoginAt)} = '{timestamp.WithOffset(Offset.Zero)}' WHERE Id = '{userId}'").ConfigureAwait(false);
+        return _marketParticipantDbContext.Users
+            .Where(x => x.Id == userId.Value)
+            .ExecuteUpdateAsync(x => x.SetProperty(y => y.LatestLoginAt, timestamp.ToDateTimeOffset()));
     }
 
     private static void UpdateUserRoleAssignments(IEnumerable<UserRoleAssignment> userRoleAssignments, UserEntity userEntity)
