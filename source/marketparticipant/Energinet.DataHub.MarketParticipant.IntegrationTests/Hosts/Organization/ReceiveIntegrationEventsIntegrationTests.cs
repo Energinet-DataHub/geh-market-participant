@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.MarketParticipant.Application.Contracts;
@@ -96,25 +97,26 @@ public sealed class ReceiveIntegrationEventsIntegrationTests(MarketParticipantDa
 
     private static IntegrationEventServiceBusMessage CreateEvent(IMessage contractToParse)
     {
-        var messageInBytes = contractToParse.ToByteArray();
-
-        var bindingData = new Dictionary<string, object>
-        {
-            { "MessageId", Guid.NewGuid().ToString() },
-            { "Subject", "BalanceResponsiblePartiesChanged" },
-            {
-                "ApplicationProperties", JsonSerializer.Serialize(new Dictionary<string, object>
+        return IntegrationEventServiceBusMessage.Create(
+            ServiceBusModelFactory.ServiceBusReceivedMessage(
+                BinaryData.FromBytes(contractToParse.ToByteArray()),
+                messageId: Guid.NewGuid().ToString(),
+                subject: "BalanceResponsiblePartiesChanged",
+                properties: new Dictionary<string, object>
                 {
-                    { "EventName", "BalanceResponsiblePartiesChanged" },
-                    { "EventIdentification", Guid.NewGuid().ToString() },
-                    { "EventMinorVersion", 1 },
-                    { "CorrelationId", "123" }
-                })
-            }
-        };
-
-        var eventMessage = IntegrationEventServiceBusMessage.Create(messageInBytes, bindingData);
-        return eventMessage;
+                    {
+                        "EventName", "BalanceResponsiblePartiesChanged"
+                    },
+                    {
+                        "EventIdentification", Guid.NewGuid().ToString()
+                    },
+                    {
+                        "EventMinorVersion", 1
+                    },
+                    {
+                        "CorrelationId", "123"
+                    },
+                }));
     }
 
     private static BalanceResponsiblePartiesChanged GetBalanceResponsiblePartiesChange(bool validToIsNull)

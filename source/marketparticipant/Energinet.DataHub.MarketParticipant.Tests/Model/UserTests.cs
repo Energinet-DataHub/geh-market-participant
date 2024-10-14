@@ -33,6 +33,7 @@ public sealed class UserTests
             new ExternalUserId(Guid.Empty),
             Array.Empty<UserRoleAssignment>(),
             null,
+            null,
             null);
 
         // Assert
@@ -49,7 +50,8 @@ public sealed class UserTests
             new ExternalUserId(Guid.Empty),
             Array.Empty<UserRoleAssignment>(),
             null,
-            DateTimeOffset.UtcNow.AddMinutes(+20));
+            DateTimeOffset.UtcNow.AddMinutes(+20),
+            null);
 
         // Assert
         Assert.True(user.ValidLogonRequirements);
@@ -65,7 +67,8 @@ public sealed class UserTests
             new ExternalUserId(Guid.Empty),
             Array.Empty<UserRoleAssignment>(),
             null,
-            DateTimeOffset.UtcNow.AddMinutes(-20));
+            DateTimeOffset.UtcNow.AddMinutes(-20),
+            null);
 
         // Assert
         Assert.False(user.ValidLogonRequirements);
@@ -80,6 +83,7 @@ public sealed class UserTests
             new ActorId(Guid.Empty),
             new ExternalUserId(Guid.Empty),
             Array.Empty<UserRoleAssignment>(),
+            null,
             null,
             null);
 
@@ -102,6 +106,7 @@ public sealed class UserTests
             new ExternalUserId(Guid.Empty),
             Array.Empty<UserRoleAssignment>(),
             null,
+            null,
             null);
 
         Assert.Null(user.InvitationExpiresAt);
@@ -123,7 +128,8 @@ public sealed class UserTests
             new ExternalUserId(Guid.Empty),
             Array.Empty<UserRoleAssignment>(),
             null,
-            DateTimeOffset.UtcNow);
+            DateTimeOffset.UtcNow,
+            null);
 
         Assert.NotNull(user.InvitationExpiresAt);
 

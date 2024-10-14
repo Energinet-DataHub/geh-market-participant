@@ -43,7 +43,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
     public Task<int> GetTotalUserCountAsync(ActorId? actorId)
     {
-        var query = BuildUsersSearchQuery(actorId, null, Enumerable.Empty<UserRoleId>());
+        var query = BuildUsersSearchQuery(actorId, null, []);
         return query.CountAsync();
     }
 
@@ -54,9 +54,9 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         SortDirection sortDirection,
         ActorId? actorId)
     {
-        var query = BuildUsersSearchQuery(actorId, null, Enumerable.Empty<UserRoleId>());
+        var query = BuildUsersSearchQuery(actorId, null, []);
         var users = await query
-            .Select(x => new { x.Id, x.ExternalId, x.InvitationExpiresAt, x.AdministratedByActorId })
+            .Select(x => new { x.Id, x.ExternalId, x.InvitationExpiresAt, x.AdministratedByActorId, x.LatestLoginAt })
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -67,7 +67,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 Id = new UserId(y.Id),
                 ExternalId = new ExternalUserId(y.ExternalId),
                 y.InvitationExpiresAt,
-                y.AdministratedByActorId
+                y.AdministratedByActorId,
+                y.LatestLoginAt,
             });
 
         var userIdentities = (await _userIdentityRepository
@@ -86,7 +87,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                         PhoneNumber = userIdentity.PhoneNumber?.Number,
                         userIdentity.CreatedDate,
                         user.InvitationExpiresAt,
-                        user.AdministratedByActorId
+                        user.AdministratedByActorId,
+                        user.LatestLoginAt,
                     };
                 });
 
@@ -107,7 +109,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     new EmailAddress(x.Email),
                     x.PhoneNumber != null ? new PhoneNumber(x.PhoneNumber) : null,
                     x.CreatedDate,
-                    x.AdministratedByActorId));
+                    x.AdministratedByActorId,
+                    x.LatestLoginAt));
     }
 
     public async Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
@@ -146,7 +149,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 actorId,
                 searchUserIdentities.Select(x => x.Id),
                 userRolesFilter)
-            .Select(y => new { y.Id, y.ExternalId, y.InvitationExpiresAt, y.AdministratedByActorId })
+            .Select(y => new { y.Id, y.ExternalId, y.InvitationExpiresAt, y.AdministratedByActorId, y.LatestLoginAt })
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -157,7 +160,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         // Search local data and then fetch data from AD for results from our own data, that wasn't in the already found identities
         var searchQuery = await BuildUsersSearchQuery(actorId, searchText, userRolesFilter)
-            .Select(x => new { x.Id, x.ExternalId, x.InvitationExpiresAt, x.AdministratedByActorId })
+            .Select(x => new { x.Id, x.ExternalId, x.InvitationExpiresAt, x.AdministratedByActorId, x.LatestLoginAt })
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -189,7 +192,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 x.LastName,
                 Email = x.Email.Address,
                 PhoneNumber = x.PhoneNumber?.Number,
-                x.CreatedDate
+                x.CreatedDate,
             });
 
         allIdentities =
@@ -214,7 +217,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     new EmailAddress(userIdentity.Email),
                     userIdentity.PhoneNumber != null ? new PhoneNumber(userIdentity.PhoneNumber) : null,
                     userIdentity.CreatedDate,
-                    user.AdministratedByActorId);
+                    user.AdministratedByActorId,
+                    user.LatestLoginAt);
             });
 
         return (items, allIdentitiesEnumerated.Count);

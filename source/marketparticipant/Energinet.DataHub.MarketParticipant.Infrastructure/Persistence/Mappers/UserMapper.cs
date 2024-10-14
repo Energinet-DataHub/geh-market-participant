@@ -29,7 +29,8 @@ internal static class UserMapper
             new ExternalUserId(from.ExternalId),
             from.RoleAssignments.Select(MapFromEntity),
             from.MitIdSignupInitiatedAt,
-            from.InvitationExpiresAt);
+            from.InvitationExpiresAt,
+            from.LatestLoginAt);
     }
 
     private static UserRoleAssignment MapFromEntity(UserRoleAssignmentEntity from)

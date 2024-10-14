@@ -349,6 +349,35 @@ public sealed class TokenControllerIntegrationTests :
         Assert.Single(updatedUser.Identities, e => e.SignInType == "federated");
     }
 
+    [Fact]
+    public async Task Token_ValidExternalToken_ClocksUserLogin()
+    {
+        // arrange
+        const string target = "token";
+
+        var testUser = await _databaseFixture.PrepareUserAsync();
+        var testActor = await _databaseFixture.PrepareActorAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId);
+
+        var actorId = testActor.Id;
+        var request = new TokenRequest(actorId, externalToken);
+
+        using var httpContent = new StringContent(
+            JsonSerializer.Serialize(request),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        using var client = CreateClient();
+
+        // act
+        using var response = await client.PostAsync(new Uri(target, UriKind.Relative), httpContent);
+        await response.Content.ReadAsStringAsync();
+
+        // assert
+        await using var context = _databaseFixture.DatabaseManager.CreateDbContext();
+        Assert.NotNull((await context.Users.FindAsync(testUser.Id))?.LatestLoginAt);
+    }
+
     async Task IAsyncLifetime.InitializeAsync() => await _graphServiceClientFixture.CleanupExternalUserAsync(TestUserInviteOpenIdEmail);
     async Task IAsyncLifetime.DisposeAsync() => await DisposeAsync();
 
@@ -380,10 +409,9 @@ public sealed class TokenControllerIntegrationTests :
         var externalToken = new JwtSecurityToken(
             "https://example.com",
             "audience",
-            new[]
-            {
+            [
                 new Claim(JwtRegisteredClaimNames.Sub, externalUserId.ToString()),
-            },
+            ],
             notBefore ?? DateTime.UtcNow.AddDays(-1),
             expires ?? DateTime.UtcNow.AddDays(1),
             new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256));

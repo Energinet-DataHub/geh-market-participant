@@ -53,6 +53,7 @@ public sealed class UpdateUserRolesCommandHandlerTests
             new ExternalUserId(externalUserId),
             userRoleAssignments,
             null,
+            null,
             null);
 
         var deactivatedUserRole = new UserRole(
@@ -103,6 +104,7 @@ public sealed class UpdateUserRolesCommandHandlerTests
             new ActorId(actorId),
             new ExternalUserId(externalUserId),
             userRoleAssignments,
+            null,
             null,
             null);
 

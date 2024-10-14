@@ -67,6 +67,7 @@ public sealed class GetUserHandler : IRequestHandler<GetUserCommand, GetUserResp
             externalIdentity.Email.Address,
             externalIdentity.PhoneNumber?.Number,
             user.AdministratedBy.Value,
-            externalIdentity.CreatedDate);
+            externalIdentity.CreatedDate,
+            user.LatestLoginAt);
     }
 }

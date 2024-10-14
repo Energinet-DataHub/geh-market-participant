@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
@@ -59,4 +60,6 @@ public interface IUserRepository
     Task<IEnumerable<User>> GetToUserRoleAsync(UserRoleId userRoleId);
 
     Task<IEnumerable<User>> FindUsersWithExpiredInvitationAsync();
+
+    Task ClockUserLoginAsync(UserId userId, Instant timestamp);
 }

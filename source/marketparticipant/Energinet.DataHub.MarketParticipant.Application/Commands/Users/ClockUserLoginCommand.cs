@@ -13,16 +13,9 @@
 // limitations under the License.
 
 using System;
+using MediatR;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 
-public sealed record UserOverviewItem(
-    UserId Id,
-    UserStatus Status,
-    string FirstName,
-    string LastName,
-    EmailAddress Email,
-    PhoneNumber? PhoneNumber,
-    DateTimeOffset CreatedDate,
-    Guid AdministratedBy,
-    DateTimeOffset? LatestLoginAt);
+public sealed record ClockUserLoginCommand(Guid UserId, Instant Timestamp) : IRequest;
