@@ -112,6 +112,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<CreateDownloadTokenCommand>, CreateDownloadTokenCommandRuleSet>();
         services.AddScoped<IValidator<ExchangeDownloadTokenCommand>, ExchangeDownloadTokenCommandRuleSet>();
         services.AddScoped<IValidator<AuditLoginAttemptsCommand>, AuditLoginAttemptsCommandRuleSet>();
+        services.AddScoped<IValidator<ClockUserLoginCommand>, ClockUserLoginCommandRuleSet>();
 
         services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
         services.AddScoped<IActorClientSecretService, ActorClientSecretService>();
@@ -121,6 +122,5 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<ICertificateValidation, NoCertificateValidation>();
         services.AddScoped<IPermissionRelationService, PermissionRelationService>();
         services.AddScoped<IBalanceResponsiblePartiesChangedEventHandler, BalanceResponsiblePartiesChangedEventHandler>();
-        services.AddScoped<IValidator<ClockUserLoginCommand>, ClockUserLoginCommandRuleSet>();
     }
 }
