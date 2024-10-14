@@ -21,5 +21,6 @@ public enum UserOverviewSortProperty
     Email,
     PhoneNumber,
     CreatedDate,
-    Status
+    Status,
+    LatestLoginAt,
 }
