@@ -38,7 +38,8 @@ public sealed class User
         ExternalUserId externalId,
         IEnumerable<UserRoleAssignment> roleAssignments,
         DateTimeOffset? mitIdSignupInitiatedAt,
-        DateTimeOffset? invitationExpiresAt)
+        DateTimeOffset? invitationExpiresAt,
+        DateTimeOffset? latestLoginAt)
     {
         _sharedId = null;
         Id = id;
@@ -47,6 +48,7 @@ public sealed class User
         RoleAssignments = roleAssignments.ToHashSet();
         MitIdSignupInitiatedAt = mitIdSignupInitiatedAt;
         InvitationExpiresAt = invitationExpiresAt;
+        LatestLoginAt = latestLoginAt;
     }
 
     public UserId Id { get; }
@@ -57,6 +59,7 @@ public sealed class User
 
     public DateTimeOffset? MitIdSignupInitiatedAt { get; private set; }
     public DateTimeOffset? InvitationExpiresAt { get; private set; }
+    public DateTimeOffset? LatestLoginAt { get; }
 
     public bool ValidLogonRequirements => !InvitationExpiresAt.HasValue || InvitationExpiresAt >= DateTimeOffset.UtcNow;
 

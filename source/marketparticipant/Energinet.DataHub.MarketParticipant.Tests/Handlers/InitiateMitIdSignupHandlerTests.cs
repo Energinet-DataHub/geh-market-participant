@@ -43,6 +43,7 @@ public sealed class InitiateMitIdSignupHandlerTests
             new ExternalUserId(Guid.NewGuid()),
             Enumerable.Empty<UserRoleAssignment>(),
             null,
+            null,
             null);
 
         userRepositoryMock.Setup(x => x.GetAsync(new UserId(userId)))

@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -110,6 +111,13 @@ public sealed class UserRepository : IUserRepository
             .ConfigureAwait(false);
 
         return userEntities.Select(UserMapper.MapFromEntity);
+    }
+
+    public Task ClockUserLoginAsync(UserId userId, Instant timestamp)
+    {
+        return _marketParticipantDbContext.Users
+            .Where(x => x.Id == userId.Value)
+            .ExecuteUpdateAsync(x => x.SetProperty(y => y.LatestLoginAt, timestamp.ToDateTimeOffset()));
     }
 
     private static void UpdateUserRoleAssignments(IEnumerable<UserRoleAssignment> userRoleAssignments, UserEntity userEntity)

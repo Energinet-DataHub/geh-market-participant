@@ -359,6 +359,7 @@ public sealed class UserIdentityOpenIdLinkServiceTests
             externalUserId,
             new List<UserRoleAssignment>(),
             mitIdInitiatedAt,
+            null,
             null);
         return user;
     }

@@ -121,7 +121,8 @@ public sealed class GetUserPermissionsHandlerTests
             new ExternalUserId(command.ExternalUserId),
             [],
             null,
-            DateTimeOffset.UtcNow.AddHours(24));
+            DateTimeOffset.UtcNow.AddHours(24),
+            null);
     }
 
     private static Mock<IUserRepository> CreateUserRepository(GetUserPermissionsCommand command, User user)

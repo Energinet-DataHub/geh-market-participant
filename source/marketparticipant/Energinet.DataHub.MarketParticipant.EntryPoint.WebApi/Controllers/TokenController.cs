@@ -33,6 +33,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
@@ -145,8 +146,10 @@ public class TokenController : ControllerBase
         var roleClaims = grantedPermissions.PermissionClaims
             .Select(p => new Claim(RoleClaim, p));
 
+        var userId = grantedPermissions.UserId;
+
         var dataHubTokenClaims = roleClaims
-            .Append(new Claim(JwtRegisteredClaimNames.Sub, grantedPermissions.UserId.ToString()))
+            .Append(new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()))
             .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
             .Append(new Claim(TokenClaim, tokenRequest.ExternalToken))
             .Append(new Claim(ActorNumberClaim, actorResponse.ActorTokenData.ActorNumber))
@@ -174,6 +177,7 @@ public class TokenController : ControllerBase
         dataHubToken.Payload[JwtRegisteredClaimNames.Iat] = issuedAt;
 
         var finalToken = await CreateSignedTokenAsync(dataHubToken).ConfigureAwait(false);
+        await _mediator.Send(new ClockUserLoginCommand(userId, SystemClock.Instance.GetCurrentInstant())).ConfigureAwait(false);
         return Ok(new TokenResponse(finalToken));
     }
 
@@ -184,8 +188,8 @@ public class TokenController : ControllerBase
         var command = new CreateDownloadTokenCommand(authToken);
 
         var response = await _mediator
-           .Send(command)
-           .ConfigureAwait(false);
+            .Send(command)
+            .ConfigureAwait(false);
 
         return Ok(response);
     }

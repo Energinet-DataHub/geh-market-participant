@@ -151,5 +151,6 @@ public sealed class UpdateUserIdentityHandlerTests
         new ExternalUserId(Guid.NewGuid()),
         new List<UserRoleAssignment>(),
         null,
+        null,
         null);
 }
