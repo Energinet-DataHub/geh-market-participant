@@ -184,15 +184,20 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 var status = _userStatusCalculator.CalculateUserStatus(x.Status, user.InvitationExpiresAt);
                 return !statusFilter.Any() || statusFilter.Contains(status);
             })
-            .Select(x => new
+            .Select(x =>
             {
-                x.Id,
-                x.Status,
-                x.FirstName,
-                x.LastName,
-                Email = x.Email.Address,
-                PhoneNumber = x.PhoneNumber?.Number,
-                x.CreatedDate,
+                var user = userLookup[x.Id.Value];
+                return new
+                {
+                    x.Id,
+                    x.Status,
+                    x.FirstName,
+                    x.LastName,
+                    Email = x.Email.Address,
+                    PhoneNumber = x.PhoneNumber?.Number,
+                    x.CreatedDate,
+                    user.LatestLoginAt,
+                };
             });
 
         allIdentities =
