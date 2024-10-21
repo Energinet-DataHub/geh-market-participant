@@ -7,3 +7,8 @@ CREATE TABLE [dbo].[OrganizationDomainEntity](
     CONSTRAINT FK_OrganizationDomainEntity_OrganizationId_Organization FOREIGN KEY ([OrganizationId]) REFERENCES [dbo].[Organization]([Id]),
     )
 GO
+
+ALTER TABLE [dbo].[Organization]
+DROP COLUMN [Domain];
+
+GO
