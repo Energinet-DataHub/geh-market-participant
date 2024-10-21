@@ -62,7 +62,7 @@ public sealed class OrganizationRepository : IOrganizationRepository
         }
         catch (DbUpdateException ex) when (
             ex.InnerException is SqlException inner &&
-            inner.Message.Contains("UQ_Organization_Domain", StringComparison.InvariantCultureIgnoreCase))
+            inner.Message.Contains("UQ_OrganizationDomain_Domain", StringComparison.InvariantCultureIgnoreCase))
         {
             return new(OrganizationError.DomainConflict);
         }
