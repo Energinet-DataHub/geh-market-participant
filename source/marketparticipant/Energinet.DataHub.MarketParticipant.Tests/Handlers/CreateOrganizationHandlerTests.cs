@@ -52,7 +52,7 @@ public sealed class CreateOrganizationHandlerTests
                 It.IsAny<string>(),
                 It.Is<BusinessRegisterIdentifier>(y => y.Identifier == validCvr),
                 It.IsAny<Address>(),
-                It.IsAny<List<OrganizationDomain>>()))
+                It.IsAny<IEnumerable<OrganizationDomain>>()))
             .ReturnsAsync(organization);
 
         var command = new CreateOrganizationCommand(new CreateOrganizationDto(orgName, validCvr, validAddressDto, ["energinet.dk"]));
