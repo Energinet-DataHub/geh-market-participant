@@ -53,7 +53,7 @@ public sealed class OrganizationFactoryServiceTests
             null!,
             _validCvrBusinessRegisterIdentifier,
             _validAddress,
-            _validDomain));
+            [_validDomain]));
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public sealed class OrganizationFactoryServiceTests
             "fake_value",
             null!,
             _validAddress,
-            _validDomain));
+            [_validDomain]));
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class OrganizationFactoryServiceTests
             "fake_value",
             _validCvrBusinessRegisterIdentifier,
             null!,
-            _validDomain));
+            [_validDomain]));
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public sealed class OrganizationFactoryServiceTests
             "fake_value",
             _validCvrBusinessRegisterIdentifier,
             _validAddress,
-            _validDomain,
+            [_validDomain],
             OrganizationStatus.Active);
 
         organizationRepository
@@ -125,7 +125,7 @@ public sealed class OrganizationFactoryServiceTests
                 "fake_value",
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                _validDomain);
+                [_validDomain]);
 
         // Assert
         Assert.NotNull(response);

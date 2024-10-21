@@ -72,7 +72,7 @@ public sealed class OrganizationAuditLogRepositoryTests
         var user = await _fixture.PrepareUserAsync();
         host.ServiceCollection.MockFrontendUser(user.Id);
 
-        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         await using var scope = host.BeginScope();
         var organizationRepository = scope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
@@ -92,8 +92,8 @@ public sealed class OrganizationAuditLogRepositoryTests
                 organization.Name = newValue;
                 break;
             case OrganizationAuditedChange.Domain:
-                orgValue = organization!.Domain.Value;
-                organization.Domain = new OrganizationDomain(newValue);
+                orgValue = organization!.Domains.ToString();
+                organization.Domains = [new OrganizationDomain(newValue)];
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);

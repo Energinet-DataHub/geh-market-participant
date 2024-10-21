@@ -36,7 +36,7 @@ public sealed class OrganizationTests
                 "fake_value",
                 "fake_value",
                 "DK"),
-            new OrganizationDomain("energinet.dk"));
+            [new OrganizationDomain("energinet.dk")]);
 
         // Assert
         Assert.Equal(OrganizationStatus.New, organization.Status);
@@ -142,7 +142,7 @@ public sealed class OrganizationTests
                 "fake_value",
                 "fake_value",
                 "DK"),
-            new OrganizationDomain("energinet.dk"),
+            [new OrganizationDomain("energinet.dk")],
             status);
     }
 }

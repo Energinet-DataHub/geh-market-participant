@@ -50,7 +50,7 @@ public sealed class OrganizationRepositoryTests
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var orgRepository = new OrganizationRepository(context);
         var orgRepository2 = new OrganizationRepository(context2);
-        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         // Act
         var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -75,7 +75,7 @@ public sealed class OrganizationRepositoryTests
         var orgRepository = new OrganizationRepository(context);
         var orgRepository2 = new OrganizationRepository(context2);
 
-        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         // Act
         var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -99,7 +99,7 @@ public sealed class OrganizationRepositoryTests
 
         var orgRepository = new OrganizationRepository(context);
         var orgRepository2 = new OrganizationRepository(context2);
-        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         // Act
         var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -138,7 +138,7 @@ public sealed class OrganizationRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var orgRepository = new OrganizationRepository(context);
-        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         // Act
         var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -149,7 +149,7 @@ public sealed class OrganizationRepositoryTests
             "NewName",
             newOrg.BusinessRegisterIdentifier,
             newOrg.Address,
-            _validDomain,
+            [_validDomain],
             OrganizationStatus.New);
 
         await orgRepository.AddOrUpdateAsync(newOrg);
@@ -174,7 +174,7 @@ public sealed class OrganizationRepositoryTests
         var orgRepository = new OrganizationRepository(context);
         var orgRepository2 = new OrganizationRepository(context2);
 
-        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         // Act
         var orgId = await orgRepository.AddOrUpdateAsync(organization);
@@ -196,7 +196,7 @@ public sealed class OrganizationRepositoryTests
         var orgRepository = new OrganizationRepository(context);
         var orgRepository2 = new OrganizationRepository(context2);
 
-        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         await orgRepository.AddOrUpdateAsync(organization);
 
@@ -220,7 +220,7 @@ public sealed class OrganizationRepositoryTests
         var orgRepository2 = new OrganizationRepository(context2);
 
         var globalLocationNumber = new MockedGln();
-        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         var organizationId = await orgRepository.AddOrUpdateAsync(organization);
         await _fixture.PrepareActorAsync(

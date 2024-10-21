@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
@@ -51,10 +52,10 @@ public sealed class CreateOrganizationHandlerTests
                 It.IsAny<string>(),
                 It.Is<BusinessRegisterIdentifier>(y => y.Identifier == validCvr),
                 It.IsAny<Address>(),
-                It.IsAny<OrganizationDomain>()))
+                It.IsAny<List<OrganizationDomain>>()))
             .ReturnsAsync(organization);
 
-        var command = new CreateOrganizationCommand(new CreateOrganizationDto(orgName, validCvr, validAddressDto, "energinet.dk"));
+        var command = new CreateOrganizationCommand(new CreateOrganizationDto(orgName, validCvr, validAddressDto, ["energinet.dk"]));
 
         // Act
         var response = await target.Handle(command, CancellationToken.None);

@@ -86,7 +86,7 @@ public sealed class CreateOrganizationCommandRuleSetTests
                 string.Empty,
                 string.Empty,
                 "Denmark"),
-            "energinet.dk");
+            ["energinet.dk"]);
 
         var target = new CreateOrganizationCommandRuleSet();
         var command = new CreateOrganizationCommand(organizationDto);
@@ -127,7 +127,7 @@ public sealed class CreateOrganizationCommandRuleSetTests
                 string.Empty,
                 string.Empty,
                 "Denmark"),
-            "energinet.dk");
+            ["energinet.dk"]);
 
         var target = new CreateOrganizationCommandRuleSet();
         var command = new CreateOrganizationCommand(organizationDto);
@@ -168,7 +168,7 @@ public sealed class CreateOrganizationCommandRuleSetTests
                 string.Empty,
                 value,
                 "Denmark"),
-            "energinet.dk");
+            ["energinet.dk"]);
 
         var target = new CreateOrganizationCommandRuleSet();
         var command = new CreateOrganizationCommand(organizationDto);
@@ -209,7 +209,7 @@ public sealed class CreateOrganizationCommandRuleSetTests
                 string.Empty,
                 string.Empty,
                 value!),
-            "energinet.dk");
+            ["energinet.dk"]);
 
         var target = new CreateOrganizationCommandRuleSet();
         var command = new CreateOrganizationCommand(organizationDto);
@@ -250,7 +250,7 @@ public sealed class CreateOrganizationCommandRuleSetTests
                 string.Empty,
                 string.Empty,
                 "Denmark"),
-            "energinet.dk");
+            ["energinet.dk"]);
 
         var target = new CreateOrganizationCommandRuleSet();
         var command = new CreateOrganizationCommand(organizationDto);
@@ -291,7 +291,7 @@ public sealed class CreateOrganizationCommandRuleSetTests
                 value,
                 string.Empty,
                 "Denmark"),
-            "energinet.dk");
+            ["energinet.dk"]);
 
         var target = new CreateOrganizationCommandRuleSet();
         var command = new CreateOrganizationCommand(organizationDto);
@@ -327,7 +327,7 @@ public sealed class CreateOrganizationCommandRuleSetTests
             value!,
             validCvr,
             validAddress,
-            "energinet.dk");
+            ["energinet.dk"]);
 
         var target = new CreateOrganizationCommandRuleSet();
         var command = new CreateOrganizationCommand(organizationDto);
