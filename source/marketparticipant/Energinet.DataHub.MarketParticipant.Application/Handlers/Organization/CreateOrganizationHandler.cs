@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
@@ -41,11 +42,11 @@ public sealed class CreateOrganizationHandler : IRequestHandler<CreateOrganizati
             request.Organization.Address.ZipCode,
             request.Organization.Address.City,
             request.Organization.Address.Country);
-        var domain = new OrganizationDomain(request.Organization.Domain);
+        var domains = request.Organization.Domains.Select(d => new OrganizationDomain(d));
         var cvr = new BusinessRegisterIdentifier(request.Organization.BusinessRegisterIdentifier);
 
         var organization = await _organizationFactoryService
-            .CreateAsync(request.Organization.Name, cvr, address, domain)
+            .CreateAsync(request.Organization.Name, cvr, address, domains)
             .ConfigureAwait(false);
 
         return new CreateOrganizationResponse(organization.Id.Value);

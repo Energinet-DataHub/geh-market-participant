@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -35,7 +37,12 @@ public sealed class OrganizationDomain
 
     public string Value { get; }
 
-    public static bool IsValid(string value)
+    public static bool IsValid(IEnumerable<string> values)
+    {
+        return values.All(IsValid);
+    }
+
+    private static bool IsValid(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {

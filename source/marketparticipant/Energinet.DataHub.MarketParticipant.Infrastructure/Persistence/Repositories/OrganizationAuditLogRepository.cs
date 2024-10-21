@@ -35,7 +35,7 @@ public sealed class OrganizationAuditLogRepository : IOrganizationAuditLogReposi
 
         return new AuditLogBuilder<OrganizationAuditedChange, OrganizationEntity>(dataSource)
             .Add(OrganizationAuditedChange.Name, entity => entity.Name, AuditedChangeCompareAt.Creation)
-            .Add(OrganizationAuditedChange.Domain, entity => entity.Domain, AuditedChangeCompareAt.Creation)
+            .Add(OrganizationAuditedChange.Domain, entity => entity.Domains, AuditedChangeCompareAt.Creation)
             .BuildAsync();
     }
 }
