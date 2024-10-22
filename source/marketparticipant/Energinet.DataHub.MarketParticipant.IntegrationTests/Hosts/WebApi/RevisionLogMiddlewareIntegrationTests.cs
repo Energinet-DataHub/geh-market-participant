@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -194,6 +195,7 @@ public sealed class RevisionLogMiddlewareIntegrationTests : WebApiIntegrationTes
         builder.ConfigureServices(services =>
         {
             services.Replace(ServiceDescriptor.Scoped(_ => _revisionLogClientMock.Object));
+            services.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
         });
     }
 }

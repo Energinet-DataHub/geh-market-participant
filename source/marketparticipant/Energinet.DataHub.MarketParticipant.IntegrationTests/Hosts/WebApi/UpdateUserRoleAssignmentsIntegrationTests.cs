@@ -20,11 +20,14 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -50,6 +53,7 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -81,6 +85,7 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -117,6 +122,7 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -161,6 +167,7 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -194,6 +201,8 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
+
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
@@ -214,6 +223,7 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         // Act
         await using var hostUpdate1 = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         hostUpdate1.ServiceCollection.MockFrontendUser(frontendUser1.Id);
+        hostUpdate1.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scopeUpdate1 = hostUpdate1.BeginScope();
         var mediatorUpdate1 = scopeUpdate1.ServiceProvider.GetRequiredService<IMediator>();
@@ -221,6 +231,7 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
 
         await using var hostUpdate2 = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         hostUpdate2.ServiceCollection.MockFrontendUser(frontendUser2.Id);
+        hostUpdate2.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scopeUpdate2 = hostUpdate2.BeginScope();
         var mediatorUpdate2 = scopeUpdate2.ServiceProvider.GetRequiredService<IMediator>();
