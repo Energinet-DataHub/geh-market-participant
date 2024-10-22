@@ -43,7 +43,7 @@ public sealed class RequiredPermissionForUserRoleRuleService : IRequiredPermissi
 
     public async Task ValidateExistsAsync(IEnumerable<UserId> excludedUsers)
     {
-        var excludedUsersLookup = excludedUsers.ToLookup(x => x);
+        var excludedUsersLookup = excludedUsers.ToHashSet();
 
         foreach (var (permission, marketRole) in _requiredPermissions)
         {
@@ -81,5 +81,10 @@ public sealed class RequiredPermissionForUserRoleRuleService : IRequiredPermissi
 
             throw new ValidationException($"This operation would've removed the permission '{permission}' from the last remaining user role with active users for the market role '{marketRole}', and hence was denied.");
         }
+    }
+
+    public Task ValidateExistsAsync()
+    {
+        return ValidateExistsAsync([]);
     }
 }

@@ -73,6 +73,6 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
             .UpdateAsync(userRoleToUpdate)
             .ConfigureAwait(false);
 
-        await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync([]).ConfigureAwait(false);
+        await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync().ConfigureAwait(false);
     }
 }

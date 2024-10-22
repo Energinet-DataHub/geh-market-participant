@@ -80,6 +80,8 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
         if (currentStatus == UserStatus.Inactive)
             return;
 
+        await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync([user.Id]).ConfigureAwait(false);
+
         await _userIdentityRepository
             .DisableUserAccountAsync(userIdentity)
             .ConfigureAwait(false);
@@ -101,8 +103,6 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
                 UserStatus.Inactive.ToString(),
                 currentStatus.ToString())
             .ConfigureAwait(false);
-
-        await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync([user.Id]).ConfigureAwait(false);
     }
 
     private async Task RemoveUserFromCurrentActorAsync(User user)

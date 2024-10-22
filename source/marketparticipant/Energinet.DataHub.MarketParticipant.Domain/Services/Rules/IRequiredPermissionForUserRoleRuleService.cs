@@ -33,4 +33,5 @@ public interface IRequiredPermissionForUserRoleRuleService
     /// </summary>
     /// <param name="excludedUsers">Specific users to exclude when validating required permissions.</param>
     Task ValidateExistsAsync(IEnumerable<UserId> excludedUsers);
+    Task ValidateExistsAsync();
 }

@@ -79,7 +79,7 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
             userRole.Status = UserRoleStatus.Inactive;
             await _userRoleRepository.UpdateAsync(userRole).ConfigureAwait(false);
 
-            await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync([]).ConfigureAwait(false);
+            await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync().ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
         }
