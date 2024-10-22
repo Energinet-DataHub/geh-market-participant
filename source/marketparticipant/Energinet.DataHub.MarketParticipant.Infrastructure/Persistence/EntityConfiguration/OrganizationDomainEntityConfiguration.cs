@@ -14,15 +14,19 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 
-public sealed class OrganizationDomainEntity : IAuditedEntity
+public class OrganizationDomainEntityConfiguration : AuditedEntityTypeConfiguration<OrganizationDomainEntity>
 {
-    public Guid Id { get; set; }
-    public Guid OrganizationId { get; set; }
-    public string Domain { get; set; } = null!;
+    protected override void ConfigureEntity(EntityTypeBuilder<OrganizationDomainEntity> builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
 
-    public int Version { get; set; }
-    public Guid ChangedByIdentityId { get; set; }
+        builder.ToTable("OrganizationDomain");
+        builder.HasKey(x => x.Id);
+    }
 }
