@@ -93,7 +93,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<GetOrganizationAuditLogsCommand>, GetOrganizationAuditLogEntriesCommandRuleSet>();
         services.AddScoped<IValidator<GetActorAuditLogsCommand>, GetActorAuditLogEntriesCommandRuleSet>();
         services.AddScoped<IValidator<ResetUserTwoFactorAuthenticationCommand>, ResetUserTwoFactorAuthenticationRuleSet>();
-        services.AddScoped<IValidator<CheckEmailExistsCommand>, CheckEmailExistsCommandRuleSet>();
+        services.AddScoped<IValidator<CheckDomainExistsCommand>, CheckDomainExistsCommandRuleSet>();
         services.AddScoped<IValidator<AssignActorCertificateCommand>, AssignActorCertificateRuleSet>();
         services.AddScoped<IValidator<RemoveActorCredentialsCommand>, RemoveActorCredentialsCommandRuleSet>();
         services.AddScoped<IValidator<GetActorCredentialsCommand>, GetActorCredentialsCommandRuleSet>();

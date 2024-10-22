@@ -12,8 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Users;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed record CheckEmailExistsCommand(string EmailAddress) : IRequest<bool>;
+public sealed class CheckDomainExistsCommandRuleSet : AbstractValidator<CheckDomainExistsCommand>
+{
+    public CheckDomainExistsCommandRuleSet()
+    {
+        RuleFor(command => command.EmailAddress)
+            .EmailAddress();
+    }
+}

@@ -30,7 +30,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
 
 [UnitTest]
-public sealed class CheckEmailExistsHandlerTests
+public sealed class CheckDomainExistsHandlerTests
 {
     [Fact]
     public async Task Called_WithEmailBelongingToUserInCallersOrganization_ReturnsTrue()
@@ -45,7 +45,7 @@ public sealed class CheckEmailExistsHandlerTests
             usersOrganization: organizationId);
 
         // act
-        var actual = await target.Handle(new CheckEmailExistsCommand(usersMailAddress), default);
+        var actual = await target.Handle(new CheckDomainExistsCommand(usersMailAddress), default);
 
         // assert
         Assert.True(actual);
@@ -63,7 +63,7 @@ public sealed class CheckEmailExistsHandlerTests
             usersOrganization: Guid.NewGuid());
 
         // act
-        var actual = await target.Handle(new CheckEmailExistsCommand(usersMailAddress), default);
+        var actual = await target.Handle(new CheckDomainExistsCommand(usersMailAddress), default);
 
         // assert
         Assert.False(actual);
@@ -82,7 +82,7 @@ public sealed class CheckEmailExistsHandlerTests
             isFas: true);
 
         // act
-        var actual = await target.Handle(new CheckEmailExistsCommand(usersMailAddress), default);
+        var actual = await target.Handle(new CheckDomainExistsCommand(usersMailAddress), default);
 
         // assert
         Assert.True(actual);
@@ -100,13 +100,13 @@ public sealed class CheckEmailExistsHandlerTests
             usersOrganization: organizationId);
 
         // act
-        var actual = await target.Handle(new CheckEmailExistsCommand("janedoe@example.com"), default);
+        var actual = await target.Handle(new CheckDomainExistsCommand("janedoe@example.com"), default);
 
         // assert
         Assert.False(actual);
     }
 
-    private static CheckEmailExistsHandler SetupTarget(Guid callersOrganization, string usersMailAddress, Guid usersOrganization, bool isFas = false)
+    private static CheckDomainExistsHandler SetupTarget(Guid callersOrganization, string usersMailAddress, Guid usersOrganization, bool isFas = false)
     {
         var frontendUser = new FrontendUser(Guid.NewGuid(), callersOrganization, Guid.NewGuid(), isFas);
 
@@ -157,7 +157,7 @@ public sealed class CheckEmailExistsHandlerTests
         actorRepositoryMock.Setup(x => x.GetAsync(actor.Id))
             .ReturnsAsync(actor);
 
-        return new CheckEmailExistsHandler(
+        return new CheckDomainExistsHandler(
             userContextMock.Object,
             userIdentityRepositoryMock.Object,
             userRepositoryMock.Object,
