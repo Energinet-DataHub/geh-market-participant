@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Options;
@@ -79,7 +78,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
     private static IConfiguration BuildConfig(string dbConnectionString)
     {
         KeyValuePair<string, string?>[] keyValuePairs =
-        {
+        [
             new("Database:ConnectionString", dbConnectionString),
             new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.MitIdExternalMetadataAddress)}", "fake_value"),
             new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.ExternalMetadataAddress)}", "fake_value"),
@@ -94,7 +93,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             new("AzureB2c:BackendObjectId", "fake_value"),
             new("AzureB2c:BackendSpnObjectId", "fake_value"),
             new("AzureB2c:BackendId", "fake_value"),
-        };
+        ];
 
         return new ConfigurationBuilder()
             .AddInMemoryCollection(keyValuePairs)

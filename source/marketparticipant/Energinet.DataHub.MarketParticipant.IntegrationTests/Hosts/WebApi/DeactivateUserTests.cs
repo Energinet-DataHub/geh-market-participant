@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -108,6 +109,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase<Mark
         var userContext = new Mock<IUserContext<FrontendUser>>();
         host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
         host.ServiceCollection.AddScoped(_ => userContext.Object);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
@@ -218,6 +220,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase<Mark
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
         host.ServiceCollection.AddScoped(_ => userIdentityRepositoryMock.Object);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         var userContext = new Mock<IUserContext<FrontendUser>>();
         host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();

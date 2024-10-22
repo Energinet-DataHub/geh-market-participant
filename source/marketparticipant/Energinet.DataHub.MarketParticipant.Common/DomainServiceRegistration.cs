@@ -36,6 +36,7 @@ internal static class DomainServiceRegistration
         services.AddScoped<IUniqueOrganizationBusinessRegisterIdentifierRuleService, UniqueOrganizationBusinessRegisterIdentifierRuleService>();
         services.AddScoped<IAllowedPermissionsForUserRoleRuleService, AllowedPermissionsForUserRoleRuleService>();
         services.AddScoped<IUniqueUserRoleNameRuleService, UniqueUserRoleNameRuleService>();
+        services.AddScoped<IRequiredPermissionForUserRoleRuleService, RequiredPermissionForUserRoleRuleService>();
 
         services.AddScoped<IActorFactoryService, ActorFactoryService>();
         services.AddScoped<IOrganizationFactoryService, OrganizationFactoryService>();
