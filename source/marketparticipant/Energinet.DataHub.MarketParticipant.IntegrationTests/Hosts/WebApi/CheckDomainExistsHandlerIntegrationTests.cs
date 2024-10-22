@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -55,7 +56,7 @@ public sealed class CheckDomainExistsHandlerIntegrationTests(
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(databaseFixture);
         var organizationEntity = await databaseFixture.PrepareOrganizationAsync();
 
-        var testEmail = $"test@{organizationEntity.Domain}";
+        var testEmail = $"test@{organizationEntity.Domains.First().Domain}";
 
         var command = new CheckDomainExistsCommand(testEmail);
 
