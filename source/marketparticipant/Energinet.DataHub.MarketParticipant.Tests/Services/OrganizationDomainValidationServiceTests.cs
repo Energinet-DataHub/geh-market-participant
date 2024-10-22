@@ -110,7 +110,7 @@ public sealed class OrganizationDomainValidationServiceTests
             "TestOrg",
             new BusinessRegisterIdentifier("identifier"),
             new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
-            orgDomainToTest);
+            [orgDomainToTest]);
 
         organizationRepositoryMock
             .Setup(o => o.GetAsync(It.IsAny<OrganizationId>()))

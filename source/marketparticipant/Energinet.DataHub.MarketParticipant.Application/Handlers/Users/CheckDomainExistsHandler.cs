@@ -40,6 +40,8 @@ public sealed class CheckDomainExistsHandler : IRequestHandler<CheckDomainExists
             .GetAsync()
             .ConfigureAwait(false);
 
-        return MailAddress.TryCreate(request.EmailAddress, out var email) && organizations.Any(org => org.Domain.Value == email.Host);
+        var domains = organizations.SelectMany(o => o.Domains);
+
+        return MailAddress.TryCreate(request.EmailAddress, out var email) && domains.Any(org => org.Value == email.Host);
     }
 }

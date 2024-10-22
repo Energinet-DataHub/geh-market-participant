@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -24,13 +25,13 @@ public sealed class Organization
         string name,
         BusinessRegisterIdentifier businessRegisterIdentifier,
         Address address,
-        OrganizationDomain domain)
+        IEnumerable<OrganizationDomain> domains)
     {
         Id = new OrganizationId(Guid.Empty);
         Name = name;
         BusinessRegisterIdentifier = businessRegisterIdentifier;
         Address = address;
-        Domain = domain;
+        Domains = domains;
         _organizationStatusTransitioner = new OrganizationStatusTransitioner();
     }
 
@@ -39,14 +40,14 @@ public sealed class Organization
         string name,
         BusinessRegisterIdentifier businessRegisterIdentifier,
         Address address,
-        OrganizationDomain domain,
+        IEnumerable<OrganizationDomain> domains,
         OrganizationStatus status)
     {
         Id = id;
         Name = name;
         BusinessRegisterIdentifier = businessRegisterIdentifier;
         Address = address;
-        Domain = domain;
+        Domains = domains;
         _organizationStatusTransitioner = new OrganizationStatusTransitioner(status);
     }
 
@@ -54,7 +55,7 @@ public sealed class Organization
     public string Name { get; set; }
     public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; }
     public Address Address { get; }
-    public OrganizationDomain Domain { get; set; }
+    public IEnumerable<OrganizationDomain> Domains { get; set; }
 
     public OrganizationStatus Status
     {

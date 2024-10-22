@@ -41,7 +41,7 @@ public sealed class OrganizationDomainTests
         var target = OrganizationDomain.IsValid;
 
         // act
-        var actual = target(domain!);
+        var actual = target([domain!]);
 
         // assert
         Assert.Equal(expected, actual);

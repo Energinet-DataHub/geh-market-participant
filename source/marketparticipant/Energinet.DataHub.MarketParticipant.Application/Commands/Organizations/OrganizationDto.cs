@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 
@@ -20,6 +21,6 @@ public sealed record OrganizationDto(
     Guid OrganizationId,
     string Name,
     string BusinessRegisterIdentifier,
-    string Domain,
+    IEnumerable<string> Domains,
     string Status,
     AddressDto Address);

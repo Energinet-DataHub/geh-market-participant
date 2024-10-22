@@ -40,7 +40,7 @@ public sealed class UpdateOrganizationCommandRuleSet : AbstractValidator<UpdateO
                     .IsEnumName(typeof(OrganizationStatus));
 
                 validator
-                    .RuleFor(organization => organization.Domain)
+                    .RuleFor(organization => organization.Domains)
                     .Must(OrganizationDomain.IsValid);
             });
     }

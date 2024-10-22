@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
@@ -50,7 +51,7 @@ public sealed class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizati
 
         organization.Name = request.Organization.Name;
         organization.Status = Enum.Parse<OrganizationStatus>(request.Organization.Status, true);
-        organization.Domain = new OrganizationDomain(request.Organization.Domain);
+        organization.Domains = request.Organization.Domains.Select(d => new OrganizationDomain(d));
 
         await _uniqueOrganizationBusinessRegisterIdentifierRuleService
             .EnsureUniqueBusinessRegisterIdentifierAsync(organization)

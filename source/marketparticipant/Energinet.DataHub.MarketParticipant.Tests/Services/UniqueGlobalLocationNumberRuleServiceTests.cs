@@ -46,7 +46,7 @@ public sealed class UniqueGlobalLocationNumberRuleServiceTests
         var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
         var gln = new MockedGln();
-        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"));
+        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, [new OrganizationDomain("energinet.dk")]);
 
         organizationRepository
             .Setup(x => x.GetAsync(gln))
@@ -64,7 +64,7 @@ public sealed class UniqueGlobalLocationNumberRuleServiceTests
         var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
         var gln = new MockedGln();
-        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"));
+        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, [new OrganizationDomain("energinet.dk")]);
 
         organizationRepository
             .Setup(x => x.GetAsync(gln))
@@ -87,7 +87,7 @@ public sealed class UniqueGlobalLocationNumberRuleServiceTests
             "fake_value",
             _validCvrBusinessRegisterIdentifier,
             _validAddress,
-            new OrganizationDomain("energinet.dk"),
+            [new OrganizationDomain("energinet.dk")],
             OrganizationStatus.Active);
 
         organizationRepository
@@ -95,6 +95,6 @@ public sealed class UniqueGlobalLocationNumberRuleServiceTests
             .ReturnsAsync(new[] { organization });
 
         // Act + Assert
-        await Assert.ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk")), gln));
+        await Assert.ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, [new OrganizationDomain("energinet.dk")]), gln));
     }
 }

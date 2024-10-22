@@ -122,7 +122,7 @@ public sealed class EmailContentGeneratorTests
             organizationName,
             MockedBusinessRegisterIdentifier.New(),
             new Address(null, null, null, null, "DK"),
-            new MockedDomain(),
+            [new MockedDomain()],
             OrganizationStatus.Active);
 
         var actor = new Actor(
