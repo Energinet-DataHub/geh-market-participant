@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -29,13 +30,21 @@ public sealed class OrganizationAuditLogRepository : IOrganizationAuditLogReposi
         _context = context;
     }
 
-    public Task<IEnumerable<AuditLog<OrganizationAuditedChange>>> GetAsync(OrganizationId organization)
+    public async Task<IEnumerable<AuditLog<OrganizationAuditedChange>>> GetAsync(OrganizationId organization)
     {
-        var dataSource = new HistoryTableDataSource<OrganizationEntity>(_context.Organizations, entity => entity.Id == organization.Value);
+        var organizationDomainDataSource = new HistoryTableDataSource<OrganizationDomainEntity>(_context.OrganizationDomains, entity => entity.OrganizationId == organization.Value);
 
-        return new AuditLogBuilder<OrganizationAuditedChange, OrganizationEntity>(dataSource)
+        var organizationDomainChanges = (await new AuditLogBuilder<OrganizationAuditedChange, OrganizationDomainEntity>(organizationDomainDataSource)
+            .Add(OrganizationAuditedChange.Domain, entity => string.Join(";", entity.Domain), AuditedChangeCompareAt.Creation)
+            .BuildAsync().ConfigureAwait(false))
+            .ToList();
+
+        var organizationDataSource = new HistoryTableDataSource<OrganizationEntity>(_context.Organizations, entity => entity.Id == organization.Value);
+
+        var organizationNameChanges = await new AuditLogBuilder<OrganizationAuditedChange, OrganizationEntity>(organizationDataSource)
             .Add(OrganizationAuditedChange.Name, entity => entity.Name, AuditedChangeCompareAt.Creation)
-            .Add(OrganizationAuditedChange.Domain, entity => entity.Domains, AuditedChangeCompareAt.Creation)
-            .BuildAsync();
+            .BuildAsync().ConfigureAwait(false);
+
+        return organizationNameChanges.Concat(organizationDomainChanges);
     }
 }

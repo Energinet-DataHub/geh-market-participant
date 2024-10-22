@@ -92,7 +92,7 @@ public sealed class OrganizationAuditLogRepositoryTests
                 organization.Name = newValue;
                 break;
             case OrganizationAuditedChange.Domain:
-                orgValue = organization!.Domains.ToString();
+                orgValue = string.Join(";", organization!.Domains.Select(d => d.Value));
                 organization.Domains = [new OrganizationDomain(newValue)];
                 break;
             default:
