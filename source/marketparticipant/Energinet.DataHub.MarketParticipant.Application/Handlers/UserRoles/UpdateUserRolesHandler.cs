@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
@@ -29,13 +30,16 @@ public sealed class UpdateUserRolesHandler : IRequestHandler<UpdateUserRoleAssig
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserRoleRepository _userRoleRepository;
+    private readonly IRequiredPermissionForUserRoleRuleService _requiredPermissionForUserRoleRuleService;
 
     public UpdateUserRolesHandler(
         IUserRepository userRepository,
-        IUserRoleRepository userRoleRepository)
+        IUserRoleRepository userRoleRepository,
+        IRequiredPermissionForUserRoleRuleService requiredPermissionForUserRoleRuleService)
     {
         _userRepository = userRepository;
         _userRoleRepository = userRoleRepository;
+        _requiredPermissionForUserRoleRuleService = requiredPermissionForUserRoleRuleService;
     }
 
     public async Task Handle(UpdateUserRoleAssignmentsCommand request, CancellationToken cancellationToken)
@@ -75,5 +79,6 @@ public sealed class UpdateUserRolesHandler : IRequestHandler<UpdateUserRoleAssig
         }
 
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
+        await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync([]).ConfigureAwait(false);
     }
 }

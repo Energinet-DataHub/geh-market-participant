@@ -20,11 +20,14 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -50,6 +53,7 @@ public sealed class UpdateUserRoleIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -59,11 +63,16 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var existingUserRoleWithSameNameInOtherMarketRoleScope = TestPreparationEntities.ValidUserRole.Patch(e => e.Name = newName);
         existingUserRoleWithSameNameInOtherMarketRoleScope.EicFunctions.Clear();
-        existingUserRoleWithSameNameInOtherMarketRoleScope.EicFunctions.Add(new UserRoleEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier });
+        existingUserRoleWithSameNameInOtherMarketRoleScope.EicFunctions.Add(new UserRoleEicFunctionEntity
+        {
+            EicFunction = EicFunction.EnergySupplier,
+        });
 
         var updateCommand = new UpdateUserRoleCommand(
             userRole.Id,
-            new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
+            new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, [
+                (int)PermissionId.UsersView,
+            ]));
 
         var getUserRoleCommand = new GetUserRoleCommand(userRole.Id);
 
@@ -84,6 +93,7 @@ public sealed class UpdateUserRoleIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -95,7 +105,9 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var updateCommand = new UpdateUserRoleCommand(
             userRoleToUpdate.Id,
-            new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
+            new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, [
+                (int)PermissionId.UsersView,
+            ]));
 
         // Act + Assert
         await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(updateCommand));
@@ -110,6 +122,7 @@ public sealed class UpdateUserRoleIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -119,7 +132,9 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var updateCommand = new UpdateUserRoleCommand(
             userRole.Id,
-            new UpdateUserRoleDto("UpdateUserRoleDescription", newDescription, UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
+            new UpdateUserRoleDto("UpdateUserRoleDescription", newDescription, UserRoleStatus.Active, [
+                (int)PermissionId.UsersView,
+            ]));
 
         var getUserRoleCommand = new GetUserRoleCommand(userRole.Id);
 
@@ -140,6 +155,7 @@ public sealed class UpdateUserRoleIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -151,7 +167,9 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var updateCommand = new UpdateUserRoleCommand(
             userRole.Id,
-            new UpdateUserRoleDto("UpdateUserRoleStatus", string.Empty, newUserRoleStatus, new Collection<int> { (int)PermissionId.UsersView }));
+            new UpdateUserRoleDto("UpdateUserRoleStatus", string.Empty, newUserRoleStatus, [
+                (int)PermissionId.UsersView,
+            ]));
 
         var getUserRoleCommand = new GetUserRoleCommand(userRole.Id);
 
@@ -172,12 +190,17 @@ public sealed class UpdateUserRoleIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersView);
-        var newUserRolePermissions = new Collection<int> { (int)PermissionId.UsersView, (int)PermissionId.UsersManage };
+        var newUserRolePermissions = new Collection<int>
+        {
+            (int)PermissionId.UsersView,
+            (int)PermissionId.UsersManage,
+        };
 
         var updateCommand = new UpdateUserRoleCommand(
             userRole.Id,
@@ -203,6 +226,7 @@ public sealed class UpdateUserRoleIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -226,12 +250,17 @@ public sealed class UpdateUserRoleIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.Replace(ServiceDescriptor.Scoped(_ => new Mock<IRequiredPermissionForUserRoleRuleService>().Object));
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersView);
-        var newUserRolePermissions = new Collection<int> { (int)PermissionId.ActorsManage, (int)PermissionId.UsersView };
+        var newUserRolePermissions = new Collection<int>
+        {
+            (int)PermissionId.ActorsManage,
+            (int)PermissionId.UsersView,
+        };
 
         var updateCommand = new UpdateUserRoleCommand(
             userRole.Id,

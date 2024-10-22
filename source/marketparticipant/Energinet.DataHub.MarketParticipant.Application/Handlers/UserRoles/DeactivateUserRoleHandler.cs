@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
@@ -33,19 +34,22 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IAuditIdentityProvider _auditIdentityProvider;
+    private readonly IRequiredPermissionForUserRoleRuleService _requiredPermissionForUserRoleRuleService;
 
     public DeactivateUserRoleHandler(
         IUserRepository userRepository,
         IUserRoleAssignmentAuditLogRepository userRoleAssignmentAuditLogRepository,
         IUserRoleRepository userRoleRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
-        IAuditIdentityProvider auditIdentityProvider)
+        IAuditIdentityProvider auditIdentityProvider,
+        IRequiredPermissionForUserRoleRuleService requiredPermissionForUserRoleRuleService)
     {
         _userRepository = userRepository;
         _userRoleAssignmentAuditLogRepository = userRoleAssignmentAuditLogRepository;
         _userRoleRepository = userRoleRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _auditIdentityProvider = auditIdentityProvider;
+        _requiredPermissionForUserRoleRuleService = requiredPermissionForUserRoleRuleService;
     }
 
     public async Task Handle(DeactivateUserRoleCommand request, CancellationToken cancellationToken)
@@ -74,6 +78,8 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
 
             userRole.Status = UserRoleStatus.Inactive;
             await _userRoleRepository.UpdateAsync(userRole).ConfigureAwait(false);
+
+            await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync([]).ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
         }

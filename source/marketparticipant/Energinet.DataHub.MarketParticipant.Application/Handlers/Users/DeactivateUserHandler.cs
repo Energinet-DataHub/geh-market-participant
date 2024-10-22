@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Users;
@@ -36,6 +37,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
     private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
     private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IUserContext<FrontendUser> _userContext;
+    private readonly IRequiredPermissionForUserRoleRuleService _requiredPermissionForUserRoleRuleService;
 
     public DeactivateUserHandler(
         IUserRepository userRepository,
@@ -43,7 +45,8 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
         IUserStatusCalculator userStatusCalculator,
         IUserIdentityAuditLogRepository userIdentityAuditLogRepository,
         IAuditIdentityProvider auditIdentityProvider,
-        IUserContext<FrontendUser> userContext)
+        IUserContext<FrontendUser> userContext,
+        IRequiredPermissionForUserRoleRuleService requiredPermissionForUserRoleRuleService)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
@@ -51,6 +54,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
         _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
         _auditIdentityProvider = auditIdentityProvider;
         _userContext = userContext;
+        _requiredPermissionForUserRoleRuleService = requiredPermissionForUserRoleRuleService;
     }
 
     public async Task Handle(DeactivateUserCommand request, CancellationToken cancellationToken)
@@ -97,6 +101,8 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
                 UserStatus.Inactive.ToString(),
                 currentStatus.ToString())
             .ConfigureAwait(false);
+
+        await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync([user.Id]).ConfigureAwait(false);
     }
 
     private async Task RemoveUserFromCurrentActorAsync(User user)

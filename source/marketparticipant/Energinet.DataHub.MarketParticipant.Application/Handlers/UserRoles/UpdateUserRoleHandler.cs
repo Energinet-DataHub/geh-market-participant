@@ -32,15 +32,18 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
     private readonly IUniqueUserRoleNameRuleService _uniqueUserRoleNameRuleService;
     private readonly IAllowedPermissionsForUserRoleRuleService _allowedPermissionsForUserRoleRuleService;
     private readonly IUserRoleRepository _userRoleRepository;
+    private readonly IRequiredPermissionForUserRoleRuleService _requiredPermissionForUserRoleRuleService;
 
     public UpdateUserRoleHandler(
         IUniqueUserRoleNameRuleService uniqueUserRoleNameRuleService,
         IAllowedPermissionsForUserRoleRuleService allowedPermissionsForUserRoleRuleService,
-        IUserRoleRepository userRoleRepository)
+        IUserRoleRepository userRoleRepository,
+        IRequiredPermissionForUserRoleRuleService requiredPermissionForUserRoleRuleService)
     {
         _uniqueUserRoleNameRuleService = uniqueUserRoleNameRuleService;
         _allowedPermissionsForUserRoleRuleService = allowedPermissionsForUserRoleRuleService;
         _userRoleRepository = userRoleRepository;
+        _requiredPermissionForUserRoleRuleService = requiredPermissionForUserRoleRuleService;
     }
 
     public async Task Handle(UpdateUserRoleCommand request, CancellationToken cancellationToken)
@@ -69,5 +72,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         await _userRoleRepository
             .UpdateAsync(userRoleToUpdate)
             .ConfigureAwait(false);
+
+        await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync([]).ConfigureAwait(false);
     }
 }
