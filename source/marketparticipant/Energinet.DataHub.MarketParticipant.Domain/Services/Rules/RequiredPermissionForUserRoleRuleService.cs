@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -79,7 +80,10 @@ public sealed class RequiredPermissionForUserRoleRuleService : IRequiredPermissi
                 }
             }
 
-            throw new ValidationException($"This operation would've removed the permission '{permission}' from the last remaining user role with active users for the market role '{marketRole}', and hence was denied.");
+            throw new ValidationException($"This operation would've removed the permission '{permission}' from the last remaining user role with active users for the market role '{marketRole}', and hence was denied.")
+                .WithErrorCode("required_permission_removed")
+                .WithArgs(("permission", permission))
+                .WithArgs(("marketRole", marketRole));
         }
     }
 
