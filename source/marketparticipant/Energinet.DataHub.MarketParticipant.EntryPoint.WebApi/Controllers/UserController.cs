@@ -263,12 +263,12 @@ public class UserController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("{emailAddress}/exists")]
+    [HttpPost("{emailAddress}/check-domain")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    [EnableRevision(RevisionActivities.UserEmailLookup)]
-    public async Task<ActionResult<bool>> CheckEmailExistsAsync(string emailAddress)
+    [EnableRevision(RevisionActivities.UserDomainLookup)]
+    public async Task<ActionResult<bool>> CheckDomainExistsAsync(string emailAddress)
     {
-        var command = new CheckEmailExistsCommand(emailAddress);
+        var command = new CheckDomainExistsCommand(emailAddress);
 
         var result = await _mediator
             .Send(command)
