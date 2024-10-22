@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -236,5 +238,82 @@ public sealed class OrganizationRepositoryTests
 
         // Assert
         Assert.NotNull(organizations);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_OneOrganizationWithMultipleDomains_CanReadBack()
+    {
+        // Arrange
+        var domains = new OrganizationDomain[] { new MockedDomain(), new MockedDomain(), new MockedDomain() };
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var orgRepository = new OrganizationRepository(context);
+        var orgRepository2 = new OrganizationRepository(context2);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, domains);
+
+        // Act
+        var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
+        var newOrg = await orgRepository2.GetAsync(orgId.Value);
+
+        // Assert
+        Assert.NotNull(newOrg);
+        Assert.NotEqual(Guid.Empty, newOrg.Id.Value);
+        Assert.Equal(testOrg.Domains.Count(), domains.Length);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_OneOrganizationWitsDuplicateDomains_ReturnsError()
+    {
+        // Arrange
+        var domains = new OrganizationDomain[] { _validDomain, _validDomain };
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var orgRepository = new OrganizationRepository(context);
+        var orgRepository2 = new OrganizationRepository(context2);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, domains);
+
+        // Act
+        var organizationDomainError = await orgRepository.AddOrUpdateAsync(testOrg);
+
+        // Assert
+        Assert.NotNull(organizationDomainError.Error);
+        Assert.Equal(OrganizationError.DomainConflict, organizationDomainError.Error);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_OneOrganizationWithMultipleDomains_ToSingleDomain_CanReadBack()
+    {
+        // Arrange
+        var domains = new OrganizationDomain[] { new MockedDomain(), new MockedDomain(), new MockedDomain() };
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var orgRepository = new OrganizationRepository(context);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, domains);
+
+        // Act
+        var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
+        var newOrg = await orgRepository.GetAsync(orgId.Value);
+
+        newOrg = new Organization(
+            newOrg!.Id,
+            newOrg.Name,
+            newOrg.BusinessRegisterIdentifier,
+            newOrg.Address,
+            [_validDomain],
+            OrganizationStatus.New);
+
+        await orgRepository.AddOrUpdateAsync(newOrg);
+        newOrg = await orgRepository.GetAsync(orgId.Value);
+
+        // Assert
+        Assert.NotNull(newOrg);
+        Assert.NotEqual(Guid.Empty, newOrg.Id.Value);
+        Assert.Single(newOrg.Domains);
+        Assert.Equal(_validDomain.Value, newOrg.Domains.Single().Value);
     }
 }
