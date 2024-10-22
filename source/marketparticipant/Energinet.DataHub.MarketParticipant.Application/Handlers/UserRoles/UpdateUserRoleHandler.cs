@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -33,17 +34,20 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
     private readonly IAllowedPermissionsForUserRoleRuleService _allowedPermissionsForUserRoleRuleService;
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IRequiredPermissionForUserRoleRuleService _requiredPermissionForUserRoleRuleService;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
     public UpdateUserRoleHandler(
         IUniqueUserRoleNameRuleService uniqueUserRoleNameRuleService,
         IAllowedPermissionsForUserRoleRuleService allowedPermissionsForUserRoleRuleService,
         IUserRoleRepository userRoleRepository,
-        IRequiredPermissionForUserRoleRuleService requiredPermissionForUserRoleRuleService)
+        IRequiredPermissionForUserRoleRuleService requiredPermissionForUserRoleRuleService,
+        IUnitOfWorkProvider unitOfWorkProvider)
     {
         _uniqueUserRoleNameRuleService = uniqueUserRoleNameRuleService;
         _allowedPermissionsForUserRoleRuleService = allowedPermissionsForUserRoleRuleService;
         _userRoleRepository = userRoleRepository;
         _requiredPermissionForUserRoleRuleService = requiredPermissionForUserRoleRuleService;
+        _unitOfWorkProvider = unitOfWorkProvider;
     }
 
     public async Task Handle(UpdateUserRoleCommand request, CancellationToken cancellationToken)
@@ -69,10 +73,19 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
             .ValidateUserRoleNameAsync(userRoleToUpdate)
             .ConfigureAwait(false);
 
-        await _userRoleRepository
-            .UpdateAsync(userRoleToUpdate)
+        var uow = await _unitOfWorkProvider
+            .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
 
-        await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync().ConfigureAwait(false);
+        await using (uow.ConfigureAwait(false))
+        {
+            await _userRoleRepository
+                .UpdateAsync(userRoleToUpdate)
+                .ConfigureAwait(false);
+
+            await _requiredPermissionForUserRoleRuleService.ValidateExistsAsync().ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
+        }
     }
 }

@@ -71,7 +71,8 @@ public sealed class UpdateUserRolesCommandHandlerTests
         var target = new UpdateUserRolesHandler(
             userRepositoryMock.Object,
             userRoleRepositoryMock.Object,
-            new Mock<IRequiredPermissionForUserRoleRuleService>().Object);
+            new Mock<IRequiredPermissionForUserRoleRuleService>().Object,
+            UnitOfWorkProviderMock.Create());
 
         var updatedRoleAssignments = new List<Guid> { deactivatedUserRoleId.Value, Guid.NewGuid() };
 
@@ -124,7 +125,8 @@ public sealed class UpdateUserRolesCommandHandlerTests
         var target = new UpdateUserRolesHandler(
             userRepositoryMock.Object,
             userRoleRepositoryMock.Object,
-            new Mock<IRequiredPermissionForUserRoleRuleService>().Object);
+            new Mock<IRequiredPermissionForUserRoleRuleService>().Object,
+            UnitOfWorkProviderMock.Create());
 
         var updatedRoleAssignments = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
 
