@@ -41,7 +41,7 @@ public static class RevisionActivities
 
     public const string UserInvited = "UserInvited";
     public const string UserReInvited = "UserReInvited";
-    public const string UserEmailLookup = "UserEmailLookup";
+    public const string UserDomainLookup = "UserDomainLookup";
 
     public const string UserRetrieved = "UserRetrieved";
     public const string UsersRetrieved = "UsersRetrieved";
