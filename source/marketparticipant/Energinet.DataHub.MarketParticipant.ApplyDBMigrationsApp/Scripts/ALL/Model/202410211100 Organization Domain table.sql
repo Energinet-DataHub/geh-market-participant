@@ -26,6 +26,11 @@ ALTER TABLE [dbo].[OrganizationDomain]
     SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.[OrganizationDomainHistory]))
 GO
 
+INSERT INTO [dbo].[OrganizationDomain](Id, OrganizationId, Domain, Version, ChangedByIdentityId)
+SELECT NEWID(), Id, Domain, Version, ChangedByIdentityId
+FROM [dbo].[Organization]
+GO
+
 ALTER TABLE [dbo].[Organization]
 DROP CONSTRAINT [UQ_Organization_Domain]
 GO
