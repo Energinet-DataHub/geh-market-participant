@@ -33,5 +33,8 @@ public sealed class OrganizationEntityConfiguration : AuditedEntityTypeConfigura
         builder.Property(organization => organization.Number).HasColumnName("Address_Number");
         builder.Property(organization => organization.ZipCode).HasColumnName("Address_ZipCode");
         builder.Property(organization => organization.Country).HasColumnName("Address_Country");
+        builder.HasMany(organization => organization.Domains)
+            .WithOne()
+            .HasForeignKey(domain => domain.OrganizationId);
     }
 }

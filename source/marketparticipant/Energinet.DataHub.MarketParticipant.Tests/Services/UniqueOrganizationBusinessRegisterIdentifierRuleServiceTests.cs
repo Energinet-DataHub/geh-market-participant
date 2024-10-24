@@ -34,7 +34,7 @@ public sealed class UniqueOrganizationBusinessRegisterIdentifierRuleServiceTests
             "org1Name",
             new BusinessRegisterIdentifier("same_value"),
             new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
-            new OrganizationDomain("energinet.dk"),
+            [new OrganizationDomain("energinet.dk")],
             OrganizationStatus.Active);
 
         var anotherOrganizationToUpdateWithSameIdentifier = new Organization(
@@ -42,7 +42,7 @@ public sealed class UniqueOrganizationBusinessRegisterIdentifierRuleServiceTests
             "org2Name",
             new BusinessRegisterIdentifier("same_value"),
             new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
-            new OrganizationDomain("energinet.dk"),
+            [new OrganizationDomain("energinet.dk")],
             OrganizationStatus.Active);
 
         var repository = new Mock<IOrganizationRepository>();
@@ -64,7 +64,7 @@ public sealed class UniqueOrganizationBusinessRegisterIdentifierRuleServiceTests
             "org1Name",
             new BusinessRegisterIdentifier("fake_value"),
             new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
-            new OrganizationDomain("energinet.dk"),
+            [new OrganizationDomain("energinet.dk")],
             OrganizationStatus.Active);
 
         var repository = new Mock<IOrganizationRepository>();
@@ -75,7 +75,7 @@ public sealed class UniqueOrganizationBusinessRegisterIdentifierRuleServiceTests
             "org1Name",
             new BusinessRegisterIdentifier("unique"),
             new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
-            new OrganizationDomain("energinet.dk"),
+            [new OrganizationDomain("energinet.dk")],
             OrganizationStatus.Active);
 
         var target = new UniqueOrganizationBusinessRegisterIdentifierRuleService(repository.Object);

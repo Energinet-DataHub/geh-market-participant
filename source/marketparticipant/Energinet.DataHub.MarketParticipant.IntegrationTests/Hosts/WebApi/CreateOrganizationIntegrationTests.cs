@@ -49,7 +49,7 @@ public sealed class CreateOrganizationIntegrationTests
             blankValue,
             blankValue,
             new AddressDto(null, null, null, null, "DK"),
-            new MockedDomain());
+            [new MockedDomain()]);
 
         var command = new CreateOrganizationCommand(organizationDto);
 

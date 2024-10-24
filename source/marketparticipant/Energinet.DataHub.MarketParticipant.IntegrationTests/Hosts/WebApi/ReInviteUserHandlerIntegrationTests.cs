@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -53,7 +54,7 @@ public sealed class ReInviteUserHandlerIntegrationTests : IAsyncLifetime
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var actor = await _databaseFixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization.Patch(t => t.Domain = "a.datahub.dk"),
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "a.datahub.dk" })),
             TestPreparationEntities.ValidActor,
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator));
 

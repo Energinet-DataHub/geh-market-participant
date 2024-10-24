@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
@@ -25,7 +26,16 @@ internal static class OrganizationMapper
         to.Name = from.Name;
         to.BusinessRegisterIdentifier = from.BusinessRegisterIdentifier.Identifier;
         to.Status = (int)from.Status;
-        to.Domain = from.Domain.Value;
+
+        to.Domains.Clear();
+        foreach (var domain in from.Domains)
+        {
+            to.Domains.Add(new OrganizationDomainEntity
+            {
+                Domain = domain.Value
+            });
+        }
+
         MapAddressToEntity(from.Address, to);
     }
 
@@ -36,7 +46,7 @@ internal static class OrganizationMapper
             from.Name,
             new BusinessRegisterIdentifier(from.BusinessRegisterIdentifier),
             MapAddress(from),
-            new OrganizationDomain(from.Domain),
+            from.Domains.Select(d => new OrganizationDomain(d.Domain)),
             (OrganizationStatus)from.Status);
     }
 

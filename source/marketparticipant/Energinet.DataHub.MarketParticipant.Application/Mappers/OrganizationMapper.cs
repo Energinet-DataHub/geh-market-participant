@@ -29,7 +29,7 @@ public static class OrganizationMapper
             organization.Id.Value,
             organization.Name,
             organization.BusinessRegisterIdentifier.Identifier,
-            organization.Domain.Value,
+            organization.Domains.Select(d => d.Value),
             organization.Status.ToString(),
             Map(organization.Address));
     }

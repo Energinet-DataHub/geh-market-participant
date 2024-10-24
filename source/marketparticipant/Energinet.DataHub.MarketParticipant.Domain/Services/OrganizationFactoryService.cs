@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -39,13 +40,13 @@ public sealed class OrganizationFactoryService : IOrganizationFactoryService
         string name,
         BusinessRegisterIdentifier businessRegisterIdentifier,
         Address address,
-        OrganizationDomain domain)
+        IEnumerable<OrganizationDomain> domains)
     {
         ArgumentNullException.ThrowIfNull(name, nameof(name));
         ArgumentNullException.ThrowIfNull(businessRegisterIdentifier, nameof(businessRegisterIdentifier));
         ArgumentNullException.ThrowIfNull(address, nameof(address));
 
-        var newOrganization = new Organization(name, businessRegisterIdentifier, address, domain);
+        var newOrganization = new Organization(name, businessRegisterIdentifier, address, domains);
         newOrganization.Activate();
 
         await _uniqueOrganizationBusinessRegisterIdentifierRuleService

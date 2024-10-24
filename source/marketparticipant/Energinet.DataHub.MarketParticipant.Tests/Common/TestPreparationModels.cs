@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -30,7 +31,7 @@ internal static class TestPreparationModels
         "Animal Power Company",
         MockedBusinessRegisterIdentifier.New(),
         new Address("Vej Allé", "7", "7100", "Vejle", "DK"),
-        new MockedDomain(),
+        [new MockedDomain()],
         OrganizationStatus.Active);
 
     public static Actor MockedActor() => MockedActor(Guid.NewGuid(), Guid.NewGuid());

@@ -13,24 +13,15 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class OrganizationEntity : IAuditedEntity
+public sealed class OrganizationDomainEntity : IAuditedEntity
 {
     public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
-    public string BusinessRegisterIdentifier { get; set; } = null!;
-    public int Status { get; set; }
-    public string? StreetName { get; set; }
-    public string? ZipCode { get; set; }
-    public string? City { get; set; }
-    public string Country { get; set; } = null!;
-    public string? Number { get; set; }
-
-    public Collection<OrganizationDomainEntity> Domains { get; } = new();
+    public Guid OrganizationId { get; set; }
+    public string Domain { get; set; } = null!;
 
     public int Version { get; set; }
     public Guid ChangedByIdentityId { get; set; }

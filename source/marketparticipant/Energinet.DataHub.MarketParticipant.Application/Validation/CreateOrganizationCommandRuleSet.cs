@@ -71,7 +71,7 @@ public sealed class CreateOrganizationCommandRuleSet : AbstractValidator<CreateO
                     });
 
                 validator
-                    .RuleFor(organization => organization.Domain)
+                    .RuleFor(organization => organization.Domains)
                     .Must(OrganizationDomain.IsValid)
                     .WithErrorCode("invalid_domain");
             });

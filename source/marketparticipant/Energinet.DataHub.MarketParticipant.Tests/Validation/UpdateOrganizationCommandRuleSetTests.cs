@@ -38,7 +38,7 @@ public sealed class UpdateOrganizationCommandRuleSetTests
         var organizationDto = new ChangeOrganizationDto(
             ValidName,
             "Active",
-            "testDomain.dk");
+            ["testDomain.dk"]);
 
         var target = new UpdateOrganizationCommandRuleSet();
         var command = new UpdateOrganizationCommand(Guid.Empty, organizationDto);
@@ -83,7 +83,7 @@ public sealed class UpdateOrganizationCommandRuleSetTests
         var organizationDto = new ChangeOrganizationDto(
             value!,
             "Active",
-            "testDomain.dk");
+            ["testDomain.dk"]);
 
         var target = new UpdateOrganizationCommandRuleSet();
         var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -121,7 +121,7 @@ public sealed class UpdateOrganizationCommandRuleSetTests
         var organizationDto = new ChangeOrganizationDto(
             "fake_value",
             status!,
-            "testDomain.dk");
+            ["testDomain.dk"]);
 
         var target = new UpdateOrganizationCommandRuleSet();
         var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -151,12 +151,12 @@ public sealed class UpdateOrganizationCommandRuleSetTests
     {
         // Arrange
         var propertyName =
-            $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Domain)}";
+            $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Domains)}";
 
         var organizationDto = new ChangeOrganizationDto(
             ValidName,
             "Active",
-            value!);
+            [value!]);
 
         var target = new UpdateOrganizationCommandRuleSet();
         var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
