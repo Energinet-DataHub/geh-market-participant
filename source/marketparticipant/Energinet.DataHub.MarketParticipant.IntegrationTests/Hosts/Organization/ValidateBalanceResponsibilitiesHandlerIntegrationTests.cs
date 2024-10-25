@@ -35,7 +35,7 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.Organization;
 
-[Collection(nameof(IntegrationTestCollectionFixture))]
+[Collection(nameof(ValidateBalanceResponsibilitiesTestCollectionFixture))]
 [IntegrationTest]
 public sealed class ValidateBalanceResponsibilitiesHandlerIntegrationTests : IAsyncLifetime
 {
