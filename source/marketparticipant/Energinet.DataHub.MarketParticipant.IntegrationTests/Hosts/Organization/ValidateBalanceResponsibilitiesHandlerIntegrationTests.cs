@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture;
 using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 using Energinet.DataHub.MarketParticipant.Application.Contracts;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
@@ -24,6 +26,7 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Google.Protobuf.WellKnownTypes;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
@@ -34,13 +37,37 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.Organizatio
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class ValidateBalanceResponsibilitiesHandlerIntegrationTests
+public sealed class ValidateBalanceResponsibilitiesHandlerIntegrationTests : IAsyncLifetime
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
     public ValidateBalanceResponsibilitiesHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
+    }
+
+    public Task InitializeAsync()
+    {
+        return _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActiveActor,
+            TestPreparationEntities.ValidMarketRole.Patch(mr => mr.Function = EicFunction.DataHubAdministrator));
+    }
+
+    public async Task DisposeAsync()
+    {
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var cleanup = await context.Actors
+            .Include(a => a.MarketRoles)
+            .Where(a => a.MarketRoles.Any(mr => mr.Function == EicFunction.DataHubAdministrator))
+            .ToListAsync();
+
+        foreach (var entity in cleanup)
+        {
+            context.Actors.Remove(entity);
+        }
+
+        await context.SaveChangesAsync();
     }
 
     [Fact]

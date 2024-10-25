@@ -99,7 +99,7 @@ public sealed class IntegrationEventProviderIntegrationTests
 
     private static async Task PrepareBalanceResponsibilityValidationFailedEventAsync(IServiceProvider scope)
     {
-        var notification = new BalanceResponsibilityValidationFailed(new MockedGln(), true);
+        var notification = new BalanceResponsibilityValidationFailed(new ActorId(Guid.NewGuid()), new MockedGln(), true);
 
         var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
         await domainEventRepository.EnqueueAsync(notification);
