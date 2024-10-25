@@ -14,4 +14,12 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-public abstract class NotificationEvent : DomainEvent;
+public abstract class NotificationEvent : DomainEvent
+{
+    protected NotificationEvent(ActorId sender)
+    {
+        Sender = sender;
+    }
+
+    public ActorId Sender { get; }
+}

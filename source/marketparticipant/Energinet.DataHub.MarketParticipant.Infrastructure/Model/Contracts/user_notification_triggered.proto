@@ -30,31 +30,36 @@ message UserNotificationTriggered {
    */
   string reason_identifier = 1;
 
+  /*
+   * The unique identifier of the actor whose users will receive the notification.
+   */
+  string target_actor_id = 2;
+
   oneof target {
 
       /*
        * The unique identifier of the user that should receive the notification.
        */
-      string target_user_id = 2;
+      string target_user_id = 3;
 
       /*
        * The unique identifier of the group of users having the specified permission that should receive the notification.
        */
-      string target_permissions = 3;
+      string target_permissions = 4;
   }
 
   /*
    * A reason-specific id of an entity that the notification targets.
    */
-  string related_id = 4;
+  string related_id = 5;
 
   /*
    * A timestamp for when the notification was generated.
    */
-  google.protobuf.Timestamp occurred_at = 5;
+  google.protobuf.Timestamp occurred_at = 6;
     
   /*
    * A timestamp for when the notification expires by itself.
    */
-  google.protobuf.Timestamp expires_at = 6;
+  google.protobuf.Timestamp expires_at = 7;
 }
