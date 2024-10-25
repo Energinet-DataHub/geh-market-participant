@@ -50,9 +50,17 @@ public sealed class ValidateBalanceResponsibilitiesHandler : IRequestHandler<Val
 
     public async Task Handle(ValidateBalanceResponsibilitiesCommand request, CancellationToken cancellationToken)
     {
-        var allActors = await _actorRepository
+        var allActors = (await _actorRepository
             .GetActorsAsync()
-            .ConfigureAwait(false);
+            .ConfigureAwait(false))
+            .ToList();
+
+        var notificationTargets = allActors
+            .Where(actor =>
+                actor.Status == ActorStatus.Active &&
+                actor.MarketRoles.Any(mr => mr.Function == EicFunction.DataHubAdministrator))
+            .Select(actor => actor.Id)
+            .ToList();
 
         foreach (var actor in allActors)
         {
@@ -74,10 +82,7 @@ public sealed class ValidateBalanceResponsibilitiesHandler : IRequestHandler<Val
             {
                 // Reading the balance responsibility requests triggers validation of several rules.
                 // If the rules are violated, a notification is always sent.
-                await _domainEventRepository
-                    .EnqueueAsync(new BalanceResponsibilityValidationFailed(actor.ActorNumber, false))
-                    .ConfigureAwait(false);
-
+                await NotifyAsync(notificationTargets, actor.ActorNumber, false).ConfigureAwait(false);
                 continue;
             }
 
@@ -87,9 +92,7 @@ public sealed class ValidateBalanceResponsibilitiesHandler : IRequestHandler<Val
 
             if (ShouldNotify(relations))
             {
-                await _domainEventRepository
-                    .EnqueueAsync(new BalanceResponsibilityValidationFailed(actor.ActorNumber, false))
-                    .ConfigureAwait(false);
+                await NotifyAsync(notificationTargets, actor.ActorNumber, false).ConfigureAwait(false);
             }
         }
 
@@ -99,9 +102,7 @@ public sealed class ValidateBalanceResponsibilitiesHandler : IRequestHandler<Val
 
         foreach (var actorNumber in unrecognizedActors)
         {
-            await _domainEventRepository
-                .EnqueueAsync(new BalanceResponsibilityValidationFailed(actorNumber, true))
-                .ConfigureAwait(false);
+            await NotifyAsync(notificationTargets, actorNumber, true).ConfigureAwait(false);
         }
     }
 
@@ -155,5 +156,15 @@ public sealed class ValidateBalanceResponsibilitiesHandler : IRequestHandler<Val
         }
 
         return false;
+    }
+
+    private async Task NotifyAsync(IEnumerable<ActorId> targets, ActorNumber affectedActor, bool isActorUnrecognized)
+    {
+        foreach (var target in targets)
+        {
+            await _domainEventRepository
+                .EnqueueAsync(new BalanceResponsibilityValidationFailed(target, affectedActor, isActorUnrecognized))
+                .ConfigureAwait(false);
+        }
     }
 }
