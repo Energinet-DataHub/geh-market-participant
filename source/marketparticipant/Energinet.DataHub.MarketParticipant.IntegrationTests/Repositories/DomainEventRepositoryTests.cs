@@ -151,7 +151,7 @@ public sealed class DomainEventRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
         var target = scope.ServiceProvider.GetRequiredService<IDomainEventRepository>();
-        var notification = new BalanceResponsibilityValidationFailed(new MockedGln(), true);
+        var notification = new BalanceResponsibilityValidationFailed(new ActorId(Guid.NewGuid()), new MockedGln(), true);
 
         // Act
         await target.EnqueueAsync(notification);
