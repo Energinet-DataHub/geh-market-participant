@@ -21,7 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public sealed class OrganizationDomain
+public sealed record OrganizationDomain
 {
     public OrganizationDomain(string value)
     {
@@ -37,12 +37,7 @@ public sealed class OrganizationDomain
 
     public string Value { get; }
 
-    public static bool IsValid(IEnumerable<string> values)
-    {
-        return values.All(IsValid);
-    }
-
-    private static bool IsValid(string value)
+    public static bool IsValid(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
