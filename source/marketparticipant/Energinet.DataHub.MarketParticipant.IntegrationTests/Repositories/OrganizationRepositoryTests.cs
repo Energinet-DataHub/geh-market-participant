@@ -264,7 +264,7 @@ public sealed class OrganizationRepositoryTests
     }
 
     [Fact]
-    public async Task AddOrUpdateAsync_OneOrganizationWitsDuplicateDomains_ReturnsError()
+    public async Task AddOrUpdateAsync_OneOrganizationWithDuplicateDomains_ReturnsError()
     {
         // Arrange
         var domains = new OrganizationDomain[] { _validDomain, _validDomain };
