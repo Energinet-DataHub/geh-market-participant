@@ -32,19 +32,34 @@ public sealed class OrganizationAuditLogRepository : IOrganizationAuditLogReposi
 
     public async Task<IEnumerable<AuditLog<OrganizationAuditedChange>>> GetAsync(OrganizationId organization)
     {
-        var organizationDomainDataSource = new HistoryTableDataSource<OrganizationDomainEntity>(_context.OrganizationDomains, entity => entity.OrganizationId == organization.Value);
+        var organizationAuditLogs = await GetOrganizationAuditsAsync(organization)
+            .ConfigureAwait(false);
 
-        var organizationDomainChanges = (await new AuditLogBuilder<OrganizationAuditedChange, OrganizationDomainEntity>(organizationDomainDataSource)
-            .Add(OrganizationAuditedChange.Domain, entity => string.Join(";", entity.Domain), AuditedChangeCompareAt.Creation)
-            .BuildAsync().ConfigureAwait(false))
-            .ToList();
+        var organizationDomainAuditLogs = await GetOrganizationDomainAuditsAsync(organization)
+            .ConfigureAwait(false);
 
+        return organizationAuditLogs.Concat(organizationDomainAuditLogs);
+    }
+
+    private Task<IEnumerable<AuditLog<OrganizationAuditedChange>>> GetOrganizationAuditsAsync(OrganizationId organization)
+    {
         var organizationDataSource = new HistoryTableDataSource<OrganizationEntity>(_context.Organizations, entity => entity.Id == organization.Value);
 
-        var organizationNameChanges = await new AuditLogBuilder<OrganizationAuditedChange, OrganizationEntity>(organizationDataSource)
+        var organizationNameChanges = new AuditLogBuilder<OrganizationAuditedChange, OrganizationEntity>(organizationDataSource)
             .Add(OrganizationAuditedChange.Name, entity => entity.Name, AuditedChangeCompareAt.Creation)
-            .BuildAsync().ConfigureAwait(false);
+            .BuildAsync();
 
-        return organizationNameChanges.Concat(organizationDomainChanges);
+        return organizationNameChanges;
+    }
+
+    private Task<IEnumerable<AuditLog<OrganizationAuditedChange>>> GetOrganizationDomainAuditsAsync(OrganizationId organization)
+    {
+        var organizationDomainDataSource = new HistoryTableDataSource<OrganizationDomainEntity>(_context.OrganizationDomains, entity => entity.OrganizationId == organization.Value);
+
+        var organizationDomainChanges = new AuditLogBuilder<OrganizationAuditedChange, OrganizationDomainEntity>(organizationDomainDataSource)
+            .Add(OrganizationAuditedChange.Domain, entity => entity.Domain, AuditedChangeCompareAt.BothCreationAndDeletion)
+            .BuildAsync();
+
+        return organizationDomainChanges;
     }
 }

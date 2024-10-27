@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class OrganizationDomainEntity : IAuditedEntity
+public sealed class OrganizationDomainEntity : IDeletableAuditedEntity
 {
     public Guid Id { get; set; }
     public Guid OrganizationId { get; set; }
@@ -25,4 +25,5 @@ public sealed class OrganizationDomainEntity : IAuditedEntity
 
     public int Version { get; set; }
     public Guid ChangedByIdentityId { get; set; }
+    public Guid? DeletedByIdentityId { get; set; }
 }
