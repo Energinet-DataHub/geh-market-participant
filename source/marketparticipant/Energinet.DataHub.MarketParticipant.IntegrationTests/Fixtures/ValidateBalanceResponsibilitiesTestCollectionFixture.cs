@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
+using Xunit;
 
-public abstract class NotificationEvent : DomainEvent
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+
+[CollectionDefinition(nameof(ValidateBalanceResponsibilitiesTestCollectionFixture))]
+public sealed class ValidateBalanceResponsibilitiesTestCollectionFixture :
+    ICollectionFixture<MarketParticipantDatabaseFixture>
 {
-    protected NotificationEvent(ActorId sender)
-    {
-        Sender = sender;
-    }
-
-    public ActorId Sender { get; }
+    // This class has no code, and is never created. Its purpose is simply
+    // to be the place to apply [CollectionDefinition] and all the
+    // ICollectionFixture<> interfaces.
 }

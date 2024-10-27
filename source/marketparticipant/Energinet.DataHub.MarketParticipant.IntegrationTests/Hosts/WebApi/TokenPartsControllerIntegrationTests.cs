@@ -142,7 +142,7 @@ public sealed class TokenPartsControllerIntegrationTests :
 
         // Assert
         var organizationViewClaim = KnownPermissions.All.Single(kp => kp.Id == usersView).Claim;
-        Assert.NotEmpty(internalToken.Claims.Where(c => c.Type == "role" && c.Value == organizationViewClaim));
+        Assert.Contains(internalToken.Claims, c => c.Type == "role" && c.Value == organizationViewClaim);
     }
 
     [Fact]

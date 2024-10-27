@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -69,7 +70,9 @@ public sealed class UpdateUserRolesCommandHandlerTests
 
         var target = new UpdateUserRolesHandler(
             userRepositoryMock.Object,
-            userRoleRepositoryMock.Object);
+            userRoleRepositoryMock.Object,
+            new Mock<IRequiredPermissionForUserRoleRuleService>().Object,
+            UnitOfWorkProviderMock.Create());
 
         var updatedRoleAssignments = new List<Guid> { deactivatedUserRoleId.Value, Guid.NewGuid() };
 
@@ -121,7 +124,9 @@ public sealed class UpdateUserRolesCommandHandlerTests
 
         var target = new UpdateUserRolesHandler(
             userRepositoryMock.Object,
-            userRoleRepositoryMock.Object);
+            userRoleRepositoryMock.Object,
+            new Mock<IRequiredPermissionForUserRoleRuleService>().Object,
+            UnitOfWorkProviderMock.Create());
 
         var updatedRoleAssignments = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
 
