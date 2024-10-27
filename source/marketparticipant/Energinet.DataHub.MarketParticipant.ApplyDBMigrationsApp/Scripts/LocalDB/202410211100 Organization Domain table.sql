@@ -19,17 +19,49 @@ ALTER TABLE [dbo].[OrganizationDomain] ADD
     
     Version             int              NOT NULL DEFAULT 0,
     ChangedByIdentityId uniqueidentifier NOT NULL
-    CONSTRAINT DF_ChangedByIdentityId DEFAULT('00000000-FFFF-FFFF-FFFF-000000000000');
+    CONSTRAINT DF_ChangedByIdentityId DEFAULT('00000000-FFFF-FFFF-FFFF-000000000000'),
+    DeletedByIdentityId uniqueidentifier NULL
 GO
 
 ALTER TABLE [dbo].[OrganizationDomain]
     SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.[OrganizationDomainHistory]))
 GO
 
+ALTER TABLE [dbo].[OrganizationDomain]
+DROP CONSTRAINT DF_ChangedByIdentityId
+GO
+
+ALTER TABLE [dbo].[OrganizationDomain]
+    ADD CONSTRAINT CHK_OrganizationDomain_ChangedByIdentityId_NotEmpty CHECK (ChangedByIdentityId <> '00000000-0000-0000-0000-000000000000'),
+        CONSTRAINT CHK_OrganizationDomain_DeletedByIdentityId_NotEmpty CHECK (DeletedByIdentityId <> '00000000-0000-0000-0000-000000000000');
+GO
+
 INSERT INTO [dbo].[OrganizationDomain](Id, OrganizationId, Domain, Version, ChangedByIdentityId)
 SELECT NEWID(), Id, Domain, Version, ChangedByIdentityId
 FROM [dbo].[Organization]
 GO
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; 
+BEGIN TRANSACTION;
+
+ALTER TABLE [OrganizationDomain] SET (SYSTEM_VERSIONING = OFF);
+GO
+
+INSERT INTO dbo.[OrganizationDomainHistory] (Id, OrganizationId, Domain,PeriodStart, PeriodEnd,Version, ChangedByIdentityId, DeletedByIdentityId)
+SELECT NEWID(), Id, Domain, PeriodStart, PeriodEnd, Version, ChangedByIdentityId, null
+FROM OrganizationHistory oh1
+WHERE EXISTS
+	(SELECT * 
+	FROM OrganizationHistory oh2
+	WHERE oh2.Domain != oh1.Domain
+	AND oh2.Id = oh1.Id)
+ORDER BY id, PeriodStart;
+GO
+
+ALTER TABLE [OrganizationDomain] SET (SYSTEM_VERSIONING = ON (  HISTORY_TABLE = dbo.[OrganizationDomainHistory], DATA_CONSISTENCY_CHECK = ON));
+GO
+
+COMMIT TRANSACTION;
 
 ALTER TABLE [dbo].[Organization]
 DROP CONSTRAINT [UQ_Organization_Domain]
