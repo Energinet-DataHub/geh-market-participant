@@ -49,6 +49,7 @@ public sealed class OrganizationRepository : IOrganizationRepository
         {
             destination = await _marketParticipantDbContext
                 .Organizations
+                .Include(o => o.Domains)
                 .FirstAsync(x => x.Id == organization.Id.Value)
                 .ConfigureAwait(false);
         }

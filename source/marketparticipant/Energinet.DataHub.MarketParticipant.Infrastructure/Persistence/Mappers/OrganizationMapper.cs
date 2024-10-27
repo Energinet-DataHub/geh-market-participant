@@ -27,9 +27,19 @@ internal static class OrganizationMapper
         to.BusinessRegisterIdentifier = from.BusinessRegisterIdentifier.Identifier;
         to.Status = (int)from.Status;
 
-        to.Domains.Clear();
+        var domainsToDelete = to.Domains.Where(d => !from.Domains.Any(d2 => d2.Value == d.Domain)).ToList();
+        foreach (var domain in domainsToDelete)
+        {
+            to.Domains.Remove(domain);
+        }
+
         foreach (var domain in from.Domains)
         {
+            if (to.Domains.Any(d => d.Domain == domain.Value))
+            {
+                continue;
+            }
+
             to.Domains.Add(new OrganizationDomainEntity
             {
                 Domain = domain.Value

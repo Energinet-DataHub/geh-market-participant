@@ -18,14 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-/// <summary>
-/// Repository for querying organization audit logs.
-/// </summary>
 public interface IOrganizationAuditLogRepository
 {
-    /// <summary>
-    /// Retrieves all log entries for a given organization.
-    /// </summary>
-    /// <param name="organization">The organization to get the logs for.</param>
     Task<IEnumerable<AuditLog<OrganizationAuditedChange>>> GetAsync(OrganizationId organization);
 }
