@@ -264,7 +264,7 @@ public sealed class OrganizationRepositoryTests
     }
 
     [Fact]
-    public async Task AddOrUpdateAsync_OneOrganizationWithDuplicateDomains_ReturnsError()
+    public async Task AddOrUpdateAsync_OneOrganizationWithDuplicateDomains_OnlyOneDomainIsSaved_CanReadBack()
     {
         // Arrange
         var domains = new OrganizationDomain[] { _validDomain, _validDomain };
@@ -277,11 +277,35 @@ public sealed class OrganizationRepositoryTests
         var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, domains);
 
         // Act
-        var organizationDomainError = await orgRepository.AddOrUpdateAsync(testOrg);
+        var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
+        var newOrg = await orgRepository2.GetAsync(orgId.Value);
 
         // Assert
-        Assert.NotNull(organizationDomainError.Error);
-        Assert.Equal(OrganizationError.DomainConflict, organizationDomainError.Error);
+        Assert.NotNull(newOrg);
+        Assert.NotEqual(Guid.Empty, newOrg.Id.Value);
+        Assert.Equal(testOrg.Domains.Count(), domains.Length);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_TwoOrganizationsWithSameDomain_ReturnsError()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var orgRepository = new OrganizationRepository(context);
+        var orgRepository2 = new OrganizationRepository(context2);
+        var testOrg1 = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
+        var testOrg2 = new Organization("Test2", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
+
+        // Act
+        var orgId1 = await orgRepository.AddOrUpdateAsync(testOrg1);
+        var orgId2Error = await orgRepository.AddOrUpdateAsync(testOrg2);
+
+        // Assert
+        Assert.NotNull(orgId2Error.Error);
+        Assert.Equal(OrganizationError.DomainConflict, orgId2Error.Error);
     }
 
     [Fact]

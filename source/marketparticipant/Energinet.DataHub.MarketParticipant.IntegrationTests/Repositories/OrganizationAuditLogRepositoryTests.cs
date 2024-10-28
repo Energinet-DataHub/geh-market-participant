@@ -143,8 +143,8 @@ public sealed class OrganizationAuditLogRepositoryTests
         // Assert
         var organizationDomainAuditLogs = actual.Where(log => log.Change == OrganizationAuditedChange.Domain).ToList();
         Assert.NotEmpty(organizationDomainAuditLogs);
-        Assert.Single(organizationDomainAuditLogs.Where(log => log.CurrentValue == "www.raccoons.dk" && log.PreviousValue == orgValue));
-        Assert.Single(organizationDomainAuditLogs.Where(log => log.CurrentValue == orgValue && string.IsNullOrEmpty(log.PreviousValue)));
+        Assert.Single(organizationDomainAuditLogs, log => log.CurrentValue == "www.raccoons.dk" && log.PreviousValue == orgValue);
+        Assert.Single(organizationDomainAuditLogs, log => log.CurrentValue == orgValue && string.IsNullOrEmpty(log.PreviousValue));
     }
 
     [Fact]
@@ -168,7 +168,7 @@ public sealed class OrganizationAuditLogRepositoryTests
         var orgId = await organizationRepository.AddOrUpdateAsync(testOrg);
         var organization = await organizationRepository.GetAsync(orgId.Value);
         string orgValue = organization!.Domains.Single().Value;
-        organization.Domains = [new OrganizationDomain("www.raccoons.dk"), new OrganizationDomain("www.raccoons.com")];
+        organization.Domains = [new OrganizationDomain("raccoons.dk"), new OrganizationDomain("raccoons.com")];
 
         await organizationRepository.AddOrUpdateAsync(organization);
 
@@ -178,8 +178,8 @@ public sealed class OrganizationAuditLogRepositoryTests
         // Assert
         var organizationDomainAuditLogs = actual.Where(log => log.Change == OrganizationAuditedChange.Domain).ToList();
         Assert.NotEmpty(organizationDomainAuditLogs);
-        Assert.Single(organizationDomainAuditLogs.Where(log => log.CurrentValue == "www.raccoons.dk" && !string.IsNullOrEmpty(log.PreviousValue)));
-        Assert.Single(organizationDomainAuditLogs.Where(log => log.CurrentValue == "www.raccoons.com" && !string.IsNullOrEmpty(log.PreviousValue)));
+        Assert.Single(organizationDomainAuditLogs, log => log.CurrentValue == "raccoons.dk" && !string.IsNullOrEmpty(log.PreviousValue));
+        Assert.Single(organizationDomainAuditLogs, log => log.CurrentValue == "raccoons.com" && !string.IsNullOrEmpty(log.PreviousValue));
     }
 
     [Fact]
@@ -212,6 +212,6 @@ public sealed class OrganizationAuditLogRepositoryTests
         // Assert
         var organizationDomainAuditLogs = actual.Where(log => log.Change == OrganizationAuditedChange.Domain).ToList();
         Assert.NotEmpty(organizationDomainAuditLogs);
-        Assert.Single(organizationDomainAuditLogs.Where(log => log.CurrentValue == _validDomain.Value && !string.IsNullOrEmpty(log.PreviousValue)));
+        Assert.Single(organizationDomainAuditLogs, log => log.CurrentValue == _validDomain.Value && !string.IsNullOrEmpty(log.PreviousValue));
     }
 }
