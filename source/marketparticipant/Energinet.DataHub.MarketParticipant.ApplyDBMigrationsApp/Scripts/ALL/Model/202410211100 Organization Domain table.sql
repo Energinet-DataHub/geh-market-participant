@@ -37,7 +37,7 @@ ALTER TABLE [dbo].[OrganizationDomain]
 GO
 
 INSERT INTO [dbo].[OrganizationDomain](Id, OrganizationId, Domain, Version, ChangedByIdentityId)
-SELECT NEWID(), Id, Domain, Version, ChangedByIdentityId
+SELECT NEWID(), Id, Domain, 1, ChangedByIdentityId
 FROM [dbo].[Organization]
 GO
 
@@ -48,7 +48,7 @@ ALTER TABLE [OrganizationDomain] SET (SYSTEM_VERSIONING = OFF);
 GO
 
 INSERT INTO dbo.[OrganizationDomainHistory] (Id, OrganizationId, Domain,PeriodStart, PeriodEnd,Version, ChangedByIdentityId, DeletedByIdentityId)
-SELECT NEWID(), Id, Domain, PeriodStart, PeriodEnd, Version, ChangedByIdentityId, null
+SELECT NEWID(), Id, Domain, PeriodStart, PeriodEnd, 1, ChangedByIdentityId, null
 FROM OrganizationHistory oh1
 WHERE EXISTS
 	(SELECT * 
