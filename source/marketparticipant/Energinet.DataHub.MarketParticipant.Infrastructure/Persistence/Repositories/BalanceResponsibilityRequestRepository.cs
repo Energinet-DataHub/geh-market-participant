@@ -76,6 +76,8 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
 
     public async Task<IEnumerable<ActorNumber>> GetUnrecognizedActorsAsync()
     {
+        string[] exemptGridAreas = ["003", "007"];
+
         var unrecognizedEnergySuppliers =
             from balanceResponsibleRequest in _marketParticipantDbContext.BalanceResponsibilityRequests
             join energySupplier in _marketParticipantDbContext.Actors on
@@ -83,7 +85,7 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
                 equals
                 new { energySupplier.ActorNumber, energySupplier.MarketRoles.Single().Function } into energySupplierJoin
             from energySupplier in energySupplierJoin.DefaultIfEmpty()
-            where energySupplier == null
+            where energySupplier == null && !exemptGridAreas.Contains(balanceResponsibleRequest.GridAreaCode)
             select balanceResponsibleRequest.EnergySupplier;
 
         var unrecognizedBalanceResponsibleParties =
@@ -93,7 +95,7 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
                 equals
                 new { balanceResponsibleParty.ActorNumber, balanceResponsibleParty.MarketRoles.Single().Function } into balanceResponsiblePartyJoin
             from balanceResponsibleParty in balanceResponsiblePartyJoin.DefaultIfEmpty()
-            where balanceResponsibleParty == null
+            where balanceResponsibleParty == null && !exemptGridAreas.Contains(balanceResponsibleRequest.GridAreaCode)
             select balanceResponsibleRequest.BalanceResponsibleParty;
 
         var filtered = await unrecognizedEnergySuppliers

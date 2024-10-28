@@ -486,6 +486,33 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
         unrecognizedActors.Should().Contain(balanceResponsibilityRequest.BalanceResponsibleParty);
     }
 
+    [Fact]
+    public async Task GetUnrecognizedActorsAsync_HasExemptActor_DoesNotReturnActor()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var target = scope.ServiceProvider.GetRequiredService<IBalanceResponsibilityRequestRepository>();
+
+        var actor = await PrepareActorAsync(EicFunction.EnergySupplier);
+
+        var balanceResponsibilityRequest = CreateBalanceResponsibilityRequest(
+            ActorNumber.Create(actor.ActorNumber),
+            new MockedGln(),
+            new GridAreaCode("003"));
+
+        await target.EnqueueAsync(balanceResponsibilityRequest);
+
+        // Act
+        var unrecognizedActors = (await target.GetUnrecognizedActorsAsync()).ToList();
+
+        // Assert
+        unrecognizedActors.Should().NotContain(balanceResponsibilityRequest.EnergySupplier);
+        unrecognizedActors.Should().NotContain(balanceResponsibilityRequest.BalanceResponsibleParty);
+    }
+
     private static BalanceResponsibilityRequest CreateBalanceResponsibilityRequest(
         ActorNumber energySupplier,
         ActorNumber balanceResponsibleParty,

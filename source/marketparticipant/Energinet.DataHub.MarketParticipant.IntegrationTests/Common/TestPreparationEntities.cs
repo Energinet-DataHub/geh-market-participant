@@ -24,7 +24,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
 internal static class TestPreparationEntities
 {
-    private static int _gridAreaCount;
+    // Grid Areas starts at 10 because '003' and '007' are reserved and should not "occur" randomly as tests are run.
+    private static int _gridAreaCount = 10;
 
     public static OrganizationEntity ValidOrganization => new()
     {
