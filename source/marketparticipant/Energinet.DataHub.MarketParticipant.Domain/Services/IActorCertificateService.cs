@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
-public sealed class UsedActorCertificatesEntity
+public interface IActorCertificateService
 {
-    public int Id { get; set; }
-    public string Thumbprint { get; set; } = null!;
-    public Guid ActorId { get; set; }
-    public DateTimeOffset AddedAt { get; set; }
+    Task<Instant> CalculateExpirationDateAsync(X509Certificate2 certificate);
 }

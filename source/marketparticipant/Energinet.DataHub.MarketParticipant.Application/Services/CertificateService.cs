@@ -23,6 +23,7 @@ using Azure;
 using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
@@ -42,7 +43,7 @@ public class CertificateService : ICertificateService
         _logger = logger;
     }
 
-    public async Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate)
+    public async Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate, Instant expirationDate)
     {
         ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
         ArgumentNullException.ThrowIfNull(certificate);
@@ -50,8 +51,13 @@ public class CertificateService : ICertificateService
         var convertedCertificateToBase64 = Convert.ToBase64String(certificate.RawData);
         try
         {
+            var keyVaultSecret = new KeyVaultSecret(certificateLookupIdentifier, convertedCertificateToBase64)
+            {
+                Properties = { ExpiresOn = expirationDate.ToDateTimeOffset() }
+            };
+
             await _keyVault
-                .SetSecretAsync(new KeyVaultSecret(certificateLookupIdentifier, convertedCertificateToBase64))
+                .SetSecretAsync(keyVaultSecret)
                 .ConfigureAwait(false);
         }
         catch (RequestFailedException e) when (e.Status == (int)HttpStatusCode.Conflict)

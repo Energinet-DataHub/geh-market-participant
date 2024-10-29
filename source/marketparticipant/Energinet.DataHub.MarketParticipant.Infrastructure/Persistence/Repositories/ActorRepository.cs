@@ -50,14 +50,17 @@ public sealed class ActorRepository(IMarketParticipantDbContext marketParticipan
         if (actor.Credentials is ActorCertificateCredentials certificateCredentials &&
             destination.CertificateCredential?.CertificateThumbprint != certificateCredentials.CertificateThumbprint)
         {
-            var certificateReUsedByCurrentActor = await marketParticipantDbContext.UsedActorCertificates.SingleOrDefaultAsync(e =>
-                e.Thumbprint == certificateCredentials.CertificateThumbprint && e.ActorId == destination.Id).ConfigureAwait(false);
+            var certificateReUsedByCurrentActor = await marketParticipantDbContext
+                .UsedActorCertificates
+                .SingleOrDefaultAsync(e => e.Thumbprint == certificateCredentials.CertificateThumbprint && e.ActorId == destination.Id)
+                .ConfigureAwait(false);
 
             if (certificateReUsedByCurrentActor is null)
             {
                 destination.UsedActorCertificates.Add(new UsedActorCertificatesEntity
                 {
-                    Thumbprint = certificateCredentials.CertificateThumbprint
+                    Thumbprint = certificateCredentials.CertificateThumbprint,
+                    AddedAt = DateTimeOffset.UtcNow // TODO: Test
                 });
             }
         }
@@ -146,37 +149,37 @@ public sealed class ActorRepository(IMarketParticipantDbContext marketParticipan
     public async Task<ActorTokenData?> GetActorTokenDataAsync(ActorId actorId)
     {
         var query = from a in marketParticipantDbContext.Actors
-            join mr in marketParticipantDbContext.MarketRoles on a.Id equals mr.ActorId into actorMarketRoles
-            from mr in actorMarketRoles.DefaultIfEmpty()
-            join mrga in marketParticipantDbContext.MarketRoleGridAreas on mr.Id equals mrga.MarketRoleId into marketRoleGridAreas
-            from mrga in marketRoleGridAreas.DefaultIfEmpty()
-            join ga in marketParticipantDbContext.GridAreas on mrga.GridAreaId equals ga.Id into gridAreas
-            from ga in gridAreas.DefaultIfEmpty()
-            where a.Id == actorId.Value
-            group new
-                {
-                    mr,
-                    ga,
-                }
-                by a
-            into grp
-            select new ActorTokenData
-            {
-                ActorId = grp.Key.Id,
-                ActorNumber = grp.Key.ActorNumber,
-                MarketRoles =
-                    from mr in grp.Select(x => x.mr).Distinct()
-                    where mr != null
-                    select new ActorTokenDataMarketRole
+                    join mr in marketParticipantDbContext.MarketRoles on a.Id equals mr.ActorId into actorMarketRoles
+                    from mr in actorMarketRoles.DefaultIfEmpty()
+                    join mrga in marketParticipantDbContext.MarketRoleGridAreas on mr.Id equals mrga.MarketRoleId into marketRoleGridAreas
+                    from mrga in marketRoleGridAreas.DefaultIfEmpty()
+                    join ga in marketParticipantDbContext.GridAreas on mrga.GridAreaId equals ga.Id into gridAreas
+                    from ga in gridAreas.DefaultIfEmpty()
+                    where a.Id == actorId.Value
+                    group new
                     {
-                        Function = mr.Function,
-                        GridAreas = grp.Where(x => x.mr == mr)
-                            .Select(x => new ActorTokenDataGridArea
+                        mr,
+                        ga,
+                    }
+                        by a
+            into grp
+                    select new ActorTokenData
+                    {
+                        ActorId = grp.Key.Id,
+                        ActorNumber = grp.Key.ActorNumber,
+                        MarketRoles =
+                            from mr in grp.Select(x => x.mr).Distinct()
+                            where mr != null
+                            select new ActorTokenDataMarketRole
                             {
-                                GridAreaCode = x.ga.Code,
-                            }).Distinct(),
-                    },
-            };
+                                Function = mr.Function,
+                                GridAreas = grp.Where(x => x.mr == mr)
+                                    .Select(x => new ActorTokenDataGridArea
+                                    {
+                                        GridAreaCode = x.ga.Code,
+                                    }).Distinct(),
+                            },
+                    };
         return await query
             .FirstOrDefaultAsync().ConfigureAwait(false);
     }

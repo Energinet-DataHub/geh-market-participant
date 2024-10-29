@@ -15,12 +15,13 @@
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 public interface ICertificateService
 {
     X509Certificate2 CreateAndValidateX509Certificate(Stream certificate);
-    Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate);
+    Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate, Instant expirationDate);
     Task RemoveCertificateAsync(string certificateLookupIdentifier);
 }

@@ -108,6 +108,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<StopProcessDelegationCommand>, StopProcessDelegationCommandRuleSet>();
         services.AddScoped<IValidator<ReActivateUserCommand>, ReActivateUserCommandRuleSet>();
         services.AddScoped<IValidator<GetBalanceResponsibilityRelationsCommand>, GetBalanceResponsibilityRelationsCommandRuleSet>();
+        services.AddScoped<IValidator<ValidateActorCredentialsCommand>, ValidateActorCredentialsCommandRuleSet>();
         services.AddScoped<IValidator<ValidateBalanceResponsibilitiesCommand>, ValidateBalanceResponsibilitiesCommandRuleSet>();
         services.AddScoped<IValidator<CreateDownloadTokenCommand>, CreateDownloadTokenCommandRuleSet>();
         services.AddScoped<IValidator<ExchangeDownloadTokenCommand>, ExchangeDownloadTokenCommandRuleSet>();
@@ -115,6 +116,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<ClockUserLoginCommand>, ClockUserLoginCommandRuleSet>();
 
         services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
+        services.AddScoped<IActorCertificateService, ActorCertificateService>();
         services.AddScoped<IActorClientSecretService, ActorClientSecretService>();
         services.AddScoped<IOrganizationExistsHelperService, OrganizationExistsHelperService>();
         services.AddScoped<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>();

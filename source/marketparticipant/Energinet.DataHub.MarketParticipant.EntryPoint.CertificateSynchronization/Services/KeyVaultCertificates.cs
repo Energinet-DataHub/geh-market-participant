@@ -36,10 +36,12 @@ public sealed class KeyVaultCertificates : IKeyVaultCertificates
                            .GetPropertiesOfSecretsAsync()
                            .ConfigureAwait(false))
         {
+            var isDeleted = certificateSecret.ExpiresOn <= DateTimeOffset.UtcNow;
+
             certificates.Add(new CertificateIdentifier(
                 certificateSecret.Id,
                 certificateSecret.Name,
-                false));
+                isDeleted));
         }
 
         await foreach (var deletedCertificateSecret in _secretClient

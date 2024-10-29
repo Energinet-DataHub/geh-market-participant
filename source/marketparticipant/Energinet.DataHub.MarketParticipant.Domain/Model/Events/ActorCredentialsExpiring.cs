@@ -12,14 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-public abstract class NotificationEvent : DomainEvent
+public sealed class ActorCredentialsExpiring : NotificationEvent
 {
-    protected NotificationEvent(ActorId recipient)
+    [JsonConstructor]
+    [Browsable(false)]
+    public ActorCredentialsExpiring(
+        Guid eventId,
+        ActorId recipient,
+        ActorId affectedActorId)
+        : base(recipient)
     {
-        Recipient = recipient;
+        EventId = eventId;
+        AffectedActorId = affectedActorId;
     }
 
-    public ActorId Recipient { get; }
+    public ActorCredentialsExpiring(
+        ActorId recipient,
+        ActorId affectedActorId)
+        : base(recipient)
+    {
+        EventId = Guid.NewGuid();
+        AffectedActorId = affectedActorId;
+    }
+
+    public ActorId AffectedActorId { get; }
 }
