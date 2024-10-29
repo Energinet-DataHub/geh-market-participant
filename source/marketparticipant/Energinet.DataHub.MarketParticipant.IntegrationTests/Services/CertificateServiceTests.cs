@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NodaTime;
 using Xunit;
 using Xunit.Categories;
 
@@ -91,7 +92,7 @@ public sealed class CertificateServiceTests
         try
         {
             // Act
-            await certificateService.SaveCertificateAsync(name, x509Certificate);
+            await certificateService.SaveCertificateAsync(name, x509Certificate, Instant.MinValue); // TODO: Fix
 
             // Assert
             Assert.True(await _certificateFixture.CertificateExistsAsync(name));

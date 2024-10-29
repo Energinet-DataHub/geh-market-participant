@@ -39,7 +39,7 @@ public sealed class BalanceResponsibilityValidationFailedIntegrationEventFactory
             new Model.Contracts.UserNotificationTriggered
             {
                 ReasonIdentifier = domainEvent.IsActorUnrecognized ? "BalanceResponsibilityActorUnrecognized" : "BalanceResponsibilityValidationFailed",
-                TargetActorId = domainEvent.Sender.ToString(),
+                TargetActorId = domainEvent.Recipient.ToString(),
                 TargetPermissions = permission,
                 RelatedId = domainEvent.ActorNumber.Value,
                 OccurredAt = now.ToTimestamp(),
