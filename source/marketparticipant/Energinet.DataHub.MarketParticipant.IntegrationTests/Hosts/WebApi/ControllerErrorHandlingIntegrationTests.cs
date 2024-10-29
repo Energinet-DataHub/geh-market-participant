@@ -122,7 +122,7 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
             new string('a', 1000),
             MockedBusinessRegisterIdentifier.New().Identifier,
             new AddressDto(null, null, null, null, "DK"),
-            new MockedDomain());
+            [new MockedDomain()]);
 
         using var httpContent = new StringContent(
             JsonSerializer.Serialize(request),
@@ -163,7 +163,7 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
             string.Empty,
             MockedBusinessRegisterIdentifier.New().Identifier,
             new AddressDto(null, null, null, null, "DK"),
-            new MockedDomain());
+            [new MockedDomain()]);
 
         using var httpContent = new StringContent(
             JsonSerializer.Serialize(request),
@@ -199,7 +199,7 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
             "Mocked Organization",
             MockedBusinessRegisterIdentifier.New().Identifier,
             new AddressDto(null, null, null, null, "DK"),
-            new MockedDomain());
+            [new MockedDomain()]);
 
         using var httpContent = new StringContent(
             JsonSerializer.Serialize(request),

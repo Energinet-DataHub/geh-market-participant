@@ -72,7 +72,7 @@ public sealed class OrganizationAuditLogRepositoryTests
         var user = await _fixture.PrepareUserAsync();
         host.ServiceCollection.MockFrontendUser(user.Id);
 
-        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         await using var scope = host.BeginScope();
         var organizationRepository = scope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
@@ -92,8 +92,8 @@ public sealed class OrganizationAuditLogRepositoryTests
                 organization.Name = newValue;
                 break;
             case OrganizationAuditedChange.Domain:
-                orgValue = organization!.Domain.Value;
-                organization.Domain = new OrganizationDomain(newValue);
+                orgValue = string.Join(";", organization!.Domains.Select(d => d.Value));
+                organization.Domains = [new OrganizationDomain(newValue)];
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);
@@ -110,5 +110,108 @@ public sealed class OrganizationAuditLogRepositoryTests
         Assert.Contains(organizationAuditLogs, o => o.AuditIdentity.Value == user.Id);
         Assert.Contains(organizationAuditLogs, o => o.Change == changeType);
         Assert.Contains(organizationAuditLogs, o => o.CurrentValue == newValue && o.PreviousValue == orgValue);
+    }
+
+    [Fact]
+    public async Task GetAsync_ChangeDomain_CanBeReadBack()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+
+        var user = await _fixture.PrepareUserAsync();
+        host.ServiceCollection.MockFrontendUser(user.Id);
+
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
+
+        await using var scope = host.BeginScope();
+        var organizationRepository = scope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
+
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var organizationAuditLogEntryRepository = new OrganizationAuditLogRepository(context);
+
+        // Make an audited change.
+        var orgId = await organizationRepository.AddOrUpdateAsync(testOrg);
+        var organization = await organizationRepository.GetAsync(orgId.Value);
+        string orgValue = organization!.Domains.Single().Value;
+        organization.Domains = [new OrganizationDomain("www.raccoons.dk")];
+
+        await organizationRepository.AddOrUpdateAsync(organization);
+
+        // Act
+        var actual = await organizationAuditLogEntryRepository.GetAsync(orgId.Value);
+
+        // Assert
+        var organizationDomainAuditLogs = actual.Where(log => log.Change == OrganizationAuditedChange.Domain).ToList();
+        Assert.NotEmpty(organizationDomainAuditLogs);
+        Assert.Single(organizationDomainAuditLogs, log => log.CurrentValue == "www.raccoons.dk" && log.PreviousValue == orgValue);
+        Assert.Single(organizationDomainAuditLogs, log => log.CurrentValue == orgValue && string.IsNullOrEmpty(log.PreviousValue));
+    }
+
+    [Fact]
+    public async Task GetAsync_AddMultipleDomains_CanBeReadBack()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+
+        var user = await _fixture.PrepareUserAsync();
+        host.ServiceCollection.MockFrontendUser(user.Id);
+
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
+
+        await using var scope = host.BeginScope();
+        var organizationRepository = scope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
+
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var organizationAuditLogEntryRepository = new OrganizationAuditLogRepository(context);
+
+        // Make an audited change.
+        var orgId = await organizationRepository.AddOrUpdateAsync(testOrg);
+        var organization = await organizationRepository.GetAsync(orgId.Value);
+        string orgValue = organization!.Domains.Single().Value;
+        organization.Domains = [new OrganizationDomain("raccoons.dk"), new OrganizationDomain("raccoons.com")];
+
+        await organizationRepository.AddOrUpdateAsync(organization);
+
+        // Act
+        var actual = await organizationAuditLogEntryRepository.GetAsync(orgId.Value);
+
+        // Assert
+        var organizationDomainAuditLogs = actual.Where(log => log.Change == OrganizationAuditedChange.Domain).ToList();
+        Assert.NotEmpty(organizationDomainAuditLogs);
+        Assert.Single(organizationDomainAuditLogs, log => log.CurrentValue == "raccoons.dk" && !string.IsNullOrEmpty(log.PreviousValue));
+        Assert.Single(organizationDomainAuditLogs, log => log.CurrentValue == "raccoons.com" && !string.IsNullOrEmpty(log.PreviousValue));
+    }
+
+    [Fact]
+    public async Task GetAsync_FromMultipleDomainsToSingle_CanBeReadBack()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+
+        var user = await _fixture.PrepareUserAsync();
+        host.ServiceCollection.MockFrontendUser(user.Id);
+
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [new OrganizationDomain("www.raccoons.dk"), new OrganizationDomain("www.raccoons.com")]);
+
+        await using var scope = host.BeginScope();
+        var organizationRepository = scope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
+
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var organizationAuditLogEntryRepository = new OrganizationAuditLogRepository(context);
+
+        // Make an audited change.
+        var orgId = await organizationRepository.AddOrUpdateAsync(testOrg);
+        var organization = await organizationRepository.GetAsync(orgId.Value);
+        organization.Domains = [_validDomain];
+
+        await organizationRepository.AddOrUpdateAsync(organization);
+
+        // Act
+        var actual = await organizationAuditLogEntryRepository.GetAsync(orgId.Value);
+
+        // Assert
+        var organizationDomainAuditLogs = actual.Where(log => log.Change == OrganizationAuditedChange.Domain).ToList();
+        Assert.NotEmpty(organizationDomainAuditLogs);
+        Assert.Single(organizationDomainAuditLogs, log => log.CurrentValue == _validDomain.Value && !string.IsNullOrEmpty(log.PreviousValue));
     }
 }

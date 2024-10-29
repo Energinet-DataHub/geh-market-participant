@@ -42,7 +42,7 @@ public sealed class UserInvitationServiceTests
         "Organization Name",
         MockedBusinessRegisterIdentifier.New(),
         new Address(null, null, null, null, "DK"),
-        new OrganizationDomain("test.datahub.dk"),
+        [new OrganizationDomain("test.datahub.dk")],
         OrganizationStatus.Active);
 
     private static readonly Actor _validActor = new(

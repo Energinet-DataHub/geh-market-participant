@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -28,7 +29,7 @@ public interface IOrganizationFactoryService
     /// <param name="name">The name of the organization.</param>
     /// <param name="businessRegisterIdentifier">The Business Register Identifier of the new organization.</param>
     /// <param name="address">The address of the new organization.</param>
-    /// <param name="domain">The domain of the new organization.</param>
+    /// <param name="domains">The domains of the new organization.</param>
     /// <returns>The created actor.</returns>
-    Task<Organization> CreateAsync(string name, BusinessRegisterIdentifier businessRegisterIdentifier, Address address, OrganizationDomain domain);
+    Task<Organization> CreateAsync(string name, BusinessRegisterIdentifier businessRegisterIdentifier, Address address, IEnumerable<OrganizationDomain> domains);
 }

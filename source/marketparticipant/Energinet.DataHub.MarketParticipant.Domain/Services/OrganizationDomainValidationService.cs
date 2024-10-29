@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -44,9 +45,9 @@ public sealed class OrganizationDomainValidationService : IOrganizationDomainVal
             actor.OrganizationId.Value,
             $"The specified organization {actor.OrganizationId} was not found.");
 
-        if (!userInviteEmail.Address.EndsWith("@" + organization.Domain.Value, StringComparison.OrdinalIgnoreCase))
+        if (organization.Domains.All(d => !userInviteEmail.Address.EndsWith("@" + d.Value, StringComparison.OrdinalIgnoreCase)))
         {
-            throw new ValidationException("User email not valid, should match organization domain.")
+            throw new ValidationException("User email not valid, should match organization domains.")
                 .WithErrorCode("user.authentication.email_domain_mismatch");
         }
     }

@@ -84,6 +84,6 @@ public class UnitOfWorkTests
             "DK");
 
         var validBusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New();
-        return new Organization("Test", validBusinessRegisterIdentifier, validAddress, new MockedDomain());
+        return new Organization("Test", validBusinessRegisterIdentifier, validAddress, [new MockedDomain()]);
     }
 }

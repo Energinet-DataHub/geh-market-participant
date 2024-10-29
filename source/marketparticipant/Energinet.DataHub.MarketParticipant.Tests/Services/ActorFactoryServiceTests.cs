@@ -58,7 +58,7 @@ public sealed class ActorFactoryServiceTests
             new Mock<IEntityLock>().Object,
             new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
-        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
+        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, [_validDomain]);
         var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
         var actorId = new ActorId(Guid.NewGuid());
 
@@ -116,7 +116,7 @@ public sealed class ActorFactoryServiceTests
             new(new GridAreaId(Guid.NewGuid()), validMeteringPointTypes)
         };
 
-        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
+        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, [_validDomain]);
         var marketRoles = new List<ActorMarketRole> { new(EicFunction.GridAccessProvider, validGridAreas) };
         var actorId = new ActorId(Guid.NewGuid());
 
@@ -166,7 +166,7 @@ public sealed class ActorFactoryServiceTests
             new Mock<IEntityLock>().Object,
             new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
-        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
+        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, [_validDomain]);
         var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 
         var committedActor = new Actor(
@@ -216,7 +216,7 @@ public sealed class ActorFactoryServiceTests
             new Mock<IEntityLock>().Object,
             new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
-        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
+        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, [_validDomain]);
         var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
         var gridAreas = new List<ActorGridArea> { new(meteringPointTypes) };
         var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
@@ -268,7 +268,7 @@ public sealed class ActorFactoryServiceTests
             new Mock<IEntityLock>().Object,
             new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
-        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
+        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, [_validDomain]);
         var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
         var gridAreas = new List<ActorGridArea> { new(new GridAreaId(Guid.NewGuid()), meteringPointTypes) };
         var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
@@ -320,7 +320,7 @@ public sealed class ActorFactoryServiceTests
             new Mock<IEntityLock>().Object,
             new Mock<IAllowedMarketRoleCombinationsForDelegationRuleService>().Object);
 
-        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
+        var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, [_validDomain]);
         var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
         var gridAreas = new List<ActorGridArea> { new(new GridAreaId(Guid.NewGuid()), meteringPointTypes) };
         var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
