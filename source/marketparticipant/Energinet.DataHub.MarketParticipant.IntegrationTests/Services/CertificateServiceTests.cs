@@ -84,6 +84,7 @@ public sealed class CertificateServiceTests
             new Mock<ILogger<CertificateService>>().Object);
 
         var name = Guid.NewGuid().ToString();
+        var expirationDate = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(30));
 
         await using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
 
@@ -92,7 +93,7 @@ public sealed class CertificateServiceTests
         try
         {
             // Act
-            await certificateService.SaveCertificateAsync(name, x509Certificate, Instant.MinValue); // TODO: Fix
+            await certificateService.SaveCertificateAsync(name, x509Certificate, expirationDate);
 
             // Assert
             Assert.True(await _certificateFixture.CertificateExistsAsync(name));

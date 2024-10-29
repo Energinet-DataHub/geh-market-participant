@@ -44,7 +44,7 @@ public sealed class ActorCertificateService : IActorCertificateService
         var certificateAddedAt = await FindCertificateAddedDateAsync(certificate.Thumbprint).ConfigureAwait(false);
 
         var businessExpiresOn = certificateAddedAt.Plus(Duration.FromDays(365));
-        var certificateExpiresOn = certificate.NotAfter.ToInstant();
+        var certificateExpiresOn = certificate.NotAfter.ToUniversalTime().ToInstant();
         return Instant.Min(businessExpiresOn, certificateExpiresOn);
     }
 

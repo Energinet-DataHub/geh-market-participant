@@ -30,7 +30,7 @@ public sealed class ValidateActorCredentialsTimerTrigger
 
     // NOTE: Changing the schedule changes how often notifications are sent.
     [Function(nameof(ValidateActorCredentialsTimerTrigger))]
-    public Task RunAsync([TimerTrigger("0 22 * * *")] FunctionContext context)
+    public Task RunAsync([TimerTrigger("0 5 * * *")] FunctionContext context)
     {
         return _mediator.Send(new ValidateActorCredentialsCommand());
     }

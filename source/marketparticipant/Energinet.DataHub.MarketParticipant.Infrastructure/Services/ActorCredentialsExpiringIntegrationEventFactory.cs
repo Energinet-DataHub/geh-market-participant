@@ -23,7 +23,6 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
-// TODO: Tests
 public sealed class ActorCredentialsExpiringIntegrationEventFactory : IIntegrationEventFactory<ActorCredentialsExpiring>
 {
     public Task<IntegrationEvent> CreateAsync(ActorCredentialsExpiring domainEvent, int sequenceNumber)
