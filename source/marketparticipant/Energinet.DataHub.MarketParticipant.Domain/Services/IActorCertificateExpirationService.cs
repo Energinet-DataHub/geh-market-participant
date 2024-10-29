@@ -18,7 +18,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
-public interface IActorCertificateService
+public interface IActorCertificateExpirationService
 {
     Task<Instant> CalculateExpirationDateAsync(X509Certificate2 certificate);
 }

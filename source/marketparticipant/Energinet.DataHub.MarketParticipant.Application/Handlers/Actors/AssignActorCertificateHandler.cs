@@ -27,26 +27,25 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 
-// TODO: Tests
 public sealed class AssignActorCertificateHandler : IRequestHandler<AssignActorCertificateCommand>
 {
     private readonly IActorRepository _actorRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IDomainEventRepository _domainEventRepository;
-    private readonly IActorCertificateService _actorCertificateService;
+    private readonly IActorCertificateExpirationService _actorCertificateExpirationService;
     private readonly ICertificateService _certificateService;
 
     public AssignActorCertificateHandler(
         IActorRepository actorRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IDomainEventRepository domainEventRepository,
-        IActorCertificateService actorCertificateService,
+        IActorCertificateExpirationService actorCertificateExpirationService,
         ICertificateService certificateService)
     {
         _actorRepository = actorRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _domainEventRepository = domainEventRepository;
-        _actorCertificateService = actorCertificateService;
+        _actorCertificateExpirationService = actorCertificateExpirationService;
         _certificateService = certificateService;
     }
 
@@ -66,7 +65,7 @@ public sealed class AssignActorCertificateHandler : IRequestHandler<AssignActorC
         if (actor.Credentials is not null)
             throw new ValidationException("Credentials have already been assigned.");
 
-        var expirationDate = await _actorCertificateService
+        var expirationDate = await _actorCertificateExpirationService
             .CalculateExpirationDateAsync(x509Certificate)
             .ConfigureAwait(false);
 

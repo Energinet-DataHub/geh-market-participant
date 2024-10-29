@@ -60,7 +60,7 @@ public sealed class ActorRepository(IMarketParticipantDbContext marketParticipan
                 destination.UsedActorCertificates.Add(new UsedActorCertificatesEntity
                 {
                     Thumbprint = certificateCredentials.CertificateThumbprint,
-                    AddedAt = DateTimeOffset.UtcNow // TODO: Test
+                    AddedAt = DateTimeOffset.UtcNow
                 });
             }
         }

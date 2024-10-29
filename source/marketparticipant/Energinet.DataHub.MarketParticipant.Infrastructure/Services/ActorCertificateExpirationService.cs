@@ -23,13 +23,12 @@ using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
-// TODO: Tests
-public sealed class ActorCertificateService : IActorCertificateService
+public sealed class ActorCertificateExpirationService : IActorCertificateExpirationService
 {
     private readonly IClock _clock;
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
-    public ActorCertificateService(
+    public ActorCertificateExpirationService(
         IClock clock,
         IMarketParticipantDbContext marketParticipantDbContext)
     {

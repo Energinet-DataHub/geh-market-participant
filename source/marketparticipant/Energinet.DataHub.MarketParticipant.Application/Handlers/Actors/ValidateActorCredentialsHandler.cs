@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
@@ -23,7 +22,6 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 
-// TODO: Tests
 public sealed class ValidateActorCredentialsHandler : IRequestHandler<ValidateActorCredentialsCommand>
 {
     private readonly IActorRepository _actorRepository;
