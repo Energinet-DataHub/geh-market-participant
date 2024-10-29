@@ -24,10 +24,10 @@ public sealed class BalanceResponsibilityValidationFailed : NotificationEvent
     [Browsable(false)]
     public BalanceResponsibilityValidationFailed(
         Guid eventId,
-        ActorId sender,
+        ActorId recipient,
         ActorNumber actorNumber,
         bool isActorUnrecognized)
-        : base(sender)
+        : base(recipient)
     {
         EventId = eventId;
         ActorNumber = actorNumber;
@@ -35,10 +35,10 @@ public sealed class BalanceResponsibilityValidationFailed : NotificationEvent
     }
 
     public BalanceResponsibilityValidationFailed(
-        ActorId sender,
+        ActorId recipient,
         ActorNumber actorNumber,
         bool isActorUnrecognized)
-        : base(sender)
+        : base(recipient)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
 
