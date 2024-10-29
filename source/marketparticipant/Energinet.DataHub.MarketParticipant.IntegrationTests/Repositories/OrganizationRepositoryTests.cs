@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -50,7 +52,7 @@ public sealed class OrganizationRepositoryTests
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var orgRepository = new OrganizationRepository(context);
         var orgRepository2 = new OrganizationRepository(context2);
-        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         // Act
         var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -75,7 +77,7 @@ public sealed class OrganizationRepositoryTests
         var orgRepository = new OrganizationRepository(context);
         var orgRepository2 = new OrganizationRepository(context2);
 
-        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         // Act
         var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -99,7 +101,7 @@ public sealed class OrganizationRepositoryTests
 
         var orgRepository = new OrganizationRepository(context);
         var orgRepository2 = new OrganizationRepository(context2);
-        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         // Act
         var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -138,7 +140,7 @@ public sealed class OrganizationRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var orgRepository = new OrganizationRepository(context);
-        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         // Act
         var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -149,7 +151,7 @@ public sealed class OrganizationRepositoryTests
             "NewName",
             newOrg.BusinessRegisterIdentifier,
             newOrg.Address,
-            _validDomain,
+            [_validDomain],
             OrganizationStatus.New);
 
         await orgRepository.AddOrUpdateAsync(newOrg);
@@ -174,7 +176,7 @@ public sealed class OrganizationRepositoryTests
         var orgRepository = new OrganizationRepository(context);
         var orgRepository2 = new OrganizationRepository(context2);
 
-        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         // Act
         var orgId = await orgRepository.AddOrUpdateAsync(organization);
@@ -196,7 +198,7 @@ public sealed class OrganizationRepositoryTests
         var orgRepository = new OrganizationRepository(context);
         var orgRepository2 = new OrganizationRepository(context2);
 
-        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         await orgRepository.AddOrUpdateAsync(organization);
 
@@ -220,7 +222,7 @@ public sealed class OrganizationRepositoryTests
         var orgRepository2 = new OrganizationRepository(context2);
 
         var globalLocationNumber = new MockedGln();
-        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
+        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
 
         var organizationId = await orgRepository.AddOrUpdateAsync(organization);
         await _fixture.PrepareActorAsync(
@@ -236,5 +238,106 @@ public sealed class OrganizationRepositoryTests
 
         // Assert
         Assert.NotNull(organizations);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_OneOrganizationWithMultipleDomains_CanReadBack()
+    {
+        // Arrange
+        var domains = new OrganizationDomain[] { new MockedDomain(), new MockedDomain(), new MockedDomain() };
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var orgRepository = new OrganizationRepository(context);
+        var orgRepository2 = new OrganizationRepository(context2);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, domains);
+
+        // Act
+        var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
+        var newOrg = await orgRepository2.GetAsync(orgId.Value);
+
+        // Assert
+        Assert.NotNull(newOrg);
+        Assert.NotEqual(Guid.Empty, newOrg.Id.Value);
+        Assert.Equal(testOrg.Domains.Count(), domains.Length);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_OneOrganizationWithDuplicateDomains_OnlyOneDomainIsSaved_CanReadBack()
+    {
+        // Arrange
+        var domains = new OrganizationDomain[] { _validDomain, _validDomain };
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var orgRepository = new OrganizationRepository(context);
+        var orgRepository2 = new OrganizationRepository(context2);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, domains);
+
+        // Act
+        var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
+        var newOrg = await orgRepository2.GetAsync(orgId.Value);
+
+        // Assert
+        Assert.NotNull(newOrg);
+        Assert.NotEqual(Guid.Empty, newOrg.Id.Value);
+        Assert.Equal(testOrg.Domains.Count(), domains.Length);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_TwoOrganizationsWithSameDomain_ReturnsError()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var orgRepository = new OrganizationRepository(context);
+        var orgRepository2 = new OrganizationRepository(context2);
+        var testOrg1 = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
+        var testOrg2 = new Organization("Test2", MockedBusinessRegisterIdentifier.New(), _validAddress, [_validDomain]);
+
+        // Act
+        var orgId1 = await orgRepository.AddOrUpdateAsync(testOrg1);
+        var orgId2Error = await orgRepository.AddOrUpdateAsync(testOrg2);
+
+        // Assert
+        Assert.NotNull(orgId2Error.Error);
+        Assert.Equal(OrganizationError.DomainConflict, orgId2Error.Error);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_OneOrganizationWithMultipleDomains_ToSingleDomain_CanReadBack()
+    {
+        // Arrange
+        var domains = new OrganizationDomain[] { new MockedDomain(), new MockedDomain(), new MockedDomain() };
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var orgRepository = new OrganizationRepository(context);
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, domains);
+
+        // Act
+        var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
+        var newOrg = await orgRepository.GetAsync(orgId.Value);
+
+        newOrg = new Organization(
+            newOrg!.Id,
+            newOrg.Name,
+            newOrg.BusinessRegisterIdentifier,
+            newOrg.Address,
+            [_validDomain],
+            OrganizationStatus.New);
+
+        await orgRepository.AddOrUpdateAsync(newOrg);
+        newOrg = await orgRepository.GetAsync(orgId.Value);
+
+        // Assert
+        Assert.NotNull(newOrg);
+        Assert.NotEqual(Guid.Empty, newOrg.Id.Value);
+        Assert.Single(newOrg.Domains);
+        Assert.Equal(_validDomain.Value, newOrg.Domains.Single().Value);
     }
 }

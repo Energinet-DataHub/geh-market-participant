@@ -49,6 +49,7 @@ public sealed class OrganizationRepository : IOrganizationRepository
         {
             destination = await _marketParticipantDbContext
                 .Organizations
+                .Include(o => o.Domains)
                 .FirstAsync(x => x.Id == organization.Id.Value)
                 .ConfigureAwait(false);
         }
@@ -62,7 +63,7 @@ public sealed class OrganizationRepository : IOrganizationRepository
         }
         catch (DbUpdateException ex) when (
             ex.InnerException is SqlException inner &&
-            inner.Message.Contains("UQ_Organization_Domain", StringComparison.InvariantCultureIgnoreCase))
+            inner.Message.Contains("UQ_OrganizationDomain_Domain", StringComparison.InvariantCultureIgnoreCase))
         {
             return new(OrganizationError.DomainConflict);
         }
@@ -76,6 +77,7 @@ public sealed class OrganizationRepository : IOrganizationRepository
 
         var org = await _marketParticipantDbContext
             .Organizations
+            .Include(o => o.Domains)
             .FirstOrDefaultAsync(x => x.Id == id.Value)
             .ConfigureAwait(false);
 
@@ -86,6 +88,7 @@ public sealed class OrganizationRepository : IOrganizationRepository
     {
         var entities = await _marketParticipantDbContext
             .Organizations
+            .Include(o => o.Domains)
             .OrderBy(x => x.Name)
             .ToListAsync()
             .ConfigureAwait(false);

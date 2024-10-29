@@ -31,7 +31,7 @@ internal static class TestPreparationEntities
     {
         Name = "Test Organization Name",
         BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier,
-        Domain = new MockedDomain(),
+        Domains = { new OrganizationDomainEntity { Domain = new MockedDomain() } },
         Status = 1,
         StreetName = "Vej Allé",
         Number = "7",

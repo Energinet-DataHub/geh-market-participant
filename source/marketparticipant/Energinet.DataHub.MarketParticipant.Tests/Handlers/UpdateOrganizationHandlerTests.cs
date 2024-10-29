@@ -58,7 +58,7 @@ public sealed class UpdateOrganizationHandlerTests
             "fake_value",
             validBusinessRegisterIdentifier,
             validAddress,
-            new OrganizationDomain("energinet.dk"),
+            [new OrganizationDomain("energinet.dk")],
             OrganizationStatus.Active);
 
         organizationExistsHelperService
@@ -69,7 +69,7 @@ public sealed class UpdateOrganizationHandlerTests
             .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
             .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
 
-        var changeDto = new ChangeOrganizationDto("New name", "Active", "TestDomain.dk");
+        var changeDto = new ChangeOrganizationDto("New name", "Active", ["TestDomain.dk"]);
 
         var command = new UpdateOrganizationCommand(orgId, changeDto);
 
@@ -104,7 +104,7 @@ public sealed class UpdateOrganizationHandlerTests
             "fake_value",
             validBusinessRegisterIdentifier,
             validAddress,
-            new OrganizationDomain("energinet.dk"),
+            [new OrganizationDomain("energinet.dk")],
             OrganizationStatus.Deleted);
 
         organizationExistsHelperService
@@ -115,7 +115,7 @@ public sealed class UpdateOrganizationHandlerTests
             .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
             .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
 
-        var changeOrganizationDto = new ChangeOrganizationDto("New name", "Active", "TestDomain");
+        var changeOrganizationDto = new ChangeOrganizationDto("New name", "Active", ["TestDomain"]);
 
         var command = new UpdateOrganizationCommand(orgId, changeOrganizationDto);
 

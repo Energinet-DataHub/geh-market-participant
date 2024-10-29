@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -29,13 +30,36 @@ public sealed class OrganizationAuditLogRepository : IOrganizationAuditLogReposi
         _context = context;
     }
 
-    public Task<IEnumerable<AuditLog<OrganizationAuditedChange>>> GetAsync(OrganizationId organization)
+    public async Task<IEnumerable<AuditLog<OrganizationAuditedChange>>> GetAsync(OrganizationId organization)
     {
-        var dataSource = new HistoryTableDataSource<OrganizationEntity>(_context.Organizations, entity => entity.Id == organization.Value);
+        var organizationAuditLogs = await GetOrganizationAuditsAsync(organization)
+            .ConfigureAwait(false);
 
-        return new AuditLogBuilder<OrganizationAuditedChange, OrganizationEntity>(dataSource)
+        var organizationDomainAuditLogs = await GetOrganizationDomainAuditsAsync(organization)
+            .ConfigureAwait(false);
+
+        return organizationAuditLogs.Concat(organizationDomainAuditLogs);
+    }
+
+    private Task<IEnumerable<AuditLog<OrganizationAuditedChange>>> GetOrganizationAuditsAsync(OrganizationId organization)
+    {
+        var organizationDataSource = new HistoryTableDataSource<OrganizationEntity>(_context.Organizations, entity => entity.Id == organization.Value);
+
+        var organizationNameChanges = new AuditLogBuilder<OrganizationAuditedChange, OrganizationEntity>(organizationDataSource)
             .Add(OrganizationAuditedChange.Name, entity => entity.Name, AuditedChangeCompareAt.Creation)
-            .Add(OrganizationAuditedChange.Domain, entity => entity.Domain, AuditedChangeCompareAt.Creation)
             .BuildAsync();
+
+        return organizationNameChanges;
+    }
+
+    private Task<IEnumerable<AuditLog<OrganizationAuditedChange>>> GetOrganizationDomainAuditsAsync(OrganizationId organization)
+    {
+        var organizationDomainDataSource = new HistoryTableDataSource<OrganizationDomainEntity>(_context.OrganizationDomains, entity => entity.OrganizationId == organization.Value);
+
+        var organizationDomainChanges = new AuditLogBuilder<OrganizationAuditedChange, OrganizationDomainEntity>(organizationDomainDataSource)
+            .Add(OrganizationAuditedChange.Domain, entity => entity.Domain, AuditedChangeCompareAt.BothCreationAndDeletion)
+            .BuildAsync();
+
+        return organizationDomainChanges;
     }
 }
