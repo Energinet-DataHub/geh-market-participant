@@ -82,7 +82,7 @@ public sealed class GetOrganizationAuditLogsHandlerIntegrationTests
             },
             organization =>
             {
-                organization.Domain = expected;
+                organization.Domains = [expected];
             });
     }
 

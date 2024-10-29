@@ -161,6 +161,11 @@ public interface IMarketParticipantDbContext
     DbSet<CutoffEntity> Cutoffs { get; }
 
     /// <summary>
+    ///     Represent access to the Cutoff database table
+    /// </summary>
+    DbSet<OrganizationDomainEntity> OrganizationDomains { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();

@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 
 public sealed record CreateOrganizationDto(
     string Name,
     string BusinessRegisterIdentifier,
     AddressDto Address,
-    string Domain);
+    IEnumerable<string> Domains);

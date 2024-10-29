@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organizations;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
@@ -71,8 +72,8 @@ public sealed class CreateOrganizationCommandRuleSet : AbstractValidator<CreateO
                     });
 
                 validator
-                    .RuleFor(organization => organization.Domain)
-                    .Must(OrganizationDomain.IsValid)
+                    .RuleFor(organization => organization.Domains)
+                    .Must(domains => domains.All(OrganizationDomain.IsValid))
                     .WithErrorCode("invalid_domain");
             });
     }

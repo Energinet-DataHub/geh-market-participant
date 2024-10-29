@@ -47,9 +47,9 @@ public sealed class UpdateOrganizationHandlerIntegrationTests
             "Test Organization",
             MockedBusinessRegisterIdentifier.New().Identifier,
             new AddressDto(null, null, null, null, "DK"),
-            new MockedDomain());
+            [new MockedDomain()]);
         var updatedDomain = new MockedDomain();
-        var updateDto = new ChangeOrganizationDto("New Name", OrganizationStatus.Active.ToString(), updatedDomain);
+        var updateDto = new ChangeOrganizationDto("New Name", OrganizationStatus.Active.ToString(), [updatedDomain]);
         var command = new CreateOrganizationCommand(organizationDto);
         var orgResponse = await mediator.Send(command);
         var updateCommand = new UpdateOrganizationCommand(orgResponse.OrganizationId, updateDto);
@@ -60,7 +60,7 @@ public sealed class UpdateOrganizationHandlerIntegrationTests
         var updatedOrg = await mediator.Send(getCommand);
         Assert.NotNull(updatedOrg);
         Assert.Equal(orgResponse.OrganizationId, updatedOrg.Organization.OrganizationId);
-        Assert.Equal(updatedDomain, updatedOrg.Organization.Domain);
+        Assert.Equal([updatedDomain], updatedOrg.Organization.Domains);
         Assert.Equal("New Name", updatedOrg.Organization.Name);
         Assert.Equal(OrganizationStatus.Active.ToString(), updatedOrg.Organization.Status);
     }

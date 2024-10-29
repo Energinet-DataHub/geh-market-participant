@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public interface IOrganizationAuditLogRepository
+public sealed class OrganizationDomainEntity : IDeletableAuditedEntity
 {
-    Task<IEnumerable<AuditLog<OrganizationAuditedChange>>> GetAsync(OrganizationId organization);
+    public Guid Id { get; set; }
+    public Guid OrganizationId { get; set; }
+    public string Domain { get; set; } = null!;
+
+    public int Version { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
+    public Guid? DeletedByIdentityId { get; set; }
 }
