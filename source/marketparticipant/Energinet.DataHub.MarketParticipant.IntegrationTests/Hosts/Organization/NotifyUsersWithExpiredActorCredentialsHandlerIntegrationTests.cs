@@ -32,11 +32,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.Organizatio
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class ValidateActorCredentialsHandlerIntegrationTests
+public sealed class NotifyUsersWithExpiredActorCredentialsHandlerIntegrationTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public ValidateActorCredentialsHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
+    public NotifyUsersWithExpiredActorCredentialsHandlerIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -71,7 +71,7 @@ public sealed class ValidateActorCredentialsHandlerIntegrationTests
         // Act
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Send(new ValidateActorCredentialsCommand());
+        await mediator.Send(new NotifyUsersWithExpiredActorCredentialsCommand());
 
         // Assert
         domainEventRepository.Verify(
@@ -113,7 +113,7 @@ public sealed class ValidateActorCredentialsHandlerIntegrationTests
         // Act
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Send(new ValidateActorCredentialsCommand());
+        await mediator.Send(new NotifyUsersWithExpiredActorCredentialsCommand());
 
         // Assert
         domainEventRepository.Verify(
@@ -155,7 +155,7 @@ public sealed class ValidateActorCredentialsHandlerIntegrationTests
         // Act
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Send(new ValidateActorCredentialsCommand());
+        await mediator.Send(new NotifyUsersWithExpiredActorCredentialsCommand());
 
         // Assert
         domainEventRepository.Verify(
@@ -189,7 +189,7 @@ public sealed class ValidateActorCredentialsHandlerIntegrationTests
         // Act
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Send(new ValidateActorCredentialsCommand());
+        await mediator.Send(new NotifyUsersWithExpiredActorCredentialsCommand());
 
         // Assert
         domainEventRepository.Verify(

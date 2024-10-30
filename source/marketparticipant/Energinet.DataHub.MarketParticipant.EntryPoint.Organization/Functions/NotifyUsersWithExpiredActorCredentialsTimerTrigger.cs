@@ -19,19 +19,19 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 
-public sealed class ValidateActorCredentialsTimerTrigger
+public sealed class NotifyUsersWithExpiredActorCredentialsTimerTrigger
 {
     private readonly IMediator _mediator;
 
-    public ValidateActorCredentialsTimerTrigger(IMediator mediator)
+    public NotifyUsersWithExpiredActorCredentialsTimerTrigger(IMediator mediator)
     {
         _mediator = mediator;
     }
 
     // NOTE: Changing the schedule changes how often notifications are sent.
-    [Function(nameof(ValidateActorCredentialsTimerTrigger))]
+    [Function(nameof(NotifyUsersWithExpiredActorCredentialsTimerTrigger))]
     public Task RunAsync([TimerTrigger("0 5 * * *")] FunctionContext context)
     {
-        return _mediator.Send(new ValidateActorCredentialsCommand());
+        return _mediator.Send(new NotifyUsersWithExpiredActorCredentialsCommand());
     }
 }

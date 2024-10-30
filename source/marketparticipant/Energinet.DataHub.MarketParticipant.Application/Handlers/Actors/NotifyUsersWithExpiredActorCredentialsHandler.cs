@@ -22,12 +22,12 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 
-public sealed class ValidateActorCredentialsHandler : IRequestHandler<ValidateActorCredentialsCommand>
+public sealed class NotifyUsersWithExpiredActorCredentialsHandler : IRequestHandler<NotifyUsersWithExpiredActorCredentialsCommand>
 {
     private readonly IActorRepository _actorRepository;
     private readonly IDomainEventRepository _domainEventRepository;
 
-    public ValidateActorCredentialsHandler(
+    public NotifyUsersWithExpiredActorCredentialsHandler(
         IActorRepository actorRepository,
         IDomainEventRepository domainEventRepository)
     {
@@ -35,7 +35,7 @@ public sealed class ValidateActorCredentialsHandler : IRequestHandler<ValidateAc
         _domainEventRepository = domainEventRepository;
     }
 
-    public async Task Handle(ValidateActorCredentialsCommand request, CancellationToken cancellationToken)
+    public async Task Handle(NotifyUsersWithExpiredActorCredentialsCommand request, CancellationToken cancellationToken)
     {
         var allActors = await _actorRepository
             .GetActorsAsync()

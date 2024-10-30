@@ -17,4 +17,4 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class ValidateActorCredentialsCommandRuleSet : AbstractValidator<ValidateActorCredentialsCommand>;
+public sealed class NotifyUsersWithExpiredActorCredentialsCommandRuleSet : AbstractValidator<NotifyUsersWithExpiredActorCredentialsCommand>;

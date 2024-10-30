@@ -108,7 +108,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<StopProcessDelegationCommand>, StopProcessDelegationCommandRuleSet>();
         services.AddScoped<IValidator<ReActivateUserCommand>, ReActivateUserCommandRuleSet>();
         services.AddScoped<IValidator<GetBalanceResponsibilityRelationsCommand>, GetBalanceResponsibilityRelationsCommandRuleSet>();
-        services.AddScoped<IValidator<ValidateActorCredentialsCommand>, ValidateActorCredentialsCommandRuleSet>();
+        services.AddScoped<IValidator<NotifyUsersWithExpiredActorCredentialsCommand>, NotifyUsersWithExpiredActorCredentialsCommandRuleSet>();
         services.AddScoped<IValidator<ValidateBalanceResponsibilitiesCommand>, ValidateBalanceResponsibilitiesCommandRuleSet>();
         services.AddScoped<IValidator<CreateDownloadTokenCommand>, CreateDownloadTokenCommandRuleSet>();
         services.AddScoped<IValidator<ExchangeDownloadTokenCommand>, ExchangeDownloadTokenCommandRuleSet>();
