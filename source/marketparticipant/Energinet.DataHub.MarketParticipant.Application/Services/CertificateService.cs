@@ -51,11 +51,16 @@ public class CertificateService : ICertificateService
 
         await foreach (var secret in secrets)
         {
+            if (secret.Enabled != true)
+                continue;
+
             if (secret.ExpiresOn != null)
                 continue;
 
-            secret.ExpiresOn = DateTime.UtcNow.AddDays(365);
-            await _keyVault.UpdateSecretPropertiesAsync(secret).ConfigureAwait(false);
+            var latest = await _keyVault.GetSecretAsync(secret.Name).ConfigureAwait(false);
+
+            latest.Value.Properties.ExpiresOn = DateTime.UtcNow.AddDays(365);
+            await _keyVault.UpdateSecretPropertiesAsync(latest.Value.Properties).ConfigureAwait(false);
         }
     }
 
