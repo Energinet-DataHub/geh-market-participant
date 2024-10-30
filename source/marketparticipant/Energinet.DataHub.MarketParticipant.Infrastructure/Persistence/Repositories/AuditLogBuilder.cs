@@ -90,12 +90,12 @@ public sealed class AuditLogBuilder<TAuditedChange, TAuditedEntity>
                     }
                     else
                     {
-                        auditLogs.AddRange(isFirst ? BuildCreationAuditLogs(entityList, i) : BuildAuditLogs(entityList, i));
+                        auditLogs.AddRange(isFirst ? BuildCreationAuditLogs(entityList) : BuildAuditLogs(entityList, i));
                     }
                 }
                 else if (isFirst)
                 {
-                    auditLogs.AddRange(BuildCreationAuditLogs(entityList, i));
+                    auditLogs.AddRange(BuildCreationAuditLogs(entityList));
                 }
                 else
                 {
@@ -107,9 +107,9 @@ public sealed class AuditLogBuilder<TAuditedChange, TAuditedEntity>
         return auditLogs;
     }
 
-    private IEnumerable<AuditLog<TAuditedChange>> BuildCreationAuditLogs(IReadOnlyList<(TAuditedEntity Entity, DateTimeOffset Timestamp)> entities, int i)
+    private IEnumerable<AuditLog<TAuditedChange>> BuildCreationAuditLogs(IReadOnlyList<(TAuditedEntity Entity, DateTimeOffset Timestamp)> entities)
     {
-        var (entity, timestamp) = entities[i];
+        var (entity, timestamp) = entities[0];
 
         return from auditChange in _auditedChanges
                where auditChange.CompareAt is AuditedChangeCompareAt.Creation or AuditedChangeCompareAt.BothCreationAndDeletion
