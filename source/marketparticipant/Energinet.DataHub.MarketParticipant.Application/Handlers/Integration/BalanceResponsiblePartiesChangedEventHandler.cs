@@ -67,8 +67,7 @@ public sealed class BalanceResponsiblePartiesChangedEventHandler : IBalanceRespo
             .Where(actor =>
                 actor.Status == ActorStatus.Active &&
                 actor.MarketRoles.Any(mr => mr.Function == EicFunction.DataHubAdministrator))
-            .Select(actor => actor.Id)
-            .ToList();
+            .Select(actor => actor.Id);
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()
