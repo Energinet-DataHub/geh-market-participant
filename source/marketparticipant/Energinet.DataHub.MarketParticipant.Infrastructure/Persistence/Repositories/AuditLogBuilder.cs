@@ -77,23 +77,21 @@ public sealed class AuditLogBuilder<TAuditedChange, TAuditedEntity>
                 .ThenBy(entity => entity.Entity.Version)
                 .ToList();
 
-            var previouslyDeleted = false;
-
             for (var i = 0; i < entityList.Count; i++)
             {
-                var isFirst = i == 0 || previouslyDeleted;
+                var isFirst = i == 0;
                 var isLast = i == entityList.Count - 1;
 
-                previouslyDeleted = false;
-
-                if (entityList[i].Entity is IDeletableAuditedEntity { DeletedByIdentityId: not null } deleted)
+                if (isLast)
                 {
-                    auditLogs.AddRange(BuildDeletionAuditLogs(entityList[i], deleted.DeletedByIdentityId.Value));
-                    previouslyDeleted = true;
-                }
-                else if (isLast)
-                {
-                    auditLogs.AddRange(isFirst ? BuildCreationAuditLogs(entityList, i) : BuildAuditLogs(entityList, i));
+                    if (entityList[i].Entity is IDeletableAuditedEntity { DeletedByIdentityId: not null } deleted)
+                    {
+                        auditLogs.AddRange(BuildDeletionAuditLogs(entityList[i], deleted.DeletedByIdentityId.Value));
+                    }
+                    else
+                    {
+                        auditLogs.AddRange(isFirst ? BuildCreationAuditLogs(entityList, i) : BuildAuditLogs(entityList, i));
+                    }
                 }
                 else if (isFirst)
                 {
