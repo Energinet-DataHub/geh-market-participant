@@ -233,6 +233,7 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
             Assert.NotNull(userRole);
 
             action(userRole);
+            await Task.Delay(100).ConfigureAwait(false); // Delay a bit, so audits get unique time stamps and are easier to assert.
             await userRoleRepository.UpdateAsync(userRole);
 
             var auditLogs = await mediator.Send(command);
