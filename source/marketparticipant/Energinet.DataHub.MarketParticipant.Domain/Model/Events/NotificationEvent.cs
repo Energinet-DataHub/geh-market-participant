@@ -16,10 +16,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
 public abstract class NotificationEvent : DomainEvent
 {
-    protected NotificationEvent(ActorId sender)
+    protected NotificationEvent(ActorId recipient)
     {
-        Sender = sender;
+        Recipient = recipient;
     }
 
-    public ActorId Sender { get; }
+    public ActorId Recipient { get; }
 }

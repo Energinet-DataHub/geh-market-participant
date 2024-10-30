@@ -66,6 +66,11 @@ public sealed class CertificateFixture : IAsyncLifetime
         }
     }
 
+    public async Task<KeyVaultSecret?> GetCertificateAsync(string name)
+    {
+        return await SecretClient.GetSecretAsync(name);
+    }
+
     public async Task<bool> CertificateExistsAsync(string name)
     {
         try

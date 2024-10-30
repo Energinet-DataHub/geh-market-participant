@@ -12,7 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+using NodaTime;
 
-// TODO: Delete
-public record UpdatePermissionOldDto(int Id, string Description);
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+public interface IActorCertificateExpirationService
+{
+    Task<Instant> CalculateExpirationDateAsync(X509Certificate2 certificate);
+}

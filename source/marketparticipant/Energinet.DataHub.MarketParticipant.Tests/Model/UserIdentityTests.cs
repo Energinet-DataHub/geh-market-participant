@@ -29,7 +29,7 @@ public sealed class UserIdentityTests
     private const string ValidFirstName = "John";
     private const string ValidLastName = "Doe";
     private readonly PhoneNumber _validPhoneNumber = new("+45 00000000");
-    private readonly EmailAddress _validEmailAddress = new("todo@todo.dk");
+    private readonly EmailAddress _validEmailAddress = new("test@datahub.dk");
     private readonly AuthenticationMethod _validAuthentication = new SmsAuthenticationMethod(new PhoneNumber("+45 71000000"));
     private readonly IEnumerable<LoginIdentity> _validLoginIdentities = [new LoginIdentity("emailAddress", "issuer", "issuerAssignedId")];
 

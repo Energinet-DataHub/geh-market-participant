@@ -18,35 +18,28 @@ using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-public sealed class BalanceResponsibilityValidationFailed : NotificationEvent
+public sealed class ActorCredentialsExpiring : NotificationEvent
 {
     [JsonConstructor]
     [Browsable(false)]
-    public BalanceResponsibilityValidationFailed(
+    public ActorCredentialsExpiring(
         Guid eventId,
         ActorId recipient,
-        ActorNumber actorNumber,
-        bool isActorUnrecognized)
+        ActorId affectedActorId)
         : base(recipient)
     {
         EventId = eventId;
-        ActorNumber = actorNumber;
-        IsActorUnrecognized = isActorUnrecognized;
+        AffectedActorId = affectedActorId;
     }
 
-    public BalanceResponsibilityValidationFailed(
+    public ActorCredentialsExpiring(
         ActorId recipient,
-        ActorNumber actorNumber,
-        bool isActorUnrecognized)
+        ActorId affectedActorId)
         : base(recipient)
     {
-        ArgumentNullException.ThrowIfNull(actorNumber);
-
         EventId = Guid.NewGuid();
-        ActorNumber = actorNumber;
-        IsActorUnrecognized = isActorUnrecognized;
+        AffectedActorId = affectedActorId;
     }
 
-    public ActorNumber ActorNumber { get; }
-    public bool IsActorUnrecognized { get; }
+    public ActorId AffectedActorId { get; }
 }

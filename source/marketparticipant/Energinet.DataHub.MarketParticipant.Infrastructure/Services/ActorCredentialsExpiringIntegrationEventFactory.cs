@@ -23,14 +23,14 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
-public sealed class BalanceResponsibilityValidationFailedIntegrationEventFactory : IIntegrationEventFactory<BalanceResponsibilityValidationFailed>
+public sealed class ActorCredentialsExpiringIntegrationEventFactory : IIntegrationEventFactory<ActorCredentialsExpiring>
 {
-    public Task<IntegrationEvent> CreateAsync(BalanceResponsibilityValidationFailed domainEvent, int sequenceNumber)
+    public Task<IntegrationEvent> CreateAsync(ActorCredentialsExpiring domainEvent, int sequenceNumber)
     {
         ArgumentNullException.ThrowIfNull(domainEvent);
 
         var now = DateTime.UtcNow;
-        var permission = KnownPermissions.All.Single(p => p.Id == PermissionId.BalanceResponsibilityView).Claim;
+        var permission = KnownPermissions.All.Single(p => p.Id == PermissionId.ActorCredentialsManage).Claim;
 
         var integrationEvent = new IntegrationEvent(
             domainEvent.EventId,
@@ -38,10 +38,10 @@ public sealed class BalanceResponsibilityValidationFailedIntegrationEventFactory
             Model.Contracts.UserNotificationTriggered.CurrentMinorVersion,
             new Model.Contracts.UserNotificationTriggered
             {
-                ReasonIdentifier = domainEvent.IsActorUnrecognized ? "BalanceResponsibilityActorUnrecognized" : "BalanceResponsibilityValidationFailed",
+                ReasonIdentifier = "ActorCredentialsExpiring",
                 TargetActorId = domainEvent.Recipient.ToString(),
                 TargetPermissions = permission,
-                RelatedId = domainEvent.ActorNumber.Value,
+                RelatedId = domainEvent.AffectedActorId.ToString(),
                 OccurredAt = now.ToTimestamp(),
                 ExpiresAt = now.AddHours(23).ToTimestamp(),
             });

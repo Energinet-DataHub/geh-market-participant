@@ -22,8 +22,8 @@ using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
-using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 
@@ -32,17 +32,20 @@ public sealed class AssignActorCertificateHandler : IRequestHandler<AssignActorC
     private readonly IActorRepository _actorRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IDomainEventRepository _domainEventRepository;
+    private readonly IActorCertificateExpirationService _actorCertificateExpirationService;
     private readonly ICertificateService _certificateService;
 
     public AssignActorCertificateHandler(
         IActorRepository actorRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IDomainEventRepository domainEventRepository,
+        IActorCertificateExpirationService actorCertificateExpirationService,
         ICertificateService certificateService)
     {
         _actorRepository = actorRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _domainEventRepository = domainEventRepository;
+        _actorCertificateExpirationService = actorCertificateExpirationService;
         _certificateService = certificateService;
     }
 
@@ -62,10 +65,14 @@ public sealed class AssignActorCertificateHandler : IRequestHandler<AssignActorC
         if (actor.Credentials is not null)
             throw new ValidationException("Credentials have already been assigned.");
 
+        var expirationDate = await _actorCertificateExpirationService
+            .CalculateExpirationDateAsync(x509Certificate)
+            .ConfigureAwait(false);
+
         actor.Credentials = new ActorCertificateCredentials(
             x509Certificate.Thumbprint,
             certificateLookupIdentifier,
-            x509Certificate.NotAfter.ToUniversalTime().ToInstant());
+            expirationDate);
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()
@@ -84,7 +91,7 @@ public sealed class AssignActorCertificateHandler : IRequestHandler<AssignActorC
                 .ConfigureAwait(false);
 
             await _certificateService
-                .SaveCertificateAsync(certificateLookupIdentifier, x509Certificate)
+                .SaveCertificateAsync(certificateLookupIdentifier, x509Certificate, expirationDate)
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
