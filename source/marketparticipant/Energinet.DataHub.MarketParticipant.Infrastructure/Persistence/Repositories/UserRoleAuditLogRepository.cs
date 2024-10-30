@@ -78,7 +78,7 @@ public sealed class UserRoleAuditLogRepository : IUserRoleAuditLogRepository
         return new AuditLogBuilder<UserRoleAuditedChange, UserRolePermissionEntity>(dataSource)
             .Add(UserRoleAuditedChange.PermissionAdded, entity => (int)entity.Permission, AuditedChangeCompareAt.Creation)
             .Add(UserRoleAuditedChange.PermissionRemoved, entity => (int)entity.Permission, AuditedChangeCompareAt.Deletion)
-            .WithGrouping(entity => entity.Permission)
+            .WithGrouping(_ => Guid.NewGuid()) // Each changed should be looked at separately.
             .BuildAsync();
     }
 }
