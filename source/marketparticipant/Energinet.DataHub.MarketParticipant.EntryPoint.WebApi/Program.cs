@@ -41,8 +41,6 @@ builder.Services
     .AddApiVersioningForWebApp(new ApiVersion(1, 0))
     .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), SubsystemInformation.Name);
 
-builder.Services.AddHostedService<PatchCerts>();
-
 builder.Services
     .AddJwtBearerAuthenticationForWebApp(builder.Configuration)
     .AddUserAuthenticationForWebApp<FrontendUser, FrontendUserProvider>()
@@ -52,6 +50,8 @@ builder.Services
 
 builder.Services
     .AddMarketParticipantWebApiModule(builder.Configuration);
+
+builder.Services.AddHostedService<PatchCerts>();
 
 var app = builder.Build();
 
