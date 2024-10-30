@@ -14,4 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public abstract class ActorCredentials;
+public abstract class ActorCredentials
+{
+    public abstract bool ExpiresSoon();
+}

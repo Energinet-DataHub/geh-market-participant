@@ -31,4 +31,9 @@ public class ActorCertificateCredentials : ActorCredentials
     public string CertificateThumbprint { get; }
     public string KeyVaultSecretIdentifier { get; }
     public Instant ExpirationDate { get; }
+
+    public override bool ExpiresSoon()
+    {
+        return ExpirationDate - Clock.Instance.GetCurrentInstant() < Duration.FromDays(30);
+    }
 }

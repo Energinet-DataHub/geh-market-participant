@@ -105,6 +105,18 @@ public sealed class IntegrationEventProviderIntegrationTests
         await domainEventRepository.EnqueueAsync(notification);
     }
 
+    private static async Task PrepareActorCredentialsExpiringEventAsync(IServiceProvider scope)
+    {
+        var recipient = new ActorId(Guid.NewGuid());
+
+        var notification = new ActorCredentialsExpiring(
+            recipient,
+            recipient);
+
+        var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
+        await domainEventRepository.EnqueueAsync(notification);
+    }
+
     private static Task PrepareActorActivatedEventAsync(IServiceProvider scope)
     {
         var actor = new Actor(
@@ -238,6 +250,7 @@ public sealed class IntegrationEventProviderIntegrationTests
             nameof(GridAreaOwnershipAssigned) => PrepareGridAreaOwnershipAssignedEventAsync(scope),
             nameof(ProcessDelegationConfigured) => PrepareProcessDelegationConfiguredEventAsync(scope),
             nameof(BalanceResponsibilityValidationFailed) => PrepareBalanceResponsibilityValidationFailedEventAsync(scope),
+            nameof(ActorCredentialsExpiring) => PrepareActorCredentialsExpiringEventAsync(scope),
             _ => throw new NotSupportedException($"Domain event {domainEvent.Name} is missing a test.")
         };
     }

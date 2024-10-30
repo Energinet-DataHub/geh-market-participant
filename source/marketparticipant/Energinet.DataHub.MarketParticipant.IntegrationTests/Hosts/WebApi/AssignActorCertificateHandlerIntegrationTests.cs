@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
@@ -71,8 +72,10 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         var thumbprint = (updatedActor.Credentials as ActorCertificateCredentials)?.CertificateThumbprint;
         var certificateLookupIdentifier = $"{actor.ActorNumber}-{thumbprint}";
 
-        var certificateExists = await _certificateFixture.CertificateExistsAsync(certificateLookupIdentifier);
-        Assert.True(certificateExists);
+        var uploadedCertificate = await _certificateFixture.GetCertificateAsync(certificateLookupIdentifier);
+        Assert.NotNull(uploadedCertificate);
+        Assert.Equal(new DateTimeOffset(638611295260000000, TimeSpan.Zero), uploadedCertificate.Properties.ExpiresOn);
+
         await _certificateFixture.CleanUpCertificateFromStorageAsync(certificateLookupIdentifier);
         await _databaseFixture.AssignActorCredentialsAsync(actor.Id, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
     }

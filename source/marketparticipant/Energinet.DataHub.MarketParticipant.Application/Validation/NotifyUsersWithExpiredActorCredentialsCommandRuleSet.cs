@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class UsedActorCertificatesEntity
-{
-    public int Id { get; set; }
-    public string Thumbprint { get; set; } = null!;
-    public Guid ActorId { get; set; }
-    public DateTimeOffset AddedAt { get; set; }
-}
+public sealed class NotifyUsersWithExpiredActorCredentialsCommandRuleSet : AbstractValidator<NotifyUsersWithExpiredActorCredentialsCommand>;

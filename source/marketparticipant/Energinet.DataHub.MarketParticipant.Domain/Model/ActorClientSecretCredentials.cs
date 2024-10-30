@@ -29,4 +29,9 @@ public class ActorClientSecretCredentials : ActorCredentials
     public Guid ClientId { get; }
     public Guid SecretIdentifier { get; }
     public Instant ExpirationDate { get; }
+
+    public override bool ExpiresSoon()
+    {
+        return ExpirationDate - Clock.Instance.GetCurrentInstant() < Duration.FromDays(30);
+    }
 }

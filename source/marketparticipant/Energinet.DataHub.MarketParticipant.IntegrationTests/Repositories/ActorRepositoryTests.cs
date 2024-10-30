@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Moq;
+using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
@@ -232,6 +233,7 @@ public sealed class ActorRepositoryTests
         Assert.IsType<ActorCertificateCredentials>(actual.Credentials);
         Assert.Equal(actorCredentials.KeyVaultSecretIdentifier, (actual.Credentials as ActorCertificateCredentials)?.KeyVaultSecretIdentifier);
         Assert.Equal(actorCredentials.CertificateThumbprint, (actual.Credentials as ActorCertificateCredentials)?.CertificateThumbprint);
+        Assert.True((actual.Credentials as ActorCertificateCredentials)?.ExpirationDate > SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(364)));
     }
 
     [Fact]

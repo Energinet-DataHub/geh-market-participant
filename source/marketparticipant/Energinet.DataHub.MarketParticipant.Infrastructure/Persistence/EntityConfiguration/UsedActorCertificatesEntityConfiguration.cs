@@ -26,6 +26,5 @@ public class UsedActorCertificatesEntityConfiguration : IEntityTypeConfiguration
         ArgumentNullException.ThrowIfNull(builder);
         builder.ToTable("UsedActorCertificates");
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Thumbprint);
     }
 }

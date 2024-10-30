@@ -66,25 +66,6 @@ public class PermissionController : ControllerBase
         return Ok(response.Permissions);
     }
 
-    // TODO: Delete.
-    [HttpPut]
-    [AuthorizeUser(PermissionId.UserRolesManage)]
-    public async Task<ActionResult> UpdateAsync(UpdatePermissionOldDto updatePermissionDto)
-    {
-        ArgumentNullException.ThrowIfNull(updatePermissionDto);
-
-        if (!_userContext.CurrentUser.IsFas)
-            return Unauthorized();
-
-        var command = new UpdatePermissionCommand(updatePermissionDto.Id, updatePermissionDto.Description);
-
-        await _mediator
-            .Send(command)
-            .ConfigureAwait(false);
-
-        return Ok();
-    }
-
     [HttpPut("{permissionId:int}")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
     [EnableRevision(RevisionActivities.PermissionEdited, typeof(Permission), "permissionId")]
