@@ -16,23 +16,27 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
 public sealed class PatchCerts : IHostedService
 {
-    private readonly ICertificateService _certificateService;
+    private readonly IServiceProvider _serviceProvider;
 
-    public PatchCerts(ICertificateService certificateService)
+    public PatchCerts(IServiceProvider serviceProvider)
     {
-        _certificateService = certificateService;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken).ConfigureAwait(false);
-        await _certificateService.SyncWorkaroundAsync().ConfigureAwait(false);
+
+        using var scope = _serviceProvider.CreateScope();
+        var certificateService = scope.ServiceProvider.GetRequiredService<ICertificateService>();
+        await certificateService.SyncWorkaroundAsync().ConfigureAwait(false);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
