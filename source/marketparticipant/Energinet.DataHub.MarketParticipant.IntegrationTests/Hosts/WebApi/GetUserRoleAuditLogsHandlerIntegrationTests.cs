@@ -171,6 +171,33 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
             });
     }
 
+    [Fact]
+    public Task GetAuditLogs_AddedRemovedPermissions_IsAudited()
+    {
+        var expectedA = PermissionId.UsersManage;
+        var expectedB = PermissionId.ActorCredentialsManage;
+
+        return TestAuditOfUserRoleChangeAsync(
+            response =>
+            {
+                Assert.Contains(response.AuditLogs, log => log.Change == UserRoleAuditedChange.PermissionAdded && expectedA == Enum.Parse<PermissionId>(log.CurrentValue!));
+                Assert.Contains(response.AuditLogs, log => log.Change == UserRoleAuditedChange.PermissionAdded && expectedB == Enum.Parse<PermissionId>(log.CurrentValue!));
+                Assert.Contains(response.AuditLogs, log => log.Change == UserRoleAuditedChange.PermissionRemoved && expectedA == Enum.Parse<PermissionId>(log.PreviousValue!));
+            },
+            userRole =>
+            {
+                userRole.Permissions = [expectedA, expectedB];
+            },
+            userRole =>
+            {
+                userRole.Permissions = [expectedB];
+            },
+            userRole =>
+            {
+                userRole.Permissions = [expectedA, expectedB];
+            });
+    }
+
     private async Task TestAuditOfUserRoleChangeAsync(
         Action<GetUserRoleAuditLogsResponse> assert,
         params Action<UserRole>[] changeActions)
@@ -192,6 +219,7 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var command = new GetUserRoleAuditLogsCommand(userRoleEntity.Id);
+        var auditLogsProcessed = 4; // Skip 4, as first log is always Created.
 
         foreach (var action in changeActions)
         {
@@ -205,15 +233,18 @@ public sealed class GetUserRoleAuditLogsHandlerIntegrationTests
             Assert.NotNull(userRole);
 
             action(userRole);
+            await Task.Delay(100).ConfigureAwait(false); // Delay a bit, so audits get unique time stamps and are easier to assert.
             await userRoleRepository.UpdateAsync(userRole);
 
             var auditLogs = await mediator.Send(command);
 
-            foreach (var actorAuditLog in auditLogs.AuditLogs.Where(log => !log.IsInitialAssignment))
+            foreach (var actorAuditLog in auditLogs.AuditLogs.Skip(auditLogsProcessed))
             {
                 Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
                 Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
+
+                auditLogsProcessed++;
             }
         }
 
