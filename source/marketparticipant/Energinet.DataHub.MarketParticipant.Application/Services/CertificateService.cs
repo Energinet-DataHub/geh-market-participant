@@ -43,6 +43,22 @@ public class CertificateService : ICertificateService
         _logger = logger;
     }
 
+    public async Task SyncWorkaroundAsync()
+    {
+        var secrets = _keyVault
+            .GetPropertiesOfSecretsAsync()
+            .ConfigureAwait(false);
+
+        await foreach (var secret in secrets)
+        {
+            if (secret.ExpiresOn != null)
+                continue;
+
+            secret.ExpiresOn = DateTime.UtcNow.AddDays(365);
+            await _keyVault.UpdateSecretPropertiesAsync(secret).ConfigureAwait(false);
+        }
+    }
+
     public async Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate, Instant expirationDate)
     {
         ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
