@@ -77,25 +77,27 @@ public sealed class AuditLogBuilder<TAuditedChange, TAuditedEntity>
                 .ThenBy(entity => entity.Entity.Version)
                 .ToList();
 
+            var previouslyDeleted = false;
+
             for (var i = 0; i < entityList.Count; i++)
             {
-                var isFirst = i == 0;
+                var isFirst = i == 0 || previouslyDeleted;
                 var isLast = i == entityList.Count - 1;
 
-                if (isLast)
+                previouslyDeleted = false;
+
+                if (entityList[i].Entity is IDeletableAuditedEntity { DeletedByIdentityId: not null } deleted)
                 {
-                    if (entityList[i].Entity is IDeletableAuditedEntity { DeletedByIdentityId: not null } deleted)
-                    {
-                        auditLogs.AddRange(BuildDeletionAuditLogs(entityList[i], deleted.DeletedByIdentityId.Value));
-                    }
-                    else
-                    {
-                        auditLogs.AddRange(isFirst ? BuildCreationAuditLogs(entityList) : BuildAuditLogs(entityList, i));
-                    }
+                    auditLogs.AddRange(BuildDeletionAuditLogs(entityList[i], deleted.DeletedByIdentityId.Value));
+                    previouslyDeleted = true;
+                }
+                else if (isLast)
+                {
+                    auditLogs.AddRange(isFirst ? BuildCreationAuditLogs(entityList, i) : BuildAuditLogs(entityList, i));
                 }
                 else if (isFirst)
                 {
-                    auditLogs.AddRange(BuildCreationAuditLogs(entityList));
+                    auditLogs.AddRange(BuildCreationAuditLogs(entityList, i));
                 }
                 else
                 {
@@ -107,9 +109,9 @@ public sealed class AuditLogBuilder<TAuditedChange, TAuditedEntity>
         return auditLogs;
     }
 
-    private IEnumerable<AuditLog<TAuditedChange>> BuildCreationAuditLogs(IReadOnlyList<(TAuditedEntity Entity, DateTimeOffset Timestamp)> entities)
+    private IEnumerable<AuditLog<TAuditedChange>> BuildCreationAuditLogs(IReadOnlyList<(TAuditedEntity Entity, DateTimeOffset Timestamp)> entities, int i)
     {
-        var (entity, timestamp) = entities[0];
+        var (entity, timestamp) = entities[i];
 
         return from auditChange in _auditedChanges
                where auditChange.CompareAt is AuditedChangeCompareAt.Creation or AuditedChangeCompareAt.BothCreationAndDeletion
