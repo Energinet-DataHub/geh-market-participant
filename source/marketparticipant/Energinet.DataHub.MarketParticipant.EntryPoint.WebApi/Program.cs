@@ -51,8 +51,6 @@ builder.Services
 builder.Services
     .AddMarketParticipantWebApiModule(builder.Configuration);
 
-builder.Services.AddHostedService<PatchCerts>();
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
