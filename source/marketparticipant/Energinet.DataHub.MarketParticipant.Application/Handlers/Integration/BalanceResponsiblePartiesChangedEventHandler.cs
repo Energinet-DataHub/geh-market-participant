@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Options;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Email;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Extensions.Options;
 using NodaTime.Serialization.Protobuf;
@@ -26,19 +28,48 @@ using MeteringPointType = Energinet.DataHub.MarketParticipant.Application.Contra
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 
 #pragma warning disable CA1711
-public sealed class BalanceResponsiblePartiesChangedEventHandler(
-#pragma warning restore CA1711
-    IBalanceResponsibilityRequestRepository balanceResponsibilityRequestRepository,
-    IEmailEventRepository emailEventRepository,
-    IUnitOfWorkProvider unitOfWorkProvider,
-    IOptions<BalanceResponsibleChangedOptions> balanceResponsibleChangedOptions)
-    : IBalanceResponsiblePartiesChangedEventHandler
+public sealed class BalanceResponsiblePartiesChangedEventHandler : IBalanceResponsiblePartiesChangedEventHandler
 {
+#pragma warning disable CA1711
+
+    private readonly IActorRepository _actorRepository;
+    private readonly IDomainEventRepository _domainEventRepository;
+    private readonly IBalanceResponsibilityRequestRepository _balanceResponsibilityRequestRepository;
+    private readonly IEmailEventRepository _emailEventRepository;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+    private readonly IOptions<BalanceResponsibleChangedOptions> _balanceResponsibleChangedOptions;
+
+    public BalanceResponsiblePartiesChangedEventHandler(
+        IActorRepository actorRepository,
+        IDomainEventRepository domainEventRepository,
+        IBalanceResponsibilityRequestRepository balanceResponsibilityRequestRepository,
+        IEmailEventRepository emailEventRepository,
+        IUnitOfWorkProvider unitOfWorkProvider,
+        IOptions<BalanceResponsibleChangedOptions> balanceResponsibleChangedOptions)
+    {
+        _actorRepository = actorRepository;
+        _domainEventRepository = domainEventRepository;
+        _balanceResponsibilityRequestRepository = balanceResponsibilityRequestRepository;
+        _emailEventRepository = emailEventRepository;
+        _unitOfWorkProvider = unitOfWorkProvider;
+        _balanceResponsibleChangedOptions = balanceResponsibleChangedOptions;
+    }
+
     public async Task HandleAsync(Contracts.BalanceResponsiblePartiesChanged balanceResponsiblePartiesChanged)
     {
         ArgumentNullException.ThrowIfNull(balanceResponsiblePartiesChanged);
 
-        var uow = await unitOfWorkProvider
+        var allActors = await _actorRepository
+                .GetActorsAsync()
+                .ConfigureAwait(false);
+
+        var notificationTargets = allActors
+            .Where(actor =>
+                actor.Status == ActorStatus.Active &&
+                actor.MarketRoles.Any(mr => mr.Function == EicFunction.DataHubAdministrator))
+            .Select(actor => actor.Id);
+
+        var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
 
@@ -46,9 +77,16 @@ public sealed class BalanceResponsiblePartiesChangedEventHandler(
         {
             var balanceResponsibilityRequest = Map(balanceResponsiblePartiesChanged);
 
-            await balanceResponsibilityRequestRepository
+            await _balanceResponsibilityRequestRepository
                 .EnqueueAsync(balanceResponsibilityRequest)
                 .ConfigureAwait(false);
+
+            foreach (var target in notificationTargets)
+            {
+                await _domainEventRepository
+                    .EnqueueAsync(new NewBalanceResponsibilityReceived(target, balanceResponsibilityRequest.EnergySupplier))
+                    .ConfigureAwait(false);
+            }
 
             await BuildAndSendEmailAsync(balanceResponsibilityRequest)
                 .ConfigureAwait(false);
@@ -78,9 +116,9 @@ public sealed class BalanceResponsiblePartiesChangedEventHandler(
 
     private Task BuildAndSendEmailAsync(BalanceResponsibilityRequest balanceResponsibilityRequest)
     {
-        return emailEventRepository.InsertAsync(
+        return _emailEventRepository.InsertAsync(
             new EmailEvent(
-                new EmailAddress(balanceResponsibleChangedOptions.Value.NotificationToEmail),
+                new EmailAddress(_balanceResponsibleChangedOptions.Value.NotificationToEmail),
                 new BalanceResponsiblePartiesChangedEmailTemplate(balanceResponsibilityRequest)));
     }
 }
