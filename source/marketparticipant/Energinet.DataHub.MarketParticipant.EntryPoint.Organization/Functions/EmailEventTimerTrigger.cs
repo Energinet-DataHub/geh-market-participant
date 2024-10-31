@@ -29,7 +29,7 @@ public sealed class EmailEventTimerTrigger
     }
 
     [Function(nameof(EmailEventTimerTrigger))]
-    public Task RunAsync([TimerTrigger("* */5 * * * *")] FunctionContext context)
+    public Task RunAsync([TimerTrigger("*/3 * * * *")] FunctionContext context)
     {
         return _mediator.Send(new SendEmailCommand());
     }

@@ -30,7 +30,7 @@ public sealed class AuditLoginAttemptsTrigger
     }
 
     [Function(nameof(AuditLoginAttemptsTrigger))]
-    public Task RunAsync([TimerTrigger("0 3/24 * * *", RunOnStartup = true)] FunctionContext context)
+    public Task RunAsync([TimerTrigger("0 3/24 * * *")] FunctionContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         return _mediator.Send(new AuditLoginAttemptsCommand());

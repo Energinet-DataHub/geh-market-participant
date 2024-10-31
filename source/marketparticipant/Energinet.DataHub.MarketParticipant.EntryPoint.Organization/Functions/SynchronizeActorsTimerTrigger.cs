@@ -29,7 +29,7 @@ public sealed class SynchronizeActorsTimerTrigger
     }
 
     [Function(nameof(SynchronizeActorsTimerTrigger))]
-    public Task RunAsync([TimerTrigger("*/30 * * * * *")] FunctionContext context)
+    public Task RunAsync([TimerTrigger("* * * * *")] FunctionContext context)
     {
         return _mediator.Send(new SynchronizeActorsCommand());
     }
