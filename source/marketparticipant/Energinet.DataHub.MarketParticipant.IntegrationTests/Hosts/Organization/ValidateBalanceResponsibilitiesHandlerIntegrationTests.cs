@@ -326,7 +326,7 @@ public sealed class ValidateBalanceResponsibilitiesHandlerIntegrationTests : IAs
             MeteringPointType = Application.Contracts.MeteringPointType.Production,
             Received = DateTime.UtcNow.ToTimestamp(),
             ValidFrom = new DateTime(2024, 10, 8, 0, 0, 0, DateTimeKind.Utc).ToTimestamp(),
-            ValidTo = new DateTime(2024, 11, 1, 0, 0, 0, DateTimeKind.Utc).ToTimestamp()
+            ValidTo = DateTime.UtcNow.AddDays(5).ToTimestamp()
         });
 
         // Act
