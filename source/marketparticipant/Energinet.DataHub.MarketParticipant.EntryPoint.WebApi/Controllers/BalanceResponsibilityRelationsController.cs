@@ -64,6 +64,7 @@ public sealed class BalanceResponsibilityRelationsController : ControllerBase
     public async Task<ActionResult> ImportAsync(IFormFile balanceResponsibility)
     {
         ArgumentNullException.ThrowIfNull(balanceResponsibility);
+        await _mediator.Send(new ImportBalanceResponsibilitiesCommand(balanceResponsibility.OpenReadStream())).ConfigureAwait(false);
         return Ok();
     }
 }
