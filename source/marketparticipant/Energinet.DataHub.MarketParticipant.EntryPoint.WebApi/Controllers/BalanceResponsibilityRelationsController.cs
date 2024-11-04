@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
@@ -54,5 +55,15 @@ public sealed class BalanceResponsibilityRelationsController : ControllerBase
             .ConfigureAwait(false);
 
         return Ok(result.Relations);
+    }
+
+    [HttpPost]
+    [Route("import")]
+    [AuthorizeUser(PermissionId.BalanceResponsibilityManage)]
+    [EnableRevision(RevisionActivities.BalanceResponsibilityRelationsImported)]
+    public async Task<ActionResult> ImportAsync(IFormFile balanceResponsibility)
+    {
+        ArgumentNullException.ThrowIfNull(balanceResponsibility);
+        return Ok();
     }
 }

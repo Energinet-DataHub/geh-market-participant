@@ -33,6 +33,7 @@ public static class RevisionActivities
     public const string ActorClientSecretAssigned = "ActorClientSecretAssigned";
 
     public const string BalanceResponsibilityRelationsForActorViewed = "BalanceResponsibilityRelationsForActorViewed";
+    public const string BalanceResponsibilityRelationsImported = "BalanceResponsibilityRelationsImported";
     public const string DelegationsForActorViewed = "DelegationsForActorViewed";
     public const string ActorDelegationStarted = "ActorDelegationStarted";
     public const string ActorDelegationStopped = "ActorDelegationStopped";
