@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
-public sealed record ActorMarketRoleDto(EicFunction EicFunction, IEnumerable<ActorGridAreaDto> GridAreas, string? Comment);
+public sealed record ActorMarketRoleDto(EicFunction EicFunction, string? Comment);

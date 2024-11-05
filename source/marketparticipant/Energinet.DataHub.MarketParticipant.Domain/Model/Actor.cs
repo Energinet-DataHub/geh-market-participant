@@ -24,10 +24,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 public sealed class Actor : IPublishDomainEvents
 {
     private readonly DomainEventList _domainEvents;
-    private readonly List<ActorMarketRole> _marketRoles = new();
     private readonly ActorStatusTransitioner _actorStatusTransitioner;
     private ExternalActorId? _externalActorId;
     private ActorCredentials? _credentials;
+    private ActorMarketRole? _marketRole;
 
     public Actor(
         OrganizationId organizationId,
@@ -48,7 +48,7 @@ public sealed class Actor : IPublishDomainEvents
         ExternalActorId? externalActorId,
         ActorNumber actorNumber,
         ActorStatus actorStatus,
-        IEnumerable<ActorMarketRole> marketRoles,
+        ActorMarketRole marketRole,
         ActorName name,
         ActorCredentials? credentials)
     {
@@ -59,7 +59,7 @@ public sealed class Actor : IPublishDomainEvents
         _domainEvents = new DomainEventList(Id.Value);
         _externalActorId = externalActorId;
         _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
-        _marketRoles.AddRange(marketRoles);
+        _marketRole = marketRole;
         _credentials = credentials;
     }
 
@@ -81,12 +81,9 @@ public sealed class Actor : IPublishDomainEvents
         get => _externalActorId;
         set
         {
-            if (value != null)
+            if (value != null && _marketRole != null)
             {
-                foreach (var marketRole in _marketRoles)
-                {
-                    _domainEvents.Add(new ActorActivated(ActorNumber, marketRole.Function, value));
-                }
+                _domainEvents.Add(new ActorActivated(ActorNumber, _marketRole.Function, value));
             }
 
             _externalActorId = value;
@@ -137,26 +134,20 @@ public sealed class Actor : IPublishDomainEvents
 
             if (Status == ActorStatus.Active && _credentials != value)
             {
-                if (_credentials is ActorCertificateCredentials oldCredentials)
+                if (_credentials is ActorCertificateCredentials oldCredentials && _marketRole != null)
                 {
-                    foreach (var marketRole in _marketRoles)
-                    {
-                        _domainEvents.Add(new ActorCertificateCredentialsRemoved(
-                            ActorNumber,
-                            marketRole.Function,
-                            oldCredentials.CertificateThumbprint));
-                    }
+                    _domainEvents.Add(new ActorCertificateCredentialsRemoved(
+                        ActorNumber,
+                        _marketRole.Function,
+                        oldCredentials.CertificateThumbprint));
                 }
 
-                if (value is ActorCertificateCredentials newCredentials)
+                if (value is ActorCertificateCredentials newCredentials && _marketRole != null)
                 {
-                    foreach (var marketRole in _marketRoles)
-                    {
-                        _domainEvents.Add(new ActorCertificateCredentialsAssigned(
-                            ActorNumber,
-                            marketRole.Function,
-                            newCredentials.CertificateThumbprint));
-                    }
+                    _domainEvents.Add(new ActorCertificateCredentialsAssigned(
+                        ActorNumber,
+                        _marketRole.Function,
+                        newCredentials.CertificateThumbprint));
                 }
             }
 
@@ -165,58 +156,25 @@ public sealed class Actor : IPublishDomainEvents
     }
 
     /// <summary>
-    /// The roles (functions and permissions) assigned to the current actor.
+    /// The role (function and permissions) assigned to the current actor.
     /// </summary>
-    public IReadOnlyList<ActorMarketRole> MarketRoles => _marketRoles;
+    public ActorMarketRole? MarketRole
+    {
+        get => _marketRole;
+        set
+        {
+            if (AreMarketRolesReadOnly)
+            {
+                throw new ValidationException("It is only allowed to modify market roles for actors marked as 'New'.");
+            }
+
+            _marketRole = value;
+        }
+    }
 
     IDomainEvents IPublishDomainEvents.DomainEvents => _domainEvents;
 
     private bool AreMarketRolesReadOnly => Status != ActorStatus.New;
-
-    /// <summary>
-    /// Adds a new role from the current actor.
-    /// This is only allowed for 'New' actors.
-    /// </summary>
-    /// <param name="marketRole">The new market role to add.</param>
-    public void AddMarketRole(ActorMarketRole marketRole)
-    {
-        ArgumentNullException.ThrowIfNull(marketRole);
-
-        if (AreMarketRolesReadOnly)
-        {
-            throw new ValidationException("It is only allowed to modify market roles for actors marked as 'New'.");
-        }
-
-        if (_marketRoles.Any(role => role.Function == marketRole.Function))
-        {
-            throw new ValidationException("The market roles cannot contain duplicates.")
-                .WithErrorCode("actor.market_role.duplicates");
-        }
-
-        _marketRoles.Add(marketRole);
-    }
-
-    /// <summary>
-    /// Removes an existing role from the current actor.
-    /// This is only allowed for 'New' actors.
-    /// </summary>
-    /// <param name="marketRole">The existing market role to remove.</param>
-    public void RemoveMarketRole(ActorMarketRole marketRole)
-    {
-        ArgumentNullException.ThrowIfNull(marketRole);
-
-        if (AreMarketRolesReadOnly)
-        {
-            throw new ValidationException("It is only allowed to modify market roles for actors marked as 'New'.");
-        }
-
-        if (!_marketRoles.Remove(marketRole))
-        {
-            throw new ValidationException($"Market role for {marketRole.Function} was not found.")
-                .WithErrorCode("actor.market_role.not_found")
-                .WithArgs(("market_role", marketRole.Function.ToString()));
-        }
-    }
 
     /// <summary>
     /// Activates the current actor, the status changes to Active.
@@ -229,15 +187,15 @@ public sealed class Actor : IPublishDomainEvents
 
         _actorStatusTransitioner.Activate();
 
-        foreach (var marketRole in _marketRoles)
+        if (_marketRole != null)
         {
-            if (marketRole.Function == EicFunction.GridAccessProvider)
+            if (_marketRole.Function == EicFunction.GridAccessProvider)
             {
-                foreach (var gridArea in marketRole.GridAreas)
+                foreach (var gridArea in _marketRole.GridAreas)
                 {
                     _domainEvents.Add(new GridAreaOwnershipAssigned(
                         ActorNumber,
-                        marketRole.Function,
+                        _marketRole.Function,
                         gridArea.Id));
                 }
             }
@@ -246,7 +204,7 @@ public sealed class Actor : IPublishDomainEvents
             {
                 _domainEvents.Add(new ActorCertificateCredentialsAssigned(
                     ActorNumber,
-                    marketRole.Function,
+                    _marketRole.Function,
                     acc.CertificateThumbprint));
             }
         }

@@ -13,31 +13,22 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed class ActorMarketRole
 {
-    public ActorMarketRole(EicFunction eic, IEnumerable<ActorGridArea> gridAreas, string? comment)
+    public ActorMarketRole(EicFunction eic, string? comment)
     {
-        GridAreas = gridAreas.ToList();
         Function = eic;
         Comment = comment;
     }
 
-    public ActorMarketRole(EicFunction eic, IEnumerable<ActorGridArea> gridAreas)
-        : this(eic, gridAreas, null)
-    {
-    }
-
     public ActorMarketRole(EicFunction eic)
-        : this(eic, Array.Empty<ActorGridArea>(), null)
+        : this(eic, null)
     {
     }
 
-    public IReadOnlyCollection<ActorGridArea> GridAreas { get; }
     public EicFunction Function { get; }
     public string? Comment { get; }
 }
