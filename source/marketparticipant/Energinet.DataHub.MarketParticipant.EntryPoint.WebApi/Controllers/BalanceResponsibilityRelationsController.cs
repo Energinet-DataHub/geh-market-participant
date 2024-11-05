@@ -59,7 +59,7 @@ public sealed class BalanceResponsibilityRelationsController : ControllerBase
 
     [HttpPost]
     [Route("import")]
-    [AuthorizeUser(PermissionId.BalanceResponsibilityManage)]
+    [AuthorizeUser(PermissionId.ESettExchangeManage)]
     [EnableRevision(RevisionActivities.BalanceResponsibilityRelationsImported)]
     public async Task<ActionResult> ImportAsync(IFormFile balanceResponsibility)
     {
