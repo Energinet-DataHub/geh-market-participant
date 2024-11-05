@@ -111,6 +111,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<NotifyUsersWithExpiredActorCredentialsCommand>, NotifyUsersWithExpiredActorCredentialsCommandRuleSet>();
         services.AddScoped<IValidator<ValidateBalanceResponsibilitiesCommand>, ValidateBalanceResponsibilitiesCommandRuleSet>();
         services.AddScoped<IValidator<CreateDownloadTokenCommand>, CreateDownloadTokenCommandRuleSet>();
+        services.AddScoped<IValidator<ImportBalanceResponsibilitiesCommand>, ImportBalanceResponsibilitiesCommandRuleSet>();
         services.AddScoped<IValidator<ExchangeDownloadTokenCommand>, ExchangeDownloadTokenCommandRuleSet>();
         services.AddScoped<IValidator<AuditLoginAttemptsCommand>, AuditLoginAttemptsCommandRuleSet>();
         services.AddScoped<IValidator<ClockUserLoginCommand>, ClockUserLoginCommandRuleSet>();
