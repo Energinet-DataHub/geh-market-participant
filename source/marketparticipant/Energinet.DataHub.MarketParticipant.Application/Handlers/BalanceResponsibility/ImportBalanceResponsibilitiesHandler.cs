@@ -85,17 +85,11 @@ public sealed class ImportBalanceResponsibilitiesHandler : IRequestHandler<Impor
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
-    private sealed class BalanceResponsibilityRequestRecord
-    {
-        // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
-        // ReSharper disable UnusedAutoPropertyAccessor.Local
-        public string EnergySupplier { get; set; } = null!;
-        public string BalanceResponsible { get; set; } = null!;
-        public string GridArea { get; set; } = null!;
-        public MeteringPointType MeteringPointType { get; set; }
-        public DateTimeOffset ValidFrom { get; set; }
-        public DateTimeOffset? ValidTo { get; set; }
-        // ReSharper restore UnusedAutoPropertyAccessor.Local
-        // ReSharper restore AutoPropertyCanBeMadeGetOnly.Local
-    }
+    private sealed record BalanceResponsibilityRequestRecord(
+        string EnergySupplier,
+        string BalanceResponsible,
+        string GridArea,
+        MeteringPointType MeteringPointType,
+        DateTimeOffset ValidFrom,
+        DateTimeOffset? ValidTo);
 }
