@@ -25,6 +25,5 @@ public interface IProcessDelegationHelperService
     Task VerifyValidActorsForProcessDelegationAsync(
         Actor delegatedFrom,
         Actor delegatedTo,
-        IEnumerable<DelegatedProcess> processDelegations,
         IEnumerable<Guid> gridAreas);
 }
