@@ -19,5 +19,7 @@ public enum DelegatedProcess
     RequestEnergyResults = 1,
     ReceiveEnergyResults,
     RequestWholesaleResults,
-    ReceiveWholesaleResults
+    ReceiveWholesaleResults,
+    RequestMeteringPointData,
+    ReceiveMeteringPointData,
 }
