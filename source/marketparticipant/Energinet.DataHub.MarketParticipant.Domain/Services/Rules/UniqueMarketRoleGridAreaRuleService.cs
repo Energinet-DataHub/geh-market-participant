@@ -42,7 +42,7 @@ public sealed class UniqueMarketRoleGridAreaRuleService : IUniqueMarketRoleGridA
 
         var actorMarketRole = actor.MarketRole;
 
-        if (actorMarketRole is null || !_marketRoleSet.Contains(actorMarketRole.Function))
+        if (!_marketRoleSet.Contains(actorMarketRole.Function))
         {
             return;
         }
