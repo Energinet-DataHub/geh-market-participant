@@ -58,32 +58,63 @@ public sealed class ProcessDelegationConfiguredIntegrationEventFactory : IIntegr
             .GetAsync(domainEvent.GridAreaId)
             .ConfigureAwait(false);
 
-        var integrationEvent = new IntegrationEvent(
-            domainEvent.EventId,
-            Model.Contracts.ProcessDelegationConfigured.EventName,
-            Model.Contracts.ProcessDelegationConfigured.CurrentMinorVersion,
-            new Model.Contracts.ProcessDelegationConfigured
-            {
-                DelegatedByActorNumber = delegatedByActorNumber,
-                DelegatedByActorRole = delegatedByMarketRole.MapToContract(),
-                DelegatedToActorNumber = delegatedToActorNumber,
-                DelegatedToActorRole = delegatedToMarketRole.MapToContract(),
-                GridAreaCode = gridArea!.Code.Value,
-                Process = domainEvent.Process switch
+        if (domainEvent.Process is DelegatedProcess.RequestMeteringPointData or DelegatedProcess.ReceiveMeteringPointData)
+        {
+            var integrationEvent = new IntegrationEvent(
+                domainEvent.EventId,
+                Model.Contracts.ProcessDelegationConfigured.EventName,
+                Model.Contracts.ProcessDelegationConfigured.CurrentMinorVersion,
+                new Model.Contracts.ProcessDelegationConfigured
                 {
-                    DelegatedProcess.RequestEnergyResults => Model.Contracts.DelegatedProcess.ProcessRequestEnergyResults,
-                    DelegatedProcess.ReceiveEnergyResults => Model.Contracts.DelegatedProcess.ProcessReceiveEnergyResults,
-                    DelegatedProcess.RequestWholesaleResults => Model.Contracts.DelegatedProcess.ProcessRequestWholesaleResults,
-                    DelegatedProcess.ReceiveWholesaleResults => Model.Contracts.DelegatedProcess.ProcessReceiveWholesaleResults,
-                    DelegatedProcess.RequestMeteringPointData => Model.Contracts.DelegatedProcess.ProcessRequestMeteringpointData,
-                    DelegatedProcess.ReceiveMeteringPointData => Model.Contracts.DelegatedProcess.ProcessReceiveMeteringpointData,
-                    _ => throw new InvalidOperationException($"Delegation process type {domainEvent.Process} is not supported in integration event.")
-                },
-                StartsAt = domainEvent.StartsAt.ToTimestamp(),
-                StopsAt = domainEvent.StopsAt.ToTimestamp(),
-                SequenceNumber = sequenceNumber
-            });
-
-        return integrationEvent;
+                    DelegatedByActorNumber = delegatedByActorNumber,
+                    DelegatedByActorRole = delegatedByMarketRole.MapToContract(),
+                    DelegatedToActorNumber = delegatedToActorNumber,
+                    DelegatedToActorRole = delegatedToMarketRole.MapToContract(),
+                    GridAreaCode = gridArea!.Code.Value,
+                    Process = domainEvent.Process switch
+                    {
+                        DelegatedProcess.RequestEnergyResults => Model.Contracts.DelegatedProcess.ProcessRequestEnergyResults,
+                        DelegatedProcess.ReceiveEnergyResults => Model.Contracts.DelegatedProcess.ProcessReceiveEnergyResults,
+                        DelegatedProcess.RequestWholesaleResults => Model.Contracts.DelegatedProcess.ProcessRequestWholesaleResults,
+                        DelegatedProcess.ReceiveWholesaleResults => Model.Contracts.DelegatedProcess.ProcessReceiveWholesaleResults,
+                        DelegatedProcess.RequestMeteringPointData => Model.Contracts.DelegatedProcess.ProcessRequestMeteringpointData,
+                        DelegatedProcess.ReceiveMeteringPointData => Model.Contracts.DelegatedProcess.ProcessReceiveMeteringpointData,
+                        _ => throw new InvalidOperationException($"Delegation process type {domainEvent.Process} is not supported in integration event.")
+                    },
+                    StartsAt = domainEvent.StartsAt.ToTimestamp(),
+                    StopsAt = domainEvent.StopsAt.ToTimestamp(),
+                    SequenceNumber = sequenceNumber
+                });
+            return integrationEvent;
+        }
+        else
+        {
+            var integrationEvent = new IntegrationEvent(
+                domainEvent.EventId,
+                Model.Contracts.ProcessDelegationConfigured.EventName,
+                1, // Old version until EDI is updated
+                new Model.Contracts.ProcessDelegationConfigured
+                {
+                    DelegatedByActorNumber = delegatedByActorNumber,
+                    DelegatedByActorRole = delegatedByMarketRole.MapToContract(),
+                    DelegatedToActorNumber = delegatedToActorNumber,
+                    DelegatedToActorRole = delegatedToMarketRole.MapToContract(),
+                    GridAreaCode = gridArea!.Code.Value,
+                    Process = domainEvent.Process switch
+                    {
+                        DelegatedProcess.RequestEnergyResults => Model.Contracts.DelegatedProcess.ProcessRequestEnergyResults,
+                        DelegatedProcess.ReceiveEnergyResults => Model.Contracts.DelegatedProcess.ProcessReceiveEnergyResults,
+                        DelegatedProcess.RequestWholesaleResults => Model.Contracts.DelegatedProcess.ProcessRequestWholesaleResults,
+                        DelegatedProcess.ReceiveWholesaleResults => Model.Contracts.DelegatedProcess.ProcessReceiveWholesaleResults,
+                        DelegatedProcess.RequestMeteringPointData => Model.Contracts.DelegatedProcess.ProcessRequestMeteringpointData,
+                        DelegatedProcess.ReceiveMeteringPointData => Model.Contracts.DelegatedProcess.ProcessReceiveMeteringpointData,
+                        _ => throw new InvalidOperationException($"Delegation process type {domainEvent.Process} is not supported in integration event.")
+                    },
+                    StartsAt = domainEvent.StartsAt.ToTimestamp(),
+                    StopsAt = domainEvent.StopsAt.ToTimestamp(),
+                    SequenceNumber = sequenceNumber
+                });
+            return integrationEvent;
+        }
     }
 }
