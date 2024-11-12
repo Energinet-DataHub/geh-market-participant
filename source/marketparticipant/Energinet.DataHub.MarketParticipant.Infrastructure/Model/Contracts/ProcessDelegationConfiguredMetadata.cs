@@ -17,5 +17,5 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 public partial class ProcessDelegationConfigured
 {
     public const string EventName = "ProcessDelegationConfigured";
-    public const int CurrentMinorVersion = 2;
+    public const int CurrentMinorVersion = 1;
 }
