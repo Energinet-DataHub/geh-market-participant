@@ -34,5 +34,5 @@ public interface IActorFactoryService
         Organization organization,
         ActorNumber actorNumber,
         ActorName actorName,
-        ActorMarketRole? marketRole);
+        ActorMarketRole marketRole);
 }

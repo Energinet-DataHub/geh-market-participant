@@ -34,34 +34,31 @@ internal static class ActorMapper
         // Market roles are currently treated as value types, so they are deleted and recreated with each update.
         to.MarketRoles.Clear();
 
-        if (from.MarketRole is { } marketRole)
+        var marketRoleEntity = new MarketRoleEntity
         {
-            var marketRoleEntity = new MarketRoleEntity
+            Function = from.MarketRole.Function,
+            Comment = from.MarketRole.Comment
+        };
+
+        foreach (var marketRoleGridArea in from.MarketRole.GridAreas)
+        {
+            var gridAreaEntity = new MarketRoleGridAreaEntity
             {
-                Function = marketRole.Function,
-                Comment = marketRole.Comment
+                GridAreaId = marketRoleGridArea.Id.Value
             };
 
-            foreach (var marketRoleGridArea in marketRole.GridAreas)
+            foreach (var meteringPointType in marketRoleGridArea.MeteringPointTypes)
             {
-                var gridAreaEntity = new MarketRoleGridAreaEntity
+                gridAreaEntity.MeteringPointTypes.Add(new MeteringPointTypeEntity
                 {
-                    GridAreaId = marketRoleGridArea.Id.Value
-                };
-
-                foreach (var meteringPointType in marketRoleGridArea.MeteringPointTypes)
-                {
-                    gridAreaEntity.MeteringPointTypes.Add(new MeteringPointTypeEntity
-                    {
-                        MeteringTypeId = (int)meteringPointType
-                    });
-                }
-
-                marketRoleEntity.GridAreas.Add(gridAreaEntity);
+                    MeteringTypeId = (int)meteringPointType
+                });
             }
 
-            to.MarketRoles.Add(marketRoleEntity);
+            marketRoleEntity.GridAreas.Add(gridAreaEntity);
         }
+
+        to.MarketRoles.Add(marketRoleEntity);
 
         switch (from.Credentials)
         {
@@ -126,7 +123,7 @@ internal static class ActorMapper
             from.ActorId.HasValue ? new ExternalActorId(from.ActorId.Value) : null,
             actorNumber,
             actorStatus,
-            marketRoles.SingleOrDefault(),
+            marketRoles.Single(),
             actorName,
             MapCredentials(from));
     }

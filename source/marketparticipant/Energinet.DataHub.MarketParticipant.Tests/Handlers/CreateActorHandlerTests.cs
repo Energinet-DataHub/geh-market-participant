@@ -53,14 +53,14 @@ public sealed class CreateActorHandlerTests
                 organization,
                 It.Is<ActorNumber>(y => y.Value == actor.ActorNumber.Value),
                 It.Is<ActorName>(y => y.Value == string.Empty),
-                It.IsAny<ActorMarketRole?>()))
+                It.IsAny<ActorMarketRole>()))
             .ReturnsAsync(actor);
 
         var command = new CreateActorCommand(new CreateActorDto(
             organization.Id.Value,
             new ActorNameDto(string.Empty),
             new ActorNumberDto(actor.ActorNumber.Value),
-            Array.Empty<ActorMarketRoleDto>()));
+            [new ActorMarketRoleDto(EicFunction.BillingAgent, [], null)]));
 
         // Act
         var response = await target.Handle(command, CancellationToken.None);
@@ -94,7 +94,7 @@ public sealed class CreateActorHandlerTests
                 organization,
                 It.Is<ActorNumber>(y => y.Value == actorGln),
                 It.Is<ActorName>(y => y.Value == string.Empty),
-                It.IsAny<ActorMarketRole?>()))
+                It.IsAny<ActorMarketRole>()))
             .ReturnsAsync(actor);
 
         var command = new CreateActorCommand(new CreateActorDto(
@@ -143,7 +143,7 @@ public sealed class CreateActorHandlerTests
                 organization,
                 It.Is<ActorNumber>(y => y.Value == actorGln),
                 It.Is<ActorName>(y => y.Value == string.Empty),
-                It.IsAny<ActorMarketRole?>()))
+                It.IsAny<ActorMarketRole>()))
             .ReturnsAsync(actor);
 
         var command = new CreateActorCommand(new CreateActorDto(

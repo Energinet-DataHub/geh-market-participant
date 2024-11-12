@@ -35,18 +35,13 @@ public sealed class ActorFactoryService(
         Organization organization,
         ActorNumber actorNumber,
         ActorName actorName,
-        ActorMarketRole? marketRole)
+        ActorMarketRole marketRole)
     {
         ArgumentNullException.ThrowIfNull(organization);
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorName);
 
-        var newActor = new Actor(organization.Id, actorNumber, actorName);
-
-        if (marketRole is not null)
-        {
-            newActor.SetMarketRole(marketRole);
-        }
+        var newActor = new Actor(organization.Id, actorNumber, actorName, marketRole);
 
         var uow = await unitOfWorkProvider
             .NewUnitOfWorkAsync()
@@ -64,10 +59,7 @@ public sealed class ActorFactoryService(
                 .ValidateEicFunctionsAcrossActorsAsync(newActor)
                 .ConfigureAwait(false);
 
-            if (newActor.MarketRole is { } mr)
-            {
-                await allowedMarketRoleCombinationsForDelegationRuleService.ValidateAsync(organization.Id, mr.Function).ConfigureAwait(false);
-            }
+            await allowedMarketRoleCombinationsForDelegationRuleService.ValidateAsync(organization.Id, newActor.MarketRole.Function).ConfigureAwait(false);
 
             var actorId = await SaveActorAsync(newActor).ConfigureAwait(false);
 

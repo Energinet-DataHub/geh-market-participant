@@ -29,12 +29,14 @@ public sealed class Actor : IPublishDomainEvents
     public Actor(
         OrganizationId organizationId,
         ActorNumber actorNumber,
-        ActorName actorName)
+        ActorName actorName,
+        ActorMarketRole marketRole)
     {
         Id = new ActorId(Guid.Empty);
         OrganizationId = organizationId;
         ActorNumber = actorNumber;
         Name = actorName;
+        MarketRole = marketRole;
         _domainEvents = new DomainEventList();
         _actorStatusTransitioner = new ActorStatusTransitioner();
     }
@@ -45,7 +47,7 @@ public sealed class Actor : IPublishDomainEvents
         ExternalActorId? externalActorId,
         ActorNumber actorNumber,
         ActorStatus actorStatus,
-        ActorMarketRole? marketRole,
+        ActorMarketRole marketRole,
         ActorName name,
         ActorCredentials? credentials)
     {
@@ -78,7 +80,7 @@ public sealed class Actor : IPublishDomainEvents
         get => _externalActorId;
         set
         {
-            if (value != null && MarketRole != null)
+            if (value != null)
             {
                 _domainEvents.Add(new ActorActivated(ActorNumber, MarketRole.Function, value));
             }
@@ -129,7 +131,7 @@ public sealed class Actor : IPublishDomainEvents
                 throw new NotSupportedException("Cannot overwrite credentials. Remember to delete the credentials first using the appropriate service.");
             }
 
-            if (Status == ActorStatus.Active && _credentials != value && MarketRole != null)
+            if (Status == ActorStatus.Active && _credentials != value)
             {
                 if (_credentials is ActorCertificateCredentials oldCredentials)
                 {
@@ -155,18 +157,18 @@ public sealed class Actor : IPublishDomainEvents
     /// <summary>
     /// The role (function and permissions) assigned to the current actor.
     /// </summary>
-    public ActorMarketRole? MarketRole { get; private set; }
+    public ActorMarketRole MarketRole { get; private set; }
 
     IDomainEvents IPublishDomainEvents.DomainEvents => _domainEvents;
 
     private bool AreMarketRolesReadOnly => Status != ActorStatus.New;
 
     /// <summary>
-    /// Sets a new role for the current actor.
+    /// Updates the market role for the current actor.
     /// This is only allowed for 'New' actors.
     /// </summary>
     /// <param name="marketRole">The new market role to add.</param>
-    public void SetMarketRole(ActorMarketRole marketRole)
+    public void UpdateMarketRole(ActorMarketRole marketRole)
     {
         ArgumentNullException.ThrowIfNull(marketRole);
 
@@ -179,20 +181,6 @@ public sealed class Actor : IPublishDomainEvents
     }
 
     /// <summary>
-    /// Removes the existing role from the current actor.
-    /// This is only allowed for 'New' actors.
-    /// </summary>
-    public void RemoveMarketRole()
-    {
-        if (AreMarketRolesReadOnly)
-        {
-            throw new ValidationException("It is only allowed to modify market roles for actors marked as 'New'.");
-        }
-
-        MarketRole = null;
-    }
-
-    /// <summary>
     /// Activates the current actor, the status changes to Active.
     /// Only New actors can be activated.
     /// </summary>
@@ -202,11 +190,6 @@ public sealed class Actor : IPublishDomainEvents
             throw new NotSupportedException("Cannot activate uncommitted actor.");
 
         _actorStatusTransitioner.Activate();
-
-        if (MarketRole is null)
-        {
-            return;
-        }
 
         if (MarketRole.Function == EicFunction.GridAccessProvider)
         {

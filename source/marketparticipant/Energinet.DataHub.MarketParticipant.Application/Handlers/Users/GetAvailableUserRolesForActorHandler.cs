@@ -52,7 +52,7 @@ public sealed class GetAvailableUserRolesForActorHandler
         NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
         var userRoles = await _userRoleRepository
-            .GetAsync(actor.MarketRole is { } mr ? [mr.Function] : [])
+            .GetAsync([actor.MarketRole.Function])
             .ConfigureAwait(false);
 
         return new GetUserRolesResponse(userRoles

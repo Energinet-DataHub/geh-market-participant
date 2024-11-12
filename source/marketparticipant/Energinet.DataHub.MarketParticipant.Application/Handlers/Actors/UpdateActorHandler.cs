@@ -84,13 +84,9 @@ public sealed class UpdateActorHandler : IRequestHandler<UpdateActorCommand>
     {
         if (actor.Status == ActorStatus.New)
         {
-            if (changes.MarketRoles.FirstOrDefault() is { } mr)
+            if (changes.MarketRoles.SingleOrDefault() is { } mr)
             {
-                actor.SetMarketRole(MarketRoleMapper.Map(mr));
-            }
-            else
-            {
-                actor.RemoveMarketRole();
+                actor.UpdateMarketRole(MarketRoleMapper.Map(mr));
             }
         }
 

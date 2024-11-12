@@ -182,9 +182,9 @@ public sealed class GridAreaOverviewRepositoryTests
 
             foreach (var marketRole in marketRoles)
             {
-                var actor = new Actor(orgId.Value, new MockedGln(), new ActorName("Mock"));
+                var actor = new Actor(orgId.Value, new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent));
 
-                actor.SetMarketRole(new ActorMarketRole(marketRole, [
+                actor.UpdateMarketRole(new ActorMarketRole(marketRole, [
                     new ActorGridArea(gridAreaId, [
                         MeteringPointType.D01VeProduction,
                     ]),

@@ -56,8 +56,7 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
         var actorsList = existingActors.ToList();
 
         var allMarketRolesInOrganization = actorsList
-            .Where(actor => actor.MarketRole is not null)
-            .Select(actor => actor.MarketRole!.Function)
+            .Select(actor => actor.MarketRole.Function)
             .Append(newMarketRole)
             .ToHashSet();
 
@@ -115,9 +114,8 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
                 .ConfigureAwait(false);
 
             var rolesInOrg = actorsInOrganization
-                .Where(actor => actor.MarketRole is not null)
                 .Select(actor => actor.MarketRole)
-                .Select(mr => mr!.Function)
+                .Select(mr => mr.Function)
                 .ToList();
 
             ValidateDelegation(delegatedBy!, rolesInOrg);
@@ -126,7 +124,7 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
 
     private static void ValidateDelegation(Actor delegatedBy, IReadOnlyCollection<EicFunction> delegatedTo)
     {
-        var function = delegatedBy.MarketRole!.Function;
+        var function = delegatedBy.MarketRole.Function;
 
         if (!_forbiddenCombinations.TryGetValue(function, out var forbidden))
             return;

@@ -35,8 +35,8 @@ public sealed class OverlappingEicFunctionsRuleServiceTests
 
         var actorExisting = CreateActorForTest(EicFunction.GridAccessProvider);
 
-        var actor = new Actor(actorExisting.OrganizationId, new MockedGln(), actorExisting.Name);
-        actor.SetMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider));
+        var actor = new Actor(actorExisting.OrganizationId, new MockedGln(), actorExisting.Name, new ActorMarketRole(EicFunction.BillingAgent));
+        actor.UpdateMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider));
 
         repository
             .Setup(repo => repo.GetActorsAsync(actor.OrganizationId))
@@ -57,8 +57,8 @@ public sealed class OverlappingEicFunctionsRuleServiceTests
 
         var actorExisting = CreateActorForTest(EicFunction.GridAccessProvider);
 
-        var actor = new Actor(actorExisting.OrganizationId, actorExisting.ActorNumber, actorExisting.Name);
-        actor.SetMarketRole(new ActorMarketRole(EicFunction.EnergySupplier));
+        var actor = new Actor(actorExisting.OrganizationId, actorExisting.ActorNumber, actorExisting.Name, new ActorMarketRole(EicFunction.BillingAgent));
+        actor.UpdateMarketRole(new ActorMarketRole(EicFunction.EnergySupplier));
 
         repository
             .Setup(repo => repo.GetActorsAsync(actor.OrganizationId))
@@ -79,8 +79,8 @@ public sealed class OverlappingEicFunctionsRuleServiceTests
 
         var actorExisting = CreateActorForTest(EicFunction.EnergySupplier);
 
-        var actor = new Actor(actorExisting.OrganizationId, actorExisting.ActorNumber, actorExisting.Name);
-        actor.SetMarketRole(new ActorMarketRole(EicFunction.EnergySupplier));
+        var actor = new Actor(actorExisting.OrganizationId, actorExisting.ActorNumber, actorExisting.Name, new ActorMarketRole(EicFunction.BillingAgent));
+        actor.UpdateMarketRole(new ActorMarketRole(EicFunction.EnergySupplier));
 
         repository
             .Setup(repo => repo.GetActorsAsync(actor.OrganizationId))

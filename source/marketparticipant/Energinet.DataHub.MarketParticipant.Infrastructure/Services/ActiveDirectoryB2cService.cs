@@ -48,7 +48,7 @@ public sealed class ActiveDirectoryB2CService : IActiveDirectoryB2CService
     {
         ArgumentNullException.ThrowIfNull(actor, nameof(actor));
 
-        var b2CPermissions = actor.MarketRole is { } marketRole ? (await MapEicFunctionsToB2CIdsAsync([marketRole.Function]).ConfigureAwait(false)).ToList() : [];
+        var b2CPermissions = (await MapEicFunctionsToB2CIdsAsync([actor.MarketRole.Function]).ConfigureAwait(false)).ToList();
         var applicationRegistration = await EnsureApplicationRegistrationAsync(actor, b2CPermissions).ConfigureAwait(false);
         var servicePrincipal = await EnsureServicePrincipalToAppAsync(applicationRegistration).ConfigureAwait(false);
 

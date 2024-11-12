@@ -210,8 +210,7 @@ public sealed class ProcessDelegationTests
     {
         // Arrange
         var actorFrom = TestPreparationModels.MockedActor();
-        actorFrom.RemoveMarketRole();
-        actorFrom.SetMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, [new ActorGridArea(new GridAreaId(Guid.NewGuid()), [])]));
+        actorFrom.UpdateMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, [new ActorGridArea(new GridAreaId(Guid.NewGuid()), [])]));
 
         var processDelegation = new ProcessDelegation(actorFrom, DelegatedProcess.RequestEnergyResults);
 

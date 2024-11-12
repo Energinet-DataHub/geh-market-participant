@@ -57,8 +57,7 @@ public sealed class OverlappingEicFunctionsRuleService : IOverlappingEicFunction
         foreach (var actorsWithSameActorNumber in allActors)
         {
             var marketRoles = actorsWithSameActorNumber
-                .Where(x => x.MarketRole is not null)
-                .Select(x => x.MarketRole!.Function)
+                .Select(x => x.MarketRole.Function)
                 .ToList();
 
             var usedMarketRoles = new HashSet<EicFunction>();

@@ -201,13 +201,13 @@ public sealed class IntegrationEventProviderIntegrationTests
             null,
             new MockedGln(),
             ActorStatus.New,
-            null,
+            new ActorMarketRole(EicFunction.BillingAgent),
             new ActorName(string.Empty),
             null);
 
         var gridArea = await _fixture.PrepareGridAreaAsync();
 
-        actor.SetMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, new[]
+        actor.UpdateMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, new[]
         {
             new ActorGridArea(new GridAreaId(gridArea.Id), Array.Empty<MeteringPointType>())
         }));

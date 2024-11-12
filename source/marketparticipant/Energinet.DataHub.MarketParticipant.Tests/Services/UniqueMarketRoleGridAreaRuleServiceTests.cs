@@ -86,7 +86,7 @@ public sealed class UniqueMarketRoleGridAreaRuleServiceTests
         await target.ValidateAndReserveAsync(actor);
 
         // assert
-        foreach (var ga in actor.MarketRole!.GridAreas)
+        foreach (var ga in actor.MarketRole.GridAreas)
         {
             repository.Verify(x => x.TryReserveAsync(actor.Id, actor.MarketRole.Function, ga.Id), Times.Exactly(1));
         }
