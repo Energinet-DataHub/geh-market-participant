@@ -93,7 +93,6 @@ public sealed class CreateProcessDelegationHandler : IRequestHandler<CreateProce
                 .VerifyValidActorsForProcessDelegationAsync(
                     actor,
                     actorDelegatedTo,
-                    request.CreateDelegation.DelegatedProcesses,
                     request.CreateDelegation.GridAreas)
                 .ConfigureAwait(false);
 

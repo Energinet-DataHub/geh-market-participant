@@ -35,7 +35,6 @@ public class ProcessDelegationHelperService : IProcessDelegationHelperService
     public async Task VerifyValidActorsForProcessDelegationAsync(
         Actor delegatedFrom,
         Actor delegatedTo,
-        IEnumerable<DelegatedProcess> processDelegations,
         IEnumerable<Guid> gridAreas)
     {
         ArgumentNullException.ThrowIfNull(delegatedFrom);
