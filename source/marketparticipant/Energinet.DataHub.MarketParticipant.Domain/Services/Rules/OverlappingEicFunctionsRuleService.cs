@@ -56,13 +56,14 @@ public sealed class OverlappingEicFunctionsRuleService : IOverlappingEicFunction
 
         foreach (var actorsWithSameActorNumber in allActors)
         {
-            var setOfSets = actorsWithSameActorNumber
-                .Select(x => x.MarketRoles.Select(m => m.Function))
+            var marketRoles = actorsWithSameActorNumber
+                .Where(x => x.MarketRole is not null)
+                .Select(x => x.MarketRole!.Function)
                 .ToList();
 
             var usedMarketRoles = new HashSet<EicFunction>();
 
-            foreach (var marketRole in setOfSets.SelectMany(x => x))
+            foreach (var marketRole in marketRoles)
             {
                 if (!usedMarketRoles.Add(marketRole))
                 {
@@ -77,15 +78,14 @@ public sealed class OverlappingEicFunctionsRuleService : IOverlappingEicFunction
     private static void ValidateAdministratorMarketRoleAcrossActors(Actor actor, IEnumerable<Actor> otherActorsInOrganization)
     {
         if (actor.Status != ActorStatus.New ||
-            actor.MarketRoles.All(a => a.Function != EicFunction.DataHubAdministrator))
+            actor.MarketRole is not { Function: EicFunction.DataHubAdministrator })
         {
             return;
         }
 
         // DataHubAdministrator is only allowed if the organization already has DataHubAdministrator.
         if (otherActorsInOrganization.All(
-                a => a.MarketRoles.All(
-                    m => m.Function != EicFunction.DataHubAdministrator)))
+                a => a.MarketRole is not { Function: EicFunction.DataHubAdministrator }))
         {
             throw new ValidationException($"Market role '{EicFunction.DataHubAdministrator}' cannot be used in this organization.")
                 .WithErrorCode("actor.market_role.forbidden")

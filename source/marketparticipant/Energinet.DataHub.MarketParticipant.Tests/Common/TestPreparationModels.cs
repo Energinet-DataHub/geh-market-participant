@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -44,7 +43,7 @@ internal static class TestPreparationModels
         new ExternalActorId(Guid.NewGuid()),
         new MockedGln(),
         ActorStatus.New,
-        new[] { new ActorMarketRole(EicFunction.GridAccessProvider) },
+        new ActorMarketRole(EicFunction.GridAccessProvider),
         new ActorName("Racoon Power"),
         null);
 
@@ -54,7 +53,7 @@ internal static class TestPreparationModels
         new ExternalActorId(Guid.NewGuid()),
         new MockedGln(),
         ActorStatus.Active,
-        new[] { new ActorMarketRole(EicFunction.GridAccessProvider) },
+        new ActorMarketRole(EicFunction.GridAccessProvider),
         new ActorName("Racoon Power"),
         null);
 

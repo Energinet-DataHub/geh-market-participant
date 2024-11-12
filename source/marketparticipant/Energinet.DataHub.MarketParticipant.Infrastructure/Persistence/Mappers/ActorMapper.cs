@@ -33,7 +33,8 @@ internal static class ActorMapper
 
         // Market roles are currently treated as value types, so they are deleted and recreated with each update.
         to.MarketRoles.Clear();
-        foreach (var marketRole in from.MarketRoles)
+
+        if (from.MarketRole is { } marketRole)
         {
             var marketRoleEntity = new MarketRoleEntity
             {
@@ -125,7 +126,7 @@ internal static class ActorMapper
             from.ActorId.HasValue ? new ExternalActorId(from.ActorId.Value) : null,
             actorNumber,
             actorStatus,
-            marketRoles,
+            marketRoles.SingleOrDefault(),
             actorName,
             MapCredentials(from));
     }

@@ -14,7 +14,6 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
@@ -53,7 +52,7 @@ public sealed class UserInvitation
             if (userRole.Status is not UserRoleStatus.Active)
                 throw new ValidationException($"The user role {userRole.Id} has an incorrect state.");
 
-            if (AssignedActor.MarketRoles.All(mr => mr.Function != userRole.EicFunction))
+            if (AssignedActor.MarketRole?.Function != userRole.EicFunction)
                 throw new ValidationException($"The user role {userRole.Id} cannot be used with the actor {AssignedActor.Id}.");
         }
     }

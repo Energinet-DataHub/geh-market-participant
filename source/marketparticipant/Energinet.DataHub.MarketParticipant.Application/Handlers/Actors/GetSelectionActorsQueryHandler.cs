@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actors;
@@ -86,7 +85,7 @@ public sealed class GetSelectionActorsQueryHandler
                 actor.ActorNumber.Value,
                 actor.Name.Value,
                 organization.Name,
-                actor.MarketRoles[0].Function));
+                actor.MarketRole!.Function));
         }
 
         return new GetSelectionActorsQueryResponse(selectionActors);

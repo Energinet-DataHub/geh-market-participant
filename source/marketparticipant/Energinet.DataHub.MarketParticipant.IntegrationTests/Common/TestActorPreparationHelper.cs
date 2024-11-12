@@ -43,13 +43,13 @@ internal static class TestActorPreparationHelper
         this MarketParticipantDatabaseFixture fixture,
         OrganizationEntity inputOrganization,
         ActorEntity inputActor,
-        params MarketRoleEntity[] inputMarketRoles)
+        MarketRoleEntity? inputMarketRole = null)
     {
         await using var context = fixture.DatabaseManager.CreateDbContext();
 
-        foreach (var localMarketRole in inputMarketRoles)
+        if (inputMarketRole is { } marketRole)
         {
-            inputActor.MarketRoles.Add(localMarketRole);
+            inputActor.MarketRoles.Add(marketRole);
         }
 
         if (inputOrganization.Id == Guid.Empty)

@@ -210,8 +210,8 @@ public sealed class ProcessDelegationTests
     {
         // Arrange
         var actorFrom = TestPreparationModels.MockedActor();
-        actorFrom.RemoveMarketRole(actorFrom.MarketRoles.Single());
-        actorFrom.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, [new ActorGridArea(new GridAreaId(Guid.NewGuid()), [])]));
+        actorFrom.RemoveMarketRole();
+        actorFrom.SetMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, [new ActorGridArea(new GridAreaId(Guid.NewGuid()), [])]));
 
         var processDelegation = new ProcessDelegation(actorFrom, DelegatedProcess.RequestEnergyResults);
 
@@ -312,7 +312,7 @@ public sealed class ProcessDelegationTests
             null,
             new MockedGln(),
             ActorStatus.Active,
-            new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) },
+            new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()),
             new ActorName("fake_value"),
             null);
         var actorTo = new Actor(
@@ -321,7 +321,7 @@ public sealed class ProcessDelegationTests
             null,
             new MockedGln(),
             ActorStatus.Active,
-            new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) },
+            new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()),
             new ActorName("fake_value"),
             null);
         var gridArea = new GridArea(

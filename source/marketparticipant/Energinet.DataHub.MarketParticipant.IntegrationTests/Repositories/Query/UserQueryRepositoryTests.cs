@@ -156,7 +156,7 @@ public sealed class UserQueryRepositoryTests
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
 
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.UsersManage },
+            [PermissionId.UsersManage],
             EicFunction.BillingAgent);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
@@ -215,7 +215,7 @@ public sealed class UserQueryRepositoryTests
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.IndependentAggregator));
 
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.UsersManage },
+            [PermissionId.UsersManage],
             EicFunction.BillingAgent);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
@@ -250,7 +250,7 @@ public sealed class UserQueryRepositoryTests
 
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.UsersManage },
+            [PermissionId.UsersManage],
             EicFunction.BillingAgent);
 
         await _fixture.AssignUserRoleAsync(user.Id, doNotReturnActor.Id, userRole.Id);
@@ -285,11 +285,11 @@ public sealed class UserQueryRepositoryTests
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.GridAccessProvider));
 
         var userRole1 = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.UsersManage },
+            [PermissionId.UsersManage],
             EicFunction.BillingAgent);
 
         var userRole2 = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.UsersView },
+            [PermissionId.UsersView],
             EicFunction.GridAccessProvider);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor1.Id, userRole1.Id);
@@ -326,19 +326,13 @@ public sealed class UserQueryRepositoryTests
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
             TestPreparationEntities.ValidActor.Patch(t => t.Status = ActorStatus.Active),
-            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator),
-            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.GridAccessProvider));
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator));
 
         var userRole1 = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.ActorsManage, PermissionId.UsersManage },
+            [PermissionId.ActorsManage, PermissionId.UsersManage],
             EicFunction.DataHubAdministrator);
 
-        var userRole2 = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.UsersView },
-            EicFunction.GridAccessProvider);
-
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole1.Id);
-        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole2.Id);
 
         // Act
         var permsActor = (await userRepository
@@ -347,10 +341,9 @@ public sealed class UserQueryRepositoryTests
 
         // Assert
         Assert.NotEmpty(permsActor);
-        Assert.Equal(3, permsActor.Count);
+        Assert.Equal(2, permsActor.Count);
         Assert.Contains(PermissionId.ActorsManage, permsActor.Select(p => p.Id));
         Assert.Contains(PermissionId.UsersManage, permsActor.Select(p => p.Id));
-        Assert.Contains(PermissionId.UsersView, permsActor.Select(p => p.Id));
     }
 
     [Fact]
@@ -369,7 +362,7 @@ public sealed class UserQueryRepositoryTests
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BalanceResponsibleParty));
 
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.ActorsManage, PermissionId.UsersManage },
+            [PermissionId.ActorsManage, PermissionId.UsersManage],
             EicFunction.BalanceResponsibleParty);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);

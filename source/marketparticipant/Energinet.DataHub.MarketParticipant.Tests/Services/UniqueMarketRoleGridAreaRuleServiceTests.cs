@@ -40,12 +40,9 @@ public sealed class UniqueMarketRoleGridAreaRuleServiceTests
             null,
             new MockedGln(),
             ActorStatus.Active,
-            new[]
-            {
-                new ActorMarketRole(
-                    EicFunction.GridAccessProvider,
-                    Enumerable.Empty<ActorGridArea>())
-            },
+            new ActorMarketRole(
+                EicFunction.GridAccessProvider,
+                []),
             new ActorName("fake_value"),
             null);
 
@@ -73,17 +70,15 @@ public sealed class UniqueMarketRoleGridAreaRuleServiceTests
             null,
             new MockedGln(),
             ActorStatus.Active,
-            new[]
-            {
-                new ActorMarketRole(
-                    EicFunction.GridAccessProvider,
-                    new[]
-                    {
-                        new ActorGridArea(
-                            new GridAreaId(Guid.NewGuid()),
-                            new[] { MeteringPointType.D02Analysis })
-                    })
-            },
+            new ActorMarketRole(
+                EicFunction.GridAccessProvider,
+                [
+                    new ActorGridArea(
+                        new GridAreaId(Guid.NewGuid()),
+                        [
+                            MeteringPointType.D02Analysis,
+                        ]),
+                ]),
             new ActorName("fake_value"),
             null);
 
@@ -91,12 +86,9 @@ public sealed class UniqueMarketRoleGridAreaRuleServiceTests
         await target.ValidateAndReserveAsync(actor);
 
         // assert
-        foreach (var mr in actor.MarketRoles)
+        foreach (var ga in actor.MarketRole!.GridAreas)
         {
-            foreach (var ga in mr.GridAreas)
-            {
-                repository.Verify(x => x.TryReserveAsync(actor.Id, mr.Function, ga.Id), Times.Exactly(1));
-            }
+            repository.Verify(x => x.TryReserveAsync(actor.Id, actor.MarketRole.Function, ga.Id), Times.Exactly(1));
         }
     }
 
@@ -104,10 +96,9 @@ public sealed class UniqueMarketRoleGridAreaRuleServiceTests
     public async Task Ensure_NonDdmMarketRole_DoesntEnsureUniqueness()
     {
         foreach (var nonDdmMarketRole in Enum.GetValues<EicFunction>().Except(
-                     new[]
-                     {
-                         EicFunction.GridAccessProvider
-                     }))
+                 [
+                     EicFunction.GridAccessProvider,
+                 ]))
         {
             // arrange
             var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
@@ -120,12 +111,9 @@ public sealed class UniqueMarketRoleGridAreaRuleServiceTests
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                new[]
-                {
-                    new ActorMarketRole(
-                        nonDdmMarketRole,
-                        Enumerable.Empty<ActorGridArea>())
-                },
+                new ActorMarketRole(
+                    nonDdmMarketRole,
+                    []),
                 new ActorName("fake_value"),
                 null);
 

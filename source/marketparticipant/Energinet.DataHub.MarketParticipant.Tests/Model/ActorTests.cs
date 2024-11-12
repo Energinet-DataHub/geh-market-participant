@@ -116,10 +116,10 @@ public sealed class ActorTests
         var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
 
         // Act
-        target.AddMarketRole(role);
+        target.SetMarketRole(role);
 
         // Assert
-        Assert.Contains(role, target.MarketRoles);
+        Assert.Equal(role, target.MarketRole);
     }
 
     [Fact]
@@ -130,19 +130,7 @@ public sealed class ActorTests
         var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
 
         // Act + Assert
-        Assert.Throws<ValidationException>(() => target.AddMarketRole(role));
-    }
-
-    [Fact]
-    public void AddMarketRole_RoleAlreadyExists_NotAllowed()
-    {
-        // Arrange
-        var target = CreateTestActor(ActorStatus.New);
-        var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
-        target.AddMarketRole(role);
-
-        // Act + Assert
-        Assert.Throws<ValidationException>(() => target.AddMarketRole(role));
+        Assert.Throws<ValidationException>(() => target.SetMarketRole(role));
     }
 
     [Fact]
@@ -151,13 +139,13 @@ public sealed class ActorTests
         // Arrange
         var target = CreateTestActor(ActorStatus.New);
         var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
-        target.AddMarketRole(role);
+        target.SetMarketRole(role);
 
         // Act
-        target.RemoveMarketRole(role);
+        target.RemoveMarketRole();
 
         // Assert
-        Assert.DoesNotContain(role, target.MarketRoles);
+        Assert.Null(target.MarketRole);
     }
 
     [Fact]
@@ -165,21 +153,9 @@ public sealed class ActorTests
     {
         // Arrange
         var target = CreateTestActor(ActorStatus.Active);
-        var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
 
         // Act + Assert
-        Assert.Throws<ValidationException>(() => target.RemoveMarketRole(role));
-    }
-
-    [Fact]
-    public void RemoveMarketRole_RoleDoesNotExist_NotAllowed()
-    {
-        // Arrange
-        var target = CreateTestActor(ActorStatus.New);
-        var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
-
-        // Act + Assert
-        Assert.Throws<ValidationException>(() => target.RemoveMarketRole(role));
+        Assert.Throws<ValidationException>(() => target.RemoveMarketRole());
     }
 
     [Fact]
@@ -187,9 +163,12 @@ public sealed class ActorTests
     {
         // Arrange
         var target = CreateTestActor(ActorStatus.New);
-        var gridAreas = new[] { new ActorGridArea(new GridAreaId(Guid.NewGuid()), Array.Empty<MeteringPointType>()) };
+        var gridAreas = new[]
+        {
+            new ActorGridArea(new GridAreaId(Guid.NewGuid()), Array.Empty<MeteringPointType>()),
+        };
 
-        target.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, gridAreas));
+        target.SetMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, gridAreas));
 
         // Act
         target.Activate();
@@ -276,7 +255,7 @@ public sealed class ActorTests
         Assert.Throws<ValidationException>(() => target.Deactivate());
     }
 
-    private static Actor CreateTestActor(ActorStatus status, params EicFunction[] eicFunctions)
+    private static Actor CreateTestActor(ActorStatus status, EicFunction? eicFunction = null)
     {
         return new Actor(
             new ActorId(Guid.NewGuid()),
@@ -284,7 +263,7 @@ public sealed class ActorTests
             new ExternalActorId(Guid.Empty),
             new MockedGln(),
             status,
-            eicFunctions.Select(f => new ActorMarketRole(f)),
+            eicFunction is { } x ? new ActorMarketRole(x) : null,
             new ActorName("test_actor_name"),
             null);
     }

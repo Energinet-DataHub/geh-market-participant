@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -27,7 +26,7 @@ public sealed class UniqueMarketRoleGridAreaRuleService : IUniqueMarketRoleGridA
 {
     private static readonly IReadOnlySet<EicFunction> _marketRoleSet = new HashSet<EicFunction>
     {
-        EicFunction.GridAccessProvider
+        EicFunction.GridAccessProvider,
     };
 
     private readonly IMarketRoleAndGridAreaForActorReservationService _marketRoleAndGridAreaForActorReservationService;
@@ -41,26 +40,28 @@ public sealed class UniqueMarketRoleGridAreaRuleService : IUniqueMarketRoleGridA
     {
         ArgumentNullException.ThrowIfNull(actor, nameof(actor));
 
-        var actorMarketRoles = actor.MarketRoles.Where(x => _marketRoleSet.Contains(x.Function));
+        var actorMarketRole = actor.MarketRole;
+
+        if (actorMarketRole is null || !_marketRoleSet.Contains(actorMarketRole.Function))
+        {
+            return;
+        }
 
         await _marketRoleAndGridAreaForActorReservationService
             .RemoveAllReservationsAsync(actor.Id)
             .ConfigureAwait(false);
 
-        foreach (var actorMarketRole in actorMarketRoles)
+        foreach (var gridArea in actorMarketRole.GridAreas)
         {
-            foreach (var gridArea in actorMarketRole.GridAreas)
-            {
-                var couldReserve = await _marketRoleAndGridAreaForActorReservationService
-                    .TryReserveAsync(actor.Id, actorMarketRole.Function, gridArea.Id)
-                    .ConfigureAwait(false);
+            var couldReserve = await _marketRoleAndGridAreaForActorReservationService
+                .TryReserveAsync(actor.Id, actorMarketRole.Function, gridArea.Id)
+                .ConfigureAwait(false);
 
-                if (!couldReserve)
-                {
-                    throw new ValidationException($"Another actor is already assigned the role of '{actorMarketRole.Function}' for the chosen grid area.")
-                        .WithErrorCode("actor.grid_area.reserved")
-                        .WithArgs(("market_role", actorMarketRole.Function), ("grid_area_id", gridArea.Id));
-                }
+            if (!couldReserve)
+            {
+                throw new ValidationException($"Another actor is already assigned the role of '{actorMarketRole.Function}' for the chosen grid area.")
+                    .WithErrorCode("actor.grid_area.reserved")
+                    .WithArgs(("market_role", actorMarketRole.Function), ("grid_area_id", gridArea.Id));
             }
         }
     }

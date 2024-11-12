@@ -51,14 +51,16 @@ public sealed class ValidateBalanceResponsibilitiesHandler : IRequestHandler<Val
     public async Task Handle(ValidateBalanceResponsibilitiesCommand request, CancellationToken cancellationToken)
     {
         var allActors = (await _actorRepository
-            .GetActorsAsync()
-            .ConfigureAwait(false))
+                .GetActorsAsync()
+                .ConfigureAwait(false))
             .ToList();
 
         var notificationTargets = allActors
-            .Where(actor =>
-                actor.Status == ActorStatus.Active &&
-                actor.MarketRoles.Any(mr => mr.Function == EicFunction.DataHubAdministrator))
+            .Where(actor => actor is
+            {
+                Status: ActorStatus.Active,
+                MarketRole.Function: EicFunction.DataHubAdministrator,
+            })
             .Select(actor => actor.Id)
             .ToList();
 
@@ -67,7 +69,7 @@ public sealed class ValidateBalanceResponsibilitiesHandler : IRequestHandler<Val
             if (actor.Status != ActorStatus.Active)
                 continue;
 
-            if (actor.MarketRoles.All(mr => mr.Function != EicFunction.EnergySupplier))
+            if (actor.MarketRole is not { Function: EicFunction.EnergySupplier })
                 continue;
 
             IEnumerable<BalanceResponsibilityContractor> contractors;
@@ -111,7 +113,11 @@ public sealed class ValidateBalanceResponsibilitiesHandler : IRequestHandler<Val
         var now = _clock.GetCurrentInstant();
 
         var relationsPerGridAreaAndMpType = relations
-            .GroupBy(relation => new { relation.GridArea, relation.MeteringPointType });
+            .GroupBy(relation => new
+            {
+                relation.GridArea,
+                relation.MeteringPointType
+            });
 
         foreach (var groupedRelations in relationsPerGridAreaAndMpType)
         {

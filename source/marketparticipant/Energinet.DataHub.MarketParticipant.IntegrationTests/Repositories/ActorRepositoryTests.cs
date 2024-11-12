@@ -133,7 +133,7 @@ public sealed class ActorRepositoryTests
         var organization = await _fixture.PrepareOrganizationAsync();
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
 
-        actor.AddMarketRole(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new[]
+        actor.SetMarketRole(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new[]
         {
             new ActorGridArea(gridAreaId, new[] { MeteringPointType.D01VeProduction })
         }));
@@ -146,7 +146,7 @@ public sealed class ActorRepositoryTests
         Assert.NotNull(actual);
         Assert.Equal(actor.OrganizationId, actual.OrganizationId);
         Assert.Equal(actor.ActorNumber, actual.ActorNumber);
-        Assert.Equal(actor.MarketRoles.Single().Function, actual.MarketRoles.Single().Function);
+        Assert.Equal(actor.MarketRole!.Function, actual.MarketRole!.Function);
     }
 
     [Fact]

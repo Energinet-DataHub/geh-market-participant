@@ -36,14 +36,13 @@ public sealed class OverlappingEicFunctionsRuleServiceTests
         var actorExisting = CreateActorForTest(EicFunction.GridAccessProvider);
 
         var actor = new Actor(actorExisting.OrganizationId, new MockedGln(), actorExisting.Name);
-        actor.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider));
+        actor.SetMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider));
 
         repository
             .Setup(repo => repo.GetActorsAsync(actor.OrganizationId))
-            .ReturnsAsync(new[]
-            {
-                actorExisting
-            });
+            .ReturnsAsync([
+                actorExisting,
+            ]);
 
         // Act + Assert
         await target.ValidateEicFunctionsAcrossActorsAsync(actor);
@@ -59,14 +58,13 @@ public sealed class OverlappingEicFunctionsRuleServiceTests
         var actorExisting = CreateActorForTest(EicFunction.GridAccessProvider);
 
         var actor = new Actor(actorExisting.OrganizationId, actorExisting.ActorNumber, actorExisting.Name);
-        actor.AddMarketRole(new ActorMarketRole(EicFunction.EnergySupplier));
+        actor.SetMarketRole(new ActorMarketRole(EicFunction.EnergySupplier));
 
         repository
             .Setup(repo => repo.GetActorsAsync(actor.OrganizationId))
-            .ReturnsAsync(new[]
-            {
-                actorExisting
-            });
+            .ReturnsAsync([
+                actorExisting,
+            ]);
 
         // Act + Assert
         await target.ValidateEicFunctionsAcrossActorsAsync(actor);
@@ -82,14 +80,13 @@ public sealed class OverlappingEicFunctionsRuleServiceTests
         var actorExisting = CreateActorForTest(EicFunction.EnergySupplier);
 
         var actor = new Actor(actorExisting.OrganizationId, actorExisting.ActorNumber, actorExisting.Name);
-        actor.AddMarketRole(new ActorMarketRole(EicFunction.EnergySupplier));
+        actor.SetMarketRole(new ActorMarketRole(EicFunction.EnergySupplier));
 
         repository
             .Setup(repo => repo.GetActorsAsync(actor.OrganizationId))
-            .ReturnsAsync(new[]
-            {
-                actorExisting
-            });
+            .ReturnsAsync([
+                actorExisting,
+            ]);
 
         // Act + Assert
         await Assert.ThrowsAsync<ValidationException>(() => target.ValidateEicFunctionsAcrossActorsAsync(actor));
@@ -125,11 +122,10 @@ public sealed class OverlappingEicFunctionsRuleServiceTests
 
         repository
             .Setup(repo => repo.GetActorsAsync(actor.OrganizationId))
-            .ReturnsAsync(new[]
-            {
+            .ReturnsAsync([
                 CreateActorForTest(EicFunction.BalanceResponsibleParty),
                 CreateActorForTest(EicFunction.BillingAgent),
-            });
+            ]);
 
         // Act + Assert
         await Assert.ThrowsAsync<ValidationException>(() => target.ValidateEicFunctionsAcrossActorsAsync(actor));
@@ -147,11 +143,10 @@ public sealed class OverlappingEicFunctionsRuleServiceTests
 
         repository
             .Setup(repo => repo.GetActorsAsync(actor.OrganizationId))
-            .ReturnsAsync(new[]
-            {
+            .ReturnsAsync([
                 CreateActorForTest(EicFunction.DataHubAdministrator),
                 CreateActorForTest(EicFunction.BillingAgent),
-            });
+            ]);
 
         // Act + Assert
         await target.ValidateEicFunctionsAcrossActorsAsync(actor);
@@ -165,7 +160,7 @@ public sealed class OverlappingEicFunctionsRuleServiceTests
             null,
             new MockedGln(),
             ActorStatus.New,
-            new[] { new ActorMarketRole(marketRole) },
+            new ActorMarketRole(marketRole),
             new ActorName("fake_value"),
             null);
     }

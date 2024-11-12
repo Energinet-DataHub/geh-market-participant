@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -22,21 +21,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers;
 
 public static class MarketRoleMapper
 {
-    public static IEnumerable<ActorMarketRole> Map(IEnumerable<ActorMarketRoleDto> marketRoleDtos)
+    public static ActorMarketRole Map(ActorMarketRoleDto marketRoleDto)
     {
-        ArgumentNullException.ThrowIfNull(marketRoleDtos);
+        ArgumentNullException.ThrowIfNull(marketRoleDto);
 
-        foreach (var marketRoleDto in marketRoleDtos)
-        {
-            var aggregatedGrids = marketRoleDto.GridAreas
-                .GroupBy(x => new GridAreaId(x.Id))
-                .Select(x => new ActorGridArea(x.Key, x.SelectMany(x => x.MeteringPointTypes)
-                    .Select(x => Enum.Parse<MeteringPointType>(x, true)).Distinct()));
+        var aggregatedGrids = marketRoleDto.GridAreas
+            .GroupBy(x => new GridAreaId(x.Id))
+            .Select(x => new ActorGridArea(x.Key, x.SelectMany(y => y.MeteringPointTypes)
+                .Select(z => Enum.Parse<MeteringPointType>(z, true)).Distinct()));
 
-            yield return new ActorMarketRole(
-                marketRoleDto.EicFunction,
-                aggregatedGrids,
-                marketRoleDto.Comment);
-        }
+        return new ActorMarketRole(
+            marketRoleDto.EicFunction,
+            aggregatedGrids,
+            marketRoleDto.Comment);
     }
 }
