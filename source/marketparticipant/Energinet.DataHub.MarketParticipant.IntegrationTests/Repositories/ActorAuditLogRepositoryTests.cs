@@ -69,7 +69,7 @@ public sealed class ActorAuditLogRepositoryTests
 
         // Arrange - Setup Organization and Actor
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent));
 
         // Arrange - Setup Repositories
         await using var scope = host.BeginScope();
@@ -104,7 +104,7 @@ public sealed class ActorAuditLogRepositoryTests
 
         // Arrange - Setup Organization and Actor
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent));
         var orgValue = actor.Name.Value;
 
         // Arrange - Setup Repositories
@@ -144,7 +144,7 @@ public sealed class ActorAuditLogRepositoryTests
 
         // Arrange - Setup Organization and Actor
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent));
         var orgValue = actor.Status;
 
         // Arrange - Setup Repositories

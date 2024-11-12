@@ -31,7 +31,7 @@ public sealed class ActorTests
     public void Ctor_NewRole_HasStatusNew()
     {
         // Arrange + Act
-        var actor = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln(), new ActorName("Mock"));
+        var actor = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent));
 
         // Assert
         Assert.Equal(ActorStatus.New, actor.Status);
@@ -41,7 +41,7 @@ public sealed class ActorTests
     public void Activate_WithoutId_NotAllowed()
     {
         // Arrange
-        var target = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln(), new ActorName("fake_value"));
+        var target = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln(), new ActorName("fake_value"), new ActorMarketRole(EicFunction.BillingAgent));
 
         // Act + Assert
         Assert.Throws<NotSupportedException>(() => target.Activate());
@@ -116,10 +116,10 @@ public sealed class ActorTests
         var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
 
         // Act
-        target.AddMarketRole(role);
+        target.UpdateMarketRole(role);
 
         // Assert
-        Assert.Contains(role, target.MarketRoles);
+        Assert.Equal(role, target.MarketRole);
     }
 
     [Fact]
@@ -130,56 +130,7 @@ public sealed class ActorTests
         var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
 
         // Act + Assert
-        Assert.Throws<ValidationException>(() => target.AddMarketRole(role));
-    }
-
-    [Fact]
-    public void AddMarketRole_RoleAlreadyExists_NotAllowed()
-    {
-        // Arrange
-        var target = CreateTestActor(ActorStatus.New);
-        var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
-        target.AddMarketRole(role);
-
-        // Act + Assert
-        Assert.Throws<ValidationException>(() => target.AddMarketRole(role));
-    }
-
-    [Fact]
-    public void RemoveMarketRole_RemovesRole_IsAllowed()
-    {
-        // Arrange
-        var target = CreateTestActor(ActorStatus.New);
-        var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
-        target.AddMarketRole(role);
-
-        // Act
-        target.RemoveMarketRole(role);
-
-        // Assert
-        Assert.DoesNotContain(role, target.MarketRoles);
-    }
-
-    [Fact]
-    public void RemoveMarketRole_StatusNotNew_NotAllowed()
-    {
-        // Arrange
-        var target = CreateTestActor(ActorStatus.Active);
-        var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
-
-        // Act + Assert
-        Assert.Throws<ValidationException>(() => target.RemoveMarketRole(role));
-    }
-
-    [Fact]
-    public void RemoveMarketRole_RoleDoesNotExist_NotAllowed()
-    {
-        // Arrange
-        var target = CreateTestActor(ActorStatus.New);
-        var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
-
-        // Act + Assert
-        Assert.Throws<ValidationException>(() => target.RemoveMarketRole(role));
+        Assert.Throws<ValidationException>(() => target.UpdateMarketRole(role));
     }
 
     [Fact]
@@ -187,9 +138,12 @@ public sealed class ActorTests
     {
         // Arrange
         var target = CreateTestActor(ActorStatus.New);
-        var gridAreas = new[] { new ActorGridArea(new GridAreaId(Guid.NewGuid()), Array.Empty<MeteringPointType>()) };
+        var gridAreas = new[]
+        {
+            new ActorGridArea(new GridAreaId(Guid.NewGuid()), Array.Empty<MeteringPointType>()),
+        };
 
-        target.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, gridAreas));
+        target.UpdateMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, gridAreas));
 
         // Act
         target.Activate();
@@ -276,7 +230,7 @@ public sealed class ActorTests
         Assert.Throws<ValidationException>(() => target.Deactivate());
     }
 
-    private static Actor CreateTestActor(ActorStatus status, params EicFunction[] eicFunctions)
+    private static Actor CreateTestActor(ActorStatus status, EicFunction eicFunction = EicFunction.BillingAgent)
     {
         return new Actor(
             new ActorId(Guid.NewGuid()),
@@ -284,7 +238,7 @@ public sealed class ActorTests
             new ExternalActorId(Guid.Empty),
             new MockedGln(),
             status,
-            eicFunctions.Select(f => new ActorMarketRole(f)),
+            new ActorMarketRole(eicFunction),
             new ActorName("test_actor_name"),
             null);
     }

@@ -131,7 +131,7 @@ public sealed class EmailContentGeneratorTests
             null,
             new GlnActorNumber(actorGln),
             ActorStatus.Active,
-            Array.Empty<ActorMarketRole>(),
+            new ActorMarketRole(EicFunction.BillingAgent),
             new ActorName(actorName),
             null);
 

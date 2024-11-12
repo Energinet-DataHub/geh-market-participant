@@ -61,7 +61,7 @@ public sealed class FrontendUserProviderTests
                 null,
                 new MockedGln(),
                 actorStatus,
-                Array.Empty<ActorMarketRole>(),
+                new ActorMarketRole(EicFunction.BillingAgent),
                 new ActorName(string.Empty),
                 null));
 

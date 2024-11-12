@@ -41,7 +41,7 @@ public sealed class InviteUserHandlerTests
             "fake_value",
             "+45 70000000"),
         Guid.NewGuid(),
-        new[] { Guid.NewGuid() });
+        [Guid.NewGuid()]);
 
     private static readonly Guid _validInvitedByUserId = Guid.NewGuid();
 
@@ -91,7 +91,7 @@ public sealed class InviteUserHandlerTests
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
+                new ActorMarketRole(EicFunction.MeteredDataResponsible),
                 new ActorName("fake_value"),
                 null));
 
@@ -130,7 +130,7 @@ public sealed class InviteUserHandlerTests
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
+                new ActorMarketRole(EicFunction.MeteredDataResponsible),
                 new ActorName("fake_value"),
                 null));
 
@@ -170,7 +170,7 @@ public sealed class InviteUserHandlerTests
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
+                new ActorMarketRole(EicFunction.MeteredDataResponsible),
                 new ActorName("fake_value"),
                 null));
 

@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
@@ -54,14 +53,14 @@ public sealed class CreateActorHandlerTests
                 organization,
                 It.Is<ActorNumber>(y => y.Value == actor.ActorNumber.Value),
                 It.Is<ActorName>(y => y.Value == string.Empty),
-                It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
+                It.IsAny<ActorMarketRole>()))
             .ReturnsAsync(actor);
 
         var command = new CreateActorCommand(new CreateActorDto(
             organization.Id.Value,
             new ActorNameDto(string.Empty),
             new ActorNumberDto(actor.ActorNumber.Value),
-            Array.Empty<ActorMarketRoleDto>()));
+            [new ActorMarketRoleDto(EicFunction.BillingAgent, [], null)]));
 
         // Act
         var response = await target.Handle(command, CancellationToken.None);
@@ -84,7 +83,7 @@ public sealed class CreateActorHandlerTests
         var organization = TestPreparationModels.MockedOrganization();
         var actor = TestPreparationModels.MockedActor(Guid.NewGuid(), organization.Id.Value);
 
-        var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, Enumerable.Empty<ActorGridAreaDto>(), string.Empty);
+        var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, [], string.Empty);
 
         organizationExistsHelperService
             .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
@@ -95,14 +94,14 @@ public sealed class CreateActorHandlerTests
                 organization,
                 It.Is<ActorNumber>(y => y.Value == actorGln),
                 It.Is<ActorName>(y => y.Value == string.Empty),
-                It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
+                It.IsAny<ActorMarketRole>()))
             .ReturnsAsync(actor);
 
         var command = new CreateActorCommand(new CreateActorDto(
             organization.Id.Value,
             new ActorNameDto(string.Empty),
             new ActorNumberDto(actorGln),
-            new[] { marketRole }));
+            [marketRole]));
 
         // Act
         var response = await target.Handle(command, CancellationToken.None);
@@ -144,14 +143,14 @@ public sealed class CreateActorHandlerTests
                 organization,
                 It.Is<ActorNumber>(y => y.Value == actorGln),
                 It.Is<ActorName>(y => y.Value == string.Empty),
-                It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
+                It.IsAny<ActorMarketRole>()))
             .ReturnsAsync(actor);
 
         var command = new CreateActorCommand(new CreateActorDto(
             organization.Id.Value,
             new ActorNameDto(string.Empty),
             new ActorNumberDto(actorGln),
-            new[] { marketRole }));
+            [marketRole]));
 
         // Act
         var response = await target.Handle(command, CancellationToken.None);

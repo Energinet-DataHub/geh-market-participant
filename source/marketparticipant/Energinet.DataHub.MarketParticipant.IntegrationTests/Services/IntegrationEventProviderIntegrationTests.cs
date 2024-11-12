@@ -133,7 +133,7 @@ public sealed class IntegrationEventProviderIntegrationTests
             null,
             new MockedGln(),
             ActorStatus.New,
-            new[] { new ActorMarketRole(EicFunction.MeteredDataAdministrator) },
+            new ActorMarketRole(EicFunction.MeteredDataAdministrator),
             new ActorName(string.Empty),
             null);
 
@@ -152,7 +152,7 @@ public sealed class IntegrationEventProviderIntegrationTests
             null,
             new MockedGln(),
             ActorStatus.New,
-            new[] { new ActorMarketRole(EicFunction.EnergySupplier) },
+            new ActorMarketRole(EicFunction.EnergySupplier),
             new ActorName(string.Empty),
             null);
 
@@ -175,7 +175,7 @@ public sealed class IntegrationEventProviderIntegrationTests
             null,
             new MockedGln(),
             ActorStatus.New,
-            new[] { new ActorMarketRole(EicFunction.EnergySupplier) },
+            new ActorMarketRole(EicFunction.EnergySupplier),
             new ActorName(string.Empty),
             null);
 
@@ -201,13 +201,13 @@ public sealed class IntegrationEventProviderIntegrationTests
             null,
             new MockedGln(),
             ActorStatus.New,
-            Array.Empty<ActorMarketRole>(),
+            new ActorMarketRole(EicFunction.BillingAgent),
             new ActorName(string.Empty),
             null);
 
         var gridArea = await _fixture.PrepareGridAreaAsync();
 
-        actor.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, new[]
+        actor.UpdateMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, new[]
         {
             new ActorGridArea(new GridAreaId(gridArea.Id), Array.Empty<MeteringPointType>())
         }));

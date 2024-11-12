@@ -55,7 +55,7 @@ public sealed class ImportBalanceResponsibilitiesHandler : IRequestHandler<Impor
         await using (unitOfWork.ConfigureAwait(false))
         {
             var actorIdLookup = (await _actorRepository.GetActorsAsync().ConfigureAwait(false))
-                .Where(x => x.MarketRoles.Any(y => y.Function == EicFunction.BalanceResponsibleParty))
+                .Where(x => x.MarketRole is { Function: EicFunction.BalanceResponsibleParty })
                 .ToDictionary(x => x.ActorNumber.Value, x => x.Id);
 
             using var streamReader = new StreamReader(request.Stream);

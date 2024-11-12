@@ -40,18 +40,17 @@ public sealed class UserInvitationTests
             null,
             new MockedGln(),
             ActorStatus.New,
-            new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty), },
+            new ActorMarketRole(EicFunction.BalanceResponsibleParty),
             new ActorName("fake_value"),
             null),
-        new[]
-        {
+        [
             new UserRole(
                 "fake_value",
                 "fake_value",
                 UserRoleStatus.Active,
                 Array.Empty<PermissionId>(),
                 EicFunction.BalanceResponsibleParty),
-        });
+        ]);
 
     [Fact]
     public void Create_ValidInvitation_ReturnsInvitation()
@@ -81,7 +80,7 @@ public sealed class UserInvitationTests
             null,
             new MockedGln(),
             status,
-            new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
+            new ActorMarketRole(EicFunction.BalanceResponsibleParty),
             new ActorName("fake_value"),
             null);
 
@@ -126,7 +125,7 @@ public sealed class UserInvitationTests
                 _validInvitation.Email,
                 _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
-                new[] { testRole });
+                [testRole]);
 
             Assert.NotNull(actual);
         }
@@ -136,7 +135,7 @@ public sealed class UserInvitationTests
                 _validInvitation.Email,
                 _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
-                new[] { testRole }));
+                [testRole]));
         }
     }
 
@@ -161,7 +160,7 @@ public sealed class UserInvitationTests
                 _validInvitation.Email,
                 _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
-                new[] { testRole });
+                [testRole]);
 
             Assert.NotNull(actual);
         }
@@ -171,7 +170,7 @@ public sealed class UserInvitationTests
                 _validInvitation.Email,
                 _validInvitation.InvitationUserDetails,
                 _validInvitation.AssignedActor,
-                new[] { testRole }));
+                [testRole]));
         }
     }
 }

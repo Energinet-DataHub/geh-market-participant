@@ -32,10 +32,7 @@ public sealed class ProcessDelegation : IPublishDomainEvents
     {
         ArgumentNullException.ThrowIfNull(processOwner);
 
-        if (processOwner.MarketRoles.All(role =>
-                role.Function != EicFunction.GridAccessProvider
-                && role.Function != EicFunction.BalanceResponsibleParty
-                && role.Function != EicFunction.EnergySupplier))
+        if (processOwner.MarketRole is not { Function: EicFunction.GridAccessProvider } and not { Function: EicFunction.BalanceResponsibleParty } and not { Function: EicFunction.EnergySupplier })
         {
             throw new ValidationException("Actor's market role does not support process delegation.")
                 .WithErrorCode("process_delegation.actor_invalid_market_role");
@@ -45,11 +42,10 @@ public sealed class ProcessDelegation : IPublishDomainEvents
         Process = process;
 
         _allowedGridAreas.AddRange(processOwner
-            .MarketRoles
-            .SelectMany(mr => mr.GridAreas)
+            .MarketRole.GridAreas
             .Select(ga => ga.Id));
 
-        _domainEvents = new DomainEventList();
+        _domainEvents = [];
     }
 
     public ProcessDelegation(
@@ -119,7 +115,10 @@ public sealed class ProcessDelegation : IPublishDomainEvents
                 .WithErrorCode("process_delegation.overlap");
         }
 
-        var delegationPeriod = existingPeriod with { StopsAt = stopsAt };
+        var delegationPeriod = existingPeriod with
+        {
+            StopsAt = stopsAt
+        };
         _delegations.Add(delegationPeriod);
         _domainEvents.Add(new ProcessDelegationConfigured(this, delegationPeriod));
     }
@@ -127,7 +126,7 @@ public sealed class ProcessDelegation : IPublishDomainEvents
     private bool IsThereDelegationPeriodOverlap(Instant startsAt, GridAreaId gridAreaId, Instant? stopsAt = null)
     {
         return _delegations
-             .Where(x => x.GridAreaId == gridAreaId && !(x.StopsAt <= x.StartsAt))
-             .Any(x => x.StartsAt < (stopsAt ?? Instant.MaxValue) && (x.StopsAt ?? Instant.MaxValue) > startsAt);
+            .Where(x => x.GridAreaId == gridAreaId && !(x.StopsAt <= x.StartsAt))
+            .Any(x => x.StartsAt < (stopsAt ?? Instant.MaxValue) && (x.StopsAt ?? Instant.MaxValue) > startsAt);
     }
 }

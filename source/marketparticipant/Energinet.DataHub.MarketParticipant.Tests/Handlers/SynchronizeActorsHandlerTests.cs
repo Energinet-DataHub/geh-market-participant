@@ -57,7 +57,7 @@ public sealed class SynchronizeActorsHandlerTests
             null,
             new MockedGln(),
             ActorStatus.New,
-            Array.Empty<ActorMarketRole>(),
+            new ActorMarketRole(EicFunction.BillingAgent),
             new ActorName("fake_value"),
             null);
 

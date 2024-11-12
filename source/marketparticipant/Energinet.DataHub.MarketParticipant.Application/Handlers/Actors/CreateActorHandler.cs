@@ -48,10 +48,10 @@ public sealed class CreateActorHandler : IRequestHandler<CreateActorCommand, Cre
 
         var actorNumber = ActorNumber.Create(request.Actor.ActorNumber.Value);
         var actorName = new ActorName(request.Actor.Name.Value);
-        var marketRoles = MarketRoleMapper.Map(request.Actor.MarketRoles).ToList();
+        var marketRole = MarketRoleMapper.Map(request.Actor.MarketRoles.Single());
 
         var actor = await _actorFactoryService
-            .CreateAsync(organization, actorNumber, actorName, marketRoles)
+            .CreateAsync(organization, actorNumber, actorName, marketRole)
             .ConfigureAwait(false);
 
         return new CreateActorResponse(actor.Id.Value);

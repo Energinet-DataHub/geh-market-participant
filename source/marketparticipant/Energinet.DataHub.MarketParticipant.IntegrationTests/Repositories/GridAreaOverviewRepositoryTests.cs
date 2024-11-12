@@ -180,15 +180,18 @@ public sealed class GridAreaOverviewRepositoryTests
             var org = new Organization("name", MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"), [new MockedDomain()]);
             var orgId = await orgRepo.AddOrUpdateAsync(org);
 
-            var actor = new Actor(orgId.Value, new MockedGln(), new ActorName("Mock"));
-
             foreach (var marketRole in marketRoles)
             {
-                actor.AddMarketRole(new ActorMarketRole(marketRole, new[] { new ActorGridArea(gridAreaId, new[] { MeteringPointType.D01VeProduction }) }));
-            }
+                var actor = new Actor(orgId.Value, new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent));
 
-            var actorRepository = new ActorRepository(context, new Mock<IEntityLock>().Object);
-            await actorRepository.AddOrUpdateAsync(actor);
+                actor.UpdateMarketRole(new ActorMarketRole(marketRole, [
+                    new ActorGridArea(gridAreaId, [
+                        MeteringPointType.D01VeProduction,
+                    ]),
+                ]));
+                var actorRepository = new ActorRepository(context, new Mock<IEntityLock>().Object);
+                await actorRepository.AddOrUpdateAsync(actor);
+            }
         }
 
         return gridAreaId;
