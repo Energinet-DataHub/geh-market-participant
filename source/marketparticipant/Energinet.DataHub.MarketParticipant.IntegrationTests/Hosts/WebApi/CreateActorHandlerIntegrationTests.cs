@@ -68,7 +68,7 @@ public sealed class CreateActorHandlerIntegrationTests
         // Assert
         Assert.Equal(createResponse.ActorId, actualActor.Actor.ActorId);
         Assert.Equal(createDto.Name.Value, actualActor.Actor.Name.Value);
-        actualActor.Actor.MarketRoles.Should().ContainSingle(x => x.EicFunction == EicFunction.Delegated);
+        actualActor.Actor.MarketRole.EicFunction.Should().Be(EicFunction.Delegated);
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public sealed class CreateActorHandlerIntegrationTests
         // Assert
         Assert.Equal(createResponseDelegatedActor.ActorId, actualDelegatedActor.Actor.ActorId);
         Assert.Equal(actualInitActor.Actor.ActorNumber, actualDelegatedActor.Actor.ActorNumber);
-        actualDelegatedActor.Actor.MarketRoles.Should().ContainSingle(x => x.EicFunction == EicFunction.Delegated);
+        actualDelegatedActor.Actor.MarketRole.EicFunction.Should().Be(EicFunction.Delegated);
     }
 
     [Fact]

@@ -61,7 +61,7 @@ public sealed class UpdateActorHandlerIntegrationTests
 
         var updateCommand = new UpdateActorCommand(
             actorEntity.Id,
-            new ChangeActorDto(ActorStatus.Active.ToString(), new ActorNameDto(newName), actorDto.MarketRoles.Single()));
+            new ChangeActorDto(ActorStatus.Active.ToString(), new ActorNameDto(newName), actorDto.MarketRole));
 
         // Act
         await mediator.Send(updateCommand);
@@ -103,7 +103,7 @@ public sealed class UpdateActorHandlerIntegrationTests
 
         // Assert
         Assert.Equal(newName, response.Actor.Name.Value);
-        Assert.Equal(EicFunction.BalanceResponsibleParty, response.Actor.MarketRoles.Single().EicFunction);
+        Assert.Equal(EicFunction.BalanceResponsibleParty, response.Actor.MarketRole.EicFunction);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public sealed class UpdateActorHandlerIntegrationTests
         var response = await mediator.Send(getActorCommand);
 
         // Assert
-        Assert.Single(response.Actor.MarketRoles);
+        Assert.NotNull(response.Actor.MarketRole);
         Assert.Equal(actor.Name.Value, response.Actor.Name.Value);
         Assert.Equal(actor.Status.ToString(), response.Actor.Status);
     }
