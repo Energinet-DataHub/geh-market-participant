@@ -53,7 +53,7 @@ public sealed class CreateActorCommandRuleSet : AbstractValidator<CreateActorCom
                     .When(i => string.IsNullOrWhiteSpace(i.ActorNumber.Value) || i.ActorNumber.Value.Length >= 14);
 
                 validator
-                    .RuleForEach(actor => actor.MarketRoles)
+                    .RuleFor(actor => actor.MarketRole)
                     .ChildRules(gridAreaValidator =>
                         gridAreaValidator
                             .RuleFor(x => x.GridAreas)
@@ -61,24 +61,18 @@ public sealed class CreateActorCommandRuleSet : AbstractValidator<CreateActorCom
                             .When(marketRole => marketRole.EicFunction == EicFunction.GridAccessProvider));
 
                 validator
-                    .RuleFor(actor => actor.MarketRoles)
+                    .RuleFor(actor => actor.MarketRole)
                     .NotNull()
-                    .ChildRules(rolesValidator =>
+                    .ChildRules(roleValidator =>
                     {
-                        rolesValidator
-                            .RuleForEach(x => x)
-                            .NotNull()
-                            .ChildRules(roleValidator =>
-                            {
-                                roleValidator
-                                    .RuleFor(x => x.EicFunction)
-                                    .NotEmpty()
-                                    .IsInEnum();
-                            });
+                        roleValidator
+                            .RuleFor(x => x.EicFunction)
+                            .NotEmpty()
+                            .IsInEnum();
                     });
 
                 validator
-                    .RuleForEach(actor => actor.MarketRoles)
+                    .RuleFor(actor => actor.MarketRole)
                     .ChildRules(inlineValidator =>
                     {
                         inlineValidator
