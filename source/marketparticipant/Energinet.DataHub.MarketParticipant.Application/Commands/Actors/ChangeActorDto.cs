@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
 public sealed record ChangeActorDto(
     string Status,
     ActorNameDto Name,
-    IEnumerable<ActorMarketRoleDto> MarketRoles);
+    ActorMarketRoleDto MarketRole);

@@ -61,7 +61,7 @@ public sealed class UpdateActorHandlerIntegrationTests
 
         var updateCommand = new UpdateActorCommand(
             actorEntity.Id,
-            new ChangeActorDto(ActorStatus.Active.ToString(), new ActorNameDto(newName), actorDto.MarketRoles));
+            new ChangeActorDto(ActorStatus.Active.ToString(), new ActorNameDto(newName), actorDto.MarketRole));
 
         // Act
         await mediator.Send(updateCommand);
@@ -91,7 +91,7 @@ public sealed class UpdateActorHandlerIntegrationTests
         var actorDto = new ChangeActorDto(
             ActorStatus.Active.ToString(),
             new ActorNameDto(newName),
-            [new ActorMarketRoleDto(EicFunction.BillingAgent, Array.Empty<ActorGridAreaDto>(), null)]);
+            new ActorMarketRoleDto(EicFunction.BillingAgent, Array.Empty<ActorGridAreaDto>(), null));
 
         var updateCommand = new UpdateActorCommand(actorEntity.Id, actorDto);
 
@@ -103,7 +103,7 @@ public sealed class UpdateActorHandlerIntegrationTests
 
         // Assert
         Assert.Equal(newName, response.Actor.Name.Value);
-        Assert.Equal(EicFunction.BalanceResponsibleParty, response.Actor.MarketRoles.Single().EicFunction);
+        Assert.Equal(EicFunction.BalanceResponsibleParty, response.Actor.MarketRole.EicFunction);
     }
 
     [Fact]
@@ -127,10 +127,10 @@ public sealed class UpdateActorHandlerIntegrationTests
 
         var updateCommand = new UpdateActorCommand(
             actorEntity.Id,
-            new ChangeActorDto(ActorStatus.New.ToString(), new ActorNameDto(actor!.Name.Value), [new ActorMarketRoleDto(
+            new ChangeActorDto(ActorStatus.New.ToString(), new ActorNameDto(actor!.Name.Value), new ActorMarketRoleDto(
                 marketRoleToAdd.Function,
                 marketRoleToAdd.GridAreas.Select(x => new ActorGridAreaDto(x.GridAreaId, x.MeteringPointTypes.Select(y => y.Id.ToString()))),
-                marketRoleToAdd.Comment)]));
+                marketRoleToAdd.Comment)));
 
         // Act
         await mediator.Send(updateCommand);
@@ -139,7 +139,7 @@ public sealed class UpdateActorHandlerIntegrationTests
         var response = await mediator.Send(getActorCommand);
 
         // Assert
-        Assert.Single(response.Actor.MarketRoles);
+        Assert.NotNull(response.Actor.MarketRole);
         Assert.Equal(actor.Name.Value, response.Actor.Name.Value);
         Assert.Equal(actor.Status.ToString(), response.Actor.Status);
     }

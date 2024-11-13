@@ -51,7 +51,7 @@ public sealed class UpdateActorHandlerTests
 
         var command = new UpdateActorCommand(
             actorId,
-            new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
+            new ChangeActorDto("Active", new ActorNameDto(string.Empty), null!));
 
         // Act + Assert
         await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
@@ -74,7 +74,7 @@ public sealed class UpdateActorHandlerTests
 
         var command = new UpdateActorCommand(
             actor.Id.Value,
-            new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
+            new ChangeActorDto("Active", new ActorNameDto(string.Empty), null!));
 
         // Act
         await target.Handle(command, CancellationToken.None);
@@ -103,7 +103,7 @@ public sealed class UpdateActorHandlerTests
 
         var command = new UpdateActorCommand(
             actor.Id.Value,
-            new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
+            new ChangeActorDto("Active", new ActorNameDto(string.Empty), null!));
 
         // Act
         await target.Handle(command, CancellationToken.None);
