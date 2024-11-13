@@ -62,9 +62,9 @@ public sealed class UpdateActorCommandRuleSetTests
         {
             new(Guid.NewGuid(), validMeteringPointTypes)
         };
-        var validMarketRoles = new ActorMarketRoleDto(EicFunction.GridAccessProvider, validGridAreas, string.Empty);
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.GridAccessProvider, validGridAreas, string.Empty);
 
-        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(Guid.Empty, actorDto);
@@ -98,9 +98,9 @@ public sealed class UpdateActorCommandRuleSetTests
         {
             new(Guid.NewGuid(), validMeteringPointTypes)
         };
-        var validMarketRoles = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var actorDto = new ChangeActorDto(value!, new ActorNameDto("fake_name"), validMarketRoles);
+        var actorDto = new ChangeActorDto(value!, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, actorDto);
@@ -195,12 +195,12 @@ public sealed class UpdateActorCommandRuleSetTests
         {
             new(Guid.NewGuid(), validMeteringPointTypes)
         };
-        var validMarketRoles = new ActorMarketRoleDto(value, validGridAreas, string.Empty);
+        var validMarketRole = new ActorMarketRoleDto(value, validGridAreas, string.Empty);
 
         var actorDto = new ChangeActorDto(
             ValidStatus,
             new ActorNameDto("fake_name"),
-            validMarketRoles);
+            validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, actorDto);
@@ -231,9 +231,9 @@ public sealed class UpdateActorCommandRuleSetTests
         {
             new(Guid.NewGuid(), null!)
         };
-        var validMarketRoles = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, actorDto);
@@ -254,9 +254,9 @@ public sealed class UpdateActorCommandRuleSetTests
         {
             new(Guid.NewGuid(), Array.Empty<string>())
         };
-        var validMarketRoles = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, actorDto);
@@ -278,9 +278,9 @@ public sealed class UpdateActorCommandRuleSetTests
         {
             new(Guid.NewGuid(), [null!]),
         };
-        var validMarketRoles = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, actorDto);
@@ -302,9 +302,9 @@ public sealed class UpdateActorCommandRuleSetTests
         {
             new(Guid.NewGuid(), null!)
         };
-        var validMarketRoles = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, changeActorDto);
@@ -335,9 +335,9 @@ public sealed class UpdateActorCommandRuleSetTests
         {
             new(Guid.NewGuid(), [value!]),
         };
-        var validMarketRoles = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, changeActorDto);
