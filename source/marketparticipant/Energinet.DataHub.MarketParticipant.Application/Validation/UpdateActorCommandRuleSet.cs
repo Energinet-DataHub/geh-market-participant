@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
@@ -38,24 +36,18 @@ public sealed class UpdateActorCommandRuleSet : AbstractValidator<UpdateActorCom
                     .IsEnumName(typeof(ActorStatus), false);
 
                 changeActorValidator
-                    .RuleFor(actor => actor.MarketRoles)
-                    .Cascade(CascadeMode.Stop)
-                    .NotEmpty()
-                    .Must(marketRoles => marketRoles
-                        .Where(r => (ActorMarketRoleDto?)r != null)
-                        .Select(r => r.EicFunction)
-                        .All(new HashSet<EicFunction>().Add))
-                    .WithMessage("Multiple market roles have the same EIC function.");
+                    .RuleFor(actor => actor.MarketRole)
+                    .NotEmpty();
 
                 changeActorValidator
-                    .RuleForEach(actor => actor.MarketRoles)
+                    .RuleFor(actor => actor.MarketRole)
                     .ChildRules(gridAreaValidator => gridAreaValidator
                         .RuleFor(x => x.GridAreas)
                         .NotEmpty()
                         .When(marketRole => marketRole.EicFunction == EicFunction.GridAccessProvider));
 
                 changeActorValidator
-                    .RuleFor(x => x.MarketRoles)
+                    .RuleFor(x => x.MarketRole)
                     .NotEmpty()
                     .When(x => Enum.TryParse(
                                    typeof(ActorStatus),
@@ -65,7 +57,7 @@ public sealed class UpdateActorCommandRuleSet : AbstractValidator<UpdateActorCom
                                result is ActorStatus actorStatus && actorStatus != ActorStatus.New)
                     .ChildRules(rolesValidator =>
                         rolesValidator
-                            .RuleForEach(x => x)
+                            .RuleFor(x => x)
                             .NotNull()
                             .ChildRules(roleValidator =>
                             {
@@ -76,7 +68,7 @@ public sealed class UpdateActorCommandRuleSet : AbstractValidator<UpdateActorCom
                             }));
 
                 changeActorValidator
-                    .RuleForEach(actor => actor.MarketRoles)
+                    .RuleFor(actor => actor.MarketRole)
                     .ChildRules(inlineValidator =>
                     {
                         inlineValidator

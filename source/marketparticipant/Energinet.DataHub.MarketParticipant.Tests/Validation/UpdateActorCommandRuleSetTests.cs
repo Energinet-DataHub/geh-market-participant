@@ -54,11 +54,17 @@ public sealed class UpdateActorCommandRuleSetTests
         // Arrange
         const string propertyName = nameof(UpdateActorCommand.ActorId);
 
-        var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
-        var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
-        var validMarketRoles = new List<ActorMarketRoleDto> { new(EicFunction.GridAccessProvider, validGridAreas, string.Empty) };
+        var validMeteringPointTypes = new[]
+        {
+            MeteringPointType.D05NetProduction.ToString()
+        };
+        var validGridAreas = new List<ActorGridAreaDto>
+        {
+            new(Guid.NewGuid(), validMeteringPointTypes)
+        };
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.GridAccessProvider, validGridAreas, string.Empty);
 
-        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(Guid.Empty, actorDto);
@@ -84,11 +90,17 @@ public sealed class UpdateActorCommandRuleSetTests
         // Arrange
         const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.Status)}";
 
-        var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
-        var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
-        var validMarketRoles = new List<ActorMarketRoleDto> { new(EicFunction.BillingAgent, validGridAreas, string.Empty) };
+        var validMeteringPointTypes = new[]
+        {
+            MeteringPointType.D05NetProduction.ToString()
+        };
+        var validGridAreas = new List<ActorGridAreaDto>
+        {
+            new(Guid.NewGuid(), validMeteringPointTypes)
+        };
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var actorDto = new ChangeActorDto(value!, new ActorNameDto("fake_name"), validMarketRoles);
+        var actorDto = new ChangeActorDto(value!, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, actorDto);
@@ -113,7 +125,7 @@ public sealed class UpdateActorCommandRuleSetTests
     public async Task Validate_MarketRole_ValidatesProperty()
     {
         // Arrange
-        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}";
+        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRole)}";
 
         var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), null!);
 
@@ -132,7 +144,7 @@ public sealed class UpdateActorCommandRuleSetTests
     public async Task Validate_NoMarketRoles_ValidatesProperty()
     {
         // Arrange
-        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}";
+        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRole)}";
 
         var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), null!);
 
@@ -151,9 +163,9 @@ public sealed class UpdateActorCommandRuleSetTests
     public async Task Validate_NullMarketRole_ValidatesProperty()
     {
         // Arrange
-        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0]";
+        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRole)}";
 
-        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), new ActorMarketRoleDto[] { null! });
+        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), null!);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, actorDto);
@@ -173,16 +185,22 @@ public sealed class UpdateActorCommandRuleSetTests
     public async Task Validate_MarketRoleFunction_ValidatesProperty(EicFunction value, bool isValid)
     {
         // Arrange
-        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].{nameof(ActorMarketRoleDto.EicFunction)}";
+        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRole)}.{nameof(ActorMarketRoleDto.EicFunction)}";
 
-        var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
-        var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
-        var validMarketRoles = new List<ActorMarketRoleDto> { new(value, validGridAreas, string.Empty) };
+        var validMeteringPointTypes = new[]
+        {
+            MeteringPointType.D05NetProduction.ToString()
+        };
+        var validGridAreas = new List<ActorGridAreaDto>
+        {
+            new(Guid.NewGuid(), validMeteringPointTypes)
+        };
+        var validMarketRole = new ActorMarketRoleDto(value, validGridAreas, string.Empty);
 
         var actorDto = new ChangeActorDto(
             ValidStatus,
             new ActorNameDto("fake_name"),
-            validMarketRoles);
+            validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, actorDto);
@@ -204,45 +222,18 @@ public sealed class UpdateActorCommandRuleSetTests
     }
 
     [Fact]
-    public async Task Validate_DuplicateMarketRoleFunctions_ValidatesProperty()
-    {
-        // Arrange
-        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}";
-
-        var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
-        var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
-        var validMarketRoles = new List<ActorMarketRoleDto>
-        {
-            new(EicFunction.GridAccessProvider, validGridAreas, string.Empty),
-            new(EicFunction.GridAccessProvider, validGridAreas, string.Empty),
-        };
-
-        var actorDto = new ChangeActorDto(
-            ValidStatus,
-            new ActorNameDto("fake_name"),
-            validMarketRoles);
-
-        var target = new UpdateActorCommandRuleSet();
-        var command = new UpdateActorCommand(_validActorId, actorDto);
-
-        // Act
-        var result = await target.ValidateAsync(command);
-
-        // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-    }
-
-    [Fact]
     public async Task Validate_MeteringPoints_ValidatesProperty()
     {
         // Arrange
-        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes";
+        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRole)}.GridAreas[0].MeteringPointTypes";
 
-        var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), null!) };
-        var validMarketRoles = new List<ActorMarketRoleDto> { new(EicFunction.BillingAgent, validGridAreas, string.Empty) };
+        var validGridAreas = new List<ActorGridAreaDto>
+        {
+            new(Guid.NewGuid(), null!)
+        };
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, actorDto);
@@ -259,12 +250,13 @@ public sealed class UpdateActorCommandRuleSetTests
     public async Task Validate_NoMeteringPoints_IsAllowed()
     {
         // Arrange
-        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes";
+        var validGridAreas = new List<ActorGridAreaDto>
+        {
+            new(Guid.NewGuid(), Array.Empty<string>())
+        };
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), Array.Empty<string>()) };
-        var validMarketRoles = new List<ActorMarketRoleDto> { new(EicFunction.BillingAgent, validGridAreas, string.Empty) };
-
-        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, actorDto);
@@ -280,12 +272,15 @@ public sealed class UpdateActorCommandRuleSetTests
     public async Task Validate_NullMeteringPoints_ValidatesProperty()
     {
         // Arrange
-        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes[0]";
+        const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRole)}.GridAreas[0].MeteringPointTypes[0]";
 
-        var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), new string[] { null! }) };
-        var validMarketRoles = new List<ActorMarketRoleDto> { new(EicFunction.BillingAgent, validGridAreas, string.Empty) };
+        var validGridAreas = new List<ActorGridAreaDto>
+        {
+            new(Guid.NewGuid(), [null!]),
+        };
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, actorDto);
@@ -302,12 +297,14 @@ public sealed class UpdateActorCommandRuleSetTests
     public async Task Validate_MeteringPointType_ValidatesProperty()
     {
         // Arrange
-        var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes";
+        var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRole)}.GridAreas[0].MeteringPointTypes";
+        var validGridAreas = new List<ActorGridAreaDto>
+        {
+            new(Guid.NewGuid(), null!)
+        };
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), null!) };
-        var validMarketRoles = new List<ActorMarketRoleDto> { new(EicFunction.BillingAgent, validGridAreas, string.Empty) };
-
-        var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, changeActorDto);
@@ -332,12 +329,15 @@ public sealed class UpdateActorCommandRuleSetTests
     public async Task Validate_MeteringPointTypes_ValidatesProperty(string? value, bool isValid)
     {
         // Arrange
-        var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes[0]";
+        var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRole)}.GridAreas[0].MeteringPointTypes[0]";
 
-        var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), new[] { value! }) };
-        var validMarketRoles = new List<ActorMarketRoleDto> { new(EicFunction.BillingAgent, validGridAreas, string.Empty) };
+        var validGridAreas = new List<ActorGridAreaDto>
+        {
+            new(Guid.NewGuid(), [value!]),
+        };
+        var validMarketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, validGridAreas, string.Empty);
 
-        var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
+        var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRole);
 
         var target = new UpdateActorCommandRuleSet();
         var command = new UpdateActorCommand(_validActorId, changeActorDto);

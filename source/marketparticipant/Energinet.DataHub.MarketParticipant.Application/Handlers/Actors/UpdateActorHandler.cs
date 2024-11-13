@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
@@ -84,7 +83,7 @@ public sealed class UpdateActorHandler : IRequestHandler<UpdateActorCommand>
     {
         if (actor.Status == ActorStatus.New)
         {
-            if (changes.MarketRoles.SingleOrDefault() is { } mr)
+            if (changes.MarketRole is { } mr)
             {
                 actor.UpdateMarketRole(MarketRoleMapper.Map(mr));
             }
