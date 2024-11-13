@@ -58,7 +58,7 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
     }
 
     [Fact]
-    public async Task GetAvailableUserRolesForActor_HasTwoUserRoles_ReturnsBoth()
+    public async Task GetAvailableUserRolesForActor_HasUserRoles_Included()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -68,11 +68,9 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
             TestPreparationEntities.ValidActor,
-            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent),
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BalanceResponsibleParty));
 
-        var userRole1 = await _fixture.PrepareUserRoleAsync(EicFunction.BalanceResponsibleParty);
-        var userRole2 = await _fixture.PrepareUserRoleAsync(EicFunction.BillingAgent);
+        var userRole = await _fixture.PrepareUserRoleAsync(EicFunction.BalanceResponsibleParty);
 
         var command = new GetAvailableUserRolesForActorCommand(actor.Id);
 
@@ -80,35 +78,6 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
         var response = await mediator.Send(command);
 
         // Assert
-        Assert.Contains(response.Roles, t => t.Id == userRole1.Id);
-        Assert.Contains(response.Roles, t => t.Id == userRole2.Id);
-    }
-
-    [Fact]
-    public async Task GetAvailableUserRolesForActor_HasTwoFunctions_DoesNotReturn()
-    {
-        // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-
-        var actor = await _fixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor,
-            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BalanceResponsibleParty),
-            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
-
-        var userRole = await _fixture.PrepareUserRoleAsync(
-            EicFunction.BalanceResponsibleParty,
-            EicFunction.BillingAgent,
-            EicFunction.GridAccessProvider);
-
-        var command = new GetAvailableUserRolesForActorCommand(actor.Id);
-
-        // Act
-        var response = await mediator.Send(command);
-
-        // Assert
-        Assert.DoesNotContain(response.Roles, t => t.Id == userRole.Id);
+        Assert.Contains(response.Roles, t => t.Id == userRole.Id);
     }
 }

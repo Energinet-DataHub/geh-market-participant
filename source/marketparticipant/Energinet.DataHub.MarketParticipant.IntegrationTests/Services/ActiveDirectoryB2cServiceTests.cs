@@ -13,12 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
@@ -31,7 +28,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 public sealed class ActiveDirectoryB2CServiceTests
 {
     private readonly IActiveDirectoryB2CService _sut;
-    private readonly IActiveDirectoryB2BRolesProvider _rolesProvider;
     private readonly GraphServiceClientFixture _graphServiceClientFixture;
 
     public ActiveDirectoryB2CServiceTests(GraphServiceClientFixture graphServiceClientFixture, B2CFixture b2CFixture)
@@ -40,17 +36,13 @@ public sealed class ActiveDirectoryB2CServiceTests
 
         _graphServiceClientFixture = graphServiceClientFixture;
         _sut = b2CFixture.B2CService;
-        _rolesProvider = b2CFixture.B2CRolesProvider;
     }
 
     [Fact]
     public async Task CreateConsumerAppRegistrationAsync_AppIsRegistered_Success()
     {
         // Arrange
-        var actor = CreateActor(new[]
-        {
-            EicFunction.SystemOperator
-        });
+        var actor = CreateActor(EicFunction.SystemOperator);
 
         try
         {
@@ -69,46 +61,10 @@ public sealed class ActiveDirectoryB2CServiceTests
     }
 
     [Fact]
-    public async Task GetExistingAppRegistrationAsync_AddTwoRolesToAppRegistration_Success()
-    {
-        // Arrange
-        var actor = CreateActor(new[]
-        {
-            EicFunction.SystemOperator, // transmission system operator
-            EicFunction.MeteredDataResponsible
-        });
-        try
-        {
-            await _sut.AssignApplicationRegistrationAsync(actor);
-
-            var appRoles = await _rolesProvider.GetB2BRolesAsync();
-            var systemOperatorRole = appRoles.EicRolesMapped[EicFunction.SystemOperator];
-            var meteredDataResponsibleRole = appRoles.EicRolesMapped[EicFunction.MeteredDataResponsible];
-
-            // Act
-            var app = await _graphServiceClientFixture.GetExistingAppRegistrationAsync(actor.ExternalActorId!.ToString());
-
-            // Assert
-            var actual = app.AppRoles.ToList();
-            Assert.Equal(2, actual.Count);
-            Assert.Contains(systemOperatorRole.ToString(), actual.Select(x => x.RoleId));
-            Assert.Contains(meteredDataResponsibleRole.ToString(), actual.Select(x => x.RoleId));
-        }
-        finally
-        {
-            await CleanupAsync(actor);
-        }
-    }
-
-    [Fact]
     public async Task DeleteConsumerAppRegistrationAsync_DeleteCreatedAppRegistration_ServiceException404IsThrownWhenTryingToGetTheDeletedApp()
     {
         // Arrange
-        var actor = CreateActor(new[]
-        {
-            EicFunction.SystemOperator, // transmission system operator
-        });
-
+        var actor = CreateActor(EicFunction.SystemOperator); // transmission system operator
         try
         {
             await _sut.AssignApplicationRegistrationAsync(actor);
@@ -128,7 +84,7 @@ public sealed class ActiveDirectoryB2CServiceTests
         }
     }
 
-    private static Actor CreateActor(IEnumerable<EicFunction> roles)
+    private static Actor CreateActor(EicFunction role)
     {
         return new Actor(
             new ActorId(Guid.NewGuid()),
@@ -136,7 +92,7 @@ public sealed class ActiveDirectoryB2CServiceTests
             null,
             new MockedGln(),
             ActorStatus.Active,
-            roles.Select(x => new ActorMarketRole(x)),
+            new ActorMarketRole(role),
             new ActorName(Guid.NewGuid().ToString()),
             null);
     }

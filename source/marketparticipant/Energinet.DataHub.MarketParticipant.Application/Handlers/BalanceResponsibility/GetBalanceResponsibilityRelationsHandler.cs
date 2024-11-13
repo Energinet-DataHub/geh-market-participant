@@ -48,7 +48,7 @@ public sealed class GetBalanceResponsibilityRelationsHandler : IRequestHandler<G
 
         NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
-        if (actor.MarketRoles.Any(mr => mr.Function == EicFunction.EnergySupplier))
+        if (actor.MarketRole is { Function: EicFunction.EnergySupplier })
         {
             var contractors = await _balanceResponsibilityRelationsRepository
                 .GetForEnergySupplierAsync(actor.Id)
@@ -61,7 +61,7 @@ public sealed class GetBalanceResponsibilityRelationsHandler : IRequestHandler<G
                     .Select(relation => Map(contractor.BalanceResponsibleParty, relation))));
         }
 
-        if (actor.MarketRoles.Any(mr => mr.Function == EicFunction.BalanceResponsibleParty))
+        if (actor.MarketRole is { Function: EicFunction.BalanceResponsibleParty })
         {
             var relations = await _balanceResponsibilityRelationsRepository
                 .GetForBalanceResponsiblePartyAsync(actor.Id)

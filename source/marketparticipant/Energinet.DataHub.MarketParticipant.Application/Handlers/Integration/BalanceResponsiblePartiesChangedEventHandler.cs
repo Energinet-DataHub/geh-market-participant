@@ -60,13 +60,15 @@ public sealed class BalanceResponsiblePartiesChangedEventHandler : IBalanceRespo
         ArgumentNullException.ThrowIfNull(balanceResponsiblePartiesChanged);
 
         var allActors = await _actorRepository
-                .GetActorsAsync()
-                .ConfigureAwait(false);
+            .GetActorsAsync()
+            .ConfigureAwait(false);
 
         var notificationTargets = allActors
-            .Where(actor =>
-                actor.Status == ActorStatus.Active &&
-                actor.MarketRoles.Any(mr => mr.Function == EicFunction.DataHubAdministrator))
+            .Where(actor => actor is
+            {
+                Status: ActorStatus.Active,
+                MarketRole.Function: EicFunction.DataHubAdministrator,
+            })
             .Select(actor => actor.Id);
 
         var uow = await _unitOfWorkProvider

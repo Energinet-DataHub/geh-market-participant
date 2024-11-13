@@ -54,7 +54,7 @@ public sealed class DomainEventRepositoryTests
             null,
             new MockedGln(),
             ActorStatus.Active,
-            Array.Empty<ActorMarketRole>(),
+            new ActorMarketRole(EicFunction.BillingAgent),
             new ActorName(string.Empty),
             null);
 
@@ -81,11 +81,11 @@ public sealed class DomainEventRepositoryTests
             null,
             new MockedGln(),
             ActorStatus.New,
-            Array.Empty<ActorMarketRole>(),
+            new ActorMarketRole(EicFunction.BillingAgent),
             new ActorName(string.Empty),
             null);
 
-        actor.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, new[]
+        actor.UpdateMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, new[]
         {
             new ActorGridArea(new GridAreaId(Guid.NewGuid()), Array.Empty<MeteringPointType>())
         }));
@@ -118,11 +118,11 @@ public sealed class DomainEventRepositoryTests
             null,
             new MockedGln(),
             ActorStatus.New,
-            Array.Empty<ActorMarketRole>(),
+            new ActorMarketRole(EicFunction.BillingAgent),
             new ActorName(string.Empty),
             null);
 
-        actor.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, new[]
+        actor.UpdateMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, new[]
         {
             new ActorGridArea(new GridAreaId(Guid.NewGuid()), Array.Empty<MeteringPointType>()),
             new ActorGridArea(new GridAreaId(Guid.NewGuid()), Array.Empty<MeteringPointType>())

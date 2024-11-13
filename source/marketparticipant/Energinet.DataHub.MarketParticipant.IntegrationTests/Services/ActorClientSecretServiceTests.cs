@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -48,10 +47,7 @@ public sealed class ActorClientSecretServiceTests
     public async Task AddSecretToAppRegistration_ReturnsPassword_AndAppHasPassword()
     {
         // Arrange
-        var actor = CreateActor(new[]
-        {
-            EicFunction.SystemOperator, // transmission system operator
-        });
+        var actor = CreateActor(EicFunction.SystemOperator); // transmission system operator
 
         try
         {
@@ -78,10 +74,7 @@ public sealed class ActorClientSecretServiceTests
     [Fact]
     public async Task RemoveSecretFromAppRegistration_DoesNotThrow_And_PasswordIsRemoved()
     {
-        var actor = CreateActor(new[]
-        {
-            EicFunction.SystemOperator, // transmission system operator
-        });
+        var actor = CreateActor(EicFunction.SystemOperator); // transmission system operator
 
         try
         {
@@ -106,7 +99,7 @@ public sealed class ActorClientSecretServiceTests
         }
     }
 
-    private static Actor CreateActor(IEnumerable<EicFunction> roles)
+    private static Actor CreateActor(EicFunction role)
     {
         return new Actor(
             new ActorId(Guid.NewGuid()),
@@ -114,7 +107,7 @@ public sealed class ActorClientSecretServiceTests
             null,
             new MockedGln(),
             ActorStatus.Active,
-            roles.Select(x => new ActorMarketRole(x)),
+            new ActorMarketRole(role),
             new ActorName(Guid.NewGuid().ToString()),
             null);
     }

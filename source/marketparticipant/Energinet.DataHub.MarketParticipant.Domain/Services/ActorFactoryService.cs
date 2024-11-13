@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -21,31 +20,28 @@ using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
-public sealed class ActorFactoryService(IActorRepository actorRepository,
-        IUnitOfWorkProvider unitOfWorkProvider,
-        IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
-        IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
-        IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService,
-        IDomainEventRepository domainEventRepository,
-        IEntityLock entityLock,
-        IAllowedMarketRoleCombinationsForDelegationRuleService allowedMarketRoleCombinationsForDelegationRuleService)
+public sealed class ActorFactoryService(
+    IActorRepository actorRepository,
+    IUnitOfWorkProvider unitOfWorkProvider,
+    IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
+    IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
+    IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService,
+    IDomainEventRepository domainEventRepository,
+    IEntityLock entityLock,
+    IAllowedMarketRoleCombinationsForDelegationRuleService allowedMarketRoleCombinationsForDelegationRuleService)
     : IActorFactoryService
 {
     public async Task<Actor> CreateAsync(
         Organization organization,
         ActorNumber actorNumber,
         ActorName actorName,
-        IReadOnlyCollection<ActorMarketRole> marketRoles)
+        ActorMarketRole marketRole)
     {
         ArgumentNullException.ThrowIfNull(organization);
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorName);
-        ArgumentNullException.ThrowIfNull(marketRoles);
 
-        var newActor = new Actor(organization.Id, actorNumber, actorName);
-
-        foreach (var marketRole in marketRoles)
-            newActor.AddMarketRole(marketRole);
+        var newActor = new Actor(organization.Id, actorNumber, actorName, marketRole);
 
         var uow = await unitOfWorkProvider
             .NewUnitOfWorkAsync()
@@ -63,10 +59,7 @@ public sealed class ActorFactoryService(IActorRepository actorRepository,
                 .ValidateEicFunctionsAcrossActorsAsync(newActor)
                 .ConfigureAwait(false);
 
-            foreach (var marketRole in newActor.MarketRoles)
-            {
-                await allowedMarketRoleCombinationsForDelegationRuleService.ValidateAsync(organization.Id, marketRole.Function).ConfigureAwait(false);
-            }
+            await allowedMarketRoleCombinationsForDelegationRuleService.ValidateAsync(organization.Id, newActor.MarketRole.Function).ConfigureAwait(false);
 
             var actorId = await SaveActorAsync(newActor).ConfigureAwait(false);
 

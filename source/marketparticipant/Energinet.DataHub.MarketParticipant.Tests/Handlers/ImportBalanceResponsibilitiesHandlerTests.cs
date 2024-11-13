@@ -135,7 +135,7 @@ public sealed class ImportBalanceResponsibilitiesHandlerTests
             null,
             new GlnActorNumber("3813271387117"),
             ActorStatus.Active,
-            [new ActorMarketRole(EicFunction.BalanceResponsibleParty)],
+            new ActorMarketRole(EicFunction.BalanceResponsibleParty),
             new ActorName(Guid.NewGuid().ToString()),
             null);
     }

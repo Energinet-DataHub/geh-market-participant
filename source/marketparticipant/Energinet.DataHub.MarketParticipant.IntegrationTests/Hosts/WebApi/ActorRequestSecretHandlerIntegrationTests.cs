@@ -55,10 +55,7 @@ public sealed class ActorRequestSecretHandlerIntegrationTests
             null,
             new MockedGln(),
             ActorStatus.Active,
-            new[]
-            {
-                new ActorMarketRole(EicFunction.EnergySupplier)
-            },
+            new ActorMarketRole(EicFunction.EnergySupplier),
             new ActorName(Guid.NewGuid().ToString()),
             null);
 

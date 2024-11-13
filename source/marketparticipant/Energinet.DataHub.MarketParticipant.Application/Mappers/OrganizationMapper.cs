@@ -43,7 +43,7 @@ public static class OrganizationMapper
             actor.Status.ToString(),
             new ActorNumberDto(actor.ActorNumber.Value),
             new ActorNameDto(actor.Name.Value),
-            actor.MarketRoles.Select(Map).ToList());
+            actor.MarketRole is not null ? [Map(actor.MarketRole)] : []);
     }
 
     private static AddressDto Map(Address address)

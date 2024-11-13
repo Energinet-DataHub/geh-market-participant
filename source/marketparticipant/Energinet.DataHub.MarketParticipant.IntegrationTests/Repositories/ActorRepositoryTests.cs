@@ -54,7 +54,7 @@ public sealed class ActorRepositoryTests
 
         var actorRepository = new ActorRepository(context, new EntityLock(context));
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent));
 
         // act, assert
         var actual = await Assert.ThrowsAsync<InvalidOperationException>(() => actorRepository.AddOrUpdateAsync(actor));
@@ -77,7 +77,7 @@ public sealed class ActorRepositoryTests
 
         var actorRepository = new ActorRepository(context, entityLock);
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent));
 
         // act
         var actual = await actorRepository.AddOrUpdateAsync(actor);
@@ -98,7 +98,7 @@ public sealed class ActorRepositoryTests
         var actorRepository2 = new ActorRepository(context2, _lock);
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent));
 
         // Act
         var result = await actorRepository.AddOrUpdateAsync(actor);
@@ -131,12 +131,11 @@ public sealed class ActorRepositoryTests
             DateTimeOffset.MaxValue));
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent));
 
-        actor.AddMarketRole(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new[]
-        {
-            new ActorGridArea(gridAreaId, new[] { MeteringPointType.D01VeProduction })
-        }));
+        actor.UpdateMarketRole(new ActorMarketRole(EicFunction.BalanceResponsibleParty, [
+            new ActorGridArea(gridAreaId, [MeteringPointType.D01VeProduction]),
+        ]));
 
         // Act
         var result = await actorRepository.AddOrUpdateAsync(actor);
@@ -146,7 +145,7 @@ public sealed class ActorRepositoryTests
         Assert.NotNull(actual);
         Assert.Equal(actor.OrganizationId, actual.OrganizationId);
         Assert.Equal(actor.ActorNumber, actual.ActorNumber);
-        Assert.Equal(actor.MarketRoles.Single().Function, actual.MarketRoles.Single().Function);
+        Assert.Equal(actor.MarketRole.Function, actual.MarketRole.Function);
     }
 
     [Fact]
@@ -166,7 +165,7 @@ public sealed class ActorRepositoryTests
             "secret",
             DateTime.UtcNow.AddYears(1).ToInstant());
 
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent))
         {
             Credentials = actorCredentials
         };
@@ -207,7 +206,7 @@ public sealed class ActorRepositoryTests
             "secret",
             DateTime.UtcNow.AddYears(1).ToInstant());
 
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent))
         {
             Credentials = actorCredentials
         };
@@ -254,7 +253,7 @@ public sealed class ActorRepositoryTests
             Guid.NewGuid(),
             endDate);
 
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent))
         {
             Credentials = actorClientSecretCredentials
         };
@@ -290,11 +289,11 @@ public sealed class ActorRepositoryTests
         var actorCertificateCredentials = new ActorCertificateCredentials("123456784", "secret", DateTime.UtcNow.AddYears(1).ToInstant());
         var actorCertificateCredentials2 = new ActorCertificateCredentials("123456784", "secret2", DateTime.UtcNow.AddYears(1).ToInstant());
 
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent))
         {
             Credentials = actorCertificateCredentials
         };
-        var actor2 = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        var actor2 = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new ActorMarketRole(EicFunction.BillingAgent))
         {
             Credentials = actorCertificateCredentials2
         };
@@ -344,7 +343,7 @@ public sealed class ActorRepositoryTests
         var actor2 = await _fixture.PrepareActorAsync();
 
         // Act
-        var actual = await actorRepository.GetActorsAsync(new[] { new ActorId(actor1.Id), new ActorId(actor2.Id) });
+        var actual = await actorRepository.GetActorsAsync([new ActorId(actor1.Id), new ActorId(actor2.Id)]);
 
         // Assert
         Assert.NotNull(actual);

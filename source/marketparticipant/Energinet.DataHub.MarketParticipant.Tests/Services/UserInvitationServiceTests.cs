@@ -51,7 +51,7 @@ public sealed class UserInvitationServiceTests
         new ExternalActorId(Guid.NewGuid()),
         new MockedGln(),
         ActorStatus.Active,
-        [new ActorMarketRole(EicFunction.BalanceResponsibleParty)],
+        new ActorMarketRole(EicFunction.BalanceResponsibleParty),
         new ActorName("Actor Name"),
         null);
 

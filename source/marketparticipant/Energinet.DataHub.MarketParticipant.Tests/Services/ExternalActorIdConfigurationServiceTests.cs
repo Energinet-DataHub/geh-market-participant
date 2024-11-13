@@ -50,7 +50,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
             externalActorId,
             gln,
             ActorStatus.New,
-            Array.Empty<ActorMarketRole>(),
+            new ActorMarketRole(EicFunction.BillingAgent),
             new ActorName("fake_value"),
             null);
 
@@ -106,7 +106,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
             null,
             gln,
             ActorStatus.New,
-            Array.Empty<ActorMarketRole>(),
+            new ActorMarketRole(EicFunction.BillingAgent),
             new ActorName("fake_value"),
             null);
 

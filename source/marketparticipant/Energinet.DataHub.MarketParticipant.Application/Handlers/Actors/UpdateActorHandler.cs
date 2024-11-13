@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
-using Energinet.DataHub.MarketParticipant.Application.Extensions;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -84,26 +84,9 @@ public sealed class UpdateActorHandler : IRequestHandler<UpdateActorCommand>
     {
         if (actor.Status == ActorStatus.New)
         {
-            var incomingMarketRoles = MarketRoleMapper.Map(changes.MarketRoles);
-            var existingMarketRoles = actor.MarketRoles;
-
-            var joinedMarketRoles = EnumerableExtensions
-                .FullOuterJoin(
-                    incomingMarketRoles,
-                    existingMarketRoles,
-                    (incomingRole, existingRole) => incomingRole.Function == existingRole.Function);
-
-            foreach (var (incomingRole, existingRole) in joinedMarketRoles)
+            if (changes.MarketRoles.SingleOrDefault() is { } mr)
             {
-                if (existingRole is not null)
-                {
-                    actor.RemoveMarketRole(existingRole);
-                }
-
-                if (incomingRole is not null)
-                {
-                    actor.AddMarketRole(incomingRole);
-                }
+                actor.UpdateMarketRole(MarketRoleMapper.Map(mr));
             }
         }
 

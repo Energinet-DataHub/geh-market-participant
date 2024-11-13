@@ -46,7 +46,7 @@ public sealed class GetActorTokenDataHandlerIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var (_, _, _, actor) = await CreateActorWith2GridAccessProviderGridAreasAnd1EnergySupplierGridArea();
+        var (_, _, actor) = await CreateActorWith2GridAccessProviderGridAreasAnd1EnergySupplierGridArea();
 
         var command = new GetActorTokenDataCommand(actor.Id);
 
@@ -66,13 +66,13 @@ public sealed class GetActorTokenDataHandlerIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        (GridAreaEntity GridAccessProviderGa1, GridAreaEntity GridAccessProviderGa2, GridAreaEntity EnergySupplierGa, ActorEntity Actor)[] actors =
+        (GridAreaEntity GridAccessProviderGa1, GridAreaEntity GridAccessProviderGa2, ActorEntity Actor)[] actors =
         [
             await CreateActorWith2GridAccessProviderGridAreasAnd1EnergySupplierGridArea(),
             await CreateActorWith2GridAccessProviderGridAreasAnd1EnergySupplierGridArea(),
         ];
 
-        foreach (var (gridAccessProviderGa1, gridAccessProviderGa2, energySupplierGa, actor) in actors)
+        foreach (var (gridAccessProviderGa1, gridAccessProviderGa2, actor) in actors)
         {
             var command = new GetActorTokenDataCommand(actor.Id);
 
@@ -83,26 +83,20 @@ public sealed class GetActorTokenDataHandlerIntegrationTests
             Assert.NotNull(actual);
             Assert.Equal(actor.Id, actual.ActorTokenData.ActorId);
             Assert.Equal(actor.ActorNumber, actual.ActorTokenData.ActorNumber);
-            Assert.Equal(2, actual.ActorTokenData.MarketRoles.Count());
+            Assert.Single(actual.ActorTokenData.MarketRoles);
             Assert.Single(actual.ActorTokenData.MarketRoles, x => x.Function == EicFunction.GridAccessProvider);
-            Assert.Single(actual.ActorTokenData.MarketRoles, x => x.Function == EicFunction.EnergySupplier);
 
             var actualGridAccessProvider = actual.ActorTokenData.MarketRoles.Single(x => x.Function == EicFunction.GridAccessProvider);
             Assert.Equal(2, actualGridAccessProvider.GridAreas.Count());
             Assert.Single(actualGridAccessProvider.GridAreas, x => x.GridAreaCode == gridAccessProviderGa1.Code);
             Assert.Single(actualGridAccessProvider.GridAreas, x => x.GridAreaCode == gridAccessProviderGa2.Code);
-
-            var actualEnergySupplier = actual.ActorTokenData.MarketRoles.Single(x => x.Function == EicFunction.EnergySupplier);
-            Assert.Single(actualEnergySupplier.GridAreas);
-            Assert.Single(actualEnergySupplier.GridAreas, x => x.GridAreaCode == energySupplierGa.Code);
         }
     }
 
-    private async Task<(GridAreaEntity GridAccessProviderGa1, GridAreaEntity GridAccessProviderGa2, GridAreaEntity EnergySupplierGa, ActorEntity Actor)> CreateActorWith2GridAccessProviderGridAreasAnd1EnergySupplierGridArea()
+    private async Task<(GridAreaEntity GridAccessProviderGa1, GridAreaEntity GridAccessProviderGa2, ActorEntity Actor)> CreateActorWith2GridAccessProviderGridAreasAnd1EnergySupplierGridArea()
     {
         var gridAccessProviderGa1 = await _fixture.PrepareGridAreaAsync();
         var gridAccessProviderGa2 = await _fixture.PrepareGridAreaAsync();
-        var energySupplierGa = await _fixture.PrepareGridAreaAsync();
 
         var gridAccessProviderRole = new MarketRoleEntity
         {
@@ -120,24 +114,11 @@ public sealed class GetActorTokenDataHandlerIntegrationTests
             },
         };
 
-        var energySupplierRole = new MarketRoleEntity
-        {
-            Function = EicFunction.EnergySupplier,
-            GridAreas =
-            {
-                new MarketRoleGridAreaEntity
-                {
-                    GridAreaId = energySupplierGa.Id,
-                },
-            },
-        };
-
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
             TestPreparationEntities.ValidActiveActor,
-            gridAccessProviderRole,
-            energySupplierRole);
+            gridAccessProviderRole);
 
-        return (gridAccessProviderGa1, gridAccessProviderGa2, energySupplierGa, actor);
+        return (gridAccessProviderGa1, gridAccessProviderGa2, actor);
     }
 }

@@ -28,8 +28,12 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
 {
     private static readonly Dictionary<EicFunction, EicFunction[]> _forbiddenCombinations = new()
     {
-        { EicFunction.EnergySupplier, [EicFunction.GridAccessProvider] },
-        { EicFunction.GridAccessProvider, [EicFunction.EnergySupplier] },
+        {
+            EicFunction.EnergySupplier, [EicFunction.GridAccessProvider]
+        },
+        {
+            EicFunction.GridAccessProvider, [EicFunction.EnergySupplier]
+        },
     };
 
     private readonly IActorRepository _actorRepository;
@@ -52,13 +56,12 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
         var actorsList = existingActors.ToList();
 
         var allMarketRolesInOrganization = actorsList
-            .SelectMany(actor => actor.MarketRoles)
-            .Select(marketRole => marketRole.Function)
+            .Select(actor => actor.MarketRole.Function)
             .Append(newMarketRole)
             .ToHashSet();
 
         var delegatedActors = actorsList
-            .Where(actor => actor.MarketRoles.Any(mr => mr.Function == EicFunction.Delegated));
+            .Where(actor => actor.MarketRole is { Function: EicFunction.Delegated });
 
         foreach (var delegatedActor in delegatedActors)
         {
@@ -111,7 +114,7 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
                 .ConfigureAwait(false);
 
             var rolesInOrg = actorsInOrganization
-                .SelectMany(actor => actor.MarketRoles)
+                .Select(actor => actor.MarketRole)
                 .Select(mr => mr.Function)
                 .ToList();
 
@@ -121,19 +124,18 @@ public sealed class AllowedMarketRoleCombinationsForDelegationRuleService : IAll
 
     private static void ValidateDelegation(Actor delegatedBy, IReadOnlyCollection<EicFunction> delegatedTo)
     {
-        foreach (var actorMarketRole in delegatedBy.MarketRoles)
-        {
-            if (!_forbiddenCombinations.TryGetValue(actorMarketRole.Function, out var forbidden))
-                continue;
+        var function = delegatedBy.MarketRole.Function;
 
-            foreach (var eicFunction in delegatedTo)
+        if (!_forbiddenCombinations.TryGetValue(function, out var forbidden))
+            return;
+
+        foreach (var eicFunction in delegatedTo)
+        {
+            if (forbidden.Contains(eicFunction))
             {
-                if (forbidden.Contains(eicFunction))
-                {
-                    throw new ValidationException($"Delegated '{actorMarketRole.Function}' cannot be used in an organization containing market role '{eicFunction}'.")
-                        .WithErrorCode("process_delegation.market_role_forbidden")
-                        .WithArgs(("assigned_market_role", actorMarketRole.Function.ToString()), ("conflicting_market_role", eicFunction.ToString()));
-                }
+                throw new ValidationException($"Delegated '{function}' cannot be used in an organization containing market role '{eicFunction}'.")
+                    .WithErrorCode("process_delegation.market_role_forbidden")
+                    .WithArgs(("assigned_market_role", function.ToString()), ("conflicting_market_role", eicFunction.ToString()));
             }
         }
     }

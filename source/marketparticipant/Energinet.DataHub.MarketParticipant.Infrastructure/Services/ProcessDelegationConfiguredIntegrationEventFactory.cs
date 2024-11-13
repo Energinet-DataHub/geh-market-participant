@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -45,14 +44,14 @@ public sealed class ProcessDelegationConfiguredIntegrationEventFactory : IIntegr
             .ConfigureAwait(false);
 
         var delegatedByActorNumber = delegatedBy!.ActorNumber.Value;
-        var delegatedByMarketRole = delegatedBy.MarketRoles.Single().Function;
+        var delegatedByMarketRole = delegatedBy.MarketRole.Function;
 
         var delegatedTo = await _actorRepository
             .GetAsync(domainEvent.DelegatedTo)
             .ConfigureAwait(false);
 
         var delegatedToActorNumber = delegatedTo!.ActorNumber.Value;
-        var delegatedToMarketRole = delegatedTo.MarketRoles.Single().Function;
+        var delegatedToMarketRole = delegatedTo.MarketRole.Function;
 
         var gridArea = await _gridAreaRepository
             .GetAsync(domainEvent.GridAreaId)

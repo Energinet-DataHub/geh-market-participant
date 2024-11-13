@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
@@ -43,14 +44,14 @@ internal static class TestActorPreparationHelper
         this MarketParticipantDatabaseFixture fixture,
         OrganizationEntity inputOrganization,
         ActorEntity inputActor,
-        params MarketRoleEntity[] inputMarketRoles)
+        MarketRoleEntity? inputMarketRole = null)
     {
         await using var context = fixture.DatabaseManager.CreateDbContext();
 
-        foreach (var localMarketRole in inputMarketRoles)
+        inputActor.MarketRoles.Add(inputMarketRole ?? new MarketRoleEntity
         {
-            inputActor.MarketRoles.Add(localMarketRole);
-        }
+            Function = EicFunction.BillingAgent,
+        });
 
         if (inputOrganization.Id == Guid.Empty)
         {
