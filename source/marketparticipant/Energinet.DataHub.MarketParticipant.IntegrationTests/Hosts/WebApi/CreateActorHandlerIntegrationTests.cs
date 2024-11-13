@@ -139,11 +139,8 @@ public sealed class CreateActorHandlerIntegrationTests
         Assert.Equal("actor.number.reserved", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
     }
 
-    private static IEnumerable<ActorMarketRoleDto> ActorMarketRoleDto(EicFunction eicFunction)
+    private static ActorMarketRoleDto ActorMarketRoleDto(EicFunction eicFunction)
     {
-        return new ActorMarketRoleDto[]
-        {
-            new(eicFunction, Array.Empty<ActorGridAreaDto>(), null)
-        };
+        return new(eicFunction, Array.Empty<ActorGridAreaDto>(), null);
     }
 }

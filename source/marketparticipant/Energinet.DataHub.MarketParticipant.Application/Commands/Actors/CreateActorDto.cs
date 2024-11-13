@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
@@ -21,4 +20,4 @@ public sealed record CreateActorDto(
     Guid OrganizationId,
     ActorNameDto Name,
     ActorNumberDto ActorNumber,
-    IEnumerable<ActorMarketRoleDto> MarketRoles);
+    ActorMarketRoleDto MarketRole);

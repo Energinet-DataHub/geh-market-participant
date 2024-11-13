@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
@@ -48,7 +47,7 @@ public sealed class CreateActorHandler : IRequestHandler<CreateActorCommand, Cre
 
         var actorNumber = ActorNumber.Create(request.Actor.ActorNumber.Value);
         var actorName = new ActorName(request.Actor.Name.Value);
-        var marketRole = MarketRoleMapper.Map(request.Actor.MarketRoles.Single());
+        var marketRole = MarketRoleMapper.Map(request.Actor.MarketRole);
 
         var actor = await _actorFactoryService
             .CreateAsync(organization, actorNumber, actorName, marketRole)

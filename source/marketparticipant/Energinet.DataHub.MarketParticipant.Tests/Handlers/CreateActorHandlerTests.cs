@@ -60,7 +60,7 @@ public sealed class CreateActorHandlerTests
             organization.Id.Value,
             new ActorNameDto(string.Empty),
             new ActorNumberDto(actor.ActorNumber.Value),
-            [new ActorMarketRoleDto(EicFunction.BillingAgent, [], null)]));
+            new ActorMarketRoleDto(EicFunction.BillingAgent, [], null)));
 
         // Act
         var response = await target.Handle(command, CancellationToken.None);
@@ -101,7 +101,7 @@ public sealed class CreateActorHandlerTests
             organization.Id.Value,
             new ActorNameDto(string.Empty),
             new ActorNumberDto(actorGln),
-            [marketRole]));
+            marketRole));
 
         // Act
         var response = await target.Handle(command, CancellationToken.None);
@@ -150,7 +150,7 @@ public sealed class CreateActorHandlerTests
             organization.Id.Value,
             new ActorNameDto(string.Empty),
             new ActorNumberDto(actorGln),
-            [marketRole]));
+            marketRole));
 
         // Act
         var response = await target.Handle(command, CancellationToken.None);
