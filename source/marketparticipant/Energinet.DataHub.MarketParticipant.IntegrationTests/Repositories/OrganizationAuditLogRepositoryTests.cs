@@ -132,7 +132,7 @@ public sealed class OrganizationAuditLogRepositoryTests
         // Make an audited change.
         var orgId = await organizationRepository.AddOrUpdateAsync(testOrg);
         var organization = await organizationRepository.GetAsync(orgId.Value);
-        string orgValue = organization!.Domains.Single().Value;
+        var orgValue = organization!.Domains.Single().Value;
         organization.Domains = [new OrganizationDomain("www.raccoons.dk")];
 
         await organizationRepository.AddOrUpdateAsync(organization);
@@ -167,8 +167,7 @@ public sealed class OrganizationAuditLogRepositoryTests
         // Make an audited change.
         var orgId = await organizationRepository.AddOrUpdateAsync(testOrg);
         var organization = await organizationRepository.GetAsync(orgId.Value);
-        string orgValue = organization!.Domains.Single().Value;
-        organization.Domains = [new OrganizationDomain("raccoons.dk"), new OrganizationDomain("raccoons.com")];
+        organization!.Domains = [new OrganizationDomain("raccoons.dk"), new OrganizationDomain("raccoons.com")];
 
         await organizationRepository.AddOrUpdateAsync(organization);
 
@@ -202,7 +201,7 @@ public sealed class OrganizationAuditLogRepositoryTests
         // Make an audited change.
         var orgId = await organizationRepository.AddOrUpdateAsync(testOrg);
         var organization = await organizationRepository.GetAsync(orgId.Value);
-        organization.Domains = [_validDomain];
+        organization!.Domains = [_validDomain];
 
         await organizationRepository.AddOrUpdateAsync(organization);
 

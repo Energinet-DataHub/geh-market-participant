@@ -29,7 +29,7 @@ public sealed class ActorEntity : IAuditedEntity
     public string ActorNumber { get; set; } = null!;
     public string Name { get; set; } = null!;
     public ActorStatus Status { get; set; }
-    public Collection<MarketRoleEntity> MarketRoles { get; } = new();
+    public MarketRoleEntity MarketRole { get; set; } = null!;
     public ActorCertificateCredentialsEntity? CertificateCredential { get; set; }
     public ActorClientSecretCredentialsEntity? ClientSecretCredential { get; set; }
     public Collection<UsedActorCertificatesEntity> UsedActorCertificates { get; } = new();

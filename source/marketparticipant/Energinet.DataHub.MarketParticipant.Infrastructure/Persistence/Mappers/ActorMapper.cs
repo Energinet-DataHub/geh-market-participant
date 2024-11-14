@@ -32,8 +32,6 @@ internal static class ActorMapper
         to.Name = from.Name.Value;
 
         // Market roles are currently treated as value types, so they are deleted and recreated with each update.
-        to.MarketRoles.Clear();
-
         var marketRoleEntity = new MarketRoleEntity
         {
             Function = from.MarketRole.Function,
@@ -58,7 +56,7 @@ internal static class ActorMapper
             marketRoleEntity.GridAreas.Add(gridAreaEntity);
         }
 
-        to.MarketRoles.Add(marketRoleEntity);
+        to.MarketRole = marketRoleEntity;
 
         switch (from.Credentials)
         {
@@ -101,17 +99,15 @@ internal static class ActorMapper
 
     public static Actor MapFromEntity(ActorEntity from)
     {
-        var marketRoles = from.MarketRoles.Select(marketRole =>
-        {
-            var function = marketRole.Function;
-            var gridAreas = marketRole
-                .GridAreas
-                .Select(grid => new ActorGridArea(
-                    new GridAreaId(grid.GridAreaId),
-                    grid.MeteringPointTypes.Select(e => (MeteringPointType)e.MeteringTypeId)));
-
-            return new ActorMarketRole(function, gridAreas.ToList(), marketRole.Comment);
-        });
+        var marketRole =
+            new ActorMarketRole(
+                from.MarketRole.Function,
+                from.MarketRole
+                    .GridAreas
+                    .Select(grid => new ActorGridArea(
+                        new GridAreaId(grid.GridAreaId),
+                        grid.MeteringPointTypes.Select(e => (MeteringPointType)e.MeteringTypeId))).ToList(),
+                from.MarketRole.Comment);
 
         var actorNumber = ActorNumber.Create(from.ActorNumber);
         var actorStatus = from.Status;
@@ -123,7 +119,7 @@ internal static class ActorMapper
             from.ActorId.HasValue ? new ExternalActorId(from.ActorId.Value) : null,
             actorNumber,
             actorStatus,
-            marketRoles.Single(),
+            marketRole,
             actorName,
             MapCredentials(from));
     }

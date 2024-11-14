@@ -15,7 +15,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoFixture;
 using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 using Energinet.DataHub.MarketParticipant.Application.Contracts;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
@@ -58,8 +57,8 @@ public sealed class ValidateBalanceResponsibilitiesHandlerIntegrationTests : IAs
     {
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var cleanup = await context.Actors
-            .Include(a => a.MarketRoles)
-            .Where(a => a.MarketRoles.Any(mr => mr.Function == EicFunction.DataHubAdministrator))
+            .Include(a => a.MarketRole)
+            .Where(a => a.MarketRole.Function == EicFunction.DataHubAdministrator)
             .ToListAsync();
 
         foreach (var entity in cleanup)
