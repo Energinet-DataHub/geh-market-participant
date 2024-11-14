@@ -29,6 +29,7 @@ public sealed class RequiredPermissionForUserRoleRuleService : IRequiredPermissi
     private static readonly HashSet<(PermissionId Permission, EicFunction MarketRole)> _requiredPermissions =
     [
         (PermissionId.UsersManage, EicFunction.DataHubAdministrator),
+        (PermissionId.UserRolesManage, EicFunction.DataHubAdministrator),
     ];
 
     private readonly IUserRoleRepository _userRoleRepository;

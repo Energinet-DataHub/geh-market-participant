@@ -13,23 +13,34 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Moq;
 using Xunit;
 using Xunit.Categories;
+using RequiredPermissionForUserRoleRuleService = Energinet.DataHub.MarketParticipant.Domain.Services.Rules.RequiredPermissionForUserRoleRuleService;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 
 [UnitTest]
-public sealed class RequiredPermissionForUserRoleRuleServiceIntegrationTests
+public sealed class RequiredPermissionForUserRoleRuleServiceTests
 {
+    private readonly HashSet<(PermissionId Permission, EicFunction MarketRole)> _actualCombos =
+        (HashSet<(PermissionId Permission, EicFunction MarketRole)>)typeof(RequiredPermissionForUserRoleRuleService).GetField("_requiredPermissions", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
+
+    private readonly HashSet<(PermissionId Permission, EicFunction MarketRole)> _excpectedCombos =
+    [
+        (PermissionId.UsersManage, EicFunction.DataHubAdministrator),
+        (PermissionId.UserRolesManage, EicFunction.DataHubAdministrator),
+    ];
+
     [Theory]
     [InlineData(null, null, false, true)]
     [InlineData(UserRoleStatus.Active, null, false, true)]
@@ -46,33 +57,35 @@ public sealed class RequiredPermissionForUserRoleRuleServiceIntegrationTests
 
         var userRoleId = new UserRoleId(Guid.NewGuid());
         var userId = new UserId(Guid.NewGuid());
-        const PermissionId permissionId = PermissionId.UsersManage;
-        const EicFunction marketRole = EicFunction.DataHubAdministrator;
 
-        if (userRoleStatus is { } urs)
+        foreach (var (permissionId, marketRole) in _excpectedCombos)
         {
-            var userRole = new UserRole(userRoleId, "User Role Name", "User Role Description", urs, [permissionId], marketRole);
-            userRoleRepository
-                .Setup(x => x.GetAsync(permissionId))
-                .ReturnsAsync([userRole]);
-
-            if (userStatus is { } uis)
+            if (userRoleStatus is { } urs)
             {
-                var user = new User(userId, new ActorId(Guid.NewGuid()), new ExternalUserId(Guid.NewGuid()), [], null, null, null);
-                userRepository
-                    .Setup(x => x.GetToUserRoleAsync(userRole.Id))
-                    .ReturnsAsync([user]);
+                var userRole = new UserRole(userRoleId, "User Role Name", "User Role Description", urs, [permissionId], marketRole);
+                userRoleRepository
+                    .Setup(x => x.GetAsync(permissionId))
+                    .ReturnsAsync([userRole]);
 
-                var userIdentity = new UserIdentity(user.ExternalId, new EmailAddress("foo@bar.baz"), uis, "firstname", "lastname", null, DateTimeOffset.Now, AuthenticationMethod.Undetermined, []);
-                userIdentityRepository
-                    .Setup(x => x.GetAsync(user.ExternalId))
-                    .ReturnsAsync(userIdentity);
+                if (userStatus is { } uis)
+                {
+                    var user = new User(userId, new ActorId(Guid.NewGuid()), new ExternalUserId(Guid.NewGuid()), [], null, null, null);
+                    userRepository
+                        .Setup(x => x.GetToUserRoleAsync(userRole.Id))
+                        .ReturnsAsync([user]);
+
+                    var userIdentity = new UserIdentity(user.ExternalId, new EmailAddress("foo@bar.baz"), uis, "firstname", "lastname", null, DateTimeOffset.Now, AuthenticationMethod.Undetermined, []);
+                    userIdentityRepository
+                        .Setup(x => x.GetAsync(user.ExternalId))
+                        .ReturnsAsync(userIdentity);
+                }
             }
         }
 
         var target = new RequiredPermissionForUserRoleRuleService(userRoleRepository.Object, userRepository.Object, userIdentityRepository.Object);
 
         // act + assert
+        Assert.Equal(_excpectedCombos, _actualCombos);
         if (shouldThrow)
         {
             await Assert.ThrowsAsync<ValidationException>(() => target.ValidateExistsAsync(excludeUser ? [userId] : []));
