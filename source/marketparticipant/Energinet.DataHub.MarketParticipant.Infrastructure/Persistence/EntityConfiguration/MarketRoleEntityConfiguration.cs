@@ -31,5 +31,6 @@ public sealed class MarketRoleEntityConfiguration : IEntityTypeConfiguration<Mar
             .HasMany(role => role.GridAreas)
             .WithOne()
             .HasForeignKey(g => g.MarketRoleId);
+        builder.Navigation(x => x.GridAreas).AutoInclude();
     }
 }

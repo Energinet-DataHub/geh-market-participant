@@ -48,10 +48,10 @@ internal static class TestActorPreparationHelper
     {
         await using var context = fixture.DatabaseManager.CreateDbContext();
 
-        inputActor.MarketRoles.Add(inputMarketRole ?? new MarketRoleEntity
+        inputActor.MarketRole = inputMarketRole ?? new MarketRoleEntity
         {
             Function = EicFunction.BillingAgent,
-        });
+        };
 
         if (inputOrganization.Id == Guid.Empty)
         {
