@@ -57,7 +57,6 @@ public sealed class ValidateBalanceResponsibilitiesHandlerIntegrationTests : IAs
     {
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var cleanup = await context.Actors
-            .Include(a => a.MarketRole)
             .Where(a => a.MarketRole.Function == EicFunction.DataHubAdministrator)
             .ToListAsync();
 

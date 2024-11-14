@@ -87,8 +87,6 @@ public sealed class ActorRepository(IMarketParticipantDbContext marketParticipan
     {
         var foundActor = await marketParticipantDbContext
             .Actors
-            .Include(a => a.MarketRole)
-            .ThenInclude(m => m.GridAreas)
             .FirstOrDefaultAsync(actor => actor.Id == actorId.Value)
             .ConfigureAwait(false);
 
@@ -101,8 +99,6 @@ public sealed class ActorRepository(IMarketParticipantDbContext marketParticipan
     {
         var actors = await marketParticipantDbContext
             .Actors
-            .Include(a => a.MarketRole)
-            .ThenInclude(m => m.GridAreas)
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -122,8 +118,6 @@ public sealed class ActorRepository(IMarketParticipantDbContext marketParticipan
             select actor;
 
         var actors = await query
-            .Include(a => a.MarketRole)
-            .ThenInclude(m => m.GridAreas)
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -138,8 +132,6 @@ public sealed class ActorRepository(IMarketParticipantDbContext marketParticipan
             select actor;
 
         var actors = await query
-            .Include(a => a.MarketRole)
-            .ThenInclude(m => m.GridAreas)
             .ToListAsync()
             .ConfigureAwait(false);
 
