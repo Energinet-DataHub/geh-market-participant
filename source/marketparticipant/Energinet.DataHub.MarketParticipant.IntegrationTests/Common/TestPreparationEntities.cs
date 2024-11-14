@@ -31,7 +31,13 @@ internal static class TestPreparationEntities
     {
         Name = "Test Organization Name",
         BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier,
-        Domains = { new OrganizationDomainEntity { Domain = new MockedDomain() } },
+        Domains =
+        {
+            new OrganizationDomainEntity
+            {
+                Domain = new MockedDomain()
+            }
+        },
         Status = 1,
         StreetName = "Vej Allé",
         Number = "7",
@@ -47,7 +53,11 @@ internal static class TestPreparationEntities
         ActorId = null,
         IsFas = false,
         Name = "Test Actor Name",
-        Status = ActorStatus.New
+        Status = ActorStatus.New,
+        MarketRole = new MarketRoleEntity
+        {
+            Function = EicFunction.BillingAgent,
+        },
     };
 
     public static ActorEntity ValidActiveActor => new()
@@ -80,7 +90,10 @@ internal static class TestPreparationEntities
         ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value,
         EicFunctions =
         {
-            new UserRoleEicFunctionEntity { EicFunction = EicFunction.GridAccessProvider }
+            new UserRoleEicFunctionEntity
+            {
+                EicFunction = EicFunction.GridAccessProvider
+            }
         },
         Permissions =
         {

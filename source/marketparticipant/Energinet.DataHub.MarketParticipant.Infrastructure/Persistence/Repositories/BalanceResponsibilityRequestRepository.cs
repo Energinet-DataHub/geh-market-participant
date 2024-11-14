@@ -83,7 +83,7 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
             join energySupplier in _marketParticipantDbContext.Actors on
                 new { ActorNumber = balanceResponsibleRequest.EnergySupplier, Function = EicFunction.EnergySupplier }
                 equals
-                new { energySupplier.ActorNumber, energySupplier.MarketRoles.Single().Function } into energySupplierJoin
+                new { energySupplier.ActorNumber, energySupplier.MarketRole.Function } into energySupplierJoin
             from energySupplier in energySupplierJoin.DefaultIfEmpty()
             where energySupplier == null && !exemptGridAreas.Contains(balanceResponsibleRequest.GridAreaCode)
             select balanceResponsibleRequest.EnergySupplier;
@@ -93,7 +93,7 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
             join balanceResponsibleParty in _marketParticipantDbContext.Actors on
                 new { ActorNumber = balanceResponsibleRequest.BalanceResponsibleParty, Function = EicFunction.BalanceResponsibleParty }
                 equals
-                new { balanceResponsibleParty.ActorNumber, balanceResponsibleParty.MarketRoles.Single().Function } into balanceResponsiblePartyJoin
+                new { balanceResponsibleParty.ActorNumber, balanceResponsibleParty.MarketRole.Function } into balanceResponsiblePartyJoin
             from balanceResponsibleParty in balanceResponsiblePartyJoin.DefaultIfEmpty()
             where balanceResponsibleParty == null && !exemptGridAreas.Contains(balanceResponsibleRequest.GridAreaCode)
             select balanceResponsibleRequest.BalanceResponsibleParty;
@@ -115,11 +115,11 @@ public sealed class BalanceResponsibilityRequestRepository : IBalanceResponsibil
             join energySupplier in _marketParticipantDbContext.Actors on
                 new { ActorNumber = balanceResponsibleRequest.EnergySupplier, Function = EicFunction.EnergySupplier }
                 equals
-                new { energySupplier.ActorNumber, energySupplier.MarketRoles.Single().Function }
+                new { energySupplier.ActorNumber, energySupplier.MarketRole.Function }
             join balanceResponsibleParty in _marketParticipantDbContext.Actors on
                 new { ActorNumber = balanceResponsibleRequest.BalanceResponsibleParty, Function = EicFunction.BalanceResponsibleParty }
                 equals
-                new { balanceResponsibleParty.ActorNumber, balanceResponsibleParty.MarketRoles.Single().Function }
+                new { balanceResponsibleParty.ActorNumber, balanceResponsibleParty.MarketRole.Function }
             join gridArea in _marketParticipantDbContext.GridAreas on
                 balanceResponsibleRequest.GridAreaCode
                 equals

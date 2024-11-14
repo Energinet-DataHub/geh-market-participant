@@ -29,9 +29,11 @@ public class ActorEntityConfiguration : AuditedEntityTypeConfiguration<ActorEnti
         builder.HasKey(actor => actor.Id);
         builder.Property(actor => actor.Id).ValueGeneratedOnAdd();
         builder
-            .HasMany(actor => actor.MarketRoles)
+            .HasOne(actor => actor.MarketRole)
             .WithOne()
-            .HasForeignKey(marketRole => marketRole.ActorId);
+            .HasForeignKey<MarketRoleEntity>(marketRole => marketRole.ActorId);
+        builder
+            .Navigation(x => x.MarketRole).AutoInclude();
         builder
             .HasOne(actor => actor.CertificateCredential)
             .WithOne()

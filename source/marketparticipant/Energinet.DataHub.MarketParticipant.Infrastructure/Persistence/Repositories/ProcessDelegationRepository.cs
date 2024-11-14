@@ -154,7 +154,7 @@ public sealed class ProcessDelegationRepository(IMarketParticipantDbContext mark
         return new ProcessDelegation(
             new ProcessDelegationId(processDelegationEntity.Id),
             new ActorId(processDelegationEntity.DelegatedByActorId),
-            actorEntity.MarketRoles.SelectMany(mr => mr.GridAreas).Select(ga => new GridAreaId(ga.GridAreaId)),
+            actorEntity.MarketRole.GridAreas.Select(ga => new GridAreaId(ga.GridAreaId)),
             processDelegationEntity.DelegatedProcess,
             processDelegationEntity.ConcurrencyToken,
             processDelegationEntity.Delegations.Select(Map));

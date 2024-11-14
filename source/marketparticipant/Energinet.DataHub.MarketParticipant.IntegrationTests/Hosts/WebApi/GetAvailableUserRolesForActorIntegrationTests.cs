@@ -45,7 +45,7 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
 
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(t => t.MarketRoles.Clear()),
+            TestPreparationEntities.ValidActor,
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.SystemOperator));
 
         var command = new GetAvailableUserRolesForActorCommand(actor.Id);

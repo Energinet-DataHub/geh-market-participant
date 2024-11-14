@@ -68,7 +68,7 @@ public sealed class UserQueryRepository : IUserQueryRepository
             join userRole in _marketParticipantDbContext.UserRoles on userRoleAssignment.UserRoleId equals userRole.Id
             where userRole.Status == UserRoleStatus.Active
             join actor in _marketParticipantDbContext.Actors on userRoleAssignment.ActorId equals actor.Id
-            where actor.Status == ActorStatus.Active && userRole.EicFunctions.All(f => actor.MarketRoles.Any(marketRole => marketRole.Function == f.EicFunction))
+            where actor.Status == ActorStatus.Active && userRole.EicFunctions.All(f => actor.MarketRole.Function == f.EicFunction)
             select userRole;
 
         var userRoles = await userRoleQuery
