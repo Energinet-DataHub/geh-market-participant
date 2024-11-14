@@ -76,7 +76,7 @@ public sealed class GetOrganizationAuditLogsHandlerIntegrationTests
                 var expectedLog = response
                     .AuditLogs
                     .Where(log => log.AuditIdentityId != KnownAuditIdentityProvider.TestFramework.IdentityId.Value)
-                    .Single(log => log.Change == OrganizationAuditedChange.Domain);
+                    .Single(log => log.Change == OrganizationAuditedChange.Domain && !string.IsNullOrEmpty(log.CurrentValue));
 
                 Assert.Equal(expected, expectedLog.CurrentValue);
             },

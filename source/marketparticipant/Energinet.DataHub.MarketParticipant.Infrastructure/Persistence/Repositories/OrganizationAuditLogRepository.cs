@@ -58,6 +58,7 @@ public sealed class OrganizationAuditLogRepository : IOrganizationAuditLogReposi
 
         var organizationDomainChanges = new AuditLogBuilder<OrganizationAuditedChange, OrganizationDomainEntity>(organizationDomainDataSource)
             .Add(OrganizationAuditedChange.Domain, entity => entity.Domain, AuditedChangeCompareAt.BothCreationAndDeletion)
+            .WithGrouping(entity => entity.Id)
             .BuildAsync();
 
         return organizationDomainChanges;
