@@ -49,46 +49,54 @@ public sealed class RequiredPermissionForUserRoleRuleService : IRequiredPermissi
 
         foreach (var (permission, marketRole) in _requiredPermissions)
         {
-            var userRoles = await _userRoleRepository.GetAsync(permission).ConfigureAwait(false);
-
-            foreach (var userRole in userRoles)
+            if (!await IsPermissionMarketRoleComboValidAsync(permission, marketRole, excludedUsersLookup).ConfigureAwait(false))
             {
-                if (userRole.EicFunction != marketRole)
-                {
-                    continue;
-                }
-
-                if (userRole.Status == UserRoleStatus.Inactive)
-                {
-                    continue;
-                }
-
-                var users = await _userRepository.GetToUserRoleAsync(userRole.Id).ConfigureAwait(false);
-
-                foreach (var user in users)
-                {
-                    if (excludedUsersLookup.Contains(user.Id))
-                    {
-                        continue;
-                    }
-
-                    var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
-
-                    if (userIdentity is { Status: UserIdentityStatus.Active })
-                    {
-                        return;
-                    }
-                }
+                throw new ValidationException($"This operation would've removed the permission '{permission}' from the last remaining user role with active users for the market role '{marketRole}', and hence was denied.")
+                    .WithErrorCode("required_permission_removed")
+                    .WithArgs(("permission", permission), ("marketRole", marketRole));
             }
-
-            throw new ValidationException($"This operation would've removed the permission '{permission}' from the last remaining user role with active users for the market role '{marketRole}', and hence was denied.")
-                .WithErrorCode("required_permission_removed")
-                .WithArgs(("permission", permission), ("marketRole", marketRole));
         }
     }
 
     public Task ValidateExistsAsync()
     {
         return ValidateExistsAsync([]);
+    }
+
+    private async Task<bool> IsPermissionMarketRoleComboValidAsync(PermissionId permission, EicFunction marketRole, HashSet<UserId> excludedUsersLookup)
+    {
+        var userRoles = await _userRoleRepository.GetAsync(permission).ConfigureAwait(false);
+
+        foreach (var userRole in userRoles)
+        {
+            if (userRole.EicFunction != marketRole)
+            {
+                continue;
+            }
+
+            if (userRole.Status == UserRoleStatus.Inactive)
+            {
+                continue;
+            }
+
+            var users = await _userRepository.GetToUserRoleAsync(userRole.Id).ConfigureAwait(false);
+
+            foreach (var user in users)
+            {
+                if (excludedUsersLookup.Contains(user.Id))
+                {
+                    continue;
+                }
+
+                var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
+
+                if (userIdentity is { Status: UserIdentityStatus.Active })
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
