@@ -165,6 +165,20 @@ public sealed class ProcessDelegationTests
         Assert.Equal(2, processDelegation.Delegations.Count);
     }
 
+    [Fact]
+    public void Validate_DisallowedMarketRole_ThrowsException()
+    {
+        // Arrange
+        var actorFrom = TestPreparationModels.MockedActor();
+        actorFrom.UpdateMarketRole(new ActorMarketRole(EicFunction.BillingAgent, [new ActorGridArea(new GridAreaId(Guid.NewGuid()), [])]));
+
+        // Act
+        var exception = Assert.Throws<ValidationException>(() => new ProcessDelegation(actorFrom, DelegatedProcess.RequestEnergyResults));
+
+        // Assert
+        Assert.Equal("process_delegation.actor_invalid_market_role", exception.Data[ValidationExceptionExtensions.ErrorCodeDataKey]);
+    }
+
     [Theory]
     [MemberData(nameof(OverlapCases))]
     public void Validate_PeriodOverlap_HandlesCorrectly(IReadOnlyList<(Instant StartsAt, Instant? StopsAt)> delegationPeriods, bool shouldThrow, int expectedDelegationCount)

@@ -24,6 +24,30 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 
 public sealed class ProcessDelegation : IPublishDomainEvents
 {
+    private static readonly ILookup<DelegatedProcess, EicFunction> _allowedProcesses =
+        new[]
+        {
+            new { Process = DelegatedProcess.RequestEnergyResults, Function = EicFunction.GridAccessProvider },
+            new { Process = DelegatedProcess.RequestEnergyResults, Function = EicFunction.BalanceResponsibleParty },
+            new { Process = DelegatedProcess.RequestEnergyResults, Function = EicFunction.EnergySupplier },
+            new { Process = DelegatedProcess.ReceiveEnergyResults, Function = EicFunction.GridAccessProvider },
+            new { Process = DelegatedProcess.ReceiveEnergyResults, Function = EicFunction.BalanceResponsibleParty },
+            new { Process = DelegatedProcess.ReceiveEnergyResults, Function = EicFunction.EnergySupplier },
+
+            new { Process = DelegatedProcess.RequestWholesaleResults, Function = EicFunction.GridAccessProvider },
+            new { Process = DelegatedProcess.RequestWholesaleResults, Function = EicFunction.BalanceResponsibleParty },
+            new { Process = DelegatedProcess.RequestWholesaleResults, Function = EicFunction.EnergySupplier },
+            new { Process = DelegatedProcess.ReceiveWholesaleResults, Function = EicFunction.GridAccessProvider },
+            new { Process = DelegatedProcess.ReceiveWholesaleResults, Function = EicFunction.BalanceResponsibleParty },
+            new { Process = DelegatedProcess.ReceiveWholesaleResults, Function = EicFunction.EnergySupplier },
+
+            new { Process = DelegatedProcess.RequestMeteringPointData, Function = EicFunction.GridAccessProvider },
+            new { Process = DelegatedProcess.RequestMeteringPointData, Function = EicFunction.BalanceResponsibleParty },
+            new { Process = DelegatedProcess.ReceiveMeteringPointData, Function = EicFunction.GridAccessProvider },
+            new { Process = DelegatedProcess.ReceiveMeteringPointData, Function = EicFunction.BalanceResponsibleParty },
+            new { Process = DelegatedProcess.ReceiveMeteringPointData, Function = EicFunction.EnergySupplier },
+        }.ToLookup(k => k.Process, v => v.Function);
+
     private readonly DomainEventList _domainEvents;
     private readonly List<DelegationPeriod> _delegations = [];
     private readonly List<GridAreaId> _allowedGridAreas = [];
@@ -32,7 +56,7 @@ public sealed class ProcessDelegation : IPublishDomainEvents
     {
         ArgumentNullException.ThrowIfNull(processOwner);
 
-        if (processOwner.MarketRole is not { Function: EicFunction.GridAccessProvider } and not { Function: EicFunction.BalanceResponsibleParty } and not { Function: EicFunction.EnergySupplier })
+        if (!_allowedProcesses[process].Contains(processOwner.MarketRole.Function))
         {
             throw new ValidationException("Actor's market role does not support process delegation.")
                 .WithErrorCode("process_delegation.actor_invalid_market_role");
