@@ -43,11 +43,11 @@ public interface IUserQueryRepository
         ExternalUserId externalUserId);
 
     /// <summary>
-    /// Checks whether the specified user under the specified actor is FAS
+    /// Checks whether the specified user under the specified actor is FAS.
     /// </summary>
     /// <param name="actorId">The id of the actor.</param>
     /// <param name="externalUserId">The external id of the user.</param>
-    /// <returns>Flag indicating whether the user under the actor is FAS</returns>
+    /// <returns>Flag indicating whether the user under the actor is FAS.</returns>
     Task<bool> IsFasAsync(
         ActorId actorId,
         ExternalUserId externalUserId);

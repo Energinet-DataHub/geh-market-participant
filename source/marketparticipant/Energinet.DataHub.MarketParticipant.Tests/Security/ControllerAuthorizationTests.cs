@@ -58,17 +58,17 @@ public sealed class ControllerAuthorizationTests
             typeof(OrganizationController).Assembly.GetTypes()
                 .Where(x => x.IsSubclassOf(typeof(ControllerBase))).SelectMany(controllerType => controllerType.GetMethods()
                     .Where(httpMethod =>
-                        !httpMethod.GetCustomAttributes(typeof(AllowAnonymousAttribute), false).Any() &&
-                        !httpMethod.GetCustomAttributes(typeof(AuthorizeUserAttribute), false).Any() &&
-                        (httpMethod.GetCustomAttributes(typeof(HttpGetAttribute), false).Any() ||
-                         httpMethod.GetCustomAttributes(typeof(HttpPostAttribute), false).Any() ||
-                         httpMethod.GetCustomAttributes(typeof(HttpPutAttribute), false).Any() ||
-                         httpMethod.GetCustomAttributes(typeof(HttpDeleteAttribute), false).Any())))
+                        httpMethod.GetCustomAttributes(typeof(AllowAnonymousAttribute), false).Length == 0 &&
+                        httpMethod.GetCustomAttributes(typeof(AuthorizeUserAttribute), false).Length == 0 &&
+                        (httpMethod.GetCustomAttributes(typeof(HttpGetAttribute), false).Length != 0 ||
+                         httpMethod.GetCustomAttributes(typeof(HttpPostAttribute), false).Length != 0 ||
+                         httpMethod.GetCustomAttributes(typeof(HttpPutAttribute), false).Length != 0 ||
+                         httpMethod.GetCustomAttributes(typeof(HttpDeleteAttribute), false).Length != 0)))
                 .Select(x => $"{x.DeclaringType!.Name}.{x.Name}")
                 .Except(ignoredEndpoints)
                 .ToList();
 
         // assert
-        Assert.False(endpointsMissingAuthorization.Any(), $"Following endpoints are missing auth:\n\t{string.Join("\n\t", endpointsMissingAuthorization)}");
+        Assert.False(endpointsMissingAuthorization.Count != 0, $"Following endpoints are missing auth:\n\t{string.Join("\n\t", endpointsMissingAuthorization)}");
     }
 }

@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -133,10 +132,9 @@ public sealed class ApimCertificateStore : IApimCertificateStore
         if (_accessToken.HasValue && _accessToken.Value.ExpiresOn >= DateTimeOffset.UtcNow.AddSeconds(10))
             return _accessToken.Value;
 
-        var apimManagementScope = new TokenRequestContext(new[]
-        {
+        var apimManagementScope = new TokenRequestContext([
             "https://management.azure.com//.default"
-        });
+        ]);
 
         var newToken = await _apimSpCredential
             .GetTokenAsync(apimManagementScope, default)
@@ -148,7 +146,7 @@ public sealed class ApimCertificateStore : IApimCertificateStore
 
     internal sealed class ApimCertificateList
     {
-        public IEnumerable<ApimCertificate> Value { get; set; } = Enumerable.Empty<ApimCertificate>();
+        public IEnumerable<ApimCertificate> Value { get; set; } = [];
     }
 
     internal sealed class ApimCertificate

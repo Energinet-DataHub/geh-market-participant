@@ -38,7 +38,7 @@ public sealed class EmailContentGeneratorTests
         var emptyParams = new Dictionary<string, string>();
         var emailTemplateIds = Enum.GetValues<EmailTemplateId>();
 
-        //Act + Assert
+        // Act + Assert
         foreach (var templateId in emailTemplateIds)
         {
             switch (templateId)

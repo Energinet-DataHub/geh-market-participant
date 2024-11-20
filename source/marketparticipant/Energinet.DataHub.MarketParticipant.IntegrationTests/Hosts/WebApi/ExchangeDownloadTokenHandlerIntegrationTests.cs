@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Token;
-using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +37,7 @@ public sealed class ExchangeDownloadTokenHandlerIntegrationTests
     public async Task ExchangeDownloadTokenWhenCalledReturnsAccessTokenAsync()
     {
         var accessToken = "accessToken";
+
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();

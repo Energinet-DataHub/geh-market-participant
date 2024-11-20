@@ -28,8 +28,8 @@ public interface IActorClientSecretService
     /// Creates a client secret for an actor.
     /// </summary>
     /// <param name="actor">The actor for which to create a client secret for.</param>
-    /// <returns>The secret created for the application</returns>
-    /// <remarks>The secret returned can only be used while in memory, it is not available in clear text after this</remarks>
+    /// <returns>The secret created for the application.</returns>
+    /// <remarks>The secret returned can only be used while in memory, it is not available in clear text after this.</remarks>
     Task<(Guid ClientId, Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretForAppRegistrationAsync(Actor actor);
 
     /// <summary>

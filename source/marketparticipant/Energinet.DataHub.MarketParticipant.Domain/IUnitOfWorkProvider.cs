@@ -17,12 +17,12 @@ using System.Threading.Tasks;
 namespace Energinet.DataHub.MarketParticipant.Domain;
 
 /// <summary>
-/// Provider for <see cref="IUnitOfWork"/>
+/// Provider for <see cref="IUnitOfWork"/>.
 /// </summary>
 public interface IUnitOfWorkProvider
 {
     /// <summary>
-    /// Creates and initializes a new <see cref="IUnitOfWork"/>
+    /// Creates and initializes a new <see cref="IUnitOfWork"/>.
     /// </summary>
     Task<IUnitOfWork> NewUnitOfWorkAsync();
 }

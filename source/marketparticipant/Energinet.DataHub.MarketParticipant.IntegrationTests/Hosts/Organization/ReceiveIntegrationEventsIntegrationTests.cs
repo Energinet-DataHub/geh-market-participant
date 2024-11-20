@@ -52,7 +52,7 @@ public sealed class ReceiveIntegrationEventsIntegrationTests(MarketParticipantDa
         var eventMessage = CreateEvent(contractToParse);
         await subscriber.HandleAsync(eventMessage);
 
-        //Assert
+        // Assert
         var context1 = fixture.DatabaseManager.CreateDbContext();
         var emailEvent = context1.EmailEventEntries.First(e => e.Sent == null && e.TemplateId == (int)EmailTemplateId.BalanceResponsiblePartiesChanged);
         var templateParameters = JsonSerializer.Deserialize<Dictionary<string, string>>(emailEvent.TemplateParameters);
@@ -81,7 +81,7 @@ public sealed class ReceiveIntegrationEventsIntegrationTests(MarketParticipantDa
         var eventMessage = CreateEvent(contractToParse);
         await subscriber.HandleAsync(eventMessage);
 
-        //Assert
+        // Assert
         var context1 = fixture.DatabaseManager.CreateDbContext();
         var emailEvent = context1.EmailEventEntries.First(e => e.Sent == null && e.TemplateId == (int)EmailTemplateId.BalanceResponsiblePartiesChanged);
         var templateParameters = JsonSerializer.Deserialize<Dictionary<string, string>>(emailEvent.TemplateParameters);

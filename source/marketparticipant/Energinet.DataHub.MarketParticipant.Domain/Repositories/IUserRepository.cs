@@ -53,7 +53,7 @@ public interface IUserRepository
     Task<IEnumerable<User>> GetAsync(IEnumerable<UserId> userIds);
 
     /// <summary>
-    /// Gets the users having the specified user role
+    /// Gets the users having the specified user role.
     /// </summary>
     /// <param name="userRoleId">The id of the user role.</param>
     /// <returns>A List of user with the actual role; otherwise empty.</returns>

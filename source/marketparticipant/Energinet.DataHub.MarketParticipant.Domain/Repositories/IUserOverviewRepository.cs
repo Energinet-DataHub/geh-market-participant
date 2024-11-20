@@ -48,17 +48,17 @@ public interface IUserOverviewRepository
         ActorId? actorId);
 
     /// <summary>
-    /// Searches users paged
+    /// Searches users paged.
     /// </summary>
     /// <param name="pageNumber">Page number.</param>
     /// <param name="pageSize">Page size.</param>
     /// <param name="sortProperty">Property to sort by.</param>
     /// <param name="sortDirection">Direction to sort in ASC/DESC.</param>
     /// <param name="actorId">The id of the actor.</param>
-    /// <param name="searchText">A text to search for, can be empty</param>
+    /// <param name="searchText">A text to search for, can be empty.</param>
     /// <param name="userStatus">Specifies which user status the search should filter on.</param>
     /// <param name="userRoles">Specifies which user roles the search should filter on.</param>
-    /// <returns>A List of users matching the criteria supplied</returns>
+    /// <returns>A List of users matching the criteria supplied.</returns>
     Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,

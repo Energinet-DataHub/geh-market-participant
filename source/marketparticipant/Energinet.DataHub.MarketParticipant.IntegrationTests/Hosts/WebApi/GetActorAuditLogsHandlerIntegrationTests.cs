@@ -513,7 +513,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
                 .Where(x => x.AuditIdentityId == auditedUser.Id)
                 .ToList();
 
-            if (!actorAuditLogs.Any())
+            if (actorAuditLogs.Count == 0)
                 Assert.Fail("No audit logs produced");
 
             foreach (var actorAuditLog in actorAuditLogs)
