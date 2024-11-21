@@ -18,7 +18,7 @@ using System.Collections.Generic;
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 
 /// <summary>
-/// Compare sql script file names
+/// Compare sql script file names.
 /// </summary>
 public sealed class ScriptComparer : Comparer<string>
 {

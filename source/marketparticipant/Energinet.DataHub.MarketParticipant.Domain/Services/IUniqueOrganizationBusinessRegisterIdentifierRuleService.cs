@@ -18,13 +18,13 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
 /// <summary>
-/// Ensures business register identifier for an organization is unique
+/// Ensures business register identifier for an organization is unique.
 /// </summary>
 public interface IUniqueOrganizationBusinessRegisterIdentifierRuleService
 {
     /// <summary>
-    /// Ensures business register identifier for an organization is unique; throws ValidationException if it is not unique
+    /// Ensures business register identifier for an organization is unique; throws ValidationException if it is not unique.
     /// </summary>
-    /// <param name="organization">Organization</param>
+    /// <param name="organization">The organization to validate.</param>
     Task EnsureUniqueBusinessRegisterIdentifierAsync(Organization organization);
 }

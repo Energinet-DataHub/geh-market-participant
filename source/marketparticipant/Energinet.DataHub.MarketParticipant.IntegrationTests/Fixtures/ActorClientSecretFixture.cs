@@ -39,10 +39,9 @@ public sealed class ActorClientSecretFixture : IAsyncLifetime
                 integrationTestConfig.B2CSettings.Tenant,
                 integrationTestConfig.B2CSettings.ServicePrincipalId,
                 integrationTestConfig.B2CSettings.ServicePrincipalSecret),
-            new[]
-            {
-                "https://graph.microsoft.com/.default",
-            });
+            [
+                "https://graph.microsoft.com/.default"
+            ]);
 
         ClientSecretService = new ActorClientSecretService(_graphClient);
 

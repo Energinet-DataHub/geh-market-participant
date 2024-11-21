@@ -21,147 +21,147 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 
 /// <summary>
-///     The interface used for the DB context for the MarketParticipant database
+///     The interface used for the DB context for the MarketParticipant database.
 /// </summary>
 public interface IMarketParticipantDbContext
 {
     /// <summary>
-    ///     Represent access to the download tokens table
+    ///     Represent access to the download tokens table.
     /// </summary>
     DbSet<DownloadTokenEntity> DownloadTokens { get; }
 
     /// <summary>
-    ///     Represent access to the organization database table
+    ///     Represent access to the organization database table.
     /// </summary>
     DbSet<OrganizationEntity> Organizations { get; }
 
     /// <summary>
-    ///     Represent access to the actor database table
+    ///     Represent access to the actor database table.
     /// </summary>
     DbSet<ActorEntity> Actors { get; }
 
     /// <summary>
-    ///     Represent access to the GridAreas database table
+    ///     Represent access to the GridAreas database table.
     /// </summary>
     DbSet<GridAreaEntity> GridAreas { get; }
 
     /// <summary>
-    ///     Represent access to the MarketRole database table
+    ///     Represent access to the MarketRole database table.
     /// </summary>
     DbSet<MarketRoleEntity> MarketRoles { get; }
 
     /// <summary>
-    ///     Represent access to the MarketRoleGridArea database table
+    ///     Represent access to the MarketRoleGridArea database table.
     /// </summary>
     DbSet<MarketRoleGridAreaEntity> MarketRoleGridAreas { get; }
 
     /// <summary>
-    ///     Represent access to the ActorContacts database table
+    ///     Represent access to the ActorContacts database table.
     /// </summary>
     DbSet<ActorContactEntity> ActorContacts { get; }
 
     /// <summary>
-    ///     Represent access to the GridAreas database table
+    ///     Represent access to the GridAreas database table.
     /// </summary>
     DbSet<GridAreaLinkEntity> GridAreaLinks { get; }
 
     /// <summary>
-    ///     Represent access to the UniqueActorMarketRoleGridArea database table
+    ///     Represent access to the UniqueActorMarketRoleGridArea database table.
     /// </summary>
     DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; }
 
     /// <summary>
-    ///     Represent access to the User database table
+    ///     Represent access to the User database table.
     /// </summary>
     DbSet<UserEntity> Users { get; }
 
     /// <summary>
-    ///     Represent access to the User role Assignments database table
+    ///     Represent access to the User role Assignments database table.
     /// </summary>
     DbSet<UserRoleAssignmentEntity> UserRoleAssignments { get; }
 
     /// <summary>
-    ///     Represent access to the UserRoles database table
+    ///     Represent access to the UserRoles database table.
     /// </summary>
     DbSet<UserRoleEntity> UserRoles { get; }
 
     /// <summary>
-    ///     Represent access to the UserRoles permissions relation database table
+    ///     Represent access to the UserRoles permissions relation database table.
     /// </summary>
     DbSet<UserRolePermissionEntity> UserRolePermissionEntries { get; }
 
     /// <summary>
-    ///     Represent access to the UserRoleAssignmentAuditLogEntry database table
+    ///     Represent access to the UserRoleAssignmentAuditLogEntry database table.
     /// </summary>
     DbSet<UserRoleAssignmentAuditLogEntryEntity> UserRoleAssignmentAuditLogEntries { get; }
 
     /// <summary>
-    ///     Represent access to the UserInviteAuditLogEntry database table
+    ///     Represent access to the UserInviteAuditLogEntry database table.
     /// </summary>
     DbSet<UserInviteAuditLogEntryEntity> UserInviteAuditLogEntries { get; }
 
     /// <summary>
-    ///     Represent access to the UserIdentityAuditLogEntry database table
+    ///     Represent access to the UserIdentityAuditLogEntry database table.
     /// </summary>
     DbSet<UserIdentityAuditLogEntryEntity> UserIdentityAuditLogEntries { get; }
 
     /// <summary>
-    ///     Represent access to the Permission database table
+    ///     Represent access to the Permission database table.
     /// </summary>
     DbSet<PermissionEntity> Permissions { get; }
 
     /// <summary>
-    ///     Represent access to the DomainEvents database table
+    ///     Represent access to the DomainEvents database table.
     /// </summary>
     DbSet<DomainEventEntity> DomainEvents { get; }
 
     /// <summary>
-    ///     Represent access to the EmailEventEntry database table
+    ///     Represent access to the EmailEventEntry database table.
     /// </summary>
     DbSet<EmailEventEntity> EmailEventEntries { get; }
 
     /// <summary>
-    ///     Represent access to the ActorCertificateCredentials database table
+    ///     Represent access to the ActorCertificateCredentials database table.
     /// </summary>
     DbSet<ActorCertificateCredentialsEntity> ActorCertificateCredentials { get; }
 
     /// <summary>
-    ///     Represent access to the ActorClientSecretCredentials database table
+    ///     Represent access to the ActorClientSecretCredentials database table.
     /// </summary>
     DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; }
 
     /// <summary>
-    ///     Represent access to the UsedActorCertificates database table
+    ///     Represent access to the UsedActorCertificates database table.
     /// </summary>
     DbSet<UsedActorCertificatesEntity> UsedActorCertificates { get; }
 
     /// <summary>
-    ///     Represent access to the ProcessDelegations database table
+    ///     Represent access to the ProcessDelegations database table.
     /// </summary>
     DbSet<ProcessDelegationEntity> ProcessDelegations { get; }
 
     /// <summary>
-    ///     Represent access to the DelegationPeriod database table
+    ///     Represent access to the DelegationPeriod database table.
     /// </summary>
     DbSet<DelegationPeriodEntity> DelegationPeriods { get; }
 
     /// <summary>
-    ///     Represent access to the BalanceResponsibilityRequest database table
+    ///     Represent access to the BalanceResponsibilityRequest database table.
     /// </summary>
     DbSet<BalanceResponsibilityRequestEntity> BalanceResponsibilityRequests { get; }
 
     /// <summary>
-    ///     Represent access to the BalanceResponsibilityRelation database table
+    ///     Represent access to the BalanceResponsibilityRelation database table.
     /// </summary>
     DbSet<BalanceResponsibilityRelationEntity> BalanceResponsibilityRelations { get; }
 
     /// <summary>
-    ///     Represent access to the Cutoff database table
+    ///     Represent access to the Cutoff database table.
     /// </summary>
     DbSet<CutoffEntity> Cutoffs { get; }
 
     /// <summary>
-    ///     Represent access to the Cutoff database table
+    ///     Represent access to the OrganizationDomains database table.
     /// </summary>
     DbSet<OrganizationDomainEntity> OrganizationDomains { get; }
 
@@ -171,8 +171,9 @@ public interface IMarketParticipantDbContext
     Task<int> SaveChangesAsync();
 
     /// <summary>
-    ///     Gets the EntityEntry for the given Entry
+    ///     Gets the EntityEntry for the given Entry.
     /// </summary>
+    /// <param name="entity">The entity to get.</param>
     EntityEntry<TEntity> Entry<TEntity>(TEntity entity)
         where TEntity : class;
 

@@ -55,11 +55,11 @@ public class ActiveDirectoryB2BRolesProvider : IActiveDirectoryB2BRolesProvider
             .Applications[_appObjectId]
             .GetAsync(request =>
             {
-                request.QueryParameters.Select = new[]
-                {
+                request.QueryParameters.Select =
+                [
                     "displayName",
                     "appRoles"
-                };
+                ];
             })
             .ConfigureAwait(false);
 

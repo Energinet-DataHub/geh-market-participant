@@ -48,8 +48,7 @@ public class PermissionRelationService : IPermissionRelationService
         foreach (var permission in allPermissions)
         {
             var userRoles = allUserRoles.Where(x => x.Permissions.Contains(permission.Id)).ToList();
-
-            if (userRoles.Any())
+            if (userRoles.Count != 0)
             {
                 foreach (var userRole in userRoles)
                 {

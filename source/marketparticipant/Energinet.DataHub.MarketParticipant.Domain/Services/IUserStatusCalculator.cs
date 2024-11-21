@@ -22,6 +22,8 @@ public interface IUserStatusCalculator
     /// <summary>
     /// Calculates UserStatus from the given user and user identity.
     /// </summary>
+    /// <param name="user">The user to calculate the status for.</param>
+    /// <param name="userIdentity">The user identity of the user.</param>
     UserStatus CalculateUserStatus(User user, UserIdentity userIdentity)
     {
         ArgumentNullException.ThrowIfNull(user);
@@ -33,5 +35,7 @@ public interface IUserStatusCalculator
     /// <summary>
     /// Calculates UserStatus from current state and user invitation.
     /// </summary>
+    /// <param name="currentUserIdentityStatus">The user identity status of a user.</param>
+    /// <param name="invitationExpiresAt">The expiration date of the invitation.</param>
     UserStatus CalculateUserStatus(UserIdentityStatus currentUserIdentityStatus, DateTimeOffset? invitationExpiresAt);
 }
