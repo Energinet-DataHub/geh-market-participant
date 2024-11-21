@@ -33,10 +33,10 @@ public sealed class CertificateKeyVaultHealthCheck : IHealthCheck
     {
         try
         {
-            //await foreach (var unused in _secretClient.GetPropertiesOfSecretsAsync(cancellationToken))
-            //{
-            //    break;
-            //}
+            await foreach (var unused in _secretClient.GetPropertiesOfSecretsAsync(cancellationToken))
+            {
+                break;
+            }
 
             return HealthCheckResult.Healthy();
         }
