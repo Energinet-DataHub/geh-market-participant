@@ -87,7 +87,7 @@ public class UpdateOrganizationIdentityHandler : IRequestHandler<UpdateOrganisat
 
             await _organizationRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
 
-            _logger.LogInformation($"Organization identity updated for organization with id {organization.Id} from {current} to {newName}");
+            _logger.LogInformation("Organization identity updated for organization with id {OrganizationId} from {Current} to {NewName}", organization.Id, current, newName);
 
             if (request.ShouldNotify)
             {

@@ -49,10 +49,9 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 
         _graphClient = new GraphServiceClient(
             clientSecretCredential,
-            new[]
-            {
+            [
                 "https://graph.microsoft.com/.default"
-            });
+            ]);
 
         Environment.SetEnvironmentVariable("AzureB2c:Tenant", integrationTestConfig.B2CSettings.Tenant);
         Environment.SetEnvironmentVariable("AzureB2c:SpnId", integrationTestConfig.B2CSettings.ServicePrincipalId);
@@ -140,11 +139,11 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             .Users
             .GetAsync(x =>
             {
-                x.QueryParameters.Select = new[]
-                {
+                x.QueryParameters.Select =
+                [
                     "id",
                     "identities"
-                };
+                ];
                 x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{TestConfigurationProvider.Configuration.B2CSettings.Tenant}' and id/issuerAssignedId eq '{testEmail}')";
             })
             .ConfigureAwait(false);
@@ -170,16 +169,16 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 
     public async Task<ActiveDirectoryAppInformation> GetExistingAppRegistrationAsync(string appId)
     {
-        var retrievedApp = (await _graphClient!.Applications //[appRegistrationObjectId.Value.ToString()]
+        var retrievedApp = (await _graphClient!.Applications
             .GetAsync(x =>
             {
-                x.QueryParameters.Select = new[]
-                {
+                x.QueryParameters.Select =
+                [
                     "appId",
                     "id",
                     "displayName",
-                    "appRoles",
-                };
+                    "appRoles"
+                ];
                 x.QueryParameters.Filter = $"appId eq '{appId}'";
             })
             .ConfigureAwait(false))!;

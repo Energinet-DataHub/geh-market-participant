@@ -6,6 +6,11 @@
     <PropertyGroup>
         <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     </PropertyGroup>
+
+    <ItemGroup Condition="'$(Configuration)'=='Debug'">  
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)\source\debug.editorconfig" Link=".editorconfig"/>
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
             <PrivateAssets>all</PrivateAssets>

@@ -19,13 +19,12 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 /// <summary>
-/// Provides access to an overview of grid areas
+/// Provides access to an overview of grid areas.
 /// </summary>
 public interface IGridAreaOverviewRepository
 {
     /// <summary>
-    /// Gets an overview of grid areas
+    /// Gets an overview of grid areas.
     /// </summary>
-    /// <returns>Grid area overview</returns>
     Task<IEnumerable<GridAreaOverviewItem>> GetAsync();
 }

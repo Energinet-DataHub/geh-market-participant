@@ -15,12 +15,12 @@
 namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
 /// <summary>
-/// Generates a random user password
+/// Generates a random user password.
 /// </summary>
 public interface IUserPasswordGenerator
 {
     /// <summary>
-    /// Generates a random user password
+    /// Generates a random user password.
     /// </summary>
     string GenerateRandomPassword();
 }

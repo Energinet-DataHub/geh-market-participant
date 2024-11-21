@@ -20,7 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 /// <summary>
-/// Gives access to user identity information
+/// Gives access to user identity information.
 /// </summary>
 public interface IUserIdentityRepository
 {
@@ -33,7 +33,7 @@ public interface IUserIdentityRepository
     /// <summary>
     /// Retrieves user identity for the provided external id with openid ready to set up.
     /// </summary>
-    /// <param name="externalId"></param>
+    /// <param name="externalId">The external id of the OpenId identity.</param>
     Task<UserIdentity?> FindIdentityReadyForOpenIdSetupAsync(ExternalUserId externalId);
 
     /// <summary>
@@ -49,12 +49,12 @@ public interface IUserIdentityRepository
     Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds);
 
     /// <summary>
-    /// Searches for users using a search text
+    /// Searches for users using a search text.
     /// </summary>
-    /// <param name="searchText">The text to search for</param>
+    /// <param name="searchText">The text to search for.</param>
     /// <param name="accountEnabled">Specifies whether the returned users should be active, inactive or both.</param>
-    /// <returns>A List of users matching the search text</returns>
-    /// <remarks>Currently searches Name, Phone and Email</remarks>
+    /// <returns>A List of users matching the search text.</returns>
+    /// <remarks>Currently searches Name, Phone and Email.</remarks>
     Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? accountEnabled);
 
     /// <summary>
@@ -67,19 +67,19 @@ public interface IUserIdentityRepository
     /// <summary>
     /// Updates the user identity.
     /// </summary>
-    /// <param name="userIdentity">The user identity to update</param>
+    /// <param name="userIdentity">The user identity to update.</param>
     Task UpdateUserAsync(UserIdentity userIdentity);
 
     /// <summary>
-    /// Assign user login identities
+    /// Assign user login identities.
     /// </summary>
-    /// <param name="userIdentity"></param>
+    /// <param name="userIdentity">The user identity to assign the login identities for.</param>
     Task AssignUserLoginIdentitiesAsync(UserIdentity userIdentity);
 
     /// <summary>
-    /// Deletes user identity
+    /// Deletes user identity.
     /// </summary>
-    /// <param name="externalUserId"></param>
+    /// <param name="externalUserId">The id of the external user identity to delete.</param>
     Task DeleteAsync(ExternalUserId externalUserId);
 
     Task EnableUserAccountAsync(ExternalUserId externalUserId);

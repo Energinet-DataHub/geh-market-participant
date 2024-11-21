@@ -45,10 +45,9 @@ public sealed class B2CFixture : IAsyncLifetime
 
         _graphClient = new GraphServiceClient(
             clientSecretCredential,
-            new[]
-            {
+            [
                 "https://graph.microsoft.com/.default"
-            });
+            ]);
 
         // Azure AD Config
         var config = new OptionsWrapper<AzureB2COptions>(new AzureB2COptions
