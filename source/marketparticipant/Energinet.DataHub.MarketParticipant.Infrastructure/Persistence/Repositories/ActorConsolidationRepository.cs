@@ -92,7 +92,6 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         destination.ActorToId = from.ActorToId.Value;
         destination.Status = from.Status;
         destination.ScheduledAt = from.ScheduledAt;
-        destination.GridAreaToMergeToId = from.GridAreaToMergeToId?.Value;
     }
 
     private static ActorConsolidation MapFromEntity(ActorConsolidationEntity input)
@@ -102,7 +101,6 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
             new ActorId(input.ActorFromId),
             new ActorId(input.ActorToId),
             input.ScheduledAt,
-            input.GridAreaToMergeToId is null ? null : new GridAreaId(input.GridAreaToMergeToId.Value),
             input.Status);
     }
 }

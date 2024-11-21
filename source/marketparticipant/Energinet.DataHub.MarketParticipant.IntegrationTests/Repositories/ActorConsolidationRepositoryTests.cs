@@ -15,7 +15,9 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
@@ -51,35 +53,42 @@ public sealed class ActorConsolidationRepositoryTests
     }
 
     [Fact]
-    public async Task AddOrUpdateAsync_OneGridArea_CanReadBack()
+    public async Task AddOrUpdateAsync_OneActorConsolidation_CanReadBack()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var gridRepository = new GridAreaRepository(context);
-        var validFrom = DateTimeOffset.Now;
-        var validTo = validFrom.AddYears(15);
-        var testGrid = new GridArea(
-            new GridAreaName("Test Grid Area"),
-            new GridAreaCode("801"),
-            PriceAreaCode.Dk1,
-            GridAreaType.Distribution,
-            validFrom,
-            validTo);
+        var consolidationRepository = new ActorConsolidationRepository(context);
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var consolidationRepository2 = new ActorConsolidationRepository(context2);
+        var scheduledAt = DateTimeOffset.Now.Date.AddMonths(2);
+        var actorFrom = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test1.dk" })),
+            TestPreparationEntities.ValidActor,
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.EnergySupplier));
+        var actorTo = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test2.dk" })),
+            TestPreparationEntities.ValidActor,
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.EnergySupplier));
+
+        var testConsolidation = new ActorConsolidation(
+            new ActorId(actorFrom.Id),
+            new ActorId(actorTo.Id),
+            scheduledAt,
+            ActorConsolidationStatus.Pending);
 
         // Act
-        var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
-        var newGrid = await gridRepository.GetAsync(gridId);
+        var consolidationId = await consolidationRepository.AddOrUpdateAsync(testConsolidation);
+        var newConsolidation = await consolidationRepository2.GetAsync(consolidationId);
 
         // Assert
-        Assert.NotNull(newGrid);
-        Assert.NotEqual(Guid.Empty, newGrid.Id.Value);
-        Assert.Equal(testGrid.Name.Value, newGrid.Name.Value);
-        Assert.Equal(testGrid.Code, newGrid.Code);
-        Assert.Equal(testGrid.PriceAreaCode, newGrid.PriceAreaCode);
-        Assert.Equal(validFrom, newGrid.ValidFrom);
-        Assert.Equal(validTo, newGrid.ValidTo);
+        Assert.NotNull(newConsolidation);
+        Assert.NotEqual(Guid.Empty, newConsolidation.Id.Value);
+        Assert.Equal(actorFrom.Id, newConsolidation.ActorFromId.Value);
+        Assert.Equal(actorTo.Id, newConsolidation.ActorToId.Value);
+        Assert.Equal(ActorConsolidationStatus.Pending, newConsolidation.Status);
+        Assert.Equal(scheduledAt, newConsolidation.ScheduledAt);
     }
 
     [Fact]
