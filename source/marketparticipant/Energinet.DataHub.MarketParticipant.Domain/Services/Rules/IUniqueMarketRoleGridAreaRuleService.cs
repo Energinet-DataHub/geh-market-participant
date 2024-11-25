@@ -18,13 +18,13 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 
 /// <summary>
-/// Ensures given market roles only exists once per grid area across all organizations
+/// Ensures given market roles only exists once per grid area across all organizations.
 /// </summary>
 public interface IUniqueMarketRoleGridAreaRuleService
 {
     /// <summary>
-    /// Ensures given market roles only exists once per grid area across all organizations
+    /// Ensures given market roles only exists once per grid area across all organizations.
     /// </summary>
-    /// <param name="actor">Actor for which to ensure unique market roles</param>
+    /// <param name="actor">Actor for which to ensure unique market roles.</param>
     Task ValidateAndReserveAsync(Actor actor);
 }

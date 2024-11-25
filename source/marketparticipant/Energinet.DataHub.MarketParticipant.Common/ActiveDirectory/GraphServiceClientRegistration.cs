@@ -33,7 +33,7 @@ internal static class GraphServiceClientRegistration
                 options.Value.SpnId,
                 options.Value.SpnSecret);
 
-            return new GraphServiceClient(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
+            return new GraphServiceClient(clientSecretCredential, ["https://graph.microsoft.com/.default"]);
         });
     }
 }

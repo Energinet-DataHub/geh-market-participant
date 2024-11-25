@@ -17,16 +17,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
-/// <summary>
-/// Service for organization domain validation
-/// </summary>
 public interface IOrganizationDomainValidationService
 {
-    /// <summary>
-    /// Validates organization domain against new user email
-    /// </summary>
-    /// <param name="actor">actor id to find organization</param>
-    /// <param name="userInviteEmail">user email</param>
-    /// <returns>validation task</returns>
     Task ValidateUserEmailInsideOrganizationDomainsAsync(Actor actor, EmailAddress userInviteEmail);
 }

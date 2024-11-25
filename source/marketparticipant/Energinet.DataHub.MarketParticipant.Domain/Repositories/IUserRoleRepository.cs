@@ -26,9 +26,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IUserRoleRepository
 {
     /// <summary>
-    /// Returns all existing user roles
+    /// Returns all existing user roles.
     /// </summary>
-    /// <returns>The all existing user roles</returns>
+    /// <returns>The all existing user roles.</returns>
     Task<IEnumerable<UserRole>> GetAllAsync();
 
     /// <summary>
@@ -54,20 +54,20 @@ public interface IUserRoleRepository
     Task<IEnumerable<UserRole>> GetAsync(IEnumerable<EicFunction> eicFunctions);
 
     /// <summary>
-    /// Create a new user role
+    /// Create a new user role.
     /// </summary>
-    /// <param name="userRole">The user role to Create</param>
-    /// <returns>The id of the created role</returns>
+    /// <param name="userRole">The user role to Create.</param>
+    /// <returns>The id of the created role.</returns>
     Task<UserRoleId> AddAsync(UserRole userRole);
 
     /// <summary>
-    /// Updates an existing user role
+    /// Updates an existing user role.
     /// </summary>
-    /// <param name="userRoleUpdate">The user role to update</param>
+    /// <param name="userRoleUpdate">The user role to update.</param>
     Task UpdateAsync(UserRole userRoleUpdate);
 
     /// <summary>
-    /// Gets user roles that have the given permission assigned to them
+    /// Gets user roles that have the given permission assigned to them.
     /// </summary>
     /// <param name="permission">The permission you want to get user roles for.</param>
     /// <returns>A list of user roles.</returns>

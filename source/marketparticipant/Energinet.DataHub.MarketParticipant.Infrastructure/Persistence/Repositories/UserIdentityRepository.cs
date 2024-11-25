@@ -153,7 +153,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         {
             x.QueryParameters.Select = _selectors;
             x.QueryParameters.Count = true;
-            if (filters.Any())
+            if (filters.Count != 0)
                 x.QueryParameters.Filter = string.Join(" and ", filters);
         }).ConfigureAwait(false);
 

@@ -97,7 +97,7 @@ public class CertificateService : ICertificateService
         }
         catch (CryptographicException ex)
         {
-            _logger.LogError(ex, $"Certificate validation failed: {ex.InnerException}");
+            _logger.LogError(ex, "Certificate validation failed: {InnerException}", ex.InnerException);
             throw new ValidationException("Certificate validation failed.")
                 .WithErrorCode("actor.credentials.invalid");
         }

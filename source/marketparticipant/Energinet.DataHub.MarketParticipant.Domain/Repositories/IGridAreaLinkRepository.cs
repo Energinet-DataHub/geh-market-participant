@@ -25,8 +25,8 @@ public interface IGridAreaLinkRepository
     /// <summary>
     /// Updates a grid area link, or adds it if it's not already present.
     /// </summary>
-    /// <param name="gridAreaLink">The GridAreaLink to add or update</param>
-    /// <returns>The id of the added GridAreaLink</returns>
+    /// <param name="gridAreaLink">The GridAreaLink to add or update.</param>
+    /// <returns>The id of the added GridAreaLink.</returns>
     Task<GridAreaLinkId> AddOrUpdateAsync(GridAreaLink gridAreaLink);
 
     /// <summary>
