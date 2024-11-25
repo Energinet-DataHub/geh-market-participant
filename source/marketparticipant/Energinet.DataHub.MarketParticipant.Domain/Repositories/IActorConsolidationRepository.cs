@@ -24,11 +24,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IActorConsolidationRepository
 {
     /// <summary>
-    /// Updates an <see cref="ActorConsolidation"/>, or adds it if it's not already present.
+    /// Adds an <see cref="ActorConsolidation"/>
     /// </summary>
     /// <param name="actorConsolidation">The actor to consolidate</param>
     /// <returns>The <see cref="ActorConsolidationId">id</see> of the added <see cref="ActorConsolidation"/></returns>
-    Task<ActorConsolidationId> AddOrUpdateAsync(ActorConsolidation actorConsolidation);
+    /// <remarks>Throws an exception if the entity to add is not with a default GUID as id</remarks>
+    Task<ActorConsolidationId> AddAsync(ActorConsolidation actorConsolidation);
 
     /// <summary>
     /// Gets a <see cref="ActorConsolidation"/> with the specified <see cref="ActorConsolidationId">id</see>.

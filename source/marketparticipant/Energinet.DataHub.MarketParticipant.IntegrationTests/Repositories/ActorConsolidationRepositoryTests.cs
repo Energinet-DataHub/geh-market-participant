@@ -53,7 +53,7 @@ public sealed class ActorConsolidationRepositoryTests
     }
 
     [Fact]
-    public async Task AddOrUpdateAsync_OneActorConsolidation_CanReadBack()
+    public async Task AddAsync_OneActorConsolidation_CanReadBack()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -79,7 +79,7 @@ public sealed class ActorConsolidationRepositoryTests
             ActorConsolidationStatus.Pending);
 
         // Act
-        var consolidationId = await consolidationRepository.AddOrUpdateAsync(testConsolidation);
+        var consolidationId = await consolidationRepository.AddAsync(testConsolidation);
         var newConsolidation = await consolidationRepository2.GetAsync(consolidationId);
 
         // Assert
@@ -89,120 +89,5 @@ public sealed class ActorConsolidationRepositoryTests
         Assert.Equal(actorTo.Id, newConsolidation.ActorToId.Value);
         Assert.Equal(ActorConsolidationStatus.Pending, newConsolidation.Status);
         Assert.Equal(scheduledAt, newConsolidation.ScheduledAt);
-    }
-
-    [Fact]
-    public async Task AddOrUpdateAsync_GridAreaChanged_CanReadBack()
-    {
-        // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var gridRepository = new GridAreaRepository(context);
-        var validFrom = DateTimeOffset.Now;
-        var validTo = validFrom.AddYears(15);
-        var testGrid = new GridArea(
-            new GridAreaName("Test Grid Area"),
-            new GridAreaCode("801"),
-            PriceAreaCode.Dk1,
-            GridAreaType.Distribution,
-            validFrom,
-            validTo);
-
-        // Act
-        var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
-        var newGrid = new GridArea(
-            gridId,
-            new GridAreaName("NewName"),
-            new GridAreaCode("234"),
-            PriceAreaCode.Dk2,
-            GridAreaType.Distribution,
-            validFrom.AddYears(2),
-            validTo.AddYears(2));
-
-        await gridRepository.AddOrUpdateAsync(newGrid);
-        newGrid = await gridRepository.GetAsync(gridId);
-
-        // Assert
-        Assert.NotNull(newGrid);
-        Assert.NotEqual(Guid.Empty, newGrid.Id.Value);
-        Assert.Equal(gridId.Value, newGrid.Id.Value);
-        Assert.Equal("234", newGrid.Code.Value);
-        Assert.Equal("NewName", newGrid.Name.Value);
-        Assert.Equal(PriceAreaCode.Dk2, newGrid.PriceAreaCode);
-        Assert.Equal(validFrom.AddYears(2), newGrid.ValidFrom);
-        Assert.Equal(validTo.AddYears(2), newGrid.ValidTo);
-    }
-
-    [Fact]
-    public async Task AddOrUpdateAsync_GridAreaChanged_NewContextCanReadBack()
-    {
-        // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var gridRepository = new GridAreaRepository(context);
-        var gridRepository2 = new GridAreaRepository(context2);
-        var validFrom = DateTimeOffset.Now;
-        var validTo = validFrom.AddYears(15);
-        var testGrid = new GridArea(
-            new GridAreaName("Test Grid Area"),
-            new GridAreaCode("801"),
-            PriceAreaCode.Dk1,
-            GridAreaType.Distribution,
-            validFrom,
-            validTo);
-
-        // Act
-        var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
-        var newGrid = new GridArea(
-            gridId,
-            new GridAreaName("NewName"),
-            new GridAreaCode("234"),
-            PriceAreaCode.Dk2,
-            GridAreaType.Distribution,
-            validFrom.AddYears(2),
-            validTo.AddYears(2));
-
-        await gridRepository.AddOrUpdateAsync(newGrid);
-        newGrid = await gridRepository2.GetAsync(gridId);
-
-        // Assert
-        Assert.NotNull(newGrid);
-        Assert.NotEqual(Guid.Empty, newGrid.Id.Value);
-        Assert.Equal(gridId.Value, newGrid.Id.Value);
-        Assert.Equal("234", newGrid.Code.Value);
-        Assert.Equal("NewName", newGrid.Name.Value);
-        Assert.Equal(PriceAreaCode.Dk2, newGrid.PriceAreaCode);
-        Assert.Equal(validFrom.AddYears(2), newGrid.ValidFrom);
-        Assert.Equal(validTo.AddYears(2), newGrid.ValidTo);
-    }
-
-    [Fact]
-    public async Task GetGridAreasAsync_ReturnsGridAreas()
-    {
-        // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var repository = new GridAreaRepository(context);
-        var validFrom = DateTimeOffset.Now;
-        var validTo = validFrom.AddYears(15);
-        var testGrid = new GridArea(
-            new GridAreaName("Test Grid Area"),
-            new GridAreaCode("801"),
-            PriceAreaCode.Dk1,
-            GridAreaType.Distribution,
-            validFrom,
-            validTo);
-
-        await repository.AddOrUpdateAsync(testGrid);
-
-        // Act
-        var actual = await repository.GetAsync();
-
-        // Assert
-        Assert.NotEmpty(actual);
     }
 }
