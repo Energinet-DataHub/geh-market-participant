@@ -18,12 +18,12 @@ using System.Threading.Tasks;
 namespace Energinet.DataHub.MarketParticipant.Domain;
 
 /// <summary>
-/// A <see cref="IUnitOfWork"/> used to run several DB commands as one atomic operation. Inject <see cref="IUnitOfWorkProvider"/> and use <see cref="IUnitOfWorkProvider.NewUnitOfWorkAsync"/> to create and initilize a new <see cref="IUnitOfWork"/>
+/// A <see cref="IUnitOfWork"/> used to run several DB commands as one atomic operation. Inject <see cref="IUnitOfWorkProvider"/> and use <see cref="IUnitOfWorkProvider.NewUnitOfWorkAsync"/> to create and initialize a new <see cref="IUnitOfWork"/>.
 /// </summary>
 public interface IUnitOfWork : IAsyncDisposable
 {
     /// <summary>
-    /// Commits changes made from when the <see cref="IUnitOfWork"/> was initilized.
+    /// Commits changes made from when the <see cref="IUnitOfWork"/> was initialized.
     /// </summary>
     Task CommitAsync();
 }

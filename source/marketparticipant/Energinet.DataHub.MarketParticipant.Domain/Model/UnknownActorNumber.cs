@@ -20,7 +20,9 @@ public sealed record UnknownActorNumber : ActorNumber
 {
     [Browsable(false)]
     public UnknownActorNumber(string value)
-        : base(value) { }
+        : base(value)
+    {
+    }
 
     public override ActorNumberType Type => ActorNumberType.Unknown;
 }

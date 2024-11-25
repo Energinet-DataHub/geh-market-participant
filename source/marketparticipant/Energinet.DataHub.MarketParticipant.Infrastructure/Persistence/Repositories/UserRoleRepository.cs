@@ -67,6 +67,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
             .Where(t => t
                 .EicFunctions
                 .Select(f => f.EicFunction)
+
                 // ReSharper disable once ConvertClosureToMethodGroup
                 .All(f => eicFunctions.Contains(f)))
             .ToListAsync()

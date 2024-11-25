@@ -48,6 +48,6 @@ public sealed class KnownPermissionsTests
     public void All_AssignableTo_HaveItems()
     {
         // Arrange + Act + Assert
-        Assert.True(KnownPermissions.All.All(p => p.AssignableTo.Any()));
+        Assert.True(KnownPermissions.All.All(p => p.AssignableTo.Count != 0));
     }
 }

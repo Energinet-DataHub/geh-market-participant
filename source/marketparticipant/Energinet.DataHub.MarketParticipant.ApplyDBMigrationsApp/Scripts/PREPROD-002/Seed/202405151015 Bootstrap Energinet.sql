@@ -119,7 +119,7 @@ VALUES
 INSERT INTO [dbo].[UserRolePermission] (
     [UserRoleId],
     [PermissionId],
-    [ChangedByIdentityId]
+[ChangedByIdentityId]
 )
 VALUES
     (@userAdminRoleId, 5, '00000000-FFFF-FFFF-FFFF-000000000000'),

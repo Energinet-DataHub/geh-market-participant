@@ -40,5 +40,6 @@ public interface IExternalAuthenticationMethod
     /// <summary>
     /// Ensures that no validation exception can be extrapolated. If one is, it is thrown.
     /// </summary>
+    /// <param name="exception">The exception to analyze.</param>
     void EnsureNoValidationException(Exception exception);
 }

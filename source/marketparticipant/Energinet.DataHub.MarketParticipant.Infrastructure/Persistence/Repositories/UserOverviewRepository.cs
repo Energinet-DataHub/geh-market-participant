@@ -182,7 +182,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             {
                 var user = userLookup[x.Id.Value];
                 var status = _userStatusCalculator.CalculateUserStatus(x.Status, user.InvitationExpiresAt);
-                return !statusFilter.Any() || statusFilter.Contains(status);
+                return statusFilter.Count == 0 || statusFilter.Contains(status);
             })
             .Select(x =>
             {
