@@ -81,6 +81,8 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<CutoffEntity> Cutoffs { get; private set; } = null!;
     public DbSet<OrganizationDomainEntity> OrganizationDomains { get; private set; } = null!;
 
+    public DbSet<ActorConsolidationEntity> ActorConsolidations { get; private set; } = null!;
+
     public async Task<int> SaveChangesAsync()
     {
         var hasExternalTransaction = Database.CurrentTransaction != null;
@@ -151,6 +153,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new BalanceResponsibilityRelationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new CutoffEntityConfiguration());
         modelBuilder.ApplyConfiguration(new OrganizationDomainEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ActorConsolidationEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 
