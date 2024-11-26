@@ -65,7 +65,7 @@ public sealed class ApimCertificateStore : IApimCertificateStore
             var certificateIdentifier = new CertificateIdentifier(
                 kv.SecretIdentifier,
                 apimCertificate.Name,
-                !kv.IsValid);
+                kv.IsValid ? CertificateState.Valid : CertificateState.Expired);
 
             certificateIdentifiers.Add(certificateIdentifier);
         }
