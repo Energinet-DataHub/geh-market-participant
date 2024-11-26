@@ -36,12 +36,14 @@ public sealed class KeyVaultCertificates : IKeyVaultCertificates
                            .GetPropertiesOfSecretsAsync()
                            .ConfigureAwait(false))
         {
-            var isDeleted = certificateSecret.ExpiresOn <= DateTimeOffset.UtcNow;
+            var state = certificateSecret.ExpiresOn <= DateTimeOffset.UtcNow
+                ? CertificateState.Expired
+                : CertificateState.Valid;
 
             certificates.Add(new CertificateIdentifier(
                 certificateSecret.Id,
                 certificateSecret.Name,
-                isDeleted));
+                state));
         }
 
         await foreach (var deletedCertificateSecret in _secretClient
@@ -51,17 +53,25 @@ public sealed class KeyVaultCertificates : IKeyVaultCertificates
             certificates.Add(new CertificateIdentifier(
                 deletedCertificateSecret.Id,
                 deletedCertificateSecret.Name,
-                true));
+                CertificateState.Deleted));
         }
 
         return certificates;
+    }
+
+    public async Task DeleteCertificateAsync(CertificateIdentifier certificate)
+    {
+        ArgumentNullException.ThrowIfNull(certificate);
+
+        var waitOperation = await _secretClient.StartDeleteSecretAsync(certificate.Name).ConfigureAwait(false);
+        await waitOperation.WaitForCompletionAsync().ConfigureAwait(false);
     }
 
     public Task PurgeDeletedCertificateAsync(CertificateIdentifier certificate)
     {
         ArgumentNullException.ThrowIfNull(certificate);
 
-        if (!certificate.IsDeleted)
+        if (certificate.State == CertificateState.Valid)
             throw new ArgumentException("Certificate must be deleted before it can be purged.", nameof(certificate));
 
         return _secretClient.PurgeDeletedSecretAsync(certificate.Name);
