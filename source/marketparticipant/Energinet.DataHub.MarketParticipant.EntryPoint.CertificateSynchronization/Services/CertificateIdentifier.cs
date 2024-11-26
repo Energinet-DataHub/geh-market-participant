@@ -16,4 +16,4 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Services;
 
-public sealed record CertificateIdentifier(Uri Id, string Name, bool IsDeleted);
+public sealed record CertificateIdentifier(Uri Id, string Name, CertificateState State);
