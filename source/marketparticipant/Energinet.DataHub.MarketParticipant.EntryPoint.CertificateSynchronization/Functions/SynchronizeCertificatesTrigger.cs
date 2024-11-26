@@ -56,12 +56,12 @@ public sealed class SynchronizeCertificatesTrigger
         IReadOnlyCollection<CertificateIdentifier> certificatesInApim)
     {
         var certificatesToAdd = certificatesInKeyVault
-            .Where(c => !c.IsDeleted)
+            .Where(c => c.State == CertificateState.Valid)
             .Except(certificatesInApim);
 
         foreach (var certificateIdentifier in certificatesToAdd)
         {
-            if (certificatesInApim.Contains(certificateIdentifier with { IsDeleted = true }))
+            if (certificatesInApim.Any(c => c.Id == certificateIdentifier.Id))
             {
                 await _apimCertificateStore
                     .RemoveCertificateAsync(certificateIdentifier)
@@ -76,20 +76,30 @@ public sealed class SynchronizeCertificatesTrigger
 
     private async Task RemoveOldCertificatesAsync(
         IEnumerable<CertificateIdentifier> certificatesInKeyVault,
-        IEnumerable<CertificateIdentifier> certificatesInApim)
+        IReadOnlyCollection<CertificateIdentifier> certificatesInApim)
     {
-        foreach (var certificateIdentifier in certificatesInKeyVault.Where(c => c.IsDeleted))
+        foreach (var certificateIdentifier in certificatesInKeyVault.Where(c => c.State != CertificateState.Valid))
         {
-            await _apimCertificateStore
-                .RemoveCertificateAsync(certificateIdentifier)
-                .ConfigureAwait(false);
+            if (certificatesInApim.Any(c => c.Id == certificateIdentifier.Id))
+            {
+                await _apimCertificateStore
+                    .RemoveCertificateAsync(certificateIdentifier)
+                    .ConfigureAwait(false);
+            }
+
+            if (certificateIdentifier.State == CertificateState.Expired)
+            {
+                await _keyVaultCertificates
+                    .DeleteCertificateAsync(certificateIdentifier)
+                    .ConfigureAwait(false);
+            }
 
             await _keyVaultCertificates
                 .PurgeDeletedCertificateAsync(certificateIdentifier)
                 .ConfigureAwait(false);
         }
 
-        foreach (var certificateIdentifier in certificatesInApim.Where(c => c.IsDeleted))
+        foreach (var certificateIdentifier in certificatesInApim.Where(c => c.State != CertificateState.Valid))
         {
             await _apimCertificateStore
                 .RemoveCertificateAsync(certificateIdentifier)

@@ -12,14 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Services;
 
-public interface IKeyVaultCertificates
+public enum CertificateState
 {
-    Task<IReadOnlyCollection<CertificateIdentifier>> GetCertificateIdentifiersAsync();
-    Task DeleteCertificateAsync(CertificateIdentifier certificate);
-    Task PurgeDeletedCertificateAsync(CertificateIdentifier certificate);
+    Valid,
+    Expired,
+    Deleted
 }
