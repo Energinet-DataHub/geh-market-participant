@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed class ActorConsolidation
 {
-    public ActorConsolidation(ActorId fromId, ActorId toId, DateTimeOffset scheduledAt, ActorConsolidationStatus status)
+    public ActorConsolidation(ActorId fromId, ActorId toId, Instant scheduledAt)
     {
         Id = new ActorConsolidationId(default);
         ActorFromId = fromId;
         ActorToId = toId;
         ScheduledAt = scheduledAt;
-        Status = status;
+        Status = ActorConsolidationStatus.Pending;
     }
 
-    public ActorConsolidation(ActorConsolidationId id, ActorId fromId, ActorId toId, DateTimeOffset scheduledAt, ActorConsolidationStatus status)
+    public ActorConsolidation(ActorConsolidationId id, ActorId fromId, ActorId toId, Instant scheduledAt, ActorConsolidationStatus status)
     {
         Id = id;
         ActorFromId = fromId;
@@ -39,6 +39,6 @@ public sealed class ActorConsolidation
     public ActorConsolidationId Id { get; init; }
     public ActorId ActorFromId { get; init; }
     public ActorId ActorToId { get; init; }
-    public DateTimeOffset ScheduledAt { get; set; }
+    public Instant ScheduledAt { get; set; }
     public ActorConsolidationStatus Status { get; set; }
 }

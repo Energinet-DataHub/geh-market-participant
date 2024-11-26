@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -86,7 +87,7 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         destination.ActorFromId = from.ActorFromId.Value;
         destination.ActorToId = from.ActorToId.Value;
         destination.Status = from.Status;
-        destination.ScheduledAt = from.ScheduledAt;
+        destination.ScheduledAt = from.ScheduledAt.ToDateTimeOffset();
     }
 
     private static ActorConsolidation MapFromEntity(ActorConsolidationEntity input)
@@ -95,7 +96,7 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
             new ActorConsolidationId(input.Id),
             new ActorId(input.ActorFromId),
             new ActorId(input.ActorToId),
-            input.ScheduledAt,
+            input.ScheduledAt.ToInstant(),
             input.Status);
     }
 }

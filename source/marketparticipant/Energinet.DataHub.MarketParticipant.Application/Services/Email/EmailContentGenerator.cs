@@ -64,9 +64,7 @@ public sealed class EmailContentGenerator : IEmailContentGenerator
         var assembly = Assembly.GetExecutingAssembly();
         var resourceName = $"Energinet.DataHub.MarketParticipant.Application.Services.Email.Templates.{emailTemplateId}.html";
 
-        var templateStream = assembly.GetManifestResourceStream(resourceName);
-        if (templateStream == null)
-            throw new InvalidOperationException($"{nameof(EmailContentGenerator)} could not find template {emailTemplateId}.");
+        var templateStream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"{nameof(EmailContentGenerator)} could not find template {emailTemplateId}.");
 
         await using (templateStream.ConfigureAwait(false))
         {
