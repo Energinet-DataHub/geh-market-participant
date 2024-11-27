@@ -53,7 +53,6 @@ public sealed class ConsolidateActorsHandler : IRequestHandler<ConsolidateActors
                 .ConfigureAwait(false);
 
             // Do consolidation here
-
             // Send domain event here
 
             await uow.CommitAsync().ConfigureAwait(false);
