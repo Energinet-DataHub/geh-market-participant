@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -31,7 +32,7 @@ public static class AuditLogBuilderExtensions
         return builder.Add(new AuditedChangeComparer<TAuditedChange, TAuditedEntity>(
             change,
             compareSelector,
-            entity => compareSelector(entity)?.ToString(),
+            entity => Convert.ToString(compareSelector(entity), CultureInfo.InvariantCulture),
             AuditedChangeCompareAt.ChangeOnly));
     }
 
@@ -48,7 +49,7 @@ public static class AuditLogBuilderExtensions
         return builder.Add(new AuditedChangeComparer<TAuditedChange, TAuditedEntity>(
             change,
             compareSelector,
-            entity => compareSelector(entity)?.ToString(),
+            entity => Convert.ToString(compareSelector(entity), CultureInfo.InvariantCulture),
             compareAt));
     }
 

@@ -35,6 +35,7 @@ public sealed class GridAreaAuditLogRepository : IGridAreaAuditLogRepository
 
         return new AuditLogBuilder<GridAreaAuditedChange, GridAreaEntity>(dataSource)
             .Add(GridAreaAuditedChange.Name, entity => entity.Name)
+            .Add(GridAreaAuditedChange.Decommissioned, entity => entity.ValidTo)
             .BuildAsync();
     }
 }

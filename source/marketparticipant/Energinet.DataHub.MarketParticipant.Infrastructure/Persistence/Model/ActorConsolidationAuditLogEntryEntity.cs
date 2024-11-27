@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+using System;
 
-public enum GridAreaAuditedChange
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class ActorConsolidationAuditLogEntryEntity
 {
-    Name,
-    ConsolidationRequested,
-    ConsolidationCompleted,
-    Decommissioned
+    public int Id { get; set; }
+    public Guid GridAreaId { get; set; }
+    public Guid ChangedByUserId { get; set; }
+    public int Field { get; set; }
+    public string NewValue { get; set; } = null!;
+    public string OldValue { get; set; } = null!;
+    public DateTimeOffset Timestamp { get; set; }
 }

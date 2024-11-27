@@ -46,7 +46,7 @@ public interface IActorConsolidationRepository
     Task<IEnumerable<ActorConsolidation>> GetByActorIdAsync(ActorId id);
 
     /// <summary>
-    /// Gets a List of <see cref="ActorConsolidation"/> that are ready to be consolidated.
+    /// Gets a list of <see cref="ActorConsolidation"/> that are ready to be consolidated.
     /// </summary>
     /// <returns>A <see cref="IEnumerable{ActorConsolidation}"/> that are ready to be consolidated.</returns>
     Task<IEnumerable<ActorConsolidation>> GetReadyToConsolidateAsync();
