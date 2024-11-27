@@ -40,7 +40,8 @@ public sealed class KeyVaultCertificates : IKeyVaultCertificates
                 ? CertificateState.Expired
                 : CertificateState.Valid;
 
-            certificates.Add(new CertificateIdentifier(
+            certificates.Add(
+                new CertificateIdentifier(
                 certificateSecret.Id,
                 certificateSecret.Name,
                 state));
@@ -50,7 +51,8 @@ public sealed class KeyVaultCertificates : IKeyVaultCertificates
                            .GetDeletedSecretsAsync()
                            .ConfigureAwait(false))
         {
-            certificates.Add(new CertificateIdentifier(
+            certificates.Add(
+                new CertificateIdentifier(
                 deletedCertificateSecret.Id,
                 deletedCertificateSecret.Name,
                 CertificateState.Deleted));
