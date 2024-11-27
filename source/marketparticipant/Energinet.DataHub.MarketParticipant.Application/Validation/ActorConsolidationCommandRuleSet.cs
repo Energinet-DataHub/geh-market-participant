@@ -17,9 +17,9 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class ActorConsolidationCommandRuleSet : AbstractValidator<ConsolidateActorsCommand>
+public sealed class ConsolidateActorsCommandRuleSet : AbstractValidator<ConsolidateActorsCommand>
 {
-    public ActorConsolidationCommandRuleSet()
+    public ConsolidateActorsCommandRuleSet()
     {
     }
 }
