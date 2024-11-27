@@ -43,5 +43,11 @@ public interface IActorConsolidationRepository
     /// </summary>
     /// <param name="id">The <see cref="ActorId">id</see> of the <see cref="Actor">Actor</see> you want to get consolidations for.</param>
     /// <returns>A List of <see cref="ActorConsolidation">consolidations</see>; or empty list if none found.</returns>
-    Task<IEnumerable<ActorConsolidation>>? GetByActorIdAsync(ActorId id);
+    Task<IEnumerable<ActorConsolidation>> GetByActorIdAsync(ActorId id);
+
+    /// <summary>
+    /// Gets a List of <see cref="ActorConsolidation"/> that are ready to be consolidated.
+    /// </summary>
+    /// <returns>A <see cref="IEnumerable{ActorConsolidation}"/> that are ready to be consolidated.</returns>
+    Task<IEnumerable<ActorConsolidation>> GetReadyToConsolidateAsync();
 }
