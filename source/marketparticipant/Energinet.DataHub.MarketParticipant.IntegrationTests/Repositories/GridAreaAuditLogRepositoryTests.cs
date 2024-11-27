@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -93,6 +94,7 @@ public sealed class GridAreaAuditLogRepositoryTests
         var gridAreaRepository = new GridAreaRepository(context);
         var gridAreaId = await gridAreaRepository.AddOrUpdateAsync(gridArea);
 
+        var validTo = gridArea.ValidFrom.AddDays(30);
         var changedGridArea = new GridArea(
             gridAreaId,
             gridArea.Name,
@@ -100,7 +102,7 @@ public sealed class GridAreaAuditLogRepositoryTests
             gridArea.PriceAreaCode,
             gridArea.Type,
             gridArea.ValidFrom,
-            gridArea.ValidFrom.AddDays(30));
+            validTo);
 
         await gridAreaRepository.AddOrUpdateAsync(changedGridArea);
 
@@ -110,6 +112,6 @@ public sealed class GridAreaAuditLogRepositoryTests
         var actual = (await target.GetAsync(gridAreaId)).Single();
 
         // Assert
-        Assert.Equal(changedGridArea.ValidTo.ToString(), actual.CurrentValue);
+        Assert.Equal(validTo.ToString(CultureInfo.InvariantCulture), actual.CurrentValue);
     }
 }
