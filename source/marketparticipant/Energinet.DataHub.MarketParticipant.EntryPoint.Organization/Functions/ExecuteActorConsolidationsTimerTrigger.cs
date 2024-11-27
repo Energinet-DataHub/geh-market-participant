@@ -29,7 +29,7 @@ public sealed class ExecuteActorConsolidationsTimerTrigger
     }
 
     [Function(nameof(ExecuteActorConsolidationsTimerTrigger))]
-    public Task RunAsync([TimerTrigger("0 0 * * *")] FunctionContext context)
+    public Task RunAsync([TimerTrigger("5 * * * *")] FunctionContext context)
     {
         return _mediator.Send(new ConsolidateActorsCommand());
     }
