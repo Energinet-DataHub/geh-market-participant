@@ -112,5 +112,4 @@ public sealed class GridAreaAuditLogRepositoryTests
         // Assert
         Assert.Equal(changedGridArea.ValidTo.ToString(), actual.CurrentValue);
     }
-
 }
