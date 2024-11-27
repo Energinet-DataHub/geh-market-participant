@@ -55,5 +55,6 @@ internal static class RepositoryRegistration
         services.AddScoped<IDownloadTokenRespository, DownloadTokenRespository>();
         services.AddScoped<IB2CLogRepository, B2CLogRepository>();
         services.AddScoped<ICutoffRepository, CutoffRepository>();
+        services.AddScoped<IActorConsolidationRepository, ActorConsolidationRepository>();
     }
 }

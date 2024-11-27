@@ -66,13 +66,28 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         return actorConsolidation is null ? null : MapFromEntity(actorConsolidation);
     }
 
-    public async Task<IEnumerable<ActorConsolidation>>? GetByActorIdAsync(ActorId id)
+    public async Task<IEnumerable<ActorConsolidation>> GetByActorIdAsync(ActorId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
         var query =
             from consolidation in _marketParticipantDbContext.ActorConsolidations
             where consolidation.ActorToId == id.Value || consolidation.ActorFromId == id.Value
+            select consolidation;
+
+        var consolidations = await query
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return consolidations.Select(MapFromEntity);
+    }
+
+    public async Task<IEnumerable<ActorConsolidation>> GetReadyToConsolidateAsync()
+    {
+        var query =
+            from consolidation in _marketParticipantDbContext.ActorConsolidations
+            where consolidation.Status == ActorConsolidationStatus.Pending &&
+                  consolidation.ScheduledAt <= DateTimeOffset.UtcNow
             select consolidation;
 
         var consolidations = await query
