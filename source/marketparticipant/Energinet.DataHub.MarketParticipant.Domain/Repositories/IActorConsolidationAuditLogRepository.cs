@@ -12,12 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public enum GridAreaAuditedChange
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+public interface IActorConsolidationAuditLogRepository
 {
-    Name,
-    ConsolidationRequested,
-    ConsolidationCompleted,
-    Decommissioned
+    Task<IEnumerable<AuditLog<GridAreaAuditedChange>>> GetAsync(GridAreaId gridAreaId);
+
+    Task AuditAsync(
+        AuditIdentity auditIdentity,
+        GridAreaAuditedChange change,
+        ActorConsolidation actorConsolidation,
+        GridAreaId gridAreaId);
 }

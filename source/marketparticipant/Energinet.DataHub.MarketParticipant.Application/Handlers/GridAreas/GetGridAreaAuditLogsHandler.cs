@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -26,22 +27,41 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridAreas;
 
 public sealed class GetGridAreaAuditLogsHandler : IRequestHandler<GetGridAreaAuditLogsCommand, GetGridAreaAuditLogsResponse>
 {
-    private readonly IGridAreaAuditLogRepository _repository;
+    private readonly IGridAreaRepository _gridAreaRepository;
+    private readonly IGridAreaAuditLogRepository _gridAreaAuditLogRepository;
+    private readonly IActorConsolidationAuditLogRepository _actorConsolidationAuditLogRepository;
 
-    public GetGridAreaAuditLogsHandler(IGridAreaAuditLogRepository repository)
+    public GetGridAreaAuditLogsHandler(
+        IGridAreaRepository gridAreaRepository,
+        IGridAreaAuditLogRepository gridAreaAuditLogRepository,
+        IActorConsolidationAuditLogRepository actorConsolidationAuditLogRepository)
     {
-        _repository = repository;
+        _gridAreaRepository = gridAreaRepository;
+        _gridAreaAuditLogRepository = gridAreaAuditLogRepository;
+        _actorConsolidationAuditLogRepository = actorConsolidationAuditLogRepository;
     }
 
     public async Task<GetGridAreaAuditLogsResponse> Handle(GetGridAreaAuditLogsCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var auditLogs = await _repository
-            .GetAsync(new GridAreaId(request.GridAreaId))
+        var gridAreaId = new GridAreaId(request.GridAreaId);
+        var gridArea = await _gridAreaRepository
+            .GetAsync(gridAreaId)
             .ConfigureAwait(false);
 
-        return new GetGridAreaAuditLogsResponse(auditLogs
+        NotFoundValidationException.ThrowIfNull(gridArea, request.GridAreaId);
+
+        var consolidationAuditLogs = await _actorConsolidationAuditLogRepository
+            .GetAsync(gridAreaId)
+            .ConfigureAwait(false);
+
+        var gridAreaAuditLogs = await _gridAreaAuditLogRepository
+            .GetAsync(gridAreaId)
+            .ConfigureAwait(false);
+
+        return new GetGridAreaAuditLogsResponse(gridAreaAuditLogs
+            .Concat(consolidationAuditLogs)
             .OrderBy(log => log.Timestamp)
             .Select(log => new AuditLogDto<GridAreaAuditedChange>(log)));
     }

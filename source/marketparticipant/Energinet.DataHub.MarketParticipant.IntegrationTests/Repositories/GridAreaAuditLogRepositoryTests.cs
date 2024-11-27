@@ -73,4 +73,44 @@ public sealed class GridAreaAuditLogRepositoryTests
         Assert.Single(actual);
         Assert.Equal(changedGridArea.Name.Value, actual.Single().CurrentValue);
     }
+
+    [Fact]
+    public async Task Get_GridAreaDecommissioned_ReturnsLogEntriesForGridArea()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var gridArea = new GridArea(
+            new GridAreaName("name"),
+            new GridAreaCode("100"),
+            PriceAreaCode.Dk1,
+            GridAreaType.Distribution,
+            DateTimeOffset.UtcNow,
+            null);
+
+        var gridAreaRepository = new GridAreaRepository(context);
+        var gridAreaId = await gridAreaRepository.AddOrUpdateAsync(gridArea);
+
+        var changedGridArea = new GridArea(
+            gridAreaId,
+            gridArea.Name,
+            gridArea.Code,
+            gridArea.PriceAreaCode,
+            gridArea.Type,
+            gridArea.ValidFrom,
+            gridArea.ValidFrom.AddDays(30));
+
+        await gridAreaRepository.AddOrUpdateAsync(changedGridArea);
+
+        var target = new GridAreaAuditLogRepository(context);
+
+        // Act
+        var actual = (await target.GetAsync(gridAreaId)).Single();
+
+        // Assert
+        Assert.Equal(changedGridArea.ValidTo.ToString(), actual.CurrentValue);
+    }
+
 }

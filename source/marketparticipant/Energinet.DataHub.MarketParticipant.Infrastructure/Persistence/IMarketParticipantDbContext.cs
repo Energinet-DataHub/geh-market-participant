@@ -171,6 +171,11 @@ public interface IMarketParticipantDbContext
     public DbSet<ActorConsolidationEntity> ActorConsolidations { get; }
 
     /// <summary>
+    ///     Represent access to the ActorConsolidationAuditLogEntry database table.
+    /// </summary>
+    DbSet<ActorConsolidationAuditLogEntryEntity> ActorConsolidationAuditLogEntries { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();

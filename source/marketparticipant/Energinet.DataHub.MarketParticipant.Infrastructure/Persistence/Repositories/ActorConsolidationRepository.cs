@@ -66,7 +66,7 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         return actorConsolidation is null ? null : MapFromEntity(actorConsolidation);
     }
 
-    public async Task<IEnumerable<ActorConsolidation>>? GetByActorIdAsync(ActorId id)
+    public async Task<IEnumerable<ActorConsolidation>> GetByActorIdAsync(ActorId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
