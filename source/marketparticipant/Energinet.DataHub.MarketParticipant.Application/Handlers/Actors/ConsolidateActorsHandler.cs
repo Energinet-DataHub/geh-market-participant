@@ -22,7 +22,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 
-public sealed class ConsolidateActorsHandler : IRequestHandler<ConsolidateActorsCommand>
+public sealed class ConsolidateActorsHandler : IRequestHandler<ActorsConsolidationCommand>
 {
     private readonly IActorConsolidationRepository _actorConsolidationRepository;
     private readonly IDomainEventRepository _domainEventRepository;
@@ -38,7 +38,7 @@ public sealed class ConsolidateActorsHandler : IRequestHandler<ConsolidateActors
         _unitOfWorkProvider = unitOfWorkProvider;
     }
 
-    public async Task Handle(ConsolidateActorsCommand request, CancellationToken cancellationToken)
+    public async Task Handle(ActorsConsolidationCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 

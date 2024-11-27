@@ -12,25 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
-using MediatR;
-using Microsoft.Azure.Functions.Worker;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class ExecuteActorConsolidationsTimerTrigger
+public sealed class ActorConsolidationCommandRuleSet : AbstractValidator<ActorsConsolidationCommand>
 {
-    private readonly IMediator _mediator;
-
-    public ExecuteActorConsolidationsTimerTrigger(IMediator mediator)
+    public ActorConsolidationCommandRuleSet()
     {
-        _mediator = mediator;
-    }
-
-    [Function(nameof(ExecuteActorConsolidationsTimerTrigger))]
-    public Task RunAsync([TimerTrigger("5 * * * *")] FunctionContext context)
-    {
-        return _mediator.Send(new ActorsConsolidationCommand());
     }
 }
