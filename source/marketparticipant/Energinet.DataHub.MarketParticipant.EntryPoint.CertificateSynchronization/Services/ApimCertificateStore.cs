@@ -132,7 +132,8 @@ public sealed class ApimCertificateStore : IApimCertificateStore
         if (_accessToken.HasValue && _accessToken.Value.ExpiresOn >= DateTimeOffset.UtcNow.AddSeconds(10))
             return _accessToken.Value;
 
-        var apimManagementScope = new TokenRequestContext([
+        var apimManagementScope = new TokenRequestContext(
+        [
             "https://management.azure.com//.default"
         ]);
 

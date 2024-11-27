@@ -82,6 +82,21 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         return consolidations.Select(MapFromEntity);
     }
 
+    public async Task<IEnumerable<ActorConsolidation>> GetReadyToConsolidateAsync()
+    {
+        var query =
+            from consolidation in _marketParticipantDbContext.ActorConsolidations
+            where consolidation.Status == ActorConsolidationStatus.Pending &&
+                  consolidation.ScheduledAt <= DateTimeOffset.UtcNow
+            select consolidation;
+
+        var consolidations = await query
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return consolidations.Select(MapFromEntity);
+    }
+
     private static void MapToEntity(ActorConsolidation from, ActorConsolidationEntity destination)
     {
         destination.ActorFromId = from.ActorFromId.Value;
