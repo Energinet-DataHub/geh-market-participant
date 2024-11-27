@@ -16,4 +16,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
-public sealed record ActorsConsolidationCommand : IRequest;
+public sealed record ConsolidateActorsCommand : IRequest;
