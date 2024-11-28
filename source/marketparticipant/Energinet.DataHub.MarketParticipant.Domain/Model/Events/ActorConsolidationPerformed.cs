@@ -18,11 +18,11 @@ using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-public sealed class ActorConsolidationExecuted : NotificationEvent
+public sealed class ActorConsolidationPerformed : NotificationEvent
 {
     [JsonConstructor]
     [Browsable(false)]
-    public ActorConsolidationExecuted(
+    public ActorConsolidationPerformed(
         Guid eventId,
         ActorId recipient,
         ActorId affectedActorId)
@@ -32,7 +32,7 @@ public sealed class ActorConsolidationExecuted : NotificationEvent
         AffectedActorId = affectedActorId;
     }
 
-    public ActorConsolidationExecuted(
+    public ActorConsolidationPerformed(
         ActorId recipient,
         ActorId affectedActorId)
         : base(recipient)

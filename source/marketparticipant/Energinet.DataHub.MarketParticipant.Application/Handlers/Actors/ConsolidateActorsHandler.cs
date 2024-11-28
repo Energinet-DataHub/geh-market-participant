@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Domain;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
@@ -53,6 +54,21 @@ public sealed class ConsolidateActorsHandler : IRequestHandler<ConsolidateActors
                 .ConfigureAwait(false);
 
             // Do consolidation here
+            foreach (var actorConsolidation in actorsReadyToConsolidate)
+            {
+                // Send notification to surviving actor
+                await _domainEventRepository
+                    .EnqueueAsync(new ActorConsolidationPerformed(actorConsolidation.ActorToId, actorConsolidation.ActorFromId))
+                    .ConfigureAwait(false);
+
+                // Send notification to expiring actor
+                await _domainEventRepository
+                    .EnqueueAsync(new ActorConsolidationPerformed(actorConsolidation.ActorFromId, actorConsolidation.ActorToId))
+                    .ConfigureAwait(false);
+
+                // Send notification to FAS
+            }
+
             // Send domain event here
             await uow.CommitAsync().ConfigureAwait(false);
         }
