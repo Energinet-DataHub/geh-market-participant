@@ -23,9 +23,9 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
-public sealed class ActorConsolidationExecutedIntegrationEventFactory : IIntegrationEventFactory<ActorConsolidationPerformed>
+public sealed class ActorConsolidationScheduledIntegrationEventFactory : IIntegrationEventFactory<ActorConsolidationScheduled>
 {
-    public Task<IntegrationEvent> CreateAsync(ActorConsolidationPerformed domainEvent, int sequenceNumber)
+    public Task<IntegrationEvent> CreateAsync(ActorConsolidationScheduled domainEvent, int sequenceNumber)
     {
         ArgumentNullException.ThrowIfNull(domainEvent);
 
