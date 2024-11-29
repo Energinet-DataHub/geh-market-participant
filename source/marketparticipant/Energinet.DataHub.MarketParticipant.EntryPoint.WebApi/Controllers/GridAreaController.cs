@@ -18,9 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -57,7 +55,6 @@ public sealed class GridAreaController : ControllerBase
     }
 
     [HttpGet("{gridAreaId:guid}/audit")]
-    [AuthorizeUser(PermissionId.GridAreasManage)]
     [EnableRevision(RevisionActivities.GridAreaAuditLogViewed, typeof(GridArea), "gridAreaId")]
     public async Task<ActionResult<IEnumerable<AuditLogDto<GridAreaAuditedChange>>>> GetAuditAsync(Guid gridAreaId)
     {
