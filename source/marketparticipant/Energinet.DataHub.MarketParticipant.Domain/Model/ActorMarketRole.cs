@@ -37,7 +37,7 @@ public sealed class ActorMarketRole
     {
     }
 
-    public IReadOnlyCollection<ActorGridArea> GridAreas { get; }
+    public ICollection<ActorGridArea> GridAreas { get; }
     public EicFunction Function { get; }
     public string? Comment { get; }
 }
