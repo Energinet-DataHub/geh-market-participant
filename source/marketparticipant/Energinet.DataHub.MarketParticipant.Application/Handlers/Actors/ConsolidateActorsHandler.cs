@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -27,15 +28,18 @@ public sealed class ConsolidateActorsHandler : IRequestHandler<ConsolidateActors
     private readonly IActorConsolidationRepository _actorConsolidationRepository;
     private readonly IDomainEventRepository _domainEventRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+    private readonly IActorConsolidationService _actorConsolidationService;
 
     public ConsolidateActorsHandler(
         IActorConsolidationRepository actorConsolidationRepository,
         IDomainEventRepository domainEventRepository,
-        IUnitOfWorkProvider unitOfWorkProvider)
+        IUnitOfWorkProvider unitOfWorkProvider,
+        IActorConsolidationService actorConsolidationService)
     {
         _actorConsolidationRepository = actorConsolidationRepository;
         _domainEventRepository = domainEventRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
+        _actorConsolidationService = actorConsolidationService;
     }
 
     public async Task Handle(ConsolidateActorsCommand request, CancellationToken cancellationToken)
@@ -53,6 +57,11 @@ public sealed class ConsolidateActorsHandler : IRequestHandler<ConsolidateActors
                 .ConfigureAwait(false);
 
             // Do consolidation here
+            foreach (var actorConsolidation in actorsReadyToConsolidate)
+            {
+                await _actorConsolidationService.ConsolidateAsync(actorConsolidation).ConfigureAwait(false);
+            }
+
             // Send domain event here
             await uow.CommitAsync().ConfigureAwait(false);
         }
