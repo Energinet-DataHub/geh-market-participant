@@ -65,6 +65,37 @@ public sealed class ActorConsolidationAuditLogRepository : IActorConsolidationAu
         }
     }
 
+    public async Task<IEnumerable<AuditLog<ActorAuditedChange>>> GetAsync(ActorId actorId)
+    {
+        var entities = await _context
+            .ActorConsolidationAuditLogEntries
+            .Where(log => log.NewValue == actorId.Value.ToString() || log.OldValue == actorId.Value.ToString())
+            .OrderBy(log => log.Id)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return
+            from entity in entities
+            let change = Map((ActorConsolidationAuditLogField)entity.Field)
+            select new AuditLog<ActorAuditedChange>(
+                change,
+                entity.Timestamp.ToInstant(),
+                new AuditIdentity(entity.ChangedByUserId),
+                false,
+                entity.NewValue,
+                entity.OldValue);
+
+        static ActorAuditedChange Map(ActorConsolidationAuditLogField field)
+        {
+            return field switch
+            {
+                ActorConsolidationAuditLogField.ConsolidationRequested => ActorAuditedChange.ConsolidationRequested,
+                ActorConsolidationAuditLogField.ConsolidationCompleted => ActorAuditedChange.ConsolidationCompleted,
+                _ => throw new ArgumentOutOfRangeException(nameof(field)),
+            };
+        }
+    }
+
     public Task AuditAsync(
         AuditIdentity auditIdentity,
         GridAreaAuditedChange change,

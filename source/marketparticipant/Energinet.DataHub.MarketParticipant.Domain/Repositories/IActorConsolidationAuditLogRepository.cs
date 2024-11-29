@@ -22,6 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IActorConsolidationAuditLogRepository
 {
     Task<IEnumerable<AuditLog<GridAreaAuditedChange>>> GetAsync(GridAreaId gridAreaId);
+    Task<IEnumerable<AuditLog<ActorAuditedChange>>> GetAsync(ActorId actorId);
 
     Task AuditAsync(
         AuditIdentity auditIdentity,
