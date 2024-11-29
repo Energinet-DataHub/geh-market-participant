@@ -22,29 +22,30 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 public sealed class ActorConsolidationService : IActorConsolidationService
 {
-    private readonly IActorRepository _actorRepository;
-    private readonly IGridAreaRepository _gridAreaRepository;
     private readonly IActorConsolidationAuditLogRepository _actorConsolidationAuditLogRepository;
+    private readonly IActorRepository _actorRepository;
     private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IDomainEventRepository _domainEventRepository;
+    private readonly IGridAreaRepository _gridAreaRepository;
 
     public ActorConsolidationService(
-        IActorRepository actorRepository,
-        IGridAreaRepository gridAreaRepository,
         IActorConsolidationAuditLogRepository actorConsolidationAuditLogRepository,
+        IActorRepository actorRepository,
         IAuditIdentityProvider auditIdentityProvider,
-        IDomainEventRepository domainEventRepository)
+        IDomainEventRepository domainEventRepository,
+        IGridAreaRepository gridAreaRepository)
     {
-        _actorRepository = actorRepository;
-        _gridAreaRepository = gridAreaRepository;
         _actorConsolidationAuditLogRepository = actorConsolidationAuditLogRepository;
+        _actorRepository = actorRepository;
         _auditIdentityProvider = auditIdentityProvider;
         _domainEventRepository = domainEventRepository;
+        _gridAreaRepository = gridAreaRepository;
     }
 
     public async Task ConsolidateAsync(ActorConsolidation actorConsolidation)
@@ -60,82 +61,61 @@ public sealed class ActorConsolidationService : IActorConsolidationService
         if (fromActor.MarketRole.Function is EicFunction.GridAccessProvider
             && toActor.MarketRole.Function is EicFunction.GridAccessProvider)
         {
-            var gridAreasToTransfer = await GetGridAreasToTransferAsync(fromActor.MarketRole.GridAreas.Select(ga => ga.Id)).ConfigureAwait(false);
+            var actorGridAreasToTransfer = fromActor.MarketRole.GridAreas.ToList();
 
-            await AuditLogConsolidationAsync(actorConsolidation, gridAreasToTransfer, GridAreaAuditedChange.ConsolidationRequested).ConfigureAwait(false);
-
-            var newFromActor = UpdateActor(actor: fromActor, newGridAreas: []);
-            fromActor.Deactivate();
-
-            var newToActor = UpdateActor(actor: toActor, newGridAreas: toActor.MarketRole.GridAreas.Concat(fromActor.MarketRole.GridAreas));
-
-            await _actorRepository
-                .AddOrUpdateAsync(fromActor)
-                .ConfigureAwait(false);
-
-            await _domainEventRepository
-                .EnqueueAsync(fromActor)
-                .ConfigureAwait(false);
-
-            await _actorRepository
-                .AddOrUpdateAsync(toActor)
-                .ConfigureAwait(false);
-
-            await _domainEventRepository
-                .EnqueueAsync(toActor)
-                .ConfigureAwait(false);
-
-            foreach (var gridArea in gridAreasToTransfer)
+            foreach (var gridArea in actorGridAreasToTransfer)
             {
-                gridArea.ValidTo = actorConsolidation.ScheduledAt.ToDateTimeOffset();
-                await _gridAreaRepository
-                    .AddOrUpdateAsync(gridArea)
-                    .ConfigureAwait(false);
+                toActor.MarketRole.GridAreas.Add(gridArea);
             }
 
-            await AuditLogConsolidationAsync(actorConsolidation, gridAreasToTransfer, GridAreaAuditedChange.ConsolidationCompleted).ConfigureAwait(false);
+            fromActor.MarketRole.GridAreas.Clear();
+            await UpdateGridAreasValidToDateAsync(actorGridAreasToTransfer, actorConsolidation.ScheduledAt).ConfigureAwait(false);
+            await AuditLogConsolidationCompletedAsync(actorGridAreasToTransfer, actorConsolidation).ConfigureAwait(false);
         }
-        else
-        {
-            throw new InvalidOperationException("Only grid access providers can be consolidated. Is this supposed to happen??");
-        }
+
+        fromActor.Deactivate();
+
+        await _actorRepository
+            .AddOrUpdateAsync(fromActor)
+            .ConfigureAwait(false);
+
+        await _actorRepository
+            .AddOrUpdateAsync(toActor)
+            .ConfigureAwait(false);
+
+        await _domainEventRepository
+            .EnqueueAsync(fromActor)
+            .ConfigureAwait(false);
+
+        await _domainEventRepository
+            .EnqueueAsync(toActor)
+            .ConfigureAwait(false);
     }
 
-    private static Actor UpdateActor(Actor actor, IEnumerable<ActorGridArea> newGridAreas)
+    private async Task AuditLogConsolidationCompletedAsync(
+        IEnumerable<ActorGridArea> actorGridAreas,
+        ActorConsolidation actorConsolidation)
     {
-        return new Actor(
-                actor.Id,
-                actor.OrganizationId,
-                actor.ExternalActorId,
-                actor.ActorNumber,
-                actor.Status,
-                new ActorMarketRole(
-                    actor.MarketRole.Function,
-                    newGridAreas,
-                    actor.MarketRole.Comment),
-                actor.Name,
-                actor.Credentials);
-    }
-
-    private async Task AuditLogConsolidationAsync(
-        ActorConsolidation actorConsolidation,
-        IEnumerable<GridArea> gridAreas,
-        GridAreaAuditedChange gridAreaAuditedChange)
-    {
-        foreach (var gridArea in gridAreas)
+        foreach (var actorGridArea in actorGridAreas)
         {
             await _actorConsolidationAuditLogRepository.AuditAsync(
                 _auditIdentityProvider.IdentityId,
-                gridAreaAuditedChange,
+                GridAreaAuditedChange.ConsolidationCompleted,
                 actorConsolidation,
-                gridArea.Id).ConfigureAwait(false);
+                actorGridArea.Id).ConfigureAwait(false);
         }
     }
 
-    private async Task<IEnumerable<GridArea>> GetGridAreasToTransferAsync(IEnumerable<GridAreaId> gridAreaIdsToTransfer)
+    private async Task UpdateGridAreasValidToDateAsync(ICollection<ActorGridArea> actorGridAreasToTransfer, Instant scheduledAt)
     {
-        var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
-        var gridAreasToTransfer = gridAreas.Where(x => gridAreaIdsToTransfer.Contains(x.Id));
-        return gridAreasToTransfer;
+        var allGridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
+        var gridAreasToUpdate = allGridAreas.Where(ga => actorGridAreasToTransfer.Select(aga => aga.Id).Contains(ga.Id));
+        foreach (var gridArea in gridAreasToUpdate)
+        {
+            gridArea.ValidTo = scheduledAt.ToDateTimeOffset();
+            await _gridAreaRepository
+                .AddOrUpdateAsync(gridArea)
+                .ConfigureAwait(false);
+        }
     }
 }
