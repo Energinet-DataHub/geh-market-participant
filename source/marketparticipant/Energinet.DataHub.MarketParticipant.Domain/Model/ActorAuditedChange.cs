@@ -27,4 +27,6 @@ public enum ActorAuditedChange
     ClientSecretCredentials = 9,
     DelegationStart = 10,
     DelegationStop = 11,
+    ConsolidationRequested = 12,
+    ConsolidationCompleted = 13
 }
