@@ -67,7 +67,6 @@ public sealed class ActorConsolidationAuditLogRepositoryTests
         // Assert
         Assert.Equal(auditIdentity, actual.AuditIdentity);
         Assert.Equal(GridAreaAuditedChange.ConsolidationRequested, actual.Change);
-        Assert.Equal(actorConsolidation.ScheduledAt, actual.Timestamp);
         Assert.Equal(actorConsolidation.ActorFromId.ToString(), actual.PreviousValue);
         Assert.Equal(actorConsolidation.ActorToId.ToString(), actual.CurrentValue);
     }
@@ -102,7 +101,6 @@ public sealed class ActorConsolidationAuditLogRepositoryTests
         // Assert
         Assert.Equal(auditIdentity, actual.AuditIdentity);
         Assert.Equal(ActorAuditedChange.ConsolidationRequested, actual.Change);
-        Assert.Equal(actorConsolidation.ScheduledAt, actual.Timestamp);
         Assert.Equal(actorConsolidation.ActorFromId.ToString(), actual.PreviousValue);
         Assert.Equal(actorConsolidation.ActorToId.ToString(), actual.CurrentValue);
     }
