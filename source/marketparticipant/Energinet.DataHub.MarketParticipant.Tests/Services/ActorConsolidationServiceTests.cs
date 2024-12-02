@@ -67,10 +67,10 @@ public class ActorConsolidationServiceTests
             gridAreaRepository.Object);
 
         actorRepository
-            .Setup(organizationRepository => organizationRepository.GetAsync(validFromActor.Id))
+            .Setup(repo => repo.GetAsync(validFromActor.Id))
             .ReturnsAsync(validFromActor);
         actorRepository
-            .Setup(organizationRepository => organizationRepository.GetAsync(validToActor.Id))
+            .Setup(repo => repo.GetAsync(validToActor.Id))
             .ReturnsAsync(validToActor);
 
         var actorConsolidation = new ActorConsolidation(validFromActor.Id, validToActor.Id, Instant.FromUtc(2024, 1, 1, 10, 59));
@@ -120,10 +120,10 @@ public class ActorConsolidationServiceTests
             gridAreaRepository.Object);
 
         actorRepository
-            .Setup(organizationRepository => organizationRepository.GetAsync(validFromActor.Id))
+            .Setup(repo => repo.GetAsync(validFromActor.Id))
             .ReturnsAsync(validFromActor);
         actorRepository
-            .Setup(organizationRepository => organizationRepository.GetAsync(validToActor.Id))
+            .Setup(repo => repo.GetAsync(validToActor.Id))
             .ReturnsAsync(validToActor);
 
         var actorConsolidation = new ActorConsolidation(validFromActor.Id, validToActor.Id, Instant.FromUtc(2024, 1, 1, 10, 59));
@@ -170,10 +170,10 @@ public class ActorConsolidationServiceTests
             gridAreaRepository.Object);
 
         actorRepository
-            .Setup(organizationRepository => organizationRepository.GetAsync(validFromActor.Id))
+            .Setup(repo => repo.GetAsync(validFromActor.Id))
             .ReturnsAsync(validFromActor);
         actorRepository
-            .Setup(organizationRepository => organizationRepository.GetAsync(validToActor.Id))
+            .Setup(repo => repo.GetAsync(validToActor.Id))
             .ReturnsAsync(validToActor);
 
         var actorConsolidation = new ActorConsolidation(validFromActor.Id, validToActor.Id, Instant.FromUtc(2024, 1, 1, 10, 59));
