@@ -38,12 +38,12 @@ public sealed class ActorConsolidationScheduledIntegrationEventFactory : IIntegr
             Model.Contracts.UserNotificationTriggered.CurrentMinorVersion,
             new Model.Contracts.UserNotificationTriggered
             {
-                ReasonIdentifier = "ActorConsolidated",
+                ReasonIdentifier = "ActorConsolidationScheduled",
                 TargetActorId = domainEvent.Recipient.ToString(),
                 TargetPermissions = permission,
                 RelatedId = domainEvent.AffectedActorId.Value.ToString(),
                 OccurredAt = now.ToTimestamp(),
-                ExpiresAt = now.AddHours(23).ToTimestamp(),
+                ExpiresAt = domainEvent.ScheduledAt.ToTimestamp(),
             });
 
         return Task.FromResult(integrationEvent);

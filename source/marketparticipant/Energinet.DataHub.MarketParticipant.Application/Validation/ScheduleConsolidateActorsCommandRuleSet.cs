@@ -15,6 +15,7 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using FluentValidation;
+using DateTime = System.DateTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
@@ -29,6 +30,7 @@ public sealed class ScheduleConsolidateActorsCommandRuleSet : AbstractValidator<
             .NotEmpty();
 
         RuleFor(command => command.ScheduledAt)
-            .GreaterThan(DateTimeOffset.UtcNow);
+            .GreaterThan(DateTimeOffset.UtcNow)
+            .Must(x => DateTime.DaysInMonth(x.Year, x.Month) == x.Day); // Since mergers are always done at month end/start, we need to make sure the day is valid
     }
 }

@@ -67,6 +67,9 @@ public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleC
             .Select(actor => actor.Id)
             .ToList();
 
+        notificationTargets.Add(new ActorId(request.ToActorId));
+        notificationTargets.Add(new ActorId(request.FromActorId));
+
         await using (uow.ConfigureAwait(false))
         {
             await _actorConsolidationRepository
@@ -81,7 +84,8 @@ public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleC
                 await _domainEventRepository
                     .EnqueueAsync(new ActorConsolidationScheduled(
                         notificationTarget,
-                        new ActorId(request.ToActorId)))
+                        new ActorId(request.ToActorId),
+                        request.ScheduledAt))
                     .ConfigureAwait(false);
             }
 
