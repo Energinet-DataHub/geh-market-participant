@@ -30,7 +30,9 @@ public sealed class ScheduleConsolidateActorsCommandRuleSet : AbstractValidator<
             .NotEmpty();
 
         RuleFor(command => command.ScheduledAt)
-            .GreaterThan(DateTimeOffset.UtcNow)
-            .Must(x => DateTime.DaysInMonth(x.Year, x.Month) == x.Day); // Since mergers are always done at month end/start, we need to make sure the day is valid
+            .GreaterThan(DateTimeOffset.UtcNow);
+
+        // TODO: Implement once testing is done.
+        // .Must(x => x.Day == 1); // Since mergers are always done at month end/start, we need to make sure the day is valid.
     }
 }
