@@ -14,10 +14,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using NodaTime.Extensions;
@@ -87,7 +89,7 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         var query =
             from consolidation in _marketParticipantDbContext.ActorConsolidations
             where consolidation.Status == ActorConsolidationStatus.Pending &&
-                  consolidation.ScheduledAt <= DateTimeOffset.UtcNow
+                  consolidation.ScheduledAt <= DateTimeOffset.UtcNow.AddMinutes(int.Parse(ScheduleActorConsolidationOptions.EXECUTECONSOLIDATIONTRIGGERMINUTES, CultureInfo.InvariantCulture))
             select consolidation;
 
         var consolidations = await query
