@@ -80,8 +80,8 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<BalanceResponsibilityRelationEntity> BalanceResponsibilityRelations { get; private set; } = null!;
     public DbSet<CutoffEntity> Cutoffs { get; private set; } = null!;
     public DbSet<OrganizationDomainEntity> OrganizationDomains { get; private set; } = null!;
-
     public DbSet<ActorConsolidationEntity> ActorConsolidations { get; private set; } = null!;
+    public DbSet<ActorConsolidationAuditLogEntryEntity> ActorConsolidationAuditLogEntries { get; private set; } = null!;
 
     public async Task<int> SaveChangesAsync()
     {
@@ -154,6 +154,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new CutoffEntityConfiguration());
         modelBuilder.ApplyConfiguration(new OrganizationDomainEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorConsolidationEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ActorConsolidationAuditLogEntryEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 

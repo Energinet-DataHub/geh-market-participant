@@ -28,15 +28,18 @@ public sealed class GetActorAuditLogsHandler : IRequestHandler<GetActorAuditLogs
 {
     private readonly IActorAuditLogRepository _actorAuditLogRepository;
     private readonly IActorContactAuditLogRepository _actorContactAuditLogRepository;
+    private readonly IActorConsolidationAuditLogRepository _actorConsolidationAuditLogRepository;
     private readonly IProcessDelegationAuditLogRepository _processDelegationAuditLogRepository;
 
     public GetActorAuditLogsHandler(
         IActorAuditLogRepository actorAuditLogRepository,
         IActorContactAuditLogRepository actorContactAuditLogRepository,
+        IActorConsolidationAuditLogRepository actorConsolidationAuditLogRepository,
         IProcessDelegationAuditLogRepository processDelegationAuditLogRepository)
     {
         _actorAuditLogRepository = actorAuditLogRepository;
         _actorContactAuditLogRepository = actorContactAuditLogRepository;
+        _actorConsolidationAuditLogRepository = actorConsolidationAuditLogRepository;
         _processDelegationAuditLogRepository = processDelegationAuditLogRepository;
     }
 
@@ -46,21 +49,27 @@ public sealed class GetActorAuditLogsHandler : IRequestHandler<GetActorAuditLogs
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        var actorId = new ActorId(request.ActorId);
         var actorAuditLogs = await _actorAuditLogRepository
-            .GetAsync(new ActorId(request.ActorId))
+            .GetAsync(actorId)
             .ConfigureAwait(false);
 
         var actorContactAuditLogs = await _actorContactAuditLogRepository
-            .GetAsync(new ActorId(request.ActorId))
+            .GetAsync(actorId)
             .ConfigureAwait(false);
 
         var actorDelegationAuditLogs = await _processDelegationAuditLogRepository
-            .GetAsync(new ActorId(request.ActorId))
+            .GetAsync(actorId)
+            .ConfigureAwait(false);
+
+        var consolidationAuditLogs = await _actorConsolidationAuditLogRepository
+            .GetAsync(actorId)
             .ConfigureAwait(false);
 
         return new GetActorAuditLogsResponse(actorAuditLogs
             .Concat(actorContactAuditLogs)
             .Concat(actorDelegationAuditLogs)
+            .Concat(consolidationAuditLogs)
             .OrderBy(log => log.Timestamp)
             .Select(log => new AuditLogDto<ActorAuditedChange>(log)));
     }
