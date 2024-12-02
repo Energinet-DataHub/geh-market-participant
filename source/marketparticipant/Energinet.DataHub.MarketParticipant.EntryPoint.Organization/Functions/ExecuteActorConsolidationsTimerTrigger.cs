@@ -14,6 +14,7 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 
@@ -22,14 +23,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 public sealed class ExecuteActorConsolidationsTimerTrigger
 {
     private readonly IMediator _mediator;
-
     public ExecuteActorConsolidationsTimerTrigger(IMediator mediator)
     {
         _mediator = mediator;
     }
 
     [Function(nameof(ExecuteActorConsolidationsTimerTrigger))]
-    public Task RunAsync([TimerTrigger("5 * * * *")] FunctionContext context)
+    public Task RunAsync([TimerTrigger(ScheduleActorConsolidationOptions.EXECUTECONSOLIDATIONTRIGGERMINUTESCRON)] FunctionContext context)
     {
         return _mediator.Send(new ConsolidateActorsCommand());
     }
