@@ -53,10 +53,9 @@ public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleC
             .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
 
-        var allActors = (await _actorRepository
-                .GetActorsAsync()
-                .ConfigureAwait(false))
-            .ToList();
+        var allActors = await _actorRepository
+            .GetActorsAsync()
+            .ConfigureAwait(false);
 
         var notificationTargets = allActors
             .Where(actor => actor is
