@@ -15,7 +15,6 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using FluentValidation;
-using DateTime = System.DateTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
