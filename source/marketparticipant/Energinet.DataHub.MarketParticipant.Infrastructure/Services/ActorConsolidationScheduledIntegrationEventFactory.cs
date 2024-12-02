@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
 using Google.Protobuf.WellKnownTypes;
+using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 

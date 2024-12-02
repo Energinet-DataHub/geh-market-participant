@@ -17,7 +17,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -28,17 +30,23 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 
 public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleConsolidateActorsCommand>
 {
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
+    private readonly IActorConsolidationAuditLogRepository _actorConsolidationAuditLogRepository;
     private readonly IActorConsolidationRepository _actorConsolidationRepository;
     private readonly IDomainEventRepository _domainEventRepository;
     private readonly IActorRepository _actorRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
     public ScheduleConsolidateActorsHandler(
+        IAuditIdentityProvider auditIdentityProvider,
+        IActorConsolidationAuditLogRepository actorConsolidationAuditLogRepository,
         IActorConsolidationRepository actorConsolidationRepository,
         IDomainEventRepository domainEventRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IActorRepository actorRepository)
     {
+        _auditIdentityProvider = auditIdentityProvider;
+        _actorConsolidationAuditLogRepository = actorConsolidationAuditLogRepository;
         _actorConsolidationRepository = actorConsolidationRepository;
         _domainEventRepository = domainEventRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
@@ -48,6 +56,14 @@ public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleC
     public async Task Handle(ScheduleConsolidateActorsCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
+
+        var fromActorId = new ActorId(request.FromActorId);
+        var fromActor = await _actorRepository.GetAsync(fromActorId).ConfigureAwait(false);
+        NotFoundValidationException.ThrowIfNull(fromActor, request.FromActorId);
+
+        var toActorId = new ActorId(request.Consolidation.ToActorId);
+        var toActor = await _actorRepository.GetAsync(toActorId).ConfigureAwait(false);
+        NotFoundValidationException.ThrowIfNull(toActor, request.Consolidation.ToActorId);
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()
@@ -66,25 +82,35 @@ public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleC
             .Select(actor => actor.Id)
             .ToList();
 
-        notificationTargets.Add(new ActorId(request.ToActorId));
-        notificationTargets.Add(new ActorId(request.FromActorId));
+        notificationTargets.Add(fromActorId);
+        notificationTargets.Add(toActorId);
 
         await using (uow.ConfigureAwait(false))
         {
+            var actorConsolidation = new ActorConsolidation(
+                fromActorId,
+                toActorId,
+                request.Consolidation.ConsolidateAt.ToInstant());
+
             await _actorConsolidationRepository
-                .AddAsync(new ActorConsolidation(
-                    new ActorId(request.FromActorId),
-                    new ActorId(request.ToActorId),
-                    request.ScheduledAt.ToInstant()))
+                .AddAsync(actorConsolidation)
                 .ConfigureAwait(false);
+
+            foreach (var gridArea in fromActor.MarketRole.GridAreas)
+            {
+                await _actorConsolidationAuditLogRepository
+                    .AuditAsync(
+                        _auditIdentityProvider.IdentityId,
+                        GridAreaAuditedChange.ConsolidationRequested,
+                        actorConsolidation,
+                        gridArea.Id)
+                    .ConfigureAwait(false);
+            }
 
             foreach (var notificationTarget in notificationTargets)
             {
                 await _domainEventRepository
-                    .EnqueueAsync(new ActorConsolidationScheduled(
-                        notificationTarget,
-                        new ActorId(request.ToActorId),
-                        request.ScheduledAt))
+                    .EnqueueAsync(new ActorConsolidationScheduled(notificationTarget, toActorId, actorConsolidation.ConsolidateAt))
                     .ConfigureAwait(false);
             }
 

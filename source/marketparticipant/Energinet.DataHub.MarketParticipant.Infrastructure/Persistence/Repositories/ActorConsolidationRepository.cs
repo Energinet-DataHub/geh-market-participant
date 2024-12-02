@@ -104,7 +104,7 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         destination.ActorFromId = from.ActorFromId.Value;
         destination.ActorToId = from.ActorToId.Value;
         destination.Status = from.Status;
-        destination.ScheduledAt = from.ScheduledAt.ToDateTimeOffset();
+        destination.ScheduledAt = from.ConsolidateAt.ToDateTimeOffset();
     }
 
     private static ActorConsolidation MapFromEntity(ActorConsolidationEntity input)

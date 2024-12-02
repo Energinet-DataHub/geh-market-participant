@@ -13,8 +13,7 @@
 // limitations under the License.
 
 using System;
-using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
-public sealed record ScheduleConsolidateActorsCommand(Guid FromActorId, ConsolidationRequestDto Consolidation) : IRequest;
+public record ConsolidationRequestDto(Guid ToActorId, DateTimeOffset ConsolidateAt);
