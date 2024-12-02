@@ -197,7 +197,7 @@ public sealed class IntegrationEventProviderIntegrationTests
     {
         var fromActorId = new ActorId(Guid.NewGuid());
         var toActorId = new ActorId(Guid.NewGuid());
-        var scheduledAt = DateTimeOffset.Now.Date.AddMonths(2).ToInstant();
+        var scheduledAt = DateTimeOffset.UtcNow.Date.AddMonths(2).ToInstant();
 
         var notification = new ActorConsolidationScheduled(
             fromActorId,

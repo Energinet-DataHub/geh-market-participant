@@ -16,4 +16,4 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
-public record ConsolidationRequestDto(Guid ToActorId, DateTimeOffset ConsolidateAt);
+public sealed record ConsolidationRequestDto(Guid ToActorId, DateTimeOffset ConsolidateAt);
