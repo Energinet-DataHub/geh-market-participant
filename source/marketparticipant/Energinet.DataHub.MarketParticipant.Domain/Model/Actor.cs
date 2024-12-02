@@ -231,4 +231,20 @@ public sealed class Actor : IPublishDomainEvents
     /// Only Active and New actors can be set to passive.
     /// </summary>
     public void SetAsPassive() => _actorStatusTransitioner.SetAsPassive();
+
+    public void TransferGridAreasTo(Actor toActor)
+    {
+        ArgumentNullException.ThrowIfNull(toActor);
+
+        foreach (var actorGridArea in MarketRole.GridAreas)
+        {
+            toActor.MarketRole.GridAreas.Add(actorGridArea);
+            _domainEvents.Add(new GridAreaOwnershipAssigned(
+                toActor.ActorNumber,
+                toActor.MarketRole.Function,
+                actorGridArea.Id));
+        }
+
+        MarketRole.GridAreas.Clear();
+    }
 }
