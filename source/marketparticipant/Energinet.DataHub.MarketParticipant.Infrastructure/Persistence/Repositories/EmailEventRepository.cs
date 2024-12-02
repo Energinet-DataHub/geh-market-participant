@@ -79,9 +79,7 @@ public sealed class EmailEventRepository : IEmailEventRepository
 
     private static EmailEvent MapTo(EmailEventEntity emailEventEntity)
     {
-        var templateParameters = JsonSerializer.Deserialize<Dictionary<string, string>>(emailEventEntity.TemplateParameters);
-        if (templateParameters == null)
-            throw new InvalidOperationException($"Template parameters for event {emailEventEntity.Id} are invalid.");
+        var templateParameters = JsonSerializer.Deserialize<Dictionary<string, string>>(emailEventEntity.TemplateParameters) ?? throw new InvalidOperationException($"Template parameters for event {emailEventEntity.Id} are invalid.");
 
         EmailTemplate mailTemplate = (EmailTemplateId)emailEventEntity.TemplateId switch
         {

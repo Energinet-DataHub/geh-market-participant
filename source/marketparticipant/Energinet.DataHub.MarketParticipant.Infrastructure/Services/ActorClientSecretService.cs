@@ -42,11 +42,7 @@ public sealed class ActorClientSecretService : IActorClientSecretService
         ArgumentNullException.ThrowIfNull(actor);
         ArgumentNullException.ThrowIfNull(actor.ExternalActorId);
 
-        var foundApp = await GetApplicationRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false);
-        if (foundApp == null)
-        {
-            throw new InvalidOperationException("Cannot add secret to B2C; application was not found.");
-        }
+        var foundApp = await GetApplicationRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false) ?? throw new InvalidOperationException("Cannot add secret to B2C; application was not found.");
 
         var passwordCredential = new PasswordCredential
         {
@@ -82,11 +78,7 @@ public sealed class ActorClientSecretService : IActorClientSecretService
         ArgumentNullException.ThrowIfNull(actor);
         ArgumentNullException.ThrowIfNull(actor.ExternalActorId);
 
-        var foundApp = await GetApplicationRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false);
-        if (foundApp == null)
-        {
-            throw new InvalidOperationException("Cannot delete secrets from B2C; Application was not found.");
-        }
+        var foundApp = await GetApplicationRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false) ?? throw new InvalidOperationException("Cannot delete secrets from B2C; Application was not found.");
 
         foreach (var secret in foundApp.PasswordCredentials!)
         {
