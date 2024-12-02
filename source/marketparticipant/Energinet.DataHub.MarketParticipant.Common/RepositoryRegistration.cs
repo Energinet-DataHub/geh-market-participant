@@ -52,6 +52,8 @@ internal static class RepositoryRegistration
         services.AddScoped<IProcessDelegationRepository, ProcessDelegationRepository>();
         services.AddScoped<IBalanceResponsibilityRequestRepository, BalanceResponsibilityRequestRepository>();
         services.AddScoped<IBalanceResponsibilityRelationsRepository, BalanceResponsibilityRelationsRepository>();
+        services.AddScoped<IActorConsolidationRepository, ActorConsolidationRepository>();
+        services.AddScoped<IActorConsolidationAuditLogRepository, ActorConsolidationAuditLogRepository>();
         services.AddScoped<IDownloadTokenRespository, DownloadTokenRespository>();
         services.AddScoped<IB2CLogRepository, B2CLogRepository>();
         services.AddScoped<ICutoffRepository, CutoffRepository>();
