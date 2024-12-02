@@ -105,31 +105,4 @@ public sealed class ActorConsolidationServiceIntegrationTests
         var gridAreas = await gridAreaRepository.GetAsync();
         Assert.All(gridAreas, result => Assert.Equal(scheduledAt.ToDateTimeOffset(), result.ValidTo));
     }
-
-    private async Task<ActorEntity> CreateDelegationOrganizationAsync(EicFunction secondActorEicFunction)
-    {
-        var organizationEntity = await _databaseFixture.PrepareOrganizationAsync();
-
-        var delegatedActorEntity = await _databaseFixture.PrepareActorAsync(
-            organizationEntity,
-            TestPreparationEntities.ValidActiveActor,
-            TestPreparationEntities.ValidMarketRole.Patch(marketRole => marketRole.Function = EicFunction.Delegated));
-
-        await _databaseFixture.PrepareActorAsync(
-            organizationEntity,
-            TestPreparationEntities.ValidActiveActor,
-            TestPreparationEntities.ValidMarketRole.Patch(marketRole => marketRole.Function = secondActorEicFunction));
-
-        return delegatedActorEntity;
-    }
-
-    private async Task CreateTestDelegationAsync(IProcessDelegationRepository processDelegationRepository, Actor delegatedBy, ActorEntity delegateTo)
-    {
-        var gridAreaEntity = await _databaseFixture.PrepareGridAreaAsync();
-
-        var delegation = new ProcessDelegation(delegatedBy, DelegatedProcess.ReceiveWholesaleResults);
-        delegation.DelegateTo(new ActorId(delegateTo.Id), new GridAreaId(gridAreaEntity.Id), Instant.FromDateTimeOffset(DateTimeOffset.UtcNow));
-
-        await processDelegationRepository.AddOrUpdateAsync(delegation);
-    }
 }
