@@ -22,16 +22,21 @@ public sealed class ScheduleConsolidateActorsCommandRuleSet : AbstractValidator<
 {
     public ScheduleConsolidateActorsCommandRuleSet()
     {
-        RuleFor(command => command.ToActorId)
-            .NotEmpty();
-
         RuleFor(command => command.FromActorId)
             .NotEmpty();
 
-        RuleFor(command => command.ScheduledAt)
-            .GreaterThan(DateTimeOffset.UtcNow);
+        RuleFor(command => command.Consolidation)
+            .NotNull()
+            .ChildRules(validator =>
+            {
+                validator.RuleFor(request => request.ToActorId)
+                    .NotEmpty();
 
-        // TODO: Implement once testing is done.
-        // .Must(x => x.Day == 1); // Since mergers are always done at month end/start, we need to make sure the day is valid.
+                validator.RuleFor(request => request.ConsolidateAt)
+                    .GreaterThan(DateTimeOffset.UtcNow);
+
+                // TODO: Implement once testing is done.
+                // .Must(x => x.Day == 1); // Since mergers are always done at month end/start, we need to make sure the day is valid.
+            });
     }
 }

@@ -32,6 +32,7 @@ public class ActorClientSecretCredentials : ActorCredentials
 
     public override bool ExpiresSoon()
     {
-        return ExpirationDate - Clock.Instance.GetCurrentInstant() < Duration.FromDays(30);
+        var now = Clock.Instance.GetCurrentInstant();
+        return ExpirationDate - now < Duration.FromDays(30) && ExpirationDate > now;
     }
 }
