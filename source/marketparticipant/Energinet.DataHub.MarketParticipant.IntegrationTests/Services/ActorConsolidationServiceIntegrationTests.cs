@@ -53,6 +53,7 @@ public sealed class ActorConsolidationServiceIntegrationTests
         await using var context = _databaseFixture.DatabaseManager.CreateDbContext();
 
         var actorConsolidationAuditLogRepository = scope.ServiceProvider.GetRequiredService<IActorConsolidationAuditLogRepository>();
+        var actorCredentialsRemovalService = scope.ServiceProvider.GetRequiredService<IActorCredentialsRemovalService>();
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
         var gridAreaRepository = scope.ServiceProvider.GetRequiredService<IGridAreaRepository>();
 
@@ -85,6 +86,7 @@ public sealed class ActorConsolidationServiceIntegrationTests
 
         var actorConsolidationService = new ActorConsolidationService(
             actorConsolidationAuditLogRepository,
+            actorCredentialsRemovalService,
             actorRepository,
             auditIdentityProvider.Object,
             domainEventRepository.Object,

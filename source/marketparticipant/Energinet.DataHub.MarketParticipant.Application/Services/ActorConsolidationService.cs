@@ -26,6 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services;
 public sealed class ActorConsolidationService : IActorConsolidationService
 {
     private readonly IActorConsolidationAuditLogRepository _actorConsolidationAuditLogRepository;
+    private readonly IActorCredentialsRemovalService _actorCredentialsRemovalService;
     private readonly IActorRepository _actorRepository;
     private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IDomainEventRepository _domainEventRepository;
@@ -33,12 +34,14 @@ public sealed class ActorConsolidationService : IActorConsolidationService
 
     public ActorConsolidationService(
         IActorConsolidationAuditLogRepository actorConsolidationAuditLogRepository,
+        IActorCredentialsRemovalService actorCredentialsRemovalService,
         IActorRepository actorRepository,
         IAuditIdentityProvider auditIdentityProvider,
         IDomainEventRepository domainEventRepository,
         IGridAreaRepository gridAreaRepository)
     {
         _actorConsolidationAuditLogRepository = actorConsolidationAuditLogRepository;
+        _actorCredentialsRemovalService = actorCredentialsRemovalService;
         _actorRepository = actorRepository;
         _auditIdentityProvider = auditIdentityProvider;
         _domainEventRepository = domainEventRepository;
@@ -62,11 +65,11 @@ public sealed class ActorConsolidationService : IActorConsolidationService
 
             toActor.TransferGridAreasFrom(fromActor);
 
-            await UpdateGridAreasValidToDateAsync(actorGridAreasToTransfer, actorConsolidation.ScheduledAt).ConfigureAwait(false);
+            await UpdateGridAreasValidToDateAsync(actorGridAreasToTransfer, actorConsolidation.ConsolidateAt).ConfigureAwait(false);
             await AuditLogConsolidationCompletedAsync(actorGridAreasToTransfer, actorConsolidation).ConfigureAwait(false);
         }
 
-        fromActor.Deactivate();
+        await DeactivateActorAsync(fromActor).ConfigureAwait(false);
 
         await _actorRepository
             .AddOrUpdateAsync(fromActor)
@@ -97,6 +100,12 @@ public sealed class ActorConsolidationService : IActorConsolidationService
                 actorConsolidation,
                 actorGridArea.Id).ConfigureAwait(false);
         }
+    }
+
+    private async Task DeactivateActorAsync(Actor actor)
+    {
+        await _actorCredentialsRemovalService.RemoveActorCredentialsAsync(actor).ConfigureAwait(false);
+        actor.Deactivate();
     }
 
     private async Task UpdateGridAreasValidToDateAsync(ICollection<ActorGridArea> actorGridAreasToTransfer, Instant scheduledAt)

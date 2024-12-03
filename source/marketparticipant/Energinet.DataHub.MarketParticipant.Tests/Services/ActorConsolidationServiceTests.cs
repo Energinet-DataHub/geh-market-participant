@@ -54,6 +54,7 @@ public class ActorConsolidationServiceTests
         var validToActor = GenerateValidActor(EicFunction.GridAccessProvider, []);
 
         var actorConsolidationAuditLogRepository = new Mock<IActorConsolidationAuditLogRepository>();
+        var actorCredentialsRemovalService = new Mock<IActorCredentialsRemovalService>();
         var actorRepository = new Mock<IActorRepository>();
         var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
         var domainEventRepository = new Mock<IDomainEventRepository>();
@@ -61,6 +62,7 @@ public class ActorConsolidationServiceTests
 
         var target = new ActorConsolidationService(
             actorConsolidationAuditLogRepository.Object,
+            actorCredentialsRemovalService.Object,
             actorRepository.Object,
             auditIdentityProvider.Object,
             domainEventRepository.Object,
@@ -107,6 +109,7 @@ public class ActorConsolidationServiceTests
             ]);
 
         var actorConsolidationAuditLogRepository = new Mock<IActorConsolidationAuditLogRepository>();
+        var actorCredentialsRemovalService = new Mock<IActorCredentialsRemovalService>();
         var actorRepository = new Mock<IActorRepository>();
         var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
         var domainEventRepository = new Mock<IDomainEventRepository>();
@@ -114,6 +117,7 @@ public class ActorConsolidationServiceTests
 
         var target = new ActorConsolidationService(
             actorConsolidationAuditLogRepository.Object,
+            actorCredentialsRemovalService.Object,
             actorRepository.Object,
             auditIdentityProvider.Object,
             domainEventRepository.Object,
@@ -157,6 +161,7 @@ public class ActorConsolidationServiceTests
             ]);
 
         var actorConsolidationAuditLogRepository = new Mock<IActorConsolidationAuditLogRepository>();
+        var actorCredentialsRemovalService = new Mock<IActorCredentialsRemovalService>();
         var actorRepository = new Mock<IActorRepository>();
         var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
         var domainEventRepository = new Mock<IDomainEventRepository>();
@@ -164,6 +169,7 @@ public class ActorConsolidationServiceTests
 
         var target = new ActorConsolidationService(
             actorConsolidationAuditLogRepository.Object,
+            actorCredentialsRemovalService.Object,
             actorRepository.Object,
             auditIdentityProvider.Object,
             domainEventRepository.Object,
