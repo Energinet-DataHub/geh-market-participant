@@ -37,7 +37,14 @@ public sealed class ActorMarketRole
     {
     }
 
-    public ICollection<ActorGridArea> GridAreas { get; }
+    public IReadOnlyCollection<ActorGridArea> GridAreas { get; private set; }
     public EicFunction Function { get; }
     public string? Comment { get; }
+
+    public void UpdateGridAreas(IEnumerable<ActorGridArea> actorGridAreas)
+    {
+        ArgumentNullException.ThrowIfNull(actorGridAreas);
+
+        GridAreas = actorGridAreas.ToList();
+    }
 }
