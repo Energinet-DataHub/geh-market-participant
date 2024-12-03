@@ -13,15 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
-public sealed class ActorConsolidationEntity
-{
-    public Guid Id { get; set; }
-    public Guid ActorFromId { get; set; }
-    public Guid ActorToId { get; set; }
-    public DateTimeOffset ConsolidateAt { get; set; }
-    public ActorConsolidationStatus Status { get; set; }
-}
+public sealed record ConsolidationRequestDto(Guid ToActorId, DateTimeOffset ConsolidateAt);

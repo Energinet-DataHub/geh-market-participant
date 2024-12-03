@@ -18,27 +18,27 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed class ActorConsolidation
 {
-    public ActorConsolidation(ActorId fromId, ActorId toId, Instant scheduledAt)
+    public ActorConsolidation(ActorId fromId, ActorId toId, Instant consolidateAt)
     {
         Id = new ActorConsolidationId(default);
         ActorFromId = fromId;
         ActorToId = toId;
-        ScheduledAt = scheduledAt;
+        ConsolidateAt = consolidateAt;
         Status = ActorConsolidationStatus.Pending;
     }
 
-    public ActorConsolidation(ActorConsolidationId id, ActorId fromId, ActorId toId, Instant scheduledAt, ActorConsolidationStatus status)
+    public ActorConsolidation(ActorConsolidationId id, ActorId fromId, ActorId toId, Instant consolidateAt, ActorConsolidationStatus status)
     {
         Id = id;
         ActorFromId = fromId;
         ActorToId = toId;
-        ScheduledAt = scheduledAt;
+        ConsolidateAt = consolidateAt;
         Status = status;
     }
 
     public ActorConsolidationId Id { get; init; }
     public ActorId ActorFromId { get; init; }
     public ActorId ActorToId { get; init; }
-    public Instant ScheduledAt { get; set; }
+    public Instant ConsolidateAt { get; set; }
     public ActorConsolidationStatus Status { get; set; }
 }

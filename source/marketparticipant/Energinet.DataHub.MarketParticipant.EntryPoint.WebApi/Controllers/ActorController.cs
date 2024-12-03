@@ -262,4 +262,21 @@ public class ActorController : ControllerBase
 
         return Ok();
     }
+
+    [HttpPost("{actorId:guid}/consolidate")]
+    [AuthorizeUser(PermissionId.ActorsManage)]
+    [EnableRevision(RevisionActivities.ConsolidateActorsRequest, typeof(ActorConsolidation), "actorId")]
+    public async Task<ActionResult> ConsolidateActorsAsync(Guid actorId, [FromBody] ConsolidationRequestDto consolidationRequest)
+    {
+        if (!_userContext.CurrentUser.IsFas)
+            return Unauthorized();
+
+        var stopMessageDelegationCommand = new ScheduleConsolidateActorsCommand(actorId, consolidationRequest);
+
+        await _mediator
+            .Send(stopMessageDelegationCommand)
+            .ConfigureAwait(false);
+
+        return Ok();
+    }
 }

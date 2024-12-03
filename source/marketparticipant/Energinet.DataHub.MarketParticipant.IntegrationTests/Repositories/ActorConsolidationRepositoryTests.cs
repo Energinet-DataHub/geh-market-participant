@@ -89,6 +89,6 @@ public sealed class ActorConsolidationRepositoryTests
         Assert.Equal(actorFrom.Id, newConsolidation.ActorFromId.Value);
         Assert.Equal(actorTo.Id, newConsolidation.ActorToId.Value);
         Assert.Equal(ActorConsolidationStatus.Pending, newConsolidation.Status);
-        Assert.Equal(scheduledAt, newConsolidation.ScheduledAt);
+        Assert.Equal(scheduledAt, newConsolidation.ConsolidateAt);
     }
 }
