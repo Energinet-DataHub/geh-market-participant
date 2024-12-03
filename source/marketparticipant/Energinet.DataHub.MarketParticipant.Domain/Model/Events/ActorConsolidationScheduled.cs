@@ -15,6 +15,7 @@
 using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
@@ -26,25 +27,25 @@ public sealed class ActorConsolidationScheduled : NotificationEvent
         Guid eventId,
         ActorId recipient,
         ActorId affectedActorId,
-        DateTimeOffset scheduledAt)
+        Instant consolidateAt)
         : base(recipient)
     {
         EventId = eventId;
         AffectedActorId = affectedActorId;
-        ScheduledAt = scheduledAt;
+        ConsolidateAt = consolidateAt;
     }
 
     public ActorConsolidationScheduled(
         ActorId recipient,
         ActorId affectedActorId,
-        DateTimeOffset scheduledAt)
+        Instant consolidateAt)
         : base(recipient)
     {
         EventId = Guid.NewGuid();
         AffectedActorId = affectedActorId;
-        ScheduledAt = scheduledAt;
+        ConsolidateAt = consolidateAt;
     }
 
     public ActorId AffectedActorId { get; }
-    public DateTimeOffset ScheduledAt { get; }
+    public Instant ConsolidateAt { get; }
 }

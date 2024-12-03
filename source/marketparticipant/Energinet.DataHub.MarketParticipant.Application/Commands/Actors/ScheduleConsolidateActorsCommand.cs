@@ -17,4 +17,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
-public sealed record ScheduleConsolidateActorsCommand(Guid FromActorId, Guid ToActorId, DateTimeOffset ScheduledAt) : IRequest;
+public sealed record ScheduleConsolidateActorsCommand(Guid FromActorId, ConsolidationRequestDto Consolidation) : IRequest;

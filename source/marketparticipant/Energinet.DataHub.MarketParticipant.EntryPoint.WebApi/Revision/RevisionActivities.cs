@@ -26,6 +26,7 @@ public static class RevisionActivities
     public const string ActorCreated = "ActorCreated";
     public const string ActorEdited = "ActorEdited";
     public const string ActorAuditLogViewed = "ActorAuditLogViewed";
+    public const string ConsolidateActorsRequest = "ConsolidateActorsRequest";
 
     public const string ActorCredentialsViewed = "ActorCredentialsViewed";
     public const string ActorCredentialsRemoved = "ActorCredentialsRemoved";
