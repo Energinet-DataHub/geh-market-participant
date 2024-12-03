@@ -38,15 +38,13 @@ public sealed class RemoveActorCredentialsHandlerTests
     {
         // Arrange
         var actorRepositoryMock = new Mock<IActorRepository>();
-        var certificateServiceMock = new Mock<ICertificateService>();
         var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
-        var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+        var actorCredentialsRemovalService = new Mock<IActorCredentialsRemovalService>();
         var target = new RemoveActorCredentialsHandler(
             actorRepositoryMock.Object,
-            certificateServiceMock.Object,
             UnitOfWorkProviderMock.Create(),
             domainEventRepositoryMock.Object,
-            actorClientSecretServiceMock.Object);
+            actorCredentialsRemovalService.Object);
 
         var actorId = Guid.NewGuid();
 
@@ -65,15 +63,13 @@ public sealed class RemoveActorCredentialsHandlerTests
     {
         // Arrange
         var actorRepositoryMock = new Mock<IActorRepository>();
-        var certificateServiceMock = new Mock<ICertificateService>();
         var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
-        var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+        var actorCredentialsRemovalService = new Mock<IActorCredentialsRemovalService>();
         var target = new RemoveActorCredentialsHandler(
             actorRepositoryMock.Object,
-            certificateServiceMock.Object,
             UnitOfWorkProviderMock.Create(),
             domainEventRepositoryMock.Object,
-            actorClientSecretServiceMock.Object);
+            actorCredentialsRemovalService.Object);
 
         var actorId = Guid.NewGuid();
         var actor = TestPreparationModels.MockedActor(actorId);
@@ -96,15 +92,13 @@ public sealed class RemoveActorCredentialsHandlerTests
     {
         // Arrange
         var actorRepositoryMock = new Mock<IActorRepository>();
-        var certificateServiceMock = new Mock<ICertificateService>();
         var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
-        var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+        var actorCredentialsRemovalService = new Mock<IActorCredentialsRemovalService>();
         var target = new RemoveActorCredentialsHandler(
             actorRepositoryMock.Object,
-            certificateServiceMock.Object,
             UnitOfWorkProviderMock.Create(),
             domainEventRepositoryMock.Object,
-            actorClientSecretServiceMock.Object);
+            actorCredentialsRemovalService.Object);
 
         var actorId = Guid.NewGuid();
         var actor = TestPreparationModels.MockedActor(actorId);
