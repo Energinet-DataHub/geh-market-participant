@@ -60,7 +60,7 @@ public sealed class ActorConsolidationService : IActorConsolidationService
         {
             var actorGridAreasToTransfer = fromActor.MarketRole.GridAreas.ToList();
 
-            fromActor.TransferGridAreasTo(toActor);
+            toActor.TransferGridAreasFrom(fromActor);
 
             await UpdateGridAreasValidToDateAsync(actorGridAreasToTransfer, actorConsolidation.ScheduledAt).ConfigureAwait(false);
             await AuditLogConsolidationCompletedAsync(actorGridAreasToTransfer, actorConsolidation).ConfigureAwait(false);

@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
@@ -232,19 +233,18 @@ public sealed class Actor : IPublishDomainEvents
     /// </summary>
     public void SetAsPassive() => _actorStatusTransitioner.SetAsPassive();
 
-    public void TransferGridAreasTo(Actor toActor)
+    public void TransferGridAreasFrom(Actor fromActor)
     {
-        ArgumentNullException.ThrowIfNull(toActor);
-
-        foreach (var actorGridArea in MarketRole.GridAreas)
+        ArgumentNullException.ThrowIfNull(fromActor);
+        foreach (var actorGridArea in fromActor.MarketRole.GridAreas)
         {
-            toActor.MarketRole.GridAreas.Add(actorGridArea);
             _domainEvents.Add(new GridAreaOwnershipAssigned(
-                toActor.ActorNumber,
-                toActor.MarketRole.Function,
+                ActorNumber,
+                MarketRole.Function,
                 actorGridArea.Id));
         }
 
-        MarketRole.GridAreas.Clear();
+        MarketRole.UpdateGridAreas(MarketRole.GridAreas.Concat(fromActor.MarketRole.GridAreas));
+        fromActor.MarketRole.UpdateGridAreas(Array.Empty<ActorGridArea>());
     }
 }
