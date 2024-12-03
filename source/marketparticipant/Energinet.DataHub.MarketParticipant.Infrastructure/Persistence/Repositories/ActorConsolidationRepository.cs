@@ -89,7 +89,7 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         var query =
             from consolidation in _marketParticipantDbContext.ActorConsolidations
             where consolidation.Status == ActorConsolidationStatus.Pending &&
-                  consolidation.ScheduledAt <= DateTimeOffset.UtcNow.AddMinutes(int.Parse(ScheduleActorConsolidationOptions.EXECUTECONSOLIDATIONTRIGGERMINUTES, CultureInfo.InvariantCulture))
+                  consolidation.ConsolidateAt <= DateTimeOffset.UtcNow.AddMinutes(int.Parse(ScheduleActorConsolidationOptions.EXECUTECONSOLIDATIONTRIGGERMINUTES, CultureInfo.InvariantCulture))
             select consolidation;
 
         var consolidations = await query
@@ -104,7 +104,7 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         destination.ActorFromId = from.ActorFromId.Value;
         destination.ActorToId = from.ActorToId.Value;
         destination.Status = from.Status;
-        destination.ScheduledAt = from.ConsolidateAt.ToDateTimeOffset();
+        destination.ConsolidateAt = from.ConsolidateAt.ToDateTimeOffset();
     }
 
     private static ActorConsolidation MapFromEntity(ActorConsolidationEntity input)
@@ -113,7 +113,7 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
             new ActorConsolidationId(input.Id),
             new ActorId(input.ActorFromId),
             new ActorId(input.ActorToId),
-            input.ScheduledAt.ToInstant(),
+            input.ConsolidateAt.ToInstant(),
             input.Status);
     }
 }

@@ -27,25 +27,25 @@ public sealed class ActorConsolidationScheduled : NotificationEvent
         Guid eventId,
         ActorId recipient,
         ActorId affectedActorId,
-        Instant scheduledAt)
+        Instant consolidateAt)
         : base(recipient)
     {
         EventId = eventId;
         AffectedActorId = affectedActorId;
-        ScheduledAt = scheduledAt;
+        ConsolidateAt = consolidateAt;
     }
 
     public ActorConsolidationScheduled(
         ActorId recipient,
         ActorId affectedActorId,
-        Instant scheduledAt)
+        Instant consolidateAt)
         : base(recipient)
     {
         EventId = Guid.NewGuid();
         AffectedActorId = affectedActorId;
-        ScheduledAt = scheduledAt;
+        ConsolidateAt = consolidateAt;
     }
 
     public ActorId AffectedActorId { get; }
-    public Instant ScheduledAt { get; }
+    public Instant ConsolidateAt { get; }
 }

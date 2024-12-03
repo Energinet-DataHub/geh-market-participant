@@ -44,7 +44,7 @@ public sealed class ActorConsolidationScheduledIntegrationEventFactory : IIntegr
                 TargetPermissions = permission,
                 RelatedId = domainEvent.AffectedActorId.Value.ToString(),
                 OccurredAt = now.ToTimestamp(),
-                ExpiresAt = domainEvent.ScheduledAt.ToTimestamp(),
+                ExpiresAt = domainEvent.ConsolidateAt.ToTimestamp(),
             });
 
         return Task.FromResult(integrationEvent);

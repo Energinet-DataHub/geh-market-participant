@@ -22,6 +22,6 @@ public sealed class ActorConsolidationEntity
     public Guid Id { get; set; }
     public Guid ActorFromId { get; set; }
     public Guid ActorToId { get; set; }
-    public DateTimeOffset ScheduledAt { get; set; }
+    public DateTimeOffset ConsolidateAt { get; set; }
     public ActorConsolidationStatus Status { get; set; }
 }
