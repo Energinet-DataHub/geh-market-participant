@@ -236,15 +236,26 @@ public sealed class Actor : IPublishDomainEvents
     public void TransferGridAreasFrom(Actor fromActor)
     {
         ArgumentNullException.ThrowIfNull(fromActor);
-        foreach (var actorGridArea in fromActor.MarketRole.GridAreas)
+
+        if (_actorStatusTransitioner.Status is ActorStatus.Active or ActorStatus.Passive)
         {
-            _domainEvents.Add(new GridAreaOwnershipAssigned(
-                ActorNumber,
-                MarketRole.Function,
-                actorGridArea.Id));
+            foreach (var actorGridArea in fromActor.MarketRole.GridAreas)
+            {
+                _domainEvents.Add(new GridAreaOwnershipAssigned(
+                    ActorNumber,
+                    MarketRole.Function,
+                    actorGridArea.Id));
+            }
         }
 
-        MarketRole.UpdateGridAreas(MarketRole.GridAreas.Concat(fromActor.MarketRole.GridAreas));
-        fromActor.MarketRole.UpdateGridAreas(Array.Empty<ActorGridArea>());
+        MarketRole = new ActorMarketRole(
+            MarketRole.Function,
+            MarketRole.GridAreas.Concat(fromActor.MarketRole.GridAreas),
+            MarketRole.Comment);
+
+        fromActor.MarketRole = new ActorMarketRole(
+            MarketRole.Function,
+            [],
+            MarketRole.Comment);
     }
 }
