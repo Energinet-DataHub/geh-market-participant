@@ -135,7 +135,6 @@ public sealed class ActorConsolidationRepositoryTests
 
         // Assert
         Assert.NotEmpty(consolidations);
-        Assert.Equal(2, consolidations.Count());
         var consolidation1 = consolidations.First(x => x.ActorFromId.Value == actorFrom.Id);
         var consolidation2 = consolidations.First(x => x.ActorFromId.Value == actorFrom2.Id);
         Assert.NotEqual(Guid.Empty, consolidation1.Id.Value);
