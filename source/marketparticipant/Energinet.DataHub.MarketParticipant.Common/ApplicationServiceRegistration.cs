@@ -117,6 +117,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<ClockUserLoginCommand>, ClockUserLoginCommandRuleSet>();
         services.AddScoped<IValidator<ConsolidateActorsCommand>, ConsolidateActorsCommandRuleSet>();
         services.AddScoped<IValidator<ScheduleConsolidateActorsCommand>, ScheduleConsolidateActorsCommandRuleSet>();
+        services.AddScoped<IValidator<GetActorConsolidationsCommand>, GetActorConsolidationsCommandRuleSet>();
 
         services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
         services.AddScoped<IActorCertificateExpirationService, ActorCertificateExpirationService>();

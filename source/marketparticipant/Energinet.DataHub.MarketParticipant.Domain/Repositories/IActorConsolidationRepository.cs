@@ -32,18 +32,17 @@ public interface IActorConsolidationRepository
     Task<ActorConsolidationId> AddAsync(ActorConsolidation actorConsolidation);
 
     /// <summary>
+    /// Gets a List of all <see cref="ActorConsolidation"/>.
+    /// </summary>
+    /// <returns>A list of <see cref="ActorConsolidation"/>.</returns>
+    Task<IEnumerable<ActorConsolidation>> GetAsync();
+
+    /// <summary>
     /// Gets a <see cref="ActorConsolidation"/> with the specified <see cref="ActorConsolidationId">id</see>.
     /// </summary>
     /// <param name="id">The <see cref="ActorConsolidationId">id</see> of the <see cref="ActorConsolidation"/> to get.</param>
     /// <returns>The specified <see cref="ActorConsolidation"/>; or null if not found.</returns>
     Task<ActorConsolidation?> GetAsync(ActorConsolidationId id);
-
-    /// <summary>
-    /// Gets a list of <see cref="ActorConsolidation"/> where the specified <see cref="ActorId">id</see> is either from or to.
-    /// </summary>
-    /// <param name="id">The <see cref="ActorId">id</see> of the <see cref="Actor">Actor</see> you want to get consolidations for.</param>
-    /// <returns>A List of <see cref="ActorConsolidation">consolidations</see>; or empty list if none found.</returns>
-    Task<IEnumerable<ActorConsolidation>> GetByActorIdAsync(ActorId id);
 
     /// <summary>
     /// Gets a list of <see cref="ActorConsolidation"/> that are ready to be consolidated.
