@@ -35,10 +35,7 @@ public sealed class CutoffRepository : ICutoffRepository
     {
         var cutoff = await _context.Cutoffs.SingleOrDefaultAsync(x => x.Type == (int)type).ConfigureAwait(false);
 
-        if (cutoff == null)
-        {
-            cutoff = await InsertCutoffAsync(type, Instant.FromUnixTimeTicks(0)).ConfigureAwait(false);
-        }
+        cutoff ??= await InsertCutoffAsync(type, Instant.FromUnixTimeTicks(0)).ConfigureAwait(false);
 
         return cutoff.Timestamp.ToInstant();
     }
