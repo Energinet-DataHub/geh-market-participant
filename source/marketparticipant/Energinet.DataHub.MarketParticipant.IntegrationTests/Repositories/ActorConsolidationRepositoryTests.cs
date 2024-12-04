@@ -106,15 +106,15 @@ public sealed class ActorConsolidationRepositoryTests
         var consolidationRepository2 = new ActorConsolidationRepository(context2);
         var scheduledAt = DateTimeOffset.Now.Date.AddMonths(2).ToDateTimeOffset().ToInstant();
         var actorFrom = await _fixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test1.dk" })),
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test11.dk" })),
             TestPreparationEntities.ValidActor,
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.EnergySupplier));
         var actorFrom2 = await _fixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test2.dk" })),
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test12.dk" })),
             TestPreparationEntities.ValidActor,
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.EnergySupplier));
         var actorTo = await _fixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test3.dk" })),
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test13.dk" })),
             TestPreparationEntities.ValidActor,
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.EnergySupplier));
 
