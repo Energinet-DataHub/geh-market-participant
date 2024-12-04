@@ -127,5 +127,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<ICertificateValidation, NoCertificateValidation>();
         services.AddScoped<IPermissionRelationService, PermissionRelationService>();
         services.AddScoped<IBalanceResponsiblePartiesChangedEventHandler, BalanceResponsiblePartiesChangedEventHandler>();
+        services.AddScoped<IActorConsolidationService, ActorConsolidationService>();
+        services.AddScoped<IActorCredentialsRemovalService, ActorCredentialsRemovalService>();
     }
 }

@@ -21,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
@@ -29,23 +28,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 public sealed class RemoveActorCredentialsHandler : IRequestHandler<RemoveActorCredentialsCommand>
 {
     private readonly IActorRepository _actorRepository;
-    private readonly ICertificateService _certificateService;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IDomainEventRepository _domainEventRepository;
-    private readonly IActorClientSecretService _actorClientSecretService;
+    private readonly IActorCredentialsRemovalService _actorCredentialsRemovalService;
 
     public RemoveActorCredentialsHandler(
         IActorRepository actorRepository,
-        ICertificateService certificateService,
         IUnitOfWorkProvider unitOfWorkProvider,
         IDomainEventRepository domainEventRepository,
-        IActorClientSecretService actorClientSecretService)
+        IActorCredentialsRemovalService actorCredentialsRemovalService)
     {
         _actorRepository = actorRepository;
-        _certificateService = certificateService;
         _unitOfWorkProvider = unitOfWorkProvider;
         _domainEventRepository = domainEventRepository;
-        _actorClientSecretService = actorClientSecretService;
+        _actorCredentialsRemovalService = actorCredentialsRemovalService;
     }
 
     public async Task Handle(RemoveActorCredentialsCommand request, CancellationToken cancellationToken)
@@ -58,22 +54,7 @@ public sealed class RemoveActorCredentialsHandler : IRequestHandler<RemoveActorC
 
         NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
-        if (actor.Credentials is null)
-            return;
-
-        switch (actor.Credentials)
-        {
-            case ActorCertificateCredentials certificateCredentials:
-                await _certificateService.RemoveCertificateAsync(certificateCredentials.KeyVaultSecretIdentifier).ConfigureAwait(false);
-                break;
-            case ActorClientSecretCredentials when actor.ExternalActorId is not null:
-                await _actorClientSecretService.RemoveSecretAsync(actor).ConfigureAwait(false);
-                break;
-            default:
-                throw new InvalidOperationException($"Actor with id {request.ActorId} does not have a known type of credentials assigned");
-        }
-
-        actor.Credentials = null;
+        await _actorCredentialsRemovalService.RemoveActorCredentialsAsync(actor).ConfigureAwait(false);
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()

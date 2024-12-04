@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
@@ -231,4 +232,30 @@ public sealed class Actor : IPublishDomainEvents
     /// Only Active and New actors can be set to passive.
     /// </summary>
     public void SetAsPassive() => _actorStatusTransitioner.SetAsPassive();
+
+    public void TransferGridAreasFrom(Actor fromActor)
+    {
+        ArgumentNullException.ThrowIfNull(fromActor);
+
+        if (_actorStatusTransitioner.Status is ActorStatus.Active or ActorStatus.Passive)
+        {
+            foreach (var actorGridArea in fromActor.MarketRole.GridAreas)
+            {
+                _domainEvents.Add(new GridAreaOwnershipAssigned(
+                    ActorNumber,
+                    MarketRole.Function,
+                    actorGridArea.Id));
+            }
+        }
+
+        MarketRole = new ActorMarketRole(
+            MarketRole.Function,
+            MarketRole.GridAreas.Concat(fromActor.MarketRole.GridAreas),
+            MarketRole.Comment);
+
+        fromActor.MarketRole = new ActorMarketRole(
+            MarketRole.Function,
+            [],
+            MarketRole.Comment);
+    }
 }
