@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 
@@ -20,4 +21,4 @@ public sealed record ActorConsolidationDto(
     Guid ActorFromId,
     Guid ActorToId,
     DateTimeOffset ConsolidateAt,
-    string Status);
+    ActorConsolidationStatus Status);

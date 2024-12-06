@@ -45,6 +45,6 @@ public sealed class GetActorConsolidationsHandler : IRequestHandler<GetActorCons
             x.ActorFromId.Value,
             x.ActorToId.Value,
             x.ConsolidateAt.ToDateTimeOffset(),
-            x.Status.ToString())));
+            x.Status)));
     }
 }
