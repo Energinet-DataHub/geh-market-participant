@@ -13,14 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -48,7 +44,7 @@ public sealed class ActorConsolidationServiceIntegrationTests
     public async Task ConsolidateAsync_GridAreasAreTransferred_NoException()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
         await using var context = _databaseFixture.DatabaseManager.CreateDbContext();
 

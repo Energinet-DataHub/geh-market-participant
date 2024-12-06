@@ -23,13 +23,15 @@
     "AzureB2c:BackendObjectId": "The object id of the 'backend-b2b-app' application registration.",
     "AzureB2c:BackendSpnObjectId": "The object id of the 'backend-b2b-app' service principal (the enterprise application for the application registration).",
     "AzureB2c:BackendId": "The client id of the 'backend-b2b-app' application registration.",
-    
+
     "ConsumeServiceBusSettings:ConnectionString": "",
     "ConsumeServiceBusSettings:SharedIntegrationEventTopic": "",
     "ConsumeServiceBusSettings:IntegrationEventSubscription": "",
-    
+
     "Database:ConnectionString": "",
-    
-    "UserInvite:InviteFlowUrl": ""
+
+    "UserInvite:InviteFlowUrl": "",
+
+    "KeyVault:CertificatesKeyVault": "The address of the key vault containing the actor certificates"
   }
 }
