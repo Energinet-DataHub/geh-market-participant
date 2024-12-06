@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
@@ -28,11 +29,13 @@ using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Integration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using SendGrid.Extensions.DependencyInjection;
@@ -53,6 +56,7 @@ internal static class MarketParticipantOrganizationModuleExtensions
         services.AddOptions<ServiceBusNamespaceOptions>().BindConfiguration(ServiceBusNamespaceOptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<CvrUpdateOptions>().BindConfiguration(CvrUpdateOptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<BalanceResponsibleChangedOptions>().BindConfiguration(BalanceResponsibleChangedOptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<KeyVaultOptions>().BindConfiguration(KeyVaultOptions.SectionName).ValidateDataAnnotations();
 
         services.AddScoped<SynchronizeActorsTimerTrigger>();
         services.AddScoped<EmailEventTimerTrigger>();
@@ -73,6 +77,21 @@ internal static class MarketParticipantOrganizationModuleExtensions
         {
             var sendGridOptions = provider.GetRequiredService<IOptions<SendGridOptions>>();
             options.ApiKey = sendGridOptions.Value.ApiKey;
+        });
+
+        services.AddSingleton(provider =>
+        {
+            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
+            var defaultCredentials = new DefaultAzureCredential();
+            return new SecretClient(options.Value.CertificatesKeyVault, defaultCredentials);
+        });
+
+        services.AddSingleton<ICertificateService>(s =>
+        {
+            var certificateClient = s.GetRequiredService<SecretClient>();
+            var logger = s.GetRequiredService<ILogger<CertificateService>>();
+            var certificateValidation = s.GetRequiredService<ICertificateValidation>();
+            return new CertificateService(certificateClient, certificateValidation, logger);
         });
 
         AddHealthChecks(services);

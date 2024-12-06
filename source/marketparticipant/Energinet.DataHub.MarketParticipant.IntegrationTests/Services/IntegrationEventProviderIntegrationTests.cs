@@ -196,12 +196,12 @@ public sealed class IntegrationEventProviderIntegrationTests
     private static async Task PrepareScheduleActorConsolidationEventAsync(IServiceProvider scope)
     {
         var fromActorId = new ActorId(Guid.NewGuid());
-        var toActorId = new ActorId(Guid.NewGuid());
+        var fromActorNumber = new MockedGln();
         var scheduledAt = DateTimeOffset.UtcNow.AddMonths(2).ToInstant();
 
         var notification = new ActorConsolidationScheduled(
             fromActorId,
-            toActorId,
+            fromActorNumber,
             scheduledAt);
 
         var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();

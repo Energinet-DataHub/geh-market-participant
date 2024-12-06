@@ -89,7 +89,7 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         var query =
             from consolidation in _marketParticipantDbContext.ActorConsolidations
             where consolidation.Status == ActorConsolidationStatus.Pending &&
-                  consolidation.ConsolidateAt <= DateTimeOffset.UtcNow.AddMinutes(int.Parse(ScheduleActorConsolidationOptions.EXECUTECONSOLIDATIONTRIGGERMINUTES, CultureInfo.InvariantCulture))
+                  consolidation.ConsolidateAt <= DateTimeOffset.UtcNow.AddMinutes(60 - int.Parse(ScheduleActorConsolidationOptions.ExecuteConsolidationTriggerMinutes, CultureInfo.InvariantCulture))
             select consolidation;
 
         var consolidations = await query
