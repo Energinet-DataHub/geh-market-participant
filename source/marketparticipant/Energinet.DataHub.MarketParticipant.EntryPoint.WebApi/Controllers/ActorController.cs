@@ -280,18 +280,18 @@ public class ActorController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("consolidations")]
+    [HttpGet("consolidations")]
     [AuthorizeUser(PermissionId.ActorsManage)]
     [EnableRevision(RevisionActivities.AllConsolidationsRetrieved, typeof(ActorConsolidation))]
-    public async Task<ActionResult<GetActorConsolidationsResponse>> ActorConsolidationsAsync()
+    public async Task<ActionResult<GetActorConsolidationsResponse>> GetActorConsolidationsAsync()
     {
         if (!_userContext.CurrentUser.IsFas)
             return Unauthorized();
 
-        var actorDelegationsCommand = new GetActorConsolidationsCommand();
+        var getActorConsolidationsCommand = new GetActorConsolidationsCommand();
 
         var result = await _mediator
-            .Send(actorDelegationsCommand)
+            .Send(getActorConsolidationsCommand)
             .ConfigureAwait(false);
 
         return Ok(result);
