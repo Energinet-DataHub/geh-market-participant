@@ -19,7 +19,6 @@ using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using FluentAssertions.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -72,9 +71,11 @@ public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
             new("SendGrid:SenderEmail", "fake_value"),
             new("SendGrid:BccEmail", "fake_value"),
 
-            new("UserInvite.InviteFlowUrl", "https://fake_value"),
+            new("UserInvite:InviteFlowUrl", "https://fake_value"),
 
             new("Environment:Description", "fake_value"),
+
+            new("KeyVault:CertificatesKeyVault", "https://fake_value"),
 
             new("CvrUpdate:NotificationToEmail", "fake_value@fake_value_test.dk"),
             new("BalanceResponsibleChanged:NotificationToEmail", "fake_value@fake_value_test.dk"),

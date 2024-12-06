@@ -42,7 +42,7 @@ public sealed class ActorConsolidationScheduledIntegrationEventFactory : IIntegr
                 ReasonIdentifier = "ActorConsolidationScheduled",
                 TargetActorId = domainEvent.Recipient.ToString(),
                 TargetPermissions = permission,
-                RelatedId = domainEvent.AffectedActorId.Value.ToString(),
+                RelatedId = domainEvent.AffectedActor.ToString(),
                 OccurredAt = now.ToTimestamp(),
                 ExpiresAt = domainEvent.ConsolidateAt.ToTimestamp(),
             });
