@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Common;
 
@@ -93,4 +94,11 @@ internal static class TestPreparationModels
         DateTimeOffset.UtcNow,
         AuthenticationMethod.Undetermined,
         Array.Empty<LoginIdentity>());
+
+    public static ActorConsolidation MockedActorConsolidation() => new(
+        new ActorConsolidationId(Guid.NewGuid()),
+        new ActorId(Guid.NewGuid()),
+        new ActorId(Guid.NewGuid()),
+        Instant.FromDateTimeOffset(DateTimeOffset.UtcNow),
+        ActorConsolidationStatus.Pending);
 }

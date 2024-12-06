@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Albedo.Refraction;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -90,5 +92,62 @@ public sealed class ActorConsolidationRepositoryTests
         Assert.Equal(actorTo.Id, newConsolidation.ActorToId.Value);
         Assert.Equal(ActorConsolidationStatus.Pending, newConsolidation.Status);
         Assert.Equal(scheduledAt, newConsolidation.ConsolidateAt);
+    }
+
+    [Fact]
+    public async Task AddAsync_MultipleActorConsolidations_CanReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var consolidationRepository = new ActorConsolidationRepository(context);
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var consolidationRepository2 = new ActorConsolidationRepository(context2);
+        var scheduledAt = DateTimeOffset.Now.Date.AddMonths(2).ToDateTimeOffset().ToInstant();
+        var actorFrom = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test11.dk" })),
+            TestPreparationEntities.ValidActor,
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.EnergySupplier));
+        var actorFrom2 = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test12.dk" })),
+            TestPreparationEntities.ValidActor,
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.EnergySupplier));
+        var actorTo = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test13.dk" })),
+            TestPreparationEntities.ValidActor,
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.EnergySupplier));
+
+        var testConsolidation = new ActorConsolidation(
+            new ActorId(actorFrom.Id),
+            new ActorId(actorTo.Id),
+            scheduledAt);
+
+        var testConsolidation2 = new ActorConsolidation(
+            new ActorId(actorFrom2.Id),
+            new ActorId(actorTo.Id),
+            scheduledAt);
+
+        // Act
+        await consolidationRepository.AddAsync(testConsolidation);
+        await consolidationRepository.AddAsync(testConsolidation2);
+        var consolidations = (await consolidationRepository2.GetAsync()).ToList();
+
+        // Assert
+        Assert.NotEmpty(consolidations);
+        var consolidation1 = consolidations.First(x => x.ActorFromId.Value == actorFrom.Id);
+        var consolidation2 = consolidations.First(x => x.ActorFromId.Value == actorFrom2.Id);
+        Assert.NotEqual(Guid.Empty, consolidation1.Id.Value);
+        Assert.NotEqual(Guid.Empty, consolidation2.Id.Value);
+
+        Assert.Equal(actorFrom.Id, consolidation1.ActorFromId.Value);
+        Assert.Equal(actorTo.Id, consolidation1.ActorToId.Value);
+        Assert.Equal(ActorConsolidationStatus.Pending, consolidation1.Status);
+        Assert.Equal(scheduledAt, consolidation1.ConsolidateAt);
+
+        Assert.Equal(actorFrom2.Id, consolidation2.ActorFromId.Value);
+        Assert.Equal(actorTo.Id, consolidation2.ActorToId.Value);
+        Assert.Equal(ActorConsolidationStatus.Pending, consolidation2.Status);
+        Assert.Equal(scheduledAt, consolidation2.ConsolidateAt);
     }
 }

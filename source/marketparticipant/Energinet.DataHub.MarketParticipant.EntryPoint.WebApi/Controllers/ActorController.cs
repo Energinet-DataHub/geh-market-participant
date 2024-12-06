@@ -271,12 +271,29 @@ public class ActorController : ControllerBase
         if (!_userContext.CurrentUser.IsFas)
             return Unauthorized();
 
-        var stopMessageDelegationCommand = new ScheduleConsolidateActorsCommand(actorId, consolidationRequest);
+        var scheduleConsolidateActorsCommand = new ScheduleConsolidateActorsCommand(actorId, consolidationRequest);
 
         await _mediator
-            .Send(stopMessageDelegationCommand)
+            .Send(scheduleConsolidateActorsCommand)
             .ConfigureAwait(false);
 
         return Ok();
+    }
+
+    [HttpGet("consolidations")]
+    [AuthorizeUser(PermissionId.ActorsManage)]
+    [EnableRevision(RevisionActivities.AllConsolidationsRetrieved, typeof(ActorConsolidation))]
+    public async Task<ActionResult<GetActorConsolidationsResponse>> GetActorConsolidationsAsync()
+    {
+        if (!_userContext.CurrentUser.IsFas)
+            return Unauthorized();
+
+        var getActorConsolidationsCommand = new GetActorConsolidationsCommand();
+
+        var result = await _mediator
+            .Send(getActorConsolidationsCommand)
+            .ConfigureAwait(false);
+
+        return Ok(result);
     }
 }
