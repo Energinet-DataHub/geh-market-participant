@@ -16,6 +16,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Options;
 
 public sealed record ScheduleActorConsolidationOptions
 {
-    public const string EXECUTECONSOLIDATIONTRIGGERMINUTES = "5";
-    public const string EXECUTECONSOLIDATIONTRIGGERMINUTESCRON = EXECUTECONSOLIDATIONTRIGGERMINUTES + " * * * *";
+    public const string ExecuteConsolidationTriggerMinutes = "50";
+    public const string ExecuteConsolidationTriggerMinutesCron = ExecuteConsolidationTriggerMinutes + " * * * *";
 }

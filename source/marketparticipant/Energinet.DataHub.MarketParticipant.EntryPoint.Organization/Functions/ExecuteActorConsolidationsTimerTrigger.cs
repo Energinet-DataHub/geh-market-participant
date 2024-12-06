@@ -29,7 +29,7 @@ public sealed class ExecuteActorConsolidationsTimerTrigger
     }
 
     [Function(nameof(ExecuteActorConsolidationsTimerTrigger))]
-    public Task RunAsync([TimerTrigger(ScheduleActorConsolidationOptions.EXECUTECONSOLIDATIONTRIGGERMINUTESCRON)] FunctionContext context)
+    public Task RunAsync([TimerTrigger(ScheduleActorConsolidationOptions.ExecuteConsolidationTriggerMinutesCron)] FunctionContext context)
     {
         return _mediator.Send(new ConsolidateActorsCommand());
     }
