@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Options;
+using System;
+using System.ComponentModel.DataAnnotations;
 
-public sealed record ScheduleActorConsolidationOptions
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Options;
+
+public sealed record KeyVaultOptions
 {
-    public const string ExecuteConsolidationTriggerMinutes = "50";
-    public const string ExecuteConsolidationTriggerMinutesCron = ExecuteConsolidationTriggerMinutes + " * * * *";
+    public const string SectionName = "KeyVault";
+
+    [Required]
+    public Uri CertificatesKeyVault { get; set; } = null!;
 }

@@ -56,13 +56,11 @@ public sealed class ConsolidateActorsHandler : IRequestHandler<ConsolidateActors
                 .GetReadyToConsolidateAsync()
                 .ConfigureAwait(false);
 
-            // Do consolidation here
             foreach (var actorConsolidation in actorsReadyToConsolidate)
             {
                 await _actorConsolidationService.ConsolidateAsync(actorConsolidation).ConfigureAwait(false);
             }
 
-            // Send domain event here
             await uow.CommitAsync().ConfigureAwait(false);
         }
     }

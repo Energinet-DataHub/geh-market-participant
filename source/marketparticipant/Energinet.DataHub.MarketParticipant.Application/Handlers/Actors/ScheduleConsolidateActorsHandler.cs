@@ -110,7 +110,7 @@ public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleC
             foreach (var notificationTarget in notificationTargets)
             {
                 await _domainEventRepository
-                    .EnqueueAsync(new ActorConsolidationScheduled(notificationTarget, toActorId, actorConsolidation.ConsolidateAt))
+                    .EnqueueAsync(new ActorConsolidationScheduled(notificationTarget, fromActor.ActorNumber, actorConsolidation.ConsolidateAt))
                     .ConfigureAwait(false);
             }
 
