@@ -94,10 +94,12 @@ public sealed class ActorConsolidationServiceIntegrationTests
 
         // Assert
         var fromActor = await actorRepository.GetAsync(new ActorId(fromActorEntity.Id));
+        Assert.NotNull(fromActor);
         Assert.Equal(ActorStatus.Inactive, fromActor.Status);
         Assert.Empty(fromActor.MarketRole.GridAreas);
 
         var toActor = await actorRepository.GetAsync(new ActorId(toActorEntity.Id));
+        Assert.NotNull(toActor);
         Assert.Equal(2, toActor.MarketRole.GridAreas.Count);
 
         var gridAreas = await gridAreaRepository.GetAsync();
