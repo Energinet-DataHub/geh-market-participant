@@ -36,4 +36,9 @@ public abstract record ActorNumber
         _ when GlnActorNumber.TryCreate(value, out var gln) => gln,
         _ => new UnknownActorNumber(value)
     };
+
+    public override string ToString()
+    {
+        return Value;
+    }
 }
