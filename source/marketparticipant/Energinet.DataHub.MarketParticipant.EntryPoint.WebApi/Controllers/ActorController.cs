@@ -281,7 +281,6 @@ public class ActorController : ControllerBase
     }
 
     [HttpGet("consolidations")]
-    [AuthorizeUser(PermissionId.ActorsManage)]
     [EnableRevision(RevisionActivities.AllConsolidationsRetrieved, typeof(ActorConsolidation))]
     public async Task<ActionResult<GetActorConsolidationsResponse>> GetActorConsolidationsAsync()
     {
