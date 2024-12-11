@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
@@ -41,6 +42,15 @@ public sealed class GridAreaController : ControllerBase
     public async Task<ActionResult<IEnumerable<GridAreaDto>>> GetGridAreasAsync()
     {
         var command = new GetGridAreasCommand();
+        var response = await _mediator.Send(command).ConfigureAwait(false);
+        return Ok(response.GridAreas);
+    }
+
+    [HttpPost]
+    [EnableRevision(RevisionActivities.PublicGridAreasRetrieved, typeof(GridArea))]
+    public async Task<ActionResult<IEnumerable<GridAreaDto>>> GetRelevantGridAreasAsync(Interval perdiod)
+    {
+        var command = new GetRelevantGridAreasCommand(perdiod);
         var response = await _mediator.Send(command).ConfigureAwait(false);
         return Ok(response.GridAreas);
     }
