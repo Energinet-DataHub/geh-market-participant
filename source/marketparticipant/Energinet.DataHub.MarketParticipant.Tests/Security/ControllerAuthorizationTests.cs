@@ -34,6 +34,7 @@ public sealed class ControllerAuthorizationTests
             $"{nameof(ActorContactController)}.{nameof(ActorContactController.GetPublicActorContactsAsync)}",
             $"{nameof(ActorController)}.{nameof(ActorController.GetActorsAsync)}",
             $"{nameof(ActorController)}.{nameof(ActorController.GetSingleActorAsync)}",
+            $"{nameof(ActorController)}.{nameof(ActorController.GetActorConsolidationsAsync)}",
             $"{nameof(ActorQueryController)}.{nameof(ActorQueryController.GetSelectionActorsAsync)}",
             $"{nameof(GridAreaController)}.{nameof(GridAreaController.GetGridAreasAsync)}",
             $"{nameof(GridAreaController)}.{nameof(GridAreaController.GetGridAreaAsync)}",

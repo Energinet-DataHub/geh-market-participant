@@ -281,13 +281,9 @@ public class ActorController : ControllerBase
     }
 
     [HttpGet("consolidations")]
-    [AuthorizeUser(PermissionId.ActorsManage)]
     [EnableRevision(RevisionActivities.AllConsolidationsRetrieved, typeof(ActorConsolidation))]
     public async Task<ActionResult<GetActorConsolidationsResponse>> GetActorConsolidationsAsync()
     {
-        if (!_userContext.CurrentUser.IsFas)
-            return Unauthorized();
-
         var getActorConsolidationsCommand = new GetActorConsolidationsCommand();
 
         var result = await _mediator
