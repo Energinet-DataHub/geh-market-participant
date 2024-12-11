@@ -284,9 +284,6 @@ public class ActorController : ControllerBase
     [EnableRevision(RevisionActivities.AllConsolidationsRetrieved, typeof(ActorConsolidation))]
     public async Task<ActionResult<GetActorConsolidationsResponse>> GetActorConsolidationsAsync()
     {
-        if (!_userContext.CurrentUser.IsFas)
-            return Unauthorized();
-
         var getActorConsolidationsCommand = new GetActorConsolidationsCommand();
 
         var result = await _mediator
