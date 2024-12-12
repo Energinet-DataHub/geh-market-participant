@@ -48,7 +48,7 @@ public sealed class GetRelevantGridAreasHandler : IRequestHandler<GetRelevantGri
         var endDate = request.Period.End.ToDateTimeOffset();
 
         var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
-        var filteredByDateGridAreas = gridAreas.Where(ga => IsRelevantGridArea(ga, startDate, endDate));
+        var filteredByDateGridAreas = gridAreas.Where(ga => DoDatesOverlap(ga, startDate, endDate));
 
         var actor = await _actorRepository.GetAsync(new ActorId(_userContext.CurrentUser.ActorId)).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(actor, _userContext.CurrentUser.ActorId);
@@ -65,15 +65,18 @@ public sealed class GetRelevantGridAreasHandler : IRequestHandler<GetRelevantGri
             gridArea.ValidTo)));
     }
 
-    private static bool IsRelevantGridArea(GridArea gridArea, DateTimeOffset startDate, DateTimeOffset endDate)
+    private static bool DoDatesOverlap(GridArea gridArea, DateTimeOffset startDate, DateTimeOffset endDate)
     {
+        var convertedStartDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(startDate, "Romance Standard Time");
+        var convertedEndDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(endDate.AddMilliseconds(-1), "Romance Standard Time");
+
         if (!gridArea.ValidTo.HasValue)
         {
-            return gridArea.ValidFrom <= endDate;
+            return gridArea.ValidFrom <= convertedEndDate;
         }
 
         // formula from https://www.baeldung.com/java-check-two-date-ranges-overlap
-        var overlap = Math.Min(gridArea.ValidTo.Value.Ticks, endDate.Ticks) - Math.Max(gridArea.ValidFrom.Ticks, startDate.Ticks);
+        var overlap = Math.Min(gridArea.ValidTo.Value.Ticks, convertedEndDate.Ticks) - Math.Max(gridArea.ValidFrom.Ticks, convertedStartDate.Ticks);
         return overlap >= 0;
     }
 }

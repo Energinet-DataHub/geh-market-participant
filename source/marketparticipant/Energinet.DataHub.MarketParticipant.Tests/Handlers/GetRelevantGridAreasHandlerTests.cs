@@ -157,7 +157,7 @@ public sealed class GetRelevantGridAreasHandlerTests
 
     [Theory]
     [InlineData("01/01/2023 00:00:00", "31/12/2025 23:59:59", "01/01/2022 00:00:00", "31/01/2022 23:59:59")]
-    [InlineData("01/01/2023 00:00:00", "31/12/2025 23:59:59", "01/01/2027 00:00:00", "31/01/2027 23:59:59")]
+    [InlineData("01/01/2023 00:00:00", "31/12/2025 23:59:59", "01/01/2026 00:00:00", "31/01/2026 23:59:59")]
     [InlineData("01/01/2027 00:00:00", null, "31/12/2025 23:59:59", "31/01/2026 23:59:59")]
     public async Task Handle_InvalidDates_ReturnsEmpty(string validFrom, string? validTo, string periodStart, string periodEnd)
     {
