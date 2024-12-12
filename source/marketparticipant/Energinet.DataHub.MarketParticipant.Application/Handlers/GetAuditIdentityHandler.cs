@@ -37,6 +37,7 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
             { KnownAuditIdentityProvider.Migration.IdentityId, KnownAuditIdentityProvider.Migration },
             { KnownAuditIdentityProvider.TestFramework.IdentityId, KnownAuditIdentityProvider.TestFramework },
             { KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId, KnownAuditIdentityProvider.OrganizationBackgroundService },
+            { KnownAuditIdentityProvider.ProcessManagerBackgroundJobs.IdentityId, KnownAuditIdentityProvider.ProcessManagerBackgroundJobs },
         };
 
     private readonly IUserRepository _userRepository;
