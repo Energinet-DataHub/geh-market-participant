@@ -59,6 +59,7 @@ public static class RevisionActivities
     public const string UserAuditLogViewed = "UserAuditLogViewed";
 
     public const string PublicGridAreasRetrieved = "PublicGridAreasRetrieved";
+    public const string RelevantGridAreasRetrieved = "RelevantGridAreasRetrieved";
     public const string GridAreaCreated = "GridAreaCreated";
     public const string GridAreaEdited = "GridAreaEdited";
     public const string GridAreaAuditLogViewed = "GridAreaAuditLogViewed";

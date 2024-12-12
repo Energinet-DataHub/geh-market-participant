@@ -45,8 +45,8 @@ public sealed class GridAreaController : ControllerBase
         return Ok(response.GridAreas);
     }
 
-    [HttpPost]
-    [EnableRevision(RevisionActivities.PublicGridAreasRetrieved, typeof(GridArea))]
+    [HttpPost("relevant")]
+    [EnableRevision(RevisionActivities.RelevantGridAreasRetrieved, typeof(GridArea))]
     public async Task<ActionResult<IEnumerable<GridAreaDto>>> GetRelevantGridAreasAsync(GetRelevantGridAreasRequestDto getRelevantGridAreasRequest)
     {
         ArgumentNullException.ThrowIfNull(getRelevantGridAreasRequest);
