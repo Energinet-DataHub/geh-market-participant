@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridAreas;
 
@@ -71,6 +72,8 @@ public sealed class GetRelevantGridAreasHandler : IRequestHandler<GetRelevantGri
             return gridArea.ValidFrom <= endDate;
         }
 
-        return (gridArea.ValidFrom >= startDate && startDate <= gridArea.ValidTo) || (gridArea.ValidFrom >= endDate && endDate <= gridArea.ValidTo);
+        // formula from https://www.baeldung.com/java-check-two-date-ranges-overlap
+        var overlap = Math.Min(gridArea.ValidTo.Value.Ticks, endDate.Ticks) - Math.Max(gridArea.ValidFrom.Ticks, startDate.Ticks);
+        return overlap >= 0;
     }
 }
