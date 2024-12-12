@@ -24,8 +24,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
-using NodaTime;
-using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
 
@@ -62,12 +60,12 @@ public sealed class GetRelevantGridAreasHandlerTests
             .Setup(x => x.CurrentUser)
             .Returns(new FrontendUser(Guid.NewGuid(), mockedActor.OrganizationId.Value, mockedActor.Id.Value, true));
 
-        var period = new Interval(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero).ToInstant(), new DateTimeOffset(2024, 1, 31, 23, 59, 59, TimeSpan.Zero).ToInstant());
+        var relevantGridAreasRequest = new GetRelevantGridAreasRequestDto(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 1, 31, 23, 59, 59, TimeSpan.Zero));
 
         var target = new GetRelevantGridAreasHandler(actorRepositoryMock.Object, gridAreaRepositoryMock.Object, userContextMock.Object);
 
         // act
-        var actual = await target.Handle(new GetRelevantGridAreasCommand(new GetRelevantGridAreasRequestDto(period)), CancellationToken.None);
+        var actual = await target.Handle(new GetRelevantGridAreasCommand(relevantGridAreasRequest), CancellationToken.None);
 
         // assert
         Assert.NotEmpty(actual.GridAreas);
@@ -100,12 +98,12 @@ public sealed class GetRelevantGridAreasHandlerTests
             .Setup(x => x.CurrentUser)
             .Returns(new FrontendUser(Guid.NewGuid(), mockedActor.OrganizationId.Value, mockedActor.Id.Value, true));
 
-        var period = new Interval(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero).ToInstant(), new DateTimeOffset(2024, 1, 31, 23, 59, 59, TimeSpan.Zero).ToInstant());
+        var relevantGridAreasRequest = new GetRelevantGridAreasRequestDto(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 1, 31, 23, 59, 59, TimeSpan.Zero));
 
         var target = new GetRelevantGridAreasHandler(actorRepositoryMock.Object, gridAreaRepositoryMock.Object, userContextMock.Object);
 
         // act
-        var actual = await target.Handle(new GetRelevantGridAreasCommand(new GetRelevantGridAreasRequestDto(period)), CancellationToken.None);
+        var actual = await target.Handle(new GetRelevantGridAreasCommand(relevantGridAreasRequest), CancellationToken.None);
 
         // assert
         Assert.Empty(actual.GridAreas);
@@ -144,12 +142,12 @@ public sealed class GetRelevantGridAreasHandlerTests
             .Setup(x => x.CurrentUser)
             .Returns(new FrontendUser(Guid.NewGuid(), mockedActor.OrganizationId.Value, mockedActor.Id.Value, true));
 
-        var period = new Interval(DateTimeOffset.Parse(periodStart, new CultureInfo("da-dk")).ToInstant(), DateTimeOffset.Parse(periodEnd, new CultureInfo("da-dk")).ToInstant());
+        var relevantGridAreasRequest = new GetRelevantGridAreasRequestDto(DateTimeOffset.Parse(periodStart, new CultureInfo("da-dk")), DateTimeOffset.Parse(periodEnd, new CultureInfo("da-dk")));
 
         var target = new GetRelevantGridAreasHandler(actorRepositoryMock.Object, gridAreaRepositoryMock.Object, userContextMock.Object);
 
         // act
-        var actual = await target.Handle(new GetRelevantGridAreasCommand(new GetRelevantGridAreasRequestDto(period)), CancellationToken.None);
+        var actual = await target.Handle(new GetRelevantGridAreasCommand(relevantGridAreasRequest), CancellationToken.None);
 
         // assert
         Assert.NotEmpty(actual.GridAreas);
@@ -186,12 +184,12 @@ public sealed class GetRelevantGridAreasHandlerTests
             .Setup(x => x.CurrentUser)
             .Returns(new FrontendUser(Guid.NewGuid(), mockedActor.OrganizationId.Value, mockedActor.Id.Value, true));
 
-        var period = new Interval(DateTimeOffset.Parse(periodStart, new CultureInfo("da-dk")).ToInstant(), DateTimeOffset.Parse(periodEnd, new CultureInfo("da-dk")).ToInstant());
+        var relevantGridAreasRequest = new GetRelevantGridAreasRequestDto(DateTimeOffset.Parse(periodStart, new CultureInfo("da-dk")), DateTimeOffset.Parse(periodEnd, new CultureInfo("da-dk")));
 
         var target = new GetRelevantGridAreasHandler(actorRepositoryMock.Object, gridAreaRepositoryMock.Object, userContextMock.Object);
 
         // act
-        var actual = await target.Handle(new GetRelevantGridAreasCommand(new GetRelevantGridAreasRequestDto(period)), CancellationToken.None);
+        var actual = await target.Handle(new GetRelevantGridAreasCommand(relevantGridAreasRequest), CancellationToken.None);
 
         // assert
         Assert.Empty(actual.GridAreas);

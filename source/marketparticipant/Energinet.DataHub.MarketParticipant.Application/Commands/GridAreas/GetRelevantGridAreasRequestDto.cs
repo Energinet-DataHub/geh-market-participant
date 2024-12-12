@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using System;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 
-public record GetRelevantGridAreasRequestDto(Interval Period);
+public record GetRelevantGridAreasRequestDto(DateTimeOffset StartDate, DateTimeOffset EndDate);

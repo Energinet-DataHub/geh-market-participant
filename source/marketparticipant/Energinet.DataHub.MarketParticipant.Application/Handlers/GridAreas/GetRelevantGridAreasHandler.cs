@@ -43,11 +43,8 @@ public sealed class GetRelevantGridAreasHandler : IRequestHandler<GetRelevantGri
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        var startDate = request.GetRelevantGridAreasRequest.Period.Start.ToDateTimeOffset();
-        var endDate = request.GetRelevantGridAreasRequest.Period.End.ToDateTimeOffset();
-
         var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
-        var filteredByDateGridAreas = gridAreas.Where(ga => DoDatesOverlap(ga, startDate, endDate));
+        var filteredByDateGridAreas = gridAreas.Where(ga => DoDatesOverlap(ga, request.GetRelevantGridAreasRequest.StartDate, request.GetRelevantGridAreasRequest.EndDate));
 
         var actor = await _actorRepository.GetAsync(new ActorId(_userContext.CurrentUser.ActorId)).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(actor, _userContext.CurrentUser.ActorId);
