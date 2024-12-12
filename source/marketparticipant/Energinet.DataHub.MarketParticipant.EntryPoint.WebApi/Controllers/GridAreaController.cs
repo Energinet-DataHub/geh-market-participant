@@ -17,13 +17,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
@@ -53,7 +51,7 @@ public sealed class GridAreaController : ControllerBase
     {
         ArgumentNullException.ThrowIfNull(getRelevantGridAreasRequest);
 
-        var command = new GetRelevantGridAreasCommand(getRelevantGridAreasRequest.Period);
+        var command = new GetRelevantGridAreasCommand(getRelevantGridAreasRequest);
         var response = await _mediator.Send(command).ConfigureAwait(false);
         return Ok(response.GridAreas);
     }

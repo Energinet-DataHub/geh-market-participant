@@ -67,7 +67,7 @@ public sealed class GetRelevantGridAreasHandlerTests
         var target = new GetRelevantGridAreasHandler(actorRepositoryMock.Object, gridAreaRepositoryMock.Object, userContextMock.Object);
 
         // act
-        var actual = await target.Handle(new GetRelevantGridAreasCommand(period), CancellationToken.None);
+        var actual = await target.Handle(new GetRelevantGridAreasCommand(new GetRelevantGridAreasRequestDto(period)), CancellationToken.None);
 
         // assert
         Assert.NotEmpty(actual.GridAreas);
@@ -105,7 +105,7 @@ public sealed class GetRelevantGridAreasHandlerTests
         var target = new GetRelevantGridAreasHandler(actorRepositoryMock.Object, gridAreaRepositoryMock.Object, userContextMock.Object);
 
         // act
-        var actual = await target.Handle(new GetRelevantGridAreasCommand(period), CancellationToken.None);
+        var actual = await target.Handle(new GetRelevantGridAreasCommand(new GetRelevantGridAreasRequestDto(period)), CancellationToken.None);
 
         // assert
         Assert.Empty(actual.GridAreas);
@@ -149,7 +149,7 @@ public sealed class GetRelevantGridAreasHandlerTests
         var target = new GetRelevantGridAreasHandler(actorRepositoryMock.Object, gridAreaRepositoryMock.Object, userContextMock.Object);
 
         // act
-        var actual = await target.Handle(new GetRelevantGridAreasCommand(period), CancellationToken.None);
+        var actual = await target.Handle(new GetRelevantGridAreasCommand(new GetRelevantGridAreasRequestDto(period)), CancellationToken.None);
 
         // assert
         Assert.NotEmpty(actual.GridAreas);
@@ -191,7 +191,7 @@ public sealed class GetRelevantGridAreasHandlerTests
         var target = new GetRelevantGridAreasHandler(actorRepositoryMock.Object, gridAreaRepositoryMock.Object, userContextMock.Object);
 
         // act
-        var actual = await target.Handle(new GetRelevantGridAreasCommand(period), CancellationToken.None);
+        var actual = await target.Handle(new GetRelevantGridAreasCommand(new GetRelevantGridAreasRequestDto(period)), CancellationToken.None);
 
         // assert
         Assert.Empty(actual.GridAreas);

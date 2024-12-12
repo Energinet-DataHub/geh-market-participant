@@ -13,8 +13,7 @@
 // limitations under the License.
 
 using MediatR;
-using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
 
-public sealed record GetRelevantGridAreasCommand(Interval Period) : IRequest<GetGridAreasResponse>;
+public sealed record GetRelevantGridAreasCommand(GetRelevantGridAreasRequestDto GetRelevantGridAreasRequest) : IRequest<GetGridAreasResponse>;

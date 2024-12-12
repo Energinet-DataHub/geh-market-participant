@@ -23,7 +23,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
-using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridAreas;
 
@@ -44,8 +43,8 @@ public sealed class GetRelevantGridAreasHandler : IRequestHandler<GetRelevantGri
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        var startDate = request.Period.Start.ToDateTimeOffset();
-        var endDate = request.Period.End.ToDateTimeOffset();
+        var startDate = request.GetRelevantGridAreasRequest.Period.Start.ToDateTimeOffset();
+        var endDate = request.GetRelevantGridAreasRequest.Period.End.ToDateTimeOffset();
 
         var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
         var filteredByDateGridAreas = gridAreas.Where(ga => DoDatesOverlap(ga, startDate, endDate));
