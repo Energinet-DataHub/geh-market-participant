@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.RevisionLog.Integration.WebApi;
@@ -48,9 +49,11 @@ public sealed class GridAreaController : ControllerBase
 
     [HttpPost]
     [EnableRevision(RevisionActivities.PublicGridAreasRetrieved, typeof(GridArea))]
-    public async Task<ActionResult<IEnumerable<GridAreaDto>>> GetRelevantGridAreasAsync(Interval perdiod)
+    public async Task<ActionResult<IEnumerable<GridAreaDto>>> GetRelevantGridAreasAsync(GetRelevantGridAreasRequestDto getRelevantGridAreasRequest)
     {
-        var command = new GetRelevantGridAreasCommand(perdiod);
+        ArgumentNullException.ThrowIfNull(getRelevantGridAreasRequest);
+
+        var command = new GetRelevantGridAreasCommand(getRelevantGridAreasRequest.Period);
         var response = await _mediator.Send(command).ConfigureAwait(false);
         return Ok(response.GridAreas);
     }
