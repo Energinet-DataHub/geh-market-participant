@@ -45,6 +45,17 @@ public sealed class GridAreaController : ControllerBase
         return Ok(response.GridAreas);
     }
 
+    [HttpPost("relevant")]
+    [EnableRevision(RevisionActivities.RelevantGridAreasRetrieved, typeof(GridArea))]
+    public async Task<ActionResult<IEnumerable<GridAreaDto>>> GetRelevantGridAreasAsync(GetRelevantGridAreasRequestDto getRelevantGridAreasRequest)
+    {
+        ArgumentNullException.ThrowIfNull(getRelevantGridAreasRequest);
+
+        var command = new GetRelevantGridAreasCommand(getRelevantGridAreasRequest);
+        var response = await _mediator.Send(command).ConfigureAwait(false);
+        return Ok(response.GridAreas);
+    }
+
     [HttpGet("{gridAreaId:guid}")]
     [EnableRevision(RevisionActivities.PublicGridAreasRetrieved, typeof(GridArea), "gridAreaId")]
     public async Task<ActionResult<GridAreaDto>> GetGridAreaAsync(Guid gridAreaId)
