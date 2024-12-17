@@ -53,8 +53,8 @@ public sealed class ActorConsolidationAuditLogRepository : IActorConsolidationAu
                 entity.Timestamp.ToInstant(),
                 new AuditIdentity(entity.ChangedByUserId),
                 false,
-                entity.NewValue,
-                entity.OldValue);
+                GetSerializedActorConsolidationActorAndDate(entity.ConsolidateAt, entity.NewValue),
+                GetSerializedActorConsolidationActorAndDate(entity.ConsolidateAt, entity.OldValue));
 
         static GridAreaAuditedChange Map(ActorConsolidationAuditLogField field)
         {
@@ -84,8 +84,8 @@ public sealed class ActorConsolidationAuditLogRepository : IActorConsolidationAu
                 entity.Timestamp.ToInstant(),
                 new AuditIdentity(entity.ChangedByUserId),
                 false,
-                entity.NewValue,
-                entity.OldValue);
+                GetSerializedActorConsolidationActorAndDate(entity.ConsolidateAt, entity.NewValue),
+                GetSerializedActorConsolidationActorAndDate(entity.ConsolidateAt, entity.OldValue));
 
         static ActorAuditedChange Map(ActorConsolidationAuditLogField field)
         {
@@ -114,8 +114,9 @@ public sealed class ActorConsolidationAuditLogRepository : IActorConsolidationAu
             Timestamp = DateTimeOffset.UtcNow,
             ChangedByUserId = auditIdentity.Value,
             Field = (int)Map(change),
-            NewValue = JsonSerializer.Serialize(new { ActorId = actorConsolidation.ActorToId, actorConsolidation.ConsolidateAt }),
-            OldValue = JsonSerializer.Serialize(new { ActorId = actorConsolidation.ActorFromId, actorConsolidation.ConsolidateAt }),
+            NewValue = actorConsolidation.ActorToId.Value.ToString(),
+            OldValue = actorConsolidation.ActorFromId.Value.ToString(),
+            ConsolidateAt = actorConsolidation.ConsolidateAt.ToDateTimeOffset()
         };
 
         _context.ActorConsolidationAuditLogEntries.Add(entity);
@@ -130,5 +131,14 @@ public sealed class ActorConsolidationAuditLogRepository : IActorConsolidationAu
                 _ => throw new ArgumentOutOfRangeException(nameof(change)),
             };
         }
+    }
+
+    private static string GetSerializedActorConsolidationActorAndDate(DateTimeOffset consolidateAt, string actorId)
+    {
+        return JsonSerializer.Serialize(new ActorConsolidationActorAndDate
+        {
+            ActorId = Guid.Parse(actorId),
+            ConsolidateAt = consolidateAt
+        });
     }
 }
