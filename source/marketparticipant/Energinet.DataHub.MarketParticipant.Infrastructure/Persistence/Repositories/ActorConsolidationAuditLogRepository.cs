@@ -112,8 +112,8 @@ public sealed class ActorConsolidationAuditLogRepository : IActorConsolidationAu
             Timestamp = DateTimeOffset.UtcNow,
             ChangedByUserId = auditIdentity.Value,
             Field = (int)Map(change),
-            NewValue = actorConsolidation.ActorToId.ToString(),
-            OldValue = actorConsolidation.ActorFromId.ToString()
+            NewValue = $"{{\"ActorId\": \"{actorConsolidation.ActorToId}\",\"ConsolidationDate\": \"{actorConsolidation.ConsolidateAt}\"}}",
+            OldValue = $"{{\"ActorId\": \"{actorConsolidation.ActorFromId}\",\"ConsolidationDate\": \"{actorConsolidation.ConsolidateAt}\"}}"
         };
 
         _context.ActorConsolidationAuditLogEntries.Add(entity);
