@@ -114,8 +114,8 @@ public sealed class ActorConsolidationAuditLogRepository : IActorConsolidationAu
             Timestamp = DateTimeOffset.UtcNow,
             ChangedByUserId = auditIdentity.Value,
             Field = (int)Map(change),
-            NewValue = JsonSerializer.Serialize(new { actorConsolidation.ActorToId, actorConsolidation.ConsolidateAt }),
-            OldValue = JsonSerializer.Serialize(new { actorConsolidation.ActorFromId, actorConsolidation.ConsolidateAt }),
+            NewValue = JsonSerializer.Serialize(new { ActorId = actorConsolidation.ActorToId, actorConsolidation.ConsolidateAt }),
+            OldValue = JsonSerializer.Serialize(new { ActorId = actorConsolidation.ActorFromId, actorConsolidation.ConsolidateAt }),
         };
 
         _context.ActorConsolidationAuditLogEntries.Add(entity);
