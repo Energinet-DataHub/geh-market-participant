@@ -15,12 +15,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -112,8 +114,8 @@ public sealed class ActorConsolidationAuditLogRepository : IActorConsolidationAu
             Timestamp = DateTimeOffset.UtcNow,
             ChangedByUserId = auditIdentity.Value,
             Field = (int)Map(change),
-            NewValue = $"{{\"ActorId\": \"{actorConsolidation.ActorToId}\",\"ConsolidationDate\": \"{actorConsolidation.ConsolidateAt}\"}}",
-            OldValue = $"{{\"ActorId\": \"{actorConsolidation.ActorFromId}\",\"ConsolidationDate\": \"{actorConsolidation.ConsolidateAt}\"}}"
+            NewValue = JsonSerializer.Serialize(new { actorConsolidation.ActorToId, actorConsolidation.ConsolidateAt }),
+            OldValue = JsonSerializer.Serialize(new { actorConsolidation.ActorFromId, actorConsolidation.ConsolidateAt }),
         };
 
         _context.ActorConsolidationAuditLogEntries.Add(entity);
