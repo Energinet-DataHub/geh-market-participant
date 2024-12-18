@@ -14,16 +14,10 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model;
 
-public sealed class ActorConsolidationAuditLogEntryEntity
+public sealed class ActorConsolidationActorAndDate
 {
-    public int Id { get; set; }
-    public Guid GridAreaId { get; set; }
-    public Guid ChangedByUserId { get; set; }
-    public int Field { get; set; }
-    public string NewValue { get; set; } = null!;
-    public string OldValue { get; set; } = null!;
-    public DateTimeOffset Timestamp { get; set; }
+    public Guid ActorId { get; set; }
     public DateTimeOffset ConsolidateAt { get; set; }
 }
