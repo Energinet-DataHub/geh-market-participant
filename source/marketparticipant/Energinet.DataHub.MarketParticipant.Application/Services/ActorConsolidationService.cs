@@ -96,6 +96,8 @@ public sealed class ActorConsolidationService : IActorConsolidationService
             await _domainEventRepository
                 .EnqueueAsync(toActor)
                 .ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
         }
     }
 
