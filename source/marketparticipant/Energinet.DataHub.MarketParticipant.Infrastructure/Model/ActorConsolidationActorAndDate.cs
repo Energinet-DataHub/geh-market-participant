@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model;
 
 public sealed class ActorConsolidationActorAndDate
 {
