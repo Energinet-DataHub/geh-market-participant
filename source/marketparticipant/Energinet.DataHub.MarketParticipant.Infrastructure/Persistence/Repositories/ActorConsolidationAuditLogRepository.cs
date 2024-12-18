@@ -113,8 +113,8 @@ public sealed class ActorConsolidationAuditLogRepository : IActorConsolidationAu
             Timestamp = DateTimeOffset.UtcNow,
             ChangedByUserId = auditIdentity.Value,
             Field = (int)Map(change),
-            NewValue = actorConsolidation.ActorToId.Value.ToString(),
-            OldValue = actorConsolidation.ActorFromId.Value.ToString(),
+            NewValue = actorConsolidation.ActorToId.ToString(),
+            OldValue = actorConsolidation.ActorFromId.ToString(),
             ConsolidateAt = actorConsolidation.ConsolidateAt.ToDateTimeOffset()
         };
 
