@@ -18,6 +18,6 @@ namespace Energinet.DataHub.MarketParticipant.Application;
 
 public static class SubsystemInformation
 {
-    public static readonly Guid Id = Guid.Parse("DA19142E-D419-4ED2-9798-CE5546260F84");
-    public static readonly string Name = "mark-part";
+    public static Guid Id { get; } = Guid.Parse("DA19142E-D419-4ED2-9798-CE5546260F84");
+    public static string Name => "mark-part";
 }

@@ -16,12 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Energinet.DataHub.MarketParticipant.Tests.Handlers;
 using Moq;
@@ -66,7 +63,8 @@ public class ActorConsolidationServiceTests
             actorRepository.Object,
             auditIdentityProvider.Object,
             domainEventRepository.Object,
-            gridAreaRepository.Object);
+            gridAreaRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         actorRepository
             .Setup(repo => repo.GetAsync(validFromActor.Id))
@@ -121,7 +119,8 @@ public class ActorConsolidationServiceTests
             actorRepository.Object,
             auditIdentityProvider.Object,
             domainEventRepository.Object,
-            gridAreaRepository.Object);
+            gridAreaRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         actorRepository
             .Setup(repo => repo.GetAsync(validFromActor.Id))
@@ -173,7 +172,8 @@ public class ActorConsolidationServiceTests
             actorRepository.Object,
             auditIdentityProvider.Object,
             domainEventRepository.Object,
-            gridAreaRepository.Object);
+            gridAreaRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         actorRepository
             .Setup(repo => repo.GetAsync(validFromActor.Id))
