@@ -15,6 +15,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridAreas;
@@ -23,6 +24,8 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -74,6 +77,7 @@ public sealed class GetGridAreaAuditLogsHandlerIntegrationTests
     {
         var expectedFrom = new ActorId(Guid.NewGuid());
         var expectedTo = new ActorId(Guid.NewGuid());
+        var consolidateAt = SystemClock.Instance.GetCurrentInstant();
 
         return TestAuditOfGridAreaChangeAsync(
             response =>
@@ -83,8 +87,12 @@ public sealed class GetGridAreaAuditLogsHandlerIntegrationTests
                     .Where(log => log.AuditIdentityId != KnownAuditIdentityProvider.TestFramework.IdentityId.Value)
                     .Single(log => log.Change == GridAreaAuditedChange.ConsolidationRequested && !string.IsNullOrEmpty(log.CurrentValue));
 
-                Assert.Equal(expectedTo.ToString(), expectedLog.CurrentValue);
-                Assert.Equal(expectedFrom.ToString(), expectedLog.PreviousValue);
+                var expectedCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.CurrentValue);
+                var expectedPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.PreviousValue);
+                Assert.Equal(expectedTo.Value, expectedCurrentValue!.ActorId);
+                Assert.Equal(consolidateAt.ToDateTimeOffset(), expectedCurrentValue.ConsolidateAt);
+                Assert.Equal(expectedFrom.Value, expectedPreviousValue!.ActorId);
+                Assert.Equal(consolidateAt.ToDateTimeOffset(), expectedPreviousValue.ConsolidateAt);
             },
             async (gridArea, sp) =>
             {
@@ -94,7 +102,7 @@ public sealed class GetGridAreaAuditLogsHandlerIntegrationTests
                 var actorConsolidation = new ActorConsolidation(
                     expectedFrom,
                     expectedTo,
-                    SystemClock.Instance.GetCurrentInstant());
+                    consolidateAt);
 
                 await actorConsolidationAuditLogRepository.AuditAsync(
                     new AuditIdentity(frontendUser.CurrentUser.UserId),
@@ -118,8 +126,10 @@ public sealed class GetGridAreaAuditLogsHandlerIntegrationTests
                     .Where(log => log.AuditIdentityId != KnownAuditIdentityProvider.TestFramework.IdentityId.Value)
                     .Single(log => log.Change == GridAreaAuditedChange.ConsolidationCompleted && !string.IsNullOrEmpty(log.CurrentValue));
 
-                Assert.Equal(expectedTo.ToString(), expectedLog.CurrentValue);
-                Assert.Equal(expectedFrom.ToString(), expectedLog.PreviousValue);
+                var expectedCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.CurrentValue);
+                var expectedPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.PreviousValue);
+                Assert.Equal(expectedTo.ToString(), expectedCurrentValue.ActorId.ToString());
+                Assert.Equal(expectedFrom.ToString(), expectedPreviousValue.ActorId.ToString());
             },
             async (gridArea, sp) =>
             {

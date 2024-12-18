@@ -14,9 +14,12 @@
 
 using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -65,10 +68,13 @@ public sealed class ActorConsolidationAuditLogRepositoryTests
         var actual = (await target.GetAsync(gridAreaId)).Single();
 
         // Assert
+        var actualCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.CurrentValue);
+        var actualPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.PreviousValue);
         Assert.Equal(auditIdentity, actual.AuditIdentity);
         Assert.Equal(GridAreaAuditedChange.ConsolidationRequested, actual.Change);
-        Assert.Equal(actorConsolidation.ActorFromId.ToString(), actual.PreviousValue);
-        Assert.Equal(actorConsolidation.ActorToId.ToString(), actual.CurrentValue);
+        Assert.Equal(actorConsolidation.ActorFromId.ToString(), actualPreviousValue!.ActorId.ToString());
+        Assert.Equal(actorConsolidation.ActorToId.ToString(), actualCurrentValue!.ActorId.ToString());
+        Assert.Equal(actorConsolidation.ConsolidateAt.ToDateTimeOffset(), actualCurrentValue.ConsolidateAt);
     }
 
     [Fact]
@@ -99,9 +105,12 @@ public sealed class ActorConsolidationAuditLogRepositoryTests
         var actual = (await target.GetAsync(actorConsolidation.ActorFromId)).Single();
 
         // Assert
+        var actualCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.CurrentValue);
+        var actualPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.PreviousValue);
         Assert.Equal(auditIdentity, actual.AuditIdentity);
         Assert.Equal(ActorAuditedChange.ConsolidationRequested, actual.Change);
-        Assert.Equal(actorConsolidation.ActorFromId.ToString(), actual.PreviousValue);
-        Assert.Equal(actorConsolidation.ActorToId.ToString(), actual.CurrentValue);
+        Assert.Equal(actorConsolidation.ActorFromId.ToString(), actualPreviousValue!.ActorId.ToString());
+        Assert.Equal(actorConsolidation.ActorToId.ToString(), actualCurrentValue!.ActorId.ToString());
+        Assert.Equal(actorConsolidation.ConsolidateAt.ToDateTimeOffset(), actualCurrentValue.ConsolidateAt);
     }
 }
