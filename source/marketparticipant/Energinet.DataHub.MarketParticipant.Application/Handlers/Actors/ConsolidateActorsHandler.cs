@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.RevisionLog.Integration;
@@ -30,15 +31,18 @@ public sealed class ConsolidateActorsHandler : IRequestHandler<ConsolidateActors
     private readonly IActorConsolidationRepository _actorConsolidationRepository;
     private readonly IActorConsolidationService _actorConsolidationService;
     private readonly IRevisionLogClient _revisionLogClient;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
     public ConsolidateActorsHandler(
         IActorConsolidationRepository actorConsolidationRepository,
         IActorConsolidationService actorConsolidationService,
-        IRevisionLogClient revisionLogClient)
+        IRevisionLogClient revisionLogClient,
+        IUnitOfWorkProvider unitOfWorkProvider)
     {
         _actorConsolidationRepository = actorConsolidationRepository;
         _actorConsolidationService = actorConsolidationService;
         _revisionLogClient = revisionLogClient;
+        _unitOfWorkProvider = unitOfWorkProvider;
     }
 
     public async Task Handle(ConsolidateActorsCommand request, CancellationToken cancellationToken)
@@ -51,19 +55,34 @@ public sealed class ConsolidateActorsHandler : IRequestHandler<ConsolidateActors
 
         foreach (var actorConsolidation in actorsReadyToConsolidate)
         {
-            await _revisionLogClient
-                .LogAsync(new RevisionLogEntry(
-                    logId: Guid.NewGuid(),
-                    systemId: SubsystemInformation.Id,
-                    activity: "ConsolidateActor",
-                    occurredOn: SystemClock.Instance.GetCurrentInstant(),
-                    origin: nameof(ConsolidateActorsHandler),
-                    affectedEntityType: nameof(Actor),
-                    affectedEntityKey: actorConsolidation.ActorFromId.ToString(),
-                    payload: actorConsolidation.Id.ToString()))
+            var uow = await _unitOfWorkProvider
+                .NewUnitOfWorkAsync()
                 .ConfigureAwait(false);
 
-            await _actorConsolidationService.ConsolidateAsync(actorConsolidation).ConfigureAwait(false);
+            await using (uow.ConfigureAwait(false))
+            {
+                await _revisionLogClient
+                    .LogAsync(new RevisionLogEntry(
+                        logId: Guid.NewGuid(),
+                        systemId: SubsystemInformation.Id,
+                        activity: "ConsolidateActor",
+                        occurredOn: SystemClock.Instance.GetCurrentInstant(),
+                        origin: nameof(ConsolidateActorsHandler),
+                        affectedEntityType: nameof(Actor),
+                        affectedEntityKey: actorConsolidation.ActorFromId.ToString(),
+                        payload: actorConsolidation.Id.ToString()))
+                    .ConfigureAwait(false);
+
+                await _actorConsolidationService
+                    .ConsolidateAsync(actorConsolidation)
+                    .ConfigureAwait(false);
+
+                await _actorConsolidationRepository
+                    .AddOrUpdateAsync(actorConsolidation)
+                    .ConfigureAwait(false);
+
+                await uow.CommitAsync().ConfigureAwait(false);
+            }
         }
     }
 }

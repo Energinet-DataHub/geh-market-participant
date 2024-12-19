@@ -93,7 +93,7 @@ public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleC
                 request.Consolidation.ConsolidateAt.ToInstant());
 
             await _actorConsolidationRepository
-                .AddAsync(actorConsolidation)
+                .AddOrUpdateAsync(actorConsolidation)
                 .ConfigureAwait(false);
 
             foreach (var gridArea in fromActor.MarketRole.GridAreas)
