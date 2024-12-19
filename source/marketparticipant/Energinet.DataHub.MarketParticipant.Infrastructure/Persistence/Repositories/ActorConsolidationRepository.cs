@@ -35,7 +35,7 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task<ActorConsolidationId> AddAsync(ActorConsolidation actorConsolidation)
+    public async Task<ActorConsolidationId> AddOrUpdateAsync(ActorConsolidation actorConsolidation)
     {
         ArgumentNullException.ThrowIfNull(actorConsolidation, nameof(actorConsolidation));
 
@@ -46,7 +46,10 @@ public sealed class ActorConsolidationRepository : IActorConsolidationRepository
         }
         else
         {
-            throw new InvalidOperationException($"ActorConsolidation you are adding already exists, or has a non default id");
+            destination = await _marketParticipantDbContext
+                .ActorConsolidations
+                .FindAsync(actorConsolidation.Id.Value)
+                .ConfigureAwait(false) ?? throw new InvalidOperationException($"ActorConsolidation with id {actorConsolidation.Id.Value} is missing, even though it cannot be deleted.");
         }
 
         MapToEntity(actorConsolidation, destination);

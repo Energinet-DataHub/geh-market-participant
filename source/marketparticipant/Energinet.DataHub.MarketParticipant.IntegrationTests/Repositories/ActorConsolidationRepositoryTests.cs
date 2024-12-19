@@ -82,7 +82,7 @@ public sealed class ActorConsolidationRepositoryTests
             scheduledAt);
 
         // Act
-        var consolidationId = await consolidationRepository.AddAsync(testConsolidation);
+        var consolidationId = await consolidationRepository.AddOrUpdateAsync(testConsolidation);
         var newConsolidation = await consolidationRepository2.GetAsync(consolidationId);
 
         // Assert
@@ -129,8 +129,8 @@ public sealed class ActorConsolidationRepositoryTests
             scheduledAt);
 
         // Act
-        await consolidationRepository.AddAsync(testConsolidation);
-        await consolidationRepository.AddAsync(testConsolidation2);
+        await consolidationRepository.AddOrUpdateAsync(testConsolidation);
+        await consolidationRepository.AddOrUpdateAsync(testConsolidation2);
         var consolidations = (await consolidationRepository2.GetAsync()).ToList();
 
         // Assert

@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -32,7 +31,6 @@ public sealed class ActorConsolidationService : IActorConsolidationService
     private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IDomainEventRepository _domainEventRepository;
     private readonly IGridAreaRepository _gridAreaRepository;
-    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
     public ActorConsolidationService(
         IActorConsolidationAuditLogRepository actorConsolidationAuditLogRepository,
@@ -40,8 +38,7 @@ public sealed class ActorConsolidationService : IActorConsolidationService
         IActorRepository actorRepository,
         IAuditIdentityProvider auditIdentityProvider,
         IDomainEventRepository domainEventRepository,
-        IGridAreaRepository gridAreaRepository,
-        IUnitOfWorkProvider unitOfWorkProvider)
+        IGridAreaRepository gridAreaRepository)
     {
         _actorConsolidationAuditLogRepository = actorConsolidationAuditLogRepository;
         _actorCredentialsRemovalService = actorCredentialsRemovalService;
@@ -49,7 +46,6 @@ public sealed class ActorConsolidationService : IActorConsolidationService
         _auditIdentityProvider = auditIdentityProvider;
         _domainEventRepository = domainEventRepository;
         _gridAreaRepository = gridAreaRepository;
-        _unitOfWorkProvider = unitOfWorkProvider;
     }
 
     public async Task ConsolidateAsync(ActorConsolidation actorConsolidation)
@@ -62,43 +58,36 @@ public sealed class ActorConsolidationService : IActorConsolidationService
         var toActor = await _actorRepository.GetAsync(actorConsolidation.ActorToId).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(toActor, actorConsolidation.ActorToId.Value);
 
-        var uow = await _unitOfWorkProvider
-            .NewUnitOfWorkAsync()
+        if (fromActor.MarketRole.Function is EicFunction.GridAccessProvider
+            && toActor.MarketRole.Function is EicFunction.GridAccessProvider)
+        {
+            var actorGridAreasToTransfer = fromActor.MarketRole.GridAreas.ToList();
+
+            toActor.TransferGridAreasFrom(fromActor);
+
+            await UpdateGridAreasValidToDateAsync(actorGridAreasToTransfer, actorConsolidation.ConsolidateAt).ConfigureAwait(false);
+            await AuditLogConsolidationCompletedAsync(actorGridAreasToTransfer, actorConsolidation).ConfigureAwait(false);
+        }
+
+        await DeactivateActorAsync(fromActor).ConfigureAwait(false);
+
+        await _actorRepository
+            .AddOrUpdateAsync(fromActor)
             .ConfigureAwait(false);
 
-        await using (uow.ConfigureAwait(false))
-        {
-            if (fromActor.MarketRole.Function is EicFunction.GridAccessProvider
-                && toActor.MarketRole.Function is EicFunction.GridAccessProvider)
-            {
-                var actorGridAreasToTransfer = fromActor.MarketRole.GridAreas.ToList();
+        await _actorRepository
+            .AddOrUpdateAsync(toActor)
+            .ConfigureAwait(false);
 
-                toActor.TransferGridAreasFrom(fromActor);
+        await _domainEventRepository
+            .EnqueueAsync(fromActor)
+            .ConfigureAwait(false);
 
-                await UpdateGridAreasValidToDateAsync(actorGridAreasToTransfer, actorConsolidation.ConsolidateAt).ConfigureAwait(false);
-                await AuditLogConsolidationCompletedAsync(actorGridAreasToTransfer, actorConsolidation).ConfigureAwait(false);
-            }
+        await _domainEventRepository
+            .EnqueueAsync(toActor)
+            .ConfigureAwait(false);
 
-            await DeactivateActorAsync(fromActor).ConfigureAwait(false);
-
-            await _actorRepository
-                .AddOrUpdateAsync(fromActor)
-                .ConfigureAwait(false);
-
-            await _actorRepository
-                .AddOrUpdateAsync(toActor)
-                .ConfigureAwait(false);
-
-            await _domainEventRepository
-                .EnqueueAsync(fromActor)
-                .ConfigureAwait(false);
-
-            await _domainEventRepository
-                .EnqueueAsync(toActor)
-                .ConfigureAwait(false);
-
-            await uow.CommitAsync().ConfigureAwait(false);
-        }
+        actorConsolidation.Complete();
     }
 
     private async Task AuditLogConsolidationCompletedAsync(

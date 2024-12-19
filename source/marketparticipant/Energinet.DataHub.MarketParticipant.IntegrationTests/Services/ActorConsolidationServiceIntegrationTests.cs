@@ -15,7 +15,6 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -53,7 +52,6 @@ public sealed class ActorConsolidationServiceIntegrationTests
         var actorCredentialsRemovalService = scope.ServiceProvider.GetRequiredService<IActorCredentialsRemovalService>();
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
         var gridAreaRepository = scope.ServiceProvider.GetRequiredService<IGridAreaRepository>();
-        var unitOfWorkProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
 
         var auditIdentityProvider = new Mock<IAuditIdentityProvider>();
         auditIdentityProvider.Setup(repo => repo.IdentityId).Returns(new Domain.Model.Users.AuditIdentity(Guid.NewGuid()));
@@ -88,8 +86,7 @@ public sealed class ActorConsolidationServiceIntegrationTests
             actorRepository,
             auditIdentityProvider.Object,
             domainEventRepository.Object,
-            gridAreaRepository,
-            unitOfWorkProvider);
+            gridAreaRepository);
 
         var scheduledAt = Instant.FromUtc(2024, 1, 1, 10, 59);
 
