@@ -36,9 +36,14 @@ public sealed class ActorConsolidation
         Status = status;
     }
 
-    public ActorConsolidationId Id { get; init; }
-    public ActorId ActorFromId { get; init; }
-    public ActorId ActorToId { get; init; }
-    public Instant ConsolidateAt { get; set; }
-    public ActorConsolidationStatus Status { get; set; }
+    public ActorConsolidationId Id { get; }
+    public ActorId ActorFromId { get; }
+    public ActorId ActorToId { get; }
+    public Instant ConsolidateAt { get; }
+    public ActorConsolidationStatus Status { get; private set; }
+
+    public void Complete()
+    {
+        Status = ActorConsolidationStatus.Executed;
+    }
 }
