@@ -76,8 +76,11 @@ public sealed class ActorConsolidationAuditLogRepository : IActorConsolidationAu
             .ToListAsync()
             .ConfigureAwait(false);
 
+        var distinctEntities = entities
+            .DistinctBy(log => new { log.OldValue, log.NewValue });
+
         return
-            from entity in entities
+            from entity in distinctEntities
             let change = Map((ActorConsolidationAuditLogField)entity.Field)
             select new AuditLog<ActorAuditedChange>(
                 change,
