@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IActorConsolidationRepository
 {
     /// <summary>
-    /// Adds or updated an <see cref="ActorConsolidation"/>.
+    /// Adds or updates an <see cref="ActorConsolidation"/>.
     /// </summary>
     /// <param name="actorConsolidation">The actor to consolidate.</param>
     /// <returns>The <see cref="ActorConsolidationId">id</see> of the added <see cref="ActorConsolidation"/>.</returns>
