@@ -26,6 +26,9 @@ public static class KnownPermissions
 {
     public static IReadOnlyCollection<KnownPermission> All { get; } =
     [
+        new(PermissionId.Dh2BridgeImport, "dh2-bridge:import", InstantPattern.ExtendedIso.Parse("2024-12-23T00:00:00Z").Value, [
+            EicFunction.DataHubAdministrator
+        ]),
         new(PermissionId.ActorsManage, "actors:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, [
             EicFunction.DataHubAdministrator
         ]),
