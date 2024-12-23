@@ -16,7 +16,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 public enum PermissionId
 {
-    GridAreasManage = 3,
+    Dh2BridgeImport = 1,
     ActorsManage = 4,
     UsersManage = 5,
     UsersView = 6,
