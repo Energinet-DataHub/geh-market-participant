@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
@@ -52,7 +51,7 @@ public sealed class ScheduleActorConsolidationsHandlerTests
         // Act + Assert
         var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
         Assert.NotNull(exception);
-        Assert.Equal(typeof(ValidationException), exception.GetType());
+        Assert.Equal(typeof(NotFoundValidationException), exception.GetType());
         Assert.Contains(exception.Message, $"Entity '{fromActorId}' does not exist.", StringComparison.OrdinalIgnoreCase);
     }
 
@@ -80,7 +79,7 @@ public sealed class ScheduleActorConsolidationsHandlerTests
         // Act + Assert
         var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
         Assert.NotNull(exception);
-        Assert.Equal(typeof(ValidationException), exception.GetType());
+        Assert.Equal(typeof(NotFoundValidationException), exception.GetType());
         Assert.Contains(exception.Message, $"Entity '{toActorId}' does not exist.", StringComparison.OrdinalIgnoreCase);
     }
 }
