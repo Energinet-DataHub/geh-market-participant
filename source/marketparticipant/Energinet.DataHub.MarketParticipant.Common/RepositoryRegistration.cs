@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -57,5 +58,6 @@ internal static class RepositoryRegistration
         services.AddScoped<IDownloadTokenRespository, DownloadTokenRespository>();
         services.AddScoped<IB2CLogRepository, B2CLogRepository>();
         services.AddScoped<ICutoffRepository, CutoffRepository>();
+        services.AddScoped<IExistingActorConsolidationService, ExistingActorConsolidationService>();
     }
 }
