@@ -36,15 +36,15 @@ public sealed class ExistingActorConsolidationService : IExistingActorConsolidat
             .GetAsync()
             .ConfigureAwait(false)).ToList();
 
-        if (existingConsolidations.Any(consolidation => consolidation.ActorFromId == fromActorId || consolidation.ActorToId == fromActorId))
+        if (existingConsolidations.Any(consolidation => consolidation.ActorFromId == fromActorId || (consolidation.ActorToId == fromActorId && consolidation.Status == ActorConsolidationStatus.Pending)))
         {
-            throw new ValidationException("The specified From actor has already been consolidated before.")
+            throw new ValidationException("The specified From actor has already been consolidated before or is already scheduled to be consolidated in the future.")
                 .WithErrorCode("actor.consolidation.fromexists");
         }
 
-        if (existingConsolidations.Any(consolidation => consolidation.ActorToId == fromActorId || consolidation.ActorFromId == toActorId))
+        if (existingConsolidations.Any(consolidation => consolidation.ActorFromId == toActorId))
         {
-            throw new ValidationException("The specified From actor has an existing consolidation scheduled already.")
+            throw new ValidationException("The specified From actor has already been, or is, in an existing consolidation as the discontinued actor.")
                 .WithErrorCode("actor.consolidation.toexists");
         }
     }
