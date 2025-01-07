@@ -39,13 +39,13 @@ public sealed class ExistingActorConsolidationService : IExistingActorConsolidat
         if (existingConsolidations.Any(consolidation => consolidation.ActorFromId == fromActorId || (consolidation.ActorToId == fromActorId && consolidation.Status == ActorConsolidationStatus.Pending)))
         {
             throw new ValidationException("The specified From actor has already been consolidated before or is already scheduled to be consolidated in the future.")
-                .WithErrorCode("actor.consolidation.fromexists");
+                .WithErrorCode("actor.consolidation.frominvalid");
         }
 
         if (existingConsolidations.Any(consolidation => consolidation.ActorFromId == toActorId))
         {
-            throw new ValidationException("The specified From actor has already been, or is, in an existing consolidation as the discontinued actor.")
-                .WithErrorCode("actor.consolidation.toexists");
+            throw new ValidationException("The specified To actor has already been, or is, in an existing consolidation as the discontinued actor.")
+                .WithErrorCode("actor.consolidation.toinvalid");
         }
     }
 }
