@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 using NodaTime.Extensions;
 
@@ -36,6 +37,7 @@ public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleC
     private readonly IDomainEventRepository _domainEventRepository;
     private readonly IActorRepository _actorRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+    private readonly IExistingActorConsolidationService _existingActorConsolidationService;
 
     public ScheduleConsolidateActorsHandler(
         IAuditIdentityProvider auditIdentityProvider,
@@ -43,7 +45,8 @@ public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleC
         IActorConsolidationRepository actorConsolidationRepository,
         IDomainEventRepository domainEventRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
-        IActorRepository actorRepository)
+        IActorRepository actorRepository,
+        IExistingActorConsolidationService existingActorConsolidationService)
     {
         _auditIdentityProvider = auditIdentityProvider;
         _actorConsolidationAuditLogRepository = actorConsolidationAuditLogRepository;
@@ -51,6 +54,7 @@ public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleC
         _domainEventRepository = domainEventRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _actorRepository = actorRepository;
+        _existingActorConsolidationService = existingActorConsolidationService;
     }
 
     public async Task Handle(ScheduleConsolidateActorsCommand request, CancellationToken cancellationToken)
@@ -64,6 +68,11 @@ public sealed class ScheduleConsolidateActorsHandler : IRequestHandler<ScheduleC
         var toActorId = new ActorId(request.Consolidation.ToActorId);
         var toActor = await _actorRepository.GetAsync(toActorId).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(toActor, request.Consolidation.ToActorId);
+
+        // Ensure that the actors are not already consolidated
+        await _existingActorConsolidationService
+            .CheckExistingConsolidationAsync(fromActorId, toActorId)
+            .ConfigureAwait(false);
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()
