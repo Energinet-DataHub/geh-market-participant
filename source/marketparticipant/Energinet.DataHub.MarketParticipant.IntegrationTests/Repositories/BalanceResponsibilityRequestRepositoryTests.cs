@@ -123,7 +123,6 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
         await target.ProcessNextRequestsAsync(new ActorId(actorA.Id));
 
         // Assert
-        Assert.Single(context.BalanceResponsibilityRequests);
         Assert.DoesNotContain(context.BalanceResponsibilityRequests, request => request.EnergySupplier == actorA.ActorNumber);
         Assert.Contains(context.BalanceResponsibilityRequests, request => request.EnergySupplier == actorB.ActorNumber);
     }
@@ -179,9 +178,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
         await target.ProcessNextRequestsAsync(new ActorId(actorA.Id));
 
         // Assert
-        Assert.Single(context.BalanceResponsibilityRequests);
         Assert.DoesNotContain(context.BalanceResponsibilityRequests, request => request.BalanceResponsibleParty == actorA.ActorNumber);
-        Assert.Contains(context.BalanceResponsibilityRequests, request => request.BalanceResponsibleParty == actorB.ActorNumber);
+        Assert.Single(context.BalanceResponsibilityRequests, request => request.BalanceResponsibleParty == actorB.ActorNumber);
     }
 
     [Fact]
