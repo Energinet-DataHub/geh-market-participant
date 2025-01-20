@@ -79,7 +79,7 @@ public sealed class GetBalanceResponsibilityRelationsHandlerIntegrationTests(Mar
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E18Production,
-            new DateTime(2020, 1, 1).ToInstant(),
+            new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             null);
 
         var balanceResponsibilityRequestRepository = scope.ServiceProvider.GetRequiredService<IBalanceResponsibilityRequestRepository>();
@@ -125,7 +125,7 @@ public sealed class GetBalanceResponsibilityRelationsHandlerIntegrationTests(Mar
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E18Production,
-            new DateTime(2020, 1, 1).ToInstant(),
+            new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             null);
 
         var balanceResponsibilityRequestRepository = scope.ServiceProvider.GetRequiredService<IBalanceResponsibilityRequestRepository>();
@@ -176,7 +176,7 @@ public sealed class GetBalanceResponsibilityRelationsHandlerIntegrationTests(Mar
             ActorNumber.Create(actorC.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E18Production,
-            new DateTime(2020, 1, 1).ToInstant(),
+            new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             null);
 
         var balanceResponsibilityRequestB = new BalanceResponsibilityRequest(
@@ -184,7 +184,7 @@ public sealed class GetBalanceResponsibilityRelationsHandlerIntegrationTests(Mar
             ActorNumber.Create(actorC.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E18Production,
-            new DateTime(2020, 1, 1).ToInstant(),
+            new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             null);
 
         var balanceResponsibilityRequestRepository = scope.ServiceProvider.GetRequiredService<IBalanceResponsibilityRequestRepository>();
@@ -236,7 +236,7 @@ public sealed class GetBalanceResponsibilityRelationsHandlerIntegrationTests(Mar
             ActorNumber.Create(actorC.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E18Production,
-            new DateTime(2020, 1, 1).ToInstant(),
+            new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             null);
 
         var balanceResponsibilityRequestB = new BalanceResponsibilityRequest(
@@ -244,7 +244,7 @@ public sealed class GetBalanceResponsibilityRelationsHandlerIntegrationTests(Mar
             ActorNumber.Create(actorC.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E18Production,
-            new DateTime(2020, 1, 1).ToInstant(),
+            new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             null);
 
         var balanceResponsibilityRequestRepository = scope.ServiceProvider.GetRequiredService<IBalanceResponsibilityRequestRepository>();

@@ -242,7 +242,7 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToInstant(),
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             null);
 
         await target.EnqueueAsync(balanceResponsibilityRequest);
@@ -282,7 +282,7 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToInstant(),
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             null);
 
         await target.EnqueueAsync(balanceResponsibilityRequestA);
@@ -294,8 +294,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToInstant(),
-            new DateTime(2024, 4, 17).ToInstant());
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 4, 17, 0, 0, 0, DateTimeKind.Utc).ToInstant());
 
         await target.EnqueueAsync(balanceResponsibilityRequestB);
         await target.ProcessNextRequestsAsync(new ActorId(actorA.Id));
@@ -331,16 +331,16 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToInstant(),
-            new DateTime(2024, 4, 8).ToInstant());
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 4, 8, 0, 0, 0, DateTimeKind.Utc).ToInstant());
 
         var balanceResponsibilityRequestB = new BalanceResponsibilityRequest(
             ActorNumber.Create(actorA.ActorNumber),
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 8).ToInstant(),
-            new DateTime(2024, 4, 9).ToInstant());
+            new DateTime(2024, 4, 8, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 4, 9, 0, 0, 0, DateTimeKind.Utc).ToInstant());
 
         await target.EnqueueAsync(balanceResponsibilityRequestA);
         await target.EnqueueAsync(balanceResponsibilityRequestB);
@@ -352,8 +352,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 3, 7).ToInstant(),
-            new DateTime(2024, 4, 17).ToInstant());
+            new DateTime(2024, 3, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 4, 17, 0, 0, 0, DateTimeKind.Utc).ToInstant());
 
         await target.EnqueueAsync(balanceResponsibilityRequestC);
 
@@ -383,7 +383,7 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToInstant(),
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             existingPeriodEnd.ToInstant());
 
         await target.EnqueueAsync(balanceResponsibilityRequestA);
@@ -395,8 +395,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToInstant(),
-            new DateTime(2024, 4, 17).ToInstant());
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 4, 17, 0, 0, 0, DateTimeKind.Utc).ToInstant());
 
         await target.EnqueueAsync(balanceResponsibilityRequestB);
 
@@ -499,8 +499,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             balanceResponsibleParty,
             gridAreaCode,
             MeteringPointType.E18Production,
-            new DateTime(2024, 1, 1).ToInstant(),
-            new DateTime(2024, 1, 31).ToInstant());
+            new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 1, 31, 0, 0, 0, DateTimeKind.Utc).ToInstant());
     }
 
     private async Task<ActorEntity> PrepareActorAsync(EicFunction function, ActorNumber? actorNumber = null)
