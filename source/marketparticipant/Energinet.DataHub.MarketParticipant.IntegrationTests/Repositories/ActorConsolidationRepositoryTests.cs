@@ -15,13 +15,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Albedo.Refraction;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using FluentAssertions.Common;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
@@ -66,7 +64,7 @@ public sealed class ActorConsolidationRepositoryTests
         var consolidationRepository = new ActorConsolidationRepository(context);
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var consolidationRepository2 = new ActorConsolidationRepository(context2);
-        var scheduledAt = DateTimeOffset.Now.Date.AddMonths(2).ToDateTimeOffset().ToInstant();
+        var scheduledAt = DateTimeOffset.UtcNow.AddMonths(2).ToInstant();
         var actorFrom = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test1.dk" })),
             TestPreparationEntities.ValidActor,
@@ -104,7 +102,7 @@ public sealed class ActorConsolidationRepositoryTests
         var consolidationRepository = new ActorConsolidationRepository(context);
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var consolidationRepository2 = new ActorConsolidationRepository(context2);
-        var scheduledAt = DateTimeOffset.Now.Date.AddMonths(2).ToDateTimeOffset().ToInstant();
+        var scheduledAt = DateTimeOffset.UtcNow.AddMonths(2).ToInstant();
         var actorFrom = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization.Patch(t => t.Domains.Add(new OrganizationDomainEntity { Domain = "test11.dk" })),
             TestPreparationEntities.ValidActor,

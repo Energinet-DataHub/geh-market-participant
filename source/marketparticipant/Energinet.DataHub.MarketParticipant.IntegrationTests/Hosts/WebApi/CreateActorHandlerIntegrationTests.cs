@@ -21,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Nito.AsyncEx;
@@ -68,7 +67,7 @@ public sealed class CreateActorHandlerIntegrationTests
         // Assert
         Assert.Equal(createResponse.ActorId, actualActor.Actor.ActorId);
         Assert.Equal(createDto.Name.Value, actualActor.Actor.Name.Value);
-        actualActor.Actor.MarketRole.EicFunction.Should().Be(EicFunction.Delegated);
+        Assert.Equal(EicFunction.Delegated, actualActor.Actor.MarketRole.EicFunction);
     }
 
     [Fact]
@@ -102,7 +101,7 @@ public sealed class CreateActorHandlerIntegrationTests
         // Assert
         Assert.Equal(createResponseDelegatedActor.ActorId, actualDelegatedActor.Actor.ActorId);
         Assert.Equal(actualInitActor.Actor.ActorNumber, actualDelegatedActor.Actor.ActorNumber);
-        actualDelegatedActor.Actor.MarketRole.EicFunction.Should().Be(EicFunction.Delegated);
+        Assert.Equal(EicFunction.Delegated, actualDelegatedActor.Actor.MarketRole.EicFunction);
     }
 
     [Fact]

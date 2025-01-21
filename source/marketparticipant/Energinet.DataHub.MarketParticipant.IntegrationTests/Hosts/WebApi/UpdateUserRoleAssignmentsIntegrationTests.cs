@@ -23,7 +23,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -188,8 +187,8 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
 
         // Assert
         var responseLogs = response.AuditLogs.ToList();
-        responseLogs.Should().HaveCount(2);
-        responseLogs.TrueForAll(e => e.Change == UserAuditedChange.UserRoleAssigned).Should().BeTrue();
+        Assert.Equal(2, responseLogs.Count);
+        Assert.All(responseLogs, log => Assert.Equal(UserAuditedChange.UserRoleAssigned, log.Change));
     }
 
     [Fact]
@@ -241,11 +240,11 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
 
         // Assert
         var responseLogs = response.AuditLogs.ToList();
-        responseLogs.Should().HaveCount(4);
+        Assert.Equal(4, responseLogs.Count);
 
         var addedLogs = responseLogs.Where(l => l.Change == UserAuditedChange.UserRoleAssigned);
         var removedLogs = responseLogs.Where(l => l.Change == UserAuditedChange.UserRoleRemoved);
-        addedLogs.Should().HaveCount(3);
-        removedLogs.Should().HaveCount(1);
+        Assert.Equal(3, addedLogs.Count());
+        Assert.Equal(1, removedLogs.Count());
     }
 }

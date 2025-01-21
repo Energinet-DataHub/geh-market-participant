@@ -21,8 +21,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using FluentAssertions;
-using FluentAssertions.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
@@ -125,15 +123,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
         await target.ProcessNextRequestsAsync(new ActorId(actorA.Id));
 
         // Assert
-        context
-            .BalanceResponsibilityRequests
-            .Should()
-            .NotContain(request => request.EnergySupplier == actorA.ActorNumber);
-
-        context
-            .BalanceResponsibilityRequests
-            .Should()
-            .ContainSingle(request => request.EnergySupplier == actorB.ActorNumber);
+        Assert.DoesNotContain(context.BalanceResponsibilityRequests, request => request.EnergySupplier == actorA.ActorNumber);
+        Assert.Contains(context.BalanceResponsibilityRequests, request => request.EnergySupplier == actorB.ActorNumber);
     }
 
     [Fact]
@@ -158,10 +149,7 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
         await target.ProcessNextRequestsAsync(new ActorId(actorB.Id));
 
         // Assert
-        context
-            .BalanceResponsibilityRequests
-            .Should()
-            .NotContain(request => request.BalanceResponsibleParty == expected);
+        Assert.DoesNotContain(context.BalanceResponsibilityRequests, request => request.BalanceResponsibleParty == expected);
     }
 
     [Fact]
@@ -190,15 +178,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
         await target.ProcessNextRequestsAsync(new ActorId(actorA.Id));
 
         // Assert
-        context
-            .BalanceResponsibilityRequests
-            .Should()
-            .ContainSingle(request => request.BalanceResponsibleParty == actorB.ActorNumber);
-
-        context
-            .BalanceResponsibilityRequests
-            .Should()
-            .NotContain(request => request.EnergySupplier == actorA.ActorNumber);
+        Assert.DoesNotContain(context.BalanceResponsibilityRequests, request => request.BalanceResponsibleParty == actorA.ActorNumber);
+        Assert.Single(context.BalanceResponsibilityRequests, request => request.BalanceResponsibleParty == actorB.ActorNumber);
     }
 
     [Fact]
@@ -237,11 +218,7 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
         Assert.Equal(2, actual.Count);
         Assert.Contains(actual, relation => relation.MeteringPointType == (int)MeteringPointType.E18Production);
         Assert.Contains(actual, relation => relation.MeteringPointType == (int)MeteringPointType.E17Consumption);
-
-        context
-            .BalanceResponsibilityRequests
-            .Should()
-            .NotContain(request => request.EnergySupplier == actorA.ActorNumber);
+        Assert.DoesNotContain(context.BalanceResponsibilityRequests, request => request.EnergySupplier == actorA.ActorNumber);
     }
 
     [Fact]
@@ -263,7 +240,7 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToDateTimeOffset().ToInstant(),
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             null);
 
         await target.EnqueueAsync(balanceResponsibilityRequest);
@@ -303,7 +280,7 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToDateTimeOffset().ToInstant(),
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             null);
 
         await target.EnqueueAsync(balanceResponsibilityRequestA);
@@ -315,8 +292,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToDateTimeOffset().ToInstant(),
-            new DateTime(2024, 4, 17).ToDateTimeOffset().ToInstant());
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 4, 17, 0, 0, 0, DateTimeKind.Utc).ToInstant());
 
         await target.EnqueueAsync(balanceResponsibilityRequestB);
         await target.ProcessNextRequestsAsync(new ActorId(actorA.Id));
@@ -352,16 +329,16 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToDateTimeOffset().ToInstant(),
-            new DateTime(2024, 4, 8).ToDateTimeOffset().ToInstant());
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 4, 8, 0, 0, 0, DateTimeKind.Utc).ToInstant());
 
         var balanceResponsibilityRequestB = new BalanceResponsibilityRequest(
             ActorNumber.Create(actorA.ActorNumber),
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 8).ToDateTimeOffset().ToInstant(),
-            new DateTime(2024, 4, 9).ToDateTimeOffset().ToInstant());
+            new DateTime(2024, 4, 8, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 4, 9, 0, 0, 0, DateTimeKind.Utc).ToInstant());
 
         await target.EnqueueAsync(balanceResponsibilityRequestA);
         await target.EnqueueAsync(balanceResponsibilityRequestB);
@@ -373,8 +350,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 3, 7).ToDateTimeOffset().ToInstant(),
-            new DateTime(2024, 4, 17).ToDateTimeOffset().ToInstant());
+            new DateTime(2024, 3, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 4, 17, 0, 0, 0, DateTimeKind.Utc).ToInstant());
 
         await target.EnqueueAsync(balanceResponsibilityRequestC);
 
@@ -404,7 +381,7 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToDateTimeOffset().ToInstant(),
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
             existingPeriodEnd.ToInstant());
 
         await target.EnqueueAsync(balanceResponsibilityRequestA);
@@ -416,20 +393,16 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             ActorNumber.Create(actorB.ActorNumber),
             new GridAreaCode(gridArea.Code),
             MeteringPointType.E17Consumption,
-            new DateTime(2024, 4, 7).ToDateTimeOffset().ToInstant(),
-            new DateTime(2024, 4, 17).ToDateTimeOffset().ToInstant());
+            new DateTime(2024, 4, 7, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 4, 17, 0, 0, 0, DateTimeKind.Utc).ToInstant());
 
         await target.EnqueueAsync(balanceResponsibilityRequestB);
 
         // Assert
         if (isValid)
-        {
             await target.ProcessNextRequestsAsync(new ActorId(actorA.Id));
-        }
         else
-        {
             await Assert.ThrowsAsync<ValidationException>(() => target.ProcessNextRequestsAsync(new ActorId(actorA.Id)));
-        }
     }
 
     [Fact]
@@ -454,8 +427,9 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
         var unrecognizedActors = (await target.GetUnrecognizedActorsAsync()).ToList();
 
         // Assert
-        unrecognizedActors.Should().NotContain(balanceResponsibilityRequest.EnergySupplier);
-        unrecognizedActors.Should().NotContain(balanceResponsibilityRequest.BalanceResponsibleParty);
+        Assert.DoesNotContain(unrecognizedActors, req =>
+            req == balanceResponsibilityRequest.EnergySupplier &&
+            req == balanceResponsibilityRequest.BalanceResponsibleParty);
     }
 
     [Fact]
@@ -482,8 +456,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
         var unrecognizedActors = (await target.GetUnrecognizedActorsAsync()).ToList();
 
         // Assert
-        unrecognizedActors.Should().NotContain(balanceResponsibilityRequest.EnergySupplier);
-        unrecognizedActors.Should().Contain(balanceResponsibilityRequest.BalanceResponsibleParty);
+        Assert.DoesNotContain(unrecognizedActors, req => req == balanceResponsibilityRequest.EnergySupplier);
+        Assert.Contains(unrecognizedActors, req => req == balanceResponsibilityRequest.BalanceResponsibleParty);
     }
 
     [Fact]
@@ -509,8 +483,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
         var unrecognizedActors = (await target.GetUnrecognizedActorsAsync()).ToList();
 
         // Assert
-        unrecognizedActors.Should().NotContain(balanceResponsibilityRequest.EnergySupplier);
-        unrecognizedActors.Should().NotContain(balanceResponsibilityRequest.BalanceResponsibleParty);
+        Assert.DoesNotContain(unrecognizedActors, req => req == balanceResponsibilityRequest.EnergySupplier);
+        Assert.DoesNotContain(unrecognizedActors, req => req == balanceResponsibilityRequest.BalanceResponsibleParty);
     }
 
     private static BalanceResponsibilityRequest CreateBalanceResponsibilityRequest(
@@ -523,8 +497,8 @@ public sealed class BalanceResponsibilityRequestRepositoryTests
             balanceResponsibleParty,
             gridAreaCode,
             MeteringPointType.E18Production,
-            new DateTime(2024, 1, 1).ToDateTimeOffset().ToInstant(),
-            new DateTime(2024, 1, 31).ToDateTimeOffset().ToInstant());
+            new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc).ToInstant(),
+            new DateTime(2024, 1, 31, 0, 0, 0, DateTimeKind.Utc).ToInstant());
     }
 
     private async Task<ActorEntity> PrepareActorAsync(EicFunction function, ActorNumber? actorNumber = null)
