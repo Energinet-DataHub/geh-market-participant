@@ -42,17 +42,20 @@ public sealed class UserQueryRepository : IUserQueryRepository
     {
         ArgumentNullException.ThrowIfNull(externalUserId);
 
-        var roleAssignmentsQuery = await _marketParticipantDbContext
-            .Users
-            .Where(u => u.ExternalId == externalUserId.Value)
-            .Include(u => u.RoleAssignments)
-            .SelectMany(u => u.RoleAssignments)
-            .Select(x => x.ActorId)
+        var roleAssignmentsQuery =
+            from user in _marketParticipantDbContext.Users
+            where user.ExternalId == externalUserId.Value
+            join userRoleAssignment in _marketParticipantDbContext.UserRoleAssignments on user.Id equals userRoleAssignment.UserId
+            join actor in _marketParticipantDbContext.Actors on userRoleAssignment.ActorId equals actor.Id
+            where actor.Status == ActorStatus.Active
+            select actor.Id;
+
+        var results = await roleAssignmentsQuery
             .Distinct()
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return roleAssignmentsQuery.Select(id => new ActorId(id));
+        return results.Select(id => new ActorId(id));
     }
 
     public async Task<IEnumerable<Permission>> GetPermissionsAsync(ActorId actorId, ExternalUserId externalUserId)

@@ -96,12 +96,12 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase<
     }
 
     [Fact]
-    public async Task GetAssociatedUserActorsAsync_GivenUser_ReturnsEmptyList()
+    public async Task GetAssociatedUserActorsAsync_GivenUser_ReturnsActorId()
     {
         // Arrange
         const string target = "user/actors";
 
-        var actor = await _fixture.PrepareActorAsync();
+        var actor = await _fixture.PrepareActiveActorAsync();
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);

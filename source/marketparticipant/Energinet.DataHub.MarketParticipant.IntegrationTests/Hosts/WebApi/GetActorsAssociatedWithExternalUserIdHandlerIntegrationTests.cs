@@ -51,7 +51,7 @@ public sealed class GetActorsAssociatedWithExternalUserIdHandlerIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var actor = await _fixture.PrepareActorAsync();
+        var actor = await _fixture.PrepareActiveActorAsync();
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
@@ -125,7 +125,7 @@ public sealed class GetActorsAssociatedWithExternalUserIdHandlerIntegrationTests
         var externalUserId = await _graphServiceClientFixture.CreateUserAsync(openIdUserEmail);
         var openIdExternalUserId = await _graphServiceClientFixture.CreateUserAsync(openIdUserEmail, openIdIdentity);
 
-        var actor = await _fixture.PrepareActorAsync();
+        var actor = await _fixture.PrepareActiveActorAsync();
         var user = await _fixture.PrepareUserAsync(TestPreparationEntities.UnconnectedUser.Patch(u => u.ExternalId = externalUserId.Value));
         var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
