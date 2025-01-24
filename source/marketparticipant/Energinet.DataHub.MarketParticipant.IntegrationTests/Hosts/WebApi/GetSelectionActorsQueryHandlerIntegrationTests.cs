@@ -39,7 +39,7 @@ public sealed class GetSelectionActorsQueryHandlerIntegrationTests
     }
 
     [Fact]
-    public async Task GetSelectionActors_GivenUserId_ReturnsActors()
+    public async Task GetSelectionActors_InactiveActor_ReturnsEmptyList()
     {
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -47,6 +47,28 @@ public sealed class GetSelectionActorsQueryHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
+
+        var command = new GetSelectionActorsQueryCommand(user.Id);
+
+        // act
+        var actual = await mediator.Send(command);
+
+        // assert
+        Assert.Empty(actual.Actors);
+    }
+
+    [Fact]
+    public async Task GetSelectionActors_GivenUserId_ReturnsActors()
+    {
+        // arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var actor = await _fixture.PrepareActiveActorAsync();
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
