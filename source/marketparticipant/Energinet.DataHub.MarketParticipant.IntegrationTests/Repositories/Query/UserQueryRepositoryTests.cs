@@ -80,7 +80,7 @@ public sealed class UserQueryRepositoryTests
     }
 
     [Fact]
-    public async Task GetActorsAsync_WithActor_ReturnsCorrectId()
+    public async Task GetActorsAsync_WithInactiveActor_ReturnsEmptyList()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -97,6 +97,29 @@ public sealed class UserQueryRepositoryTests
         var actorIds = (await userRepository
             .GetActorsAsync(new ExternalUserId(user.ExternalId)))
             .ToList();
+
+        // Assert
+        Assert.Empty(actorIds);
+    }
+
+    [Fact]
+    public async Task GetActorsAsync_WithActor_ReturnsCorrectId()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
+
+        var user = await _fixture.PrepareUserAsync();
+        var actor = await _fixture.PrepareActiveActorAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
+
+        // Act
+        var actorIds = (await userRepository
+                .GetActorsAsync(new ExternalUserId(user.ExternalId)))
+                .ToList();
 
         // Assert
         Assert.NotEmpty(actorIds);
