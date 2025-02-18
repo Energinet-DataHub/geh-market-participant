@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 [IntegrationTest]
 public sealed class UserIdentityAuthenticationServiceTests
 {
-    private static readonly PhoneNumber _validPhoneNumber = new("+45 70000000");
+    private static readonly PhoneNumber _validPhoneNumber = new("+45 70700000");
 
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
     private readonly GraphServiceClientFixture _graphServiceClientFixture;
@@ -164,7 +164,7 @@ public sealed class UserIdentityAuthenticationServiceTests
             .PostAsync(
                 new PhoneAuthenticationMethod
                 {
-                    PhoneNumber = "+45 71000000",
+                    PhoneNumber = "+45 71700000",
                     PhoneType = AuthenticationPhoneType.Mobile
                 },
                 configuration => configuration.Options = new List<IRequestOption>
