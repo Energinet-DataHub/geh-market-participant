@@ -36,5 +36,7 @@ public enum PermissionId
     RequestWholesaleSettlement = 19,
     CalculationsView = 20,
     ImbalancePricesView = 21,
-    MeteringPointSearch = 22
+    MeteringPointSearch = 22,
+    CPRView = 23,
+    MeteringPointEnergySupplierView = 24
 }
