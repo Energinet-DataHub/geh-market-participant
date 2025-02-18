@@ -26,5 +26,5 @@ public interface IExternalActorIdConfigurationService
     /// Ensure that the B2C configuration matches the state of the actor.
     /// </summary>
     /// <param name="actor">The actor to configure B2C for.</param>
-    public Task AssignExternalActorIdAsync(Actor actor);
+    Task AssignExternalActorIdAsync(Actor actor);
 }

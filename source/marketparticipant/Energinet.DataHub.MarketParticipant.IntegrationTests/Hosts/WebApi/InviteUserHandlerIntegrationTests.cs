@@ -73,7 +73,7 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
             new InvitationUserDetailsDto(
                 "Invitation Integration Tests",
                 "(Always safe to delete)",
-                "+45 70000000"),
+                "+45 70700000"),
             actor.Id,
             new[] { userRole.Id });
 
