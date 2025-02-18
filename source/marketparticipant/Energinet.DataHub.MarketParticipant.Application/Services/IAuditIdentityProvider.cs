@@ -18,5 +18,5 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 public interface IAuditIdentityProvider
 {
-    public AuditIdentity IdentityId { get; }
+    AuditIdentity IdentityId { get; }
 }

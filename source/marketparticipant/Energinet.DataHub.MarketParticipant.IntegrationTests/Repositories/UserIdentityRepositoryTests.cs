@@ -81,8 +81,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             new EmailAddress(TestUserEmail),
             "User Integration Tests",
             "(Always safe to delete)",
-            new PhoneNumber("+45 70000000"),
-            new SmsAuthenticationMethod(new PhoneNumber("+45 71000000")));
+            new PhoneNumber("+45 70700000"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 71700000")));
 
         // Act
         var externalUserId = await target.CreateAsync(userIdentity);
@@ -131,8 +131,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             new EmailAddress(TestUserEmail),
             "User Integration Tests",
             "(Always safe to delete)",
-            new PhoneNumber("+45 70000000"),
-            new SmsAuthenticationMethod(new PhoneNumber("+45 71000000")));
+            new PhoneNumber("+45 70700000"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 71700000")));
 
         await target.CreateAsync(userIdentity);
 
@@ -157,8 +157,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             new RandomlyGeneratedEmailAddress(),
             "User Integration Tests",
             "(Always safe to delete)",
-            new PhoneNumber("+45 70000000"),
-            new SmsAuthenticationMethod(new PhoneNumber("+45 71000000")));
+            new PhoneNumber("+45 70700000"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 71700000")));
 
         var expected = await _graphServiceClientFixture.CreateUserAsync(userIdentity.Email.Address);
 
@@ -204,8 +204,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             new EmailAddress(TestUserEmail),
             "User Integration Tests",
             "(Always safe to delete)",
-            new PhoneNumber("+45 70000000"),
-            new SmsAuthenticationMethod(new PhoneNumber("+45 71000000")));
+            new PhoneNumber("+45 70700000"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 71700000")));
 
         // Act
         await Assert.ThrowsAsync<TimeoutException>(() => target.CreateAsync(userIdentity));
@@ -455,7 +455,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             new EmailAddress(DisabledTestUserEmail),
             "User Integration Tests",
             "(Always safe to delete)",
-            new PhoneNumber("+45 70000000"),
+            new PhoneNumber("+45 70700000"),
             new SmsAuthenticationMethod(new PhoneNumber("+45 12345678")));
 
         try
@@ -474,8 +474,8 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             new EmailAddress(DisabledTestUserEmail),
             "A",
             "B",
-            new PhoneNumber("+45 70000001"),
-            new SmsAuthenticationMethod(new PhoneNumber("+45 71000001")));
+            new PhoneNumber("+45 70700001"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 71700001")));
 
         // Act
         var externalUserId = await target.CreateAsync(updatedUserIdentityInfo);

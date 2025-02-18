@@ -168,7 +168,7 @@ public interface IMarketParticipantDbContext
     /// <summary>
     ///     Represent access to the ActorConsolidation database table.
     /// </summary>
-    public DbSet<ActorConsolidationEntity> ActorConsolidations { get; }
+    DbSet<ActorConsolidationEntity> ActorConsolidations { get; }
 
     /// <summary>
     ///     Represent access to the ActorConsolidationAuditLogEntry database table.
