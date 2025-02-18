@@ -164,7 +164,7 @@ public sealed class UserIdentityAuthenticationServiceTests
             .PostAsync(
                 new PhoneAuthenticationMethod
                 {
-                    PhoneNumber = "+45 71000000",
+                    PhoneNumber = "+45 71700000",
                     PhoneType = AuthenticationPhoneType.Mobile
                 },
                 configuration => configuration.Options = new List<IRequestOption>
