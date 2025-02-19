@@ -88,8 +88,7 @@ public static class KnownPermissions
             EicFunction.GridAccessProvider,
             EicFunction.MeteredDataResponsible,
             EicFunction.EnergySupplier,
-            EicFunction.BalanceResponsibleParty,
-            EicFunction.SystemOperator
+            EicFunction.BalanceResponsibleParty
         ]),
         new(PermissionId.ActorCredentialsManage, "actor-credentials:manage", InstantPattern.ExtendedIso.Parse("2023-10-27T00:00:00Z").Value, [
             EicFunction.DataHubAdministrator,
