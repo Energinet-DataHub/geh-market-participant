@@ -176,6 +176,9 @@ public static class KnownPermissions
          new(PermissionId.CPRView, "cpr:view", InstantPattern.ExtendedIso.Parse("2025-02-18T00:00:00Z").Value, [
             EicFunction.DataHubAdministrator,
             EicFunction.EnergySupplier
-        ])
+        ]),
+        new(PermissionId.ElectricityMarketTransactionImport, "electricity-market:import", InstantPattern.ExtendedIso.Parse("2025-02-26T00:00:00Z").Value, [
+            EicFunction.DataHubAdministrator
+        ]),
     ];
 }
