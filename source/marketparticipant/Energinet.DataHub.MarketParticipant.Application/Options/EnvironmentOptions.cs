@@ -16,7 +16,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Options;
 
 public sealed record EnvironmentOptions
 {
-    public const string SectionName = "InviteFlowUrl";
+    public const string SectionName = "Environment";
 
     public string? Description { get; set; } = null!;
 }
