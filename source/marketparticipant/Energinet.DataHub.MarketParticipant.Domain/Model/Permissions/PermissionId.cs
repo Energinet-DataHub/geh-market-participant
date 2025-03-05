@@ -38,6 +38,5 @@ public enum PermissionId
     ImbalancePricesView = 21,
     MeteringPointSearch = 22,
     CPRView = 23,
-    MeteringPointEnergySupplierView = 24,
     ElectricityMarketTransactionImport = 25,
 }
