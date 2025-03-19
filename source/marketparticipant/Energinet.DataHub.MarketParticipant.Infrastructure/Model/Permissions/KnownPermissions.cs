@@ -167,7 +167,11 @@ public static class KnownPermissions
             EicFunction.ItSupplier
         ]),
         new(PermissionId.MeteringPointSearch, "metering-point:search", InstantPattern.ExtendedIso.Parse("2024-11-29T00:00:00Z").Value, [
-            EicFunction.DataHubAdministrator
+            EicFunction.DataHubAdministrator,
+            EicFunction.EnergySupplier,
+            EicFunction.GridAccessProvider,
+            EicFunction.DanishEnergyAgency,
+            EicFunction.SystemOperator
         ]),
         new(PermissionId.CPRView, "cpr:view", InstantPattern.ExtendedIso.Parse("2025-02-18T00:00:00Z").Value, [
             EicFunction.DataHubAdministrator,
