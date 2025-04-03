@@ -47,9 +47,9 @@ public sealed class ProcessDelegation : IPublishDomainEvents
             new { Process = DelegatedProcess.ReceiveMeteringPointData, Function = EicFunction.BalanceResponsibleParty },
             new { Process = DelegatedProcess.ReceiveMeteringPointData, Function = EicFunction.EnergySupplier },
 
-            new { Process = DelegatedProcess.SendMeteringPointData, Function = EicFunction.GridAccessProvider },
-            new { Process = DelegatedProcess.SendMeteringPointData, Function = EicFunction.BalanceResponsibleParty },
-            new { Process = DelegatedProcess.SendMeteringPointData, Function = EicFunction.EnergySupplier },
+            new { Process = DelegatedProcess.OutgoingMeterData, Function = EicFunction.GridAccessProvider },
+            new { Process = DelegatedProcess.OutgoingMeterData, Function = EicFunction.BalanceResponsibleParty },
+            new { Process = DelegatedProcess.OutgoingMeterData, Function = EicFunction.EnergySupplier },
 
             new { Process = DelegatedProcess.ReceiveGapLog, Function = EicFunction.GridAccessProvider },
             new { Process = DelegatedProcess.ReceiveGapLog, Function = EicFunction.BalanceResponsibleParty },
