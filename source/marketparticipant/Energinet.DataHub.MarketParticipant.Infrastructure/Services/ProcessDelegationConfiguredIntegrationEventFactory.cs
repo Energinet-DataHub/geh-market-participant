@@ -77,7 +77,7 @@ public sealed class ProcessDelegationConfiguredIntegrationEventFactory : IIntegr
                     DelegatedProcess.RequestMeteringPointData => Model.Contracts.DelegatedProcess.ProcessRequestMeteringpointData,
                     DelegatedProcess.ReceiveMeteringPointData => Model.Contracts.DelegatedProcess.ProcessReceiveMeteringpointData,
                     DelegatedProcess.SendMeteringPointData => Model.Contracts.DelegatedProcess.ProcessSendMeteringpointData,
-                    DelegatedProcess.ReceiveGapLog => Model.Contracts.DelegatedProcess.ProcessReceiveGapLog,
+                    DelegatedProcess.ReceiveGapLog => Model.Contracts.DelegatedProcess.ProcessReceiveGapData,
                     _ => throw new InvalidOperationException($"Delegation process type {domainEvent.Process} is not supported in integration event.")
                 },
                 StartsAt = domainEvent.StartsAt.ToTimestamp(),
