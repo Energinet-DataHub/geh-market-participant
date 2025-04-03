@@ -1,7 +1,7 @@
 UPDATE [dbo].[Actor]
-SET [ActorId] = '07c635fa-8bfa-4469-9123-7ffc8fcfe2fd'
+SET [ActorId] = '6667c7a4-6f54-4a10-9327-a90e033de72c'
 WHERE [ActorId] = '23b17b7f-2927-4714-8a88-2a26291c3921';
 
 UPDATE [dbo].[User]
-SET [ExternalId] = '07055577-7891-48ec-b5f3-6c8b47a944b6'
+SET [ExternalId] = '6667c7a4-6f54-4a10-9327-a90e033de72c'
 WHERE [ExternalId] = '21f352ee-7308-4bfe-b9bf-ad8a3cb362ae';
