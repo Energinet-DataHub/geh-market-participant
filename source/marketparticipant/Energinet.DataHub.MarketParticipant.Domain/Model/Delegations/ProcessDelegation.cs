@@ -46,6 +46,14 @@ public sealed class ProcessDelegation : IPublishDomainEvents
             new { Process = DelegatedProcess.ReceiveMeteringPointData, Function = EicFunction.GridAccessProvider },
             new { Process = DelegatedProcess.ReceiveMeteringPointData, Function = EicFunction.BalanceResponsibleParty },
             new { Process = DelegatedProcess.ReceiveMeteringPointData, Function = EicFunction.EnergySupplier },
+
+            new { Process = DelegatedProcess.SendMeteringPointData, Function = EicFunction.GridAccessProvider },
+            new { Process = DelegatedProcess.SendMeteringPointData, Function = EicFunction.BalanceResponsibleParty },
+            new { Process = DelegatedProcess.SendMeteringPointData, Function = EicFunction.EnergySupplier },
+
+            new { Process = DelegatedProcess.ReceiveGapLog, Function = EicFunction.GridAccessProvider },
+            new { Process = DelegatedProcess.ReceiveGapLog, Function = EicFunction.BalanceResponsibleParty },
+            new { Process = DelegatedProcess.ReceiveGapLog, Function = EicFunction.EnergySupplier },
         }.ToLookup(k => k.Process, v => v.Function);
 
     private readonly DomainEventList _domainEvents;

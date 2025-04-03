@@ -22,4 +22,6 @@ public enum DelegatedProcess
     ReceiveWholesaleResults,
     RequestMeteringPointData,
     ReceiveMeteringPointData,
+    SendMeteringPointData,
+    ReceiveGapLog
 }
