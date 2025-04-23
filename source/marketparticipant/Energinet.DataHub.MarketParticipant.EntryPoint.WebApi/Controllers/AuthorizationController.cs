@@ -27,6 +27,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,9 +40,22 @@ public class AuthorizationController : ControllerBase
     private readonly IMediator _mediator;
     private readonly IUserContext<FrontendUser> _userContext;
 
-    public AuthorizationController(IMediator mediator, IUserContext<FrontendUser> userContext)
+    private readonly IAuthorizationService _authorizationService;
+
+    public AuthorizationController(IAuthorizationService authorizationService, IMediator mediator, IUserContext<FrontendUser> userContext)
     {
+        _authorizationService = authorizationService;
         _mediator = mediator;
         _userContext = userContext;
+    }
+
+    [HttpPost("createSignature")]
+    public async Task<ActionResult> CreateSignatureAsync()
+    {
+        //await _mediator
+        //    .Send(command)
+        //    .ConfigureAwait(false);
+
+        return Ok();
     }
 }

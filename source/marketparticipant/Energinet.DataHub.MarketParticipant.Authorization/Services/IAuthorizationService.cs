@@ -12,17 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services
-{
-    public sealed class AuthorizationService : IAuthorizationService
-    {
-        public AuthorizationService()
-        {
-        }
+namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
-        public async Task<byte[]> CreateSignatureAsync()
-        {
-           throw new NotImplementedException();
-        }
-    }
+public interface IAuthorizationService
+{
+    Task<byte[]> CreateSignatureAsync();
 }
