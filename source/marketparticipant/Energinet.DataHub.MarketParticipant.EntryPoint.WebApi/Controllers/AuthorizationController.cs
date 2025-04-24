@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -50,11 +51,14 @@ public class AuthorizationController : ControllerBase
     }
 
     [HttpPost("createSignature")]
+    [AllowAnonymous]
     public async Task<ActionResult> CreateSignatureAsync()
     {
-        //await _mediator
-        //    .Send(command)
-        //    .ConfigureAwait(false);
+        var command = new CreateSignatureCommand();
+
+        await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
         return Ok();
     }

@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services
-{
-    public sealed class AuthorizationService : IAuthorizationService
-    {
-        public AuthorizationService()
-        {
-        }
 
-        public async Task<byte[]> CreateSignatureAsync()
-        {
-           return new byte[12];
-        }
+using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+using FluentValidation;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class CreateSignatureCommandRuleSet : AbstractValidator<CreateSignatureCommand>
+{
+    public CreateSignatureCommandRuleSet()
+    {
+        //RuleFor(command => ....)
+        //  .NotEmpty();
     }
 }

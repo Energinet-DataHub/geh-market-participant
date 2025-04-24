@@ -12,17 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services
-{
-    public sealed class AuthorizationService : IAuthorizationService
-    {
-        public AuthorizationService()
-        {
-        }
+using System;
+using System.Collections.Generic;
 
-        public async Task<byte[]> CreateSignatureAsync()
-        {
-           return new byte[12];
-        }
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+
+public sealed record SignatureDto(
+    string Signature);
