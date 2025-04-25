@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
-using MediatR;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 
-public record CreateSignatureCommand(AuthorizationRestrictionDto AuthorizationRestriction) : IRequest<CreateSignatureResponse>;
+public sealed record AuthorizationRestrictionDto(
+    string MeasurementId,
+    string MeasurementDate);
