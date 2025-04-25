@@ -43,11 +43,11 @@ public class AuthorizationVerificationController : ControllerBase
 
     private readonly IAuthorizationService _authorizationService;
 
-    public AuthorizationVerificationController()
+    public AuthorizationVerificationController(IAuthorizationService authorizationService, IMediator mediator, IUserContext<FrontendUser> userContext)
     {
-        //_authorizationService = authorizationService;
-        //_mediator = mediator;
-        //_userContext = userContext;
+        _authorizationService = authorizationService;
+        _mediator = mediator;
+        _userContext = userContext;
     }
 
     [HttpPost("VerifySignature")]
@@ -56,9 +56,9 @@ public class AuthorizationVerificationController : ControllerBase
     {
         //var command = new VerifySignatureCommand();
 
-        await _mediator
-            .Send(command)
-            .ConfigureAwait(false);
+        //await _mediator
+        //    .Send(command)
+        //    .ConfigureAwait(false);
 
         return Ok();
     }
