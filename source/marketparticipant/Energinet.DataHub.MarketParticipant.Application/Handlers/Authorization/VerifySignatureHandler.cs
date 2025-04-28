@@ -17,11 +17,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using EllipticCurve;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actors;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Authorization;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
@@ -29,29 +31,51 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Authorization;
 
-public sealed class CreateSignatureHandler
-    : IRequestHandler<CreateSignatureCommand, CreateSignatureResponse>
+public sealed class VerifySignatureHandler
+    : IRequestHandler<VerifySignatureCommand, VerifySignatureResponse>
 {
     private readonly IAuthorizationService _authorizationService;
 
-    public CreateSignatureHandler(
+    public VerifySignatureHandler(
         IAuthorizationService authorizationService)
     {
         _authorizationService = authorizationService;
     }
 
-    public async Task<CreateSignatureResponse> Handle(
-        CreateSignatureCommand request,
+    public async Task<VerifySignatureResponse> Handle(
+        VerifySignatureCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        var signature = await _authorizationService
-            .CreateSignatureAsync()
-            .ConfigureAwait(false);
+        var restriction = new AuthorizationRestriction(
+            request.AuthorizationRestriction.MeasurementId,
+            request.AuthorizationRestriction.MeasurementDate);
 
-        var conversionResult = Convert.ToBase64String(signature);
+        bool result = false;
+        if (IsStringBase64(request.Signature))
+        {
+            var conversionResult = Convert.FromBase64String(request.Signature);
 
-        return new CreateSignatureResponse(new RestrictionSignatureDto(conversionResult));
+            result = await _authorizationService
+                    .VerifySignatureAsync(restriction, conversionResult)
+                    .ConfigureAwait(false);
+        }
+
+        return new VerifySignatureResponse(result);
+    }
+
+    private static bool IsStringBase64(string signature)
+    {
+        try
+        {
+            var conversionResult = Convert.FromBase64String(signature);
+            return true;
+        }
+#pragma warning disable CA1031
+        catch (Exception)
+        {
+            return false;
+        }
     }
 }

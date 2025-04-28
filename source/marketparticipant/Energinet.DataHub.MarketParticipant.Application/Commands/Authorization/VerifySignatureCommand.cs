@@ -17,4 +17,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 
-public record VerifySignatureCommand() : IRequest<CreateSignatureResponse>;
+public record VerifySignatureCommand(AuthorizationRestrictionDto AuthorizationRestriction, string Signature) : IRequest<VerifySignatureResponse>;

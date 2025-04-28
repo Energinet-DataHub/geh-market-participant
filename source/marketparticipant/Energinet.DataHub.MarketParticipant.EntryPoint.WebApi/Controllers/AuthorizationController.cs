@@ -53,27 +53,27 @@ public class AuthorizationController : ControllerBase
 
     [HttpPost("createSignature")]
     [AllowAnonymous]
-    public async Task<ActionResult> CreateSignatureAsync([FromBody] AuthorizationRestrictionDto authorizationRestriction)
+    public async Task<ActionResult> CreateSignatureAsync([FromBody] AuthorizationRestrictionDto restriction)
     {
-        var command = new CreateSignatureCommand(authorizationRestriction);
+        var command = new CreateSignatureCommand(restriction);
 
-        await _mediator
+        var result = await _mediator
             .Send(command)
             .ConfigureAwait(false);
 
-        return Ok();
+        return Ok(result);
     }
 
     [HttpPost("verifySignature")]
     [AllowAnonymous]
-    public async Task<ActionResult> VerifySignatureAsync()
+    public async Task<ActionResult> VerifySignatureAsync(AuthorizationRestrictionDto authorizationRestriction, string signature)
     {
-        var command = new VerifySignatureCommand();
+        var command = new VerifySignatureCommand(authorizationRestriction, signature);
 
-        await _mediator
+        var result = await _mediator
             .Send(command)
             .ConfigureAwait(false);
 
-        return Ok();
+        return Ok(result);
     }
 }

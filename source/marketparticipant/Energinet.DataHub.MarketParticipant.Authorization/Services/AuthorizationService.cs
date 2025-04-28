@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Runtime.InteropServices;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Authorization;
+
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 {
     public sealed class AuthorizationService : IAuthorizationService
@@ -22,7 +25,17 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 
         public async Task<byte[]> CreateSignatureAsync()
         {
-           return new byte[12];
+           return CreateStaticSignature();
+        }
+
+        public async Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, byte[] signature)
+        {
+            return CreateStaticSignature().SequenceEqual(signature);
+        }
+
+        private byte[] CreateStaticSignature()
+        {
+            return [1, 2, 3, 4];
         }
     }
 }

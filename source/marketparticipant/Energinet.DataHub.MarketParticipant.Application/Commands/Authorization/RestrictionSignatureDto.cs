@@ -17,5 +17,5 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 
-public sealed record SignatureDto(
+public sealed record RestrictionSignatureDto(
     string Signature);

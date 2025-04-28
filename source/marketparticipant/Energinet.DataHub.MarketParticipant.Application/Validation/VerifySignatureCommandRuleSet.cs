@@ -12,8 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+using FluentValidation;
 
-public sealed record VerifySignatureResponse(bool Success);
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class VerifySignatureCommandRuleSet : AbstractValidator<VerifySignatureCommand>
+{
+    public VerifySignatureCommandRuleSet()
+    {
+        //RuleFor(command => ....)
+        //  .NotEmpty();
+    }
+}

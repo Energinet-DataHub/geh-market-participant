@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Domain.Model.Authorization;
+
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
 public interface IAuthorizationService
 {
     Task<byte[]> CreateSignatureAsync();
+    Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, byte[] signature);
 }
