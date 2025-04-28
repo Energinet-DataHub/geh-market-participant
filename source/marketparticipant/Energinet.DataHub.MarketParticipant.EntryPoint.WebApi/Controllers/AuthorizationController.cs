@@ -63,4 +63,17 @@ public class AuthorizationController : ControllerBase
 
         return Ok();
     }
+
+    [HttpPost("VerifySignature")]
+    [AllowAnonymous]
+    public async Task<ActionResult> VerifySignatureAsync()
+    {
+        var command = new VerifySignatureCommand();
+
+        await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok();
+    }
 }
