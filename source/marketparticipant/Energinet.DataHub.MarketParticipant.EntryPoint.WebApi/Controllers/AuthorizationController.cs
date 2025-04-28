@@ -64,7 +64,7 @@ public class AuthorizationController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("VerifySignature")]
+    [HttpPost("verifySignature")]
     [AllowAnonymous]
     public async Task<ActionResult> VerifySignatureAsync()
     {
