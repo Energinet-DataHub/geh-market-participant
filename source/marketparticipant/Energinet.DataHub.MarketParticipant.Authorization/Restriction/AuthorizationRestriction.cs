@@ -13,9 +13,19 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 
-public sealed record RestrictionSignatureDto(
-    string Signature);
+public sealed class AuthorizationRestriction
+{
+    public AuthorizationRestriction(
+        string measurementId,
+        string measurementDate)
+    {
+        MeasurementId = measurementId;
+        MeasurementDate = measurementDate;
+    }
+
+    public string MeasurementId { get; set; }
+    public string MeasurementDate { get; set; }
+}

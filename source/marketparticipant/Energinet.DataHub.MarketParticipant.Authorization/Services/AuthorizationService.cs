@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Runtime.InteropServices;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Authorization;
+using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 {

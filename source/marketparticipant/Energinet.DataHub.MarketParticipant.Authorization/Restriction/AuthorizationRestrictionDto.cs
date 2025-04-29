@@ -14,6 +14,8 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 
-public sealed record CreateSignatureResponse(RestrictionSignatureDto Signature);
+public sealed record AuthorizationRestrictionDto(
+    string MeasurementId,
+    string MeasurementDate);

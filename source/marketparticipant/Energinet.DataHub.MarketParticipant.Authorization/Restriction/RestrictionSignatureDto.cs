@@ -15,8 +15,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 
-public sealed record AuthorizationRestrictionDto(
-    string MeasurementId,
-    string MeasurementDate);
+public sealed record RestrictionSignatureDto(
+    string Signature);
