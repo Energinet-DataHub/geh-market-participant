@@ -13,22 +13,34 @@
 // limitations under the License.
 
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Authorization;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 {
     public sealed class AuthorizationService : IAuthorizationService
     {
+        private readonly ECDsa _ecdsa = ECDsa.Create();
+
         public AuthorizationService()
         {
         }
 
+        // Copied from example. Not sure when it is called.
+        public void Dispose()
+        {
+            _ecdsa.Dispose();
+        }
+
+        // Later this task has AuthorizationRestriction and UserIdentification as input
         public async Task<byte[]> CreateSignatureAsync()
         {
-            // 1. Call api to make authorization check
-            // 2. Create a signature
+            // 1. Call api to make authorization check. (Input: AuthorizationRestriction and UserIdentification)
+            // 2. If authorization succesfull: Create a signature (Input: AuthorizationRestriction) if unautorised return null
+            // For now just a static signature
+            var signature = CreateStaticSignature();
             // 3. Return signature - ignore error handling
-           return CreateStaticSignature();
+            return signature;
         }
 
         public async Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, byte[] signature)
@@ -38,7 +50,12 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 
         private byte[] CreateStaticSignature()
         {
-            return [1, 2, 3, 4];
+            // Will be later something like this:
+            // Var binaryRestriction = restriction.ToByteArray();
+            // For now Static
+            byte[] binaryRestriction = [1, 2, 3, 4];
+            var signature = _ecdsa.SignData(binaryRestriction, HashAlgorithmName.SHA256);
+            return signature;
         }
     }
 }
