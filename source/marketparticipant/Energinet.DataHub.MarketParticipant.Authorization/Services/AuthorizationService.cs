@@ -37,25 +37,23 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
         {
             // 1. Call api to make authorization check. (Input: AuthorizationRestriction and UserIdentification)
             // 2. If authorization succesfull: Create a signature (Input: AuthorizationRestriction) if unautorised return null
-            // For now just a static signature
-            var signature = CreateStaticSignature();
+            // For now just return a static signature
+            // Will be later something like this:
+            // Var binaryRestriction = restriction.ToByteArray();
+            byte[] binaryRestriction = [1, 2, 3, 4];
+            var signature = _ecdsa.SignData(binaryRestriction, HashAlgorithmName.SHA256);
             // 3. Return signature - ignore error handling
             return signature;
         }
 
         public async Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, byte[] signature)
         {
-            return CreateStaticSignature().SequenceEqual(signature);
-        }
-
-        private byte[] CreateStaticSignature()
-        {
             // Will be later something like this:
             // Var binaryRestriction = restriction.ToByteArray();
             // For now Static
             byte[] binaryRestriction = [1, 2, 3, 4];
-            var signature = _ecdsa.SignData(binaryRestriction, HashAlgorithmName.SHA256);
-            return signature;
+            var isValid = _ecdsa.VerifyData(binaryRestriction, signature, HashAlgorithmName.SHA256);
+            return isValid;
         }
     }
 }
