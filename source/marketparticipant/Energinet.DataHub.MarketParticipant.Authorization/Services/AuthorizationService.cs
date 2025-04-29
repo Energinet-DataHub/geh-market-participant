@@ -25,6 +25,9 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 
         public async Task<byte[]> CreateSignatureAsync()
         {
+            // 1. Call api to make authorization check
+            // 2. Create a signature
+            // 3. Return signature - ignore error handling
            return CreateStaticSignature();
         }
 
