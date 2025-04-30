@@ -134,6 +134,7 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IBalanceResponsiblePartiesChangedEventHandler, BalanceResponsiblePartiesChangedEventHandler>();
         services.AddScoped<IActorConsolidationService, ActorConsolidationService>();
         services.AddScoped<IActorCredentialsRemovalService, ActorCredentialsRemovalService>();
+
         // services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddSingleton<IAuthorizationService, AuthorizationService>();
     }
