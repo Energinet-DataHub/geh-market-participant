@@ -42,7 +42,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             // Var binaryRestriction = restriction.ToByteArray();
             byte[] binaryRestriction = [1, 2, 3, 4];
             var signature = _ecdsa.SignData(binaryRestriction, HashAlgorithmName.SHA256);
-            // 3. Return signature - ignore error handling
             return signature;
         }
 
