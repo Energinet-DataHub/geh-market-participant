@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Authorization;
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using MediatR;
 
@@ -40,12 +39,10 @@ public sealed class CreateSignatureHandler
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        var signature = await _authorizationService
+        var restrictionSignatureDto = await _authorizationService
             .CreateSignatureAsync()
             .ConfigureAwait(false);
 
-        var conversionResult = Convert.ToBase64String(signature);
-
-        return new CreateSignatureResponse(new RestrictionSignatureDto(conversionResult));
+        return new CreateSignatureResponse(restrictionSignatureDto);
     }
 }
