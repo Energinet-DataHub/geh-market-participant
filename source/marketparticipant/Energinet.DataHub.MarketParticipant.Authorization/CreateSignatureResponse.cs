@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+namespace Energinet.DataHub.MarketParticipant.Authorization;
 
 public sealed record CreateSignatureResponse(RestrictionSignatureDto Signature);

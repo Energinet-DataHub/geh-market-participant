@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
-
-public sealed record VerifySignatureResponse(bool Success);
+public sealed record RestrictionSignatureDto(
+    string Signature);

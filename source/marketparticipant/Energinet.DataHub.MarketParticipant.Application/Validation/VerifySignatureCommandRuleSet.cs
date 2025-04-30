@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using FluentValidation;
 
@@ -22,7 +21,5 @@ public sealed class VerifySignatureCommandRuleSet : AbstractValidator<VerifySign
 {
     public VerifySignatureCommandRuleSet()
     {
-        //RuleFor(command => ....)
-        //  .NotEmpty();
     }
 }

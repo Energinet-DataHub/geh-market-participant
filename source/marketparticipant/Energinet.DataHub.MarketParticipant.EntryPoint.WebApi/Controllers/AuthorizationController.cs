@@ -12,25 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Delegations;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Revision;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
-using Energinet.DataHub.RevisionLog.Integration.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
@@ -53,9 +40,9 @@ public class AuthorizationController : ControllerBase
 
     [HttpPost("createSignature")]
     [AllowAnonymous]
-    public async Task<ActionResult> CreateSignatureAsync([FromBody] AuthorizationRestrictionDto restriction)
+    public async Task<ActionResult> CreateSignatureAsync()
     {
-        var command = new CreateSignatureCommand(restriction);
+        var command = new CreateSignatureCommand();
 
         var result = await _mediator
             .Send(command)
@@ -66,9 +53,9 @@ public class AuthorizationController : ControllerBase
 
     [HttpPost("verifySignature")]
     [AllowAnonymous]
-    public async Task<ActionResult> VerifySignatureAsync(AuthorizationRestrictionDto authorizationRestriction, string signature)
+    public async Task<ActionResult> VerifySignatureAsync(string signature)
     {
-        var command = new VerifySignatureCommand(authorizationRestriction, signature);
+        var command = new VerifySignatureCommand(signature);
 
         var result = await _mediator
             .Send(command)

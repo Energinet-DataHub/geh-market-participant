@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Authorization;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 
-public record CreateSignatureCommand(AuthorizationRestrictionDto AuthorizationRestriction) : IRequest<CreateSignatureResponse>;
+public record CreateSignatureCommand() : IRequest<CreateSignatureResponse>;
