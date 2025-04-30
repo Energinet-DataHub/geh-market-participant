@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.MarketParticipant.Authorization;
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
