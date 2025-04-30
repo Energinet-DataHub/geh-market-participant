@@ -47,6 +47,7 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Authorization\Energinet.DataHub.MarketParticipant.Authorization.csproj" />
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Domain\Energinet.DataHub.MarketParticipant.Domain.csproj" />
   </ItemGroup>
 
@@ -59,6 +60,12 @@ limitations under the License.
       <OutputDir>obj\contracts</OutputDir>
       <Generator>MSBuild:Compile</Generator>
     </Protobuf>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Handlers\NewFolder\**" />
+    <EmbeddedResource Remove="Handlers\NewFolder\**" />
+    <None Remove="Handlers\NewFolder\**" />
   </ItemGroup>
 
 </Project>

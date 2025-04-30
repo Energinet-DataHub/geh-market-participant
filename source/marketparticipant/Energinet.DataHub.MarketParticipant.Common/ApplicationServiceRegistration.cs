@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
@@ -28,6 +29,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
+using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
@@ -118,6 +120,8 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<ConsolidateActorsCommand>, ConsolidateActorsCommandRuleSet>();
         services.AddScoped<IValidator<ScheduleConsolidateActorsCommand>, ScheduleConsolidateActorsCommandRuleSet>();
         services.AddScoped<IValidator<GetActorConsolidationsCommand>, GetActorConsolidationsCommandRuleSet>();
+        services.AddScoped<IValidator<CreateSignatureCommand>, CreateSignatureCommandRuleSet>();
+        services.AddScoped<IValidator<VerifySignatureCommand>, VerifySignatureCommandRuleSet>();
 
         services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
         services.AddScoped<IActorCertificateExpirationService, ActorCertificateExpirationService>();
@@ -130,5 +134,6 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IBalanceResponsiblePartiesChangedEventHandler, BalanceResponsiblePartiesChangedEventHandler>();
         services.AddScoped<IActorConsolidationService, ActorConsolidationService>();
         services.AddScoped<IActorCredentialsRemovalService, ActorCredentialsRemovalService>();
+        services.AddScoped<IAuthorizationService, AuthorizationService>();
     }
 }
