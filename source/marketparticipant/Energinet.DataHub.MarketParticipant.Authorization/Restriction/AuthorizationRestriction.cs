@@ -18,6 +18,12 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 
 public sealed class AuthorizationRestriction
 {
+    public AuthorizationRestriction()
+    {
+        MeasurementId = string.Empty;
+        MeasurementDate = string.Empty;
+    }
+
     public AuthorizationRestriction(
         string measurementId,
         string measurementDate)
@@ -28,4 +34,6 @@ public sealed class AuthorizationRestriction
 
     public string MeasurementId { get; set; }
     public string MeasurementDate { get; set; }
+    public long Expires { get; set; }
+    public long Created { get; set; }
 }

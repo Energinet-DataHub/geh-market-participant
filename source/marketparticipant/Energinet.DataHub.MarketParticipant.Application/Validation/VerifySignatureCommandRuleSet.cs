@@ -22,7 +22,5 @@ public sealed class VerifySignatureCommandRuleSet : AbstractValidator<VerifySign
 {
     public VerifySignatureCommandRuleSet()
     {
-        //RuleFor(command => ....)
-        //  .NotEmpty();
     }
 }

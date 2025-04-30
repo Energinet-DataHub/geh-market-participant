@@ -42,9 +42,7 @@ public sealed class VerifySignatureHandler
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        var restriction = new AuthorizationRestriction(
-            request.AuthorizationRestriction.MeasurementId,
-            request.AuthorizationRestriction.MeasurementDate);
+        var restriction = new AuthorizationRestriction();
 
         bool result = false;
         if (IsStringBase64(request.Signature))

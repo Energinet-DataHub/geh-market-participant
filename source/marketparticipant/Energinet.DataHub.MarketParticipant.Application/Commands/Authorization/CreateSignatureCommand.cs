@@ -19,4 +19,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 
-public record CreateSignatureCommand(AuthorizationRestrictionDto AuthorizationRestriction) : IRequest<CreateSignatureResponse>;
+public record CreateSignatureCommand() : IRequest<CreateSignatureResponse>;

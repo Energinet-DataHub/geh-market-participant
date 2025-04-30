@@ -22,7 +22,5 @@ public sealed class CreateSignatureCommandRuleSet : AbstractValidator<CreateSign
 {
     public CreateSignatureCommandRuleSet()
     {
-        //RuleFor(command => ....)
-        //  .NotEmpty();
     }
 }
