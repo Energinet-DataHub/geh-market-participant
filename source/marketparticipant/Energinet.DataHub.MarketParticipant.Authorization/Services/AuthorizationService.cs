@@ -12,33 +12,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 {
     public sealed class AuthorizationService : IAuthorizationService
     {
+        private readonly ECDsa _ecdsa = ECDsa.Create();
+
         public AuthorizationService()
         {
         }
 
-        public async Task<byte[]> CreateSignatureAsync()
+        // Copied from example. Not sure when it is called.
+        public void Dispose()
         {
-            // 1. Call api to make authorization check
-            // 2. Create a signature
-            // 3. Return signature - ignore error handling
-           return CreateStaticSignature();
+            _ecdsa.Dispose();
         }
 
-        public async Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, byte[] signature)
+        // Later this task has AuthorizationRestriction and UserIdentification as input
+        public async Task<RestrictionSignatureDto> CreateSignatureAsync()
         {
-            return CreateStaticSignature().SequenceEqual(signature);
+            // 1. Call api to make authorization check. (Input: AuthorizationRestriction and UserIdentification)
+            // 2. If authorization succesfull: Create a signature (Input: AuthorizationRestriction) if unautorised return null
+            // For now just return a static signature
+            // Will be later something like this:
+            // Var binaryRestriction = restriction.ToByteArray();
+            byte[] binaryRestriction = [1, 2, 3, 4];
+            var signature = _ecdsa.SignData(binaryRestriction, HashAlgorithmName.SHA256);
+
+            return new RestrictionSignatureDto(Convert.ToBase64String(signature));
         }
 
-        private byte[] CreateStaticSignature()
+        public async Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, string signature)
         {
-            return [1, 2, 3, 4];
+            // Will be later something like this:
+            // Var binaryRestriction = restriction.ToByteArray();
+            // For now Static
+            byte[] binaryRestriction = [1, 2, 3, 4];
+
+            var conversionResult = Convert.FromBase64String(signature);
+
+            return _ecdsa.VerifyData(binaryRestriction, conversionResult, HashAlgorithmName.SHA256);
         }
     }
 }

@@ -42,30 +42,10 @@ public sealed class VerifySignatureHandler
 
         var restriction = new AuthorizationRestriction();
 
-        bool result = false;
-        if (IsStringBase64(request.Signature))
-        {
-            var conversionResult = Convert.FromBase64String(request.Signature);
+        var isValid = await _authorizationService
+                .VerifySignatureAsync(restriction, request.Signature)
+                .ConfigureAwait(false);
 
-            result = await _authorizationService
-                    .VerifySignatureAsync(restriction, conversionResult)
-                    .ConfigureAwait(false);
-        }
-
-        return new VerifySignatureResponse(result);
-    }
-
-    private static bool IsStringBase64(string signature)
-    {
-        try
-        {
-            var conversionResult = Convert.FromBase64String(signature);
-            return true;
-        }
-#pragma warning disable CA1031
-        catch (Exception)
-        {
-            return false;
-        }
+        return new VerifySignatureResponse(isValid);
     }
 }

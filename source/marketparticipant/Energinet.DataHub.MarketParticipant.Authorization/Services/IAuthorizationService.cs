@@ -18,6 +18,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
 public interface IAuthorizationService
 {
-    Task<byte[]> CreateSignatureAsync();
-    Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, byte[] signature);
+    Task<RestrictionSignatureDto> CreateSignatureAsync();
+    Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, string signature);
 }
