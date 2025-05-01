@@ -11,18 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+namespace Energinet.DataHub.MarketParticipant.Authorization.Config;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Parameters;
-
-public abstract partial class SignatureParameter
+internal sealed class Settings
 {
-    /// <summary>
-    /// Gets the data of the restriction value.
-    /// </summary>
-    public byte[] Data { get; }
-
-    /// <summary>
-    /// Key used to identify this signature parameter in the signature.
-    /// </summary>
-    public string Key { get; }
+    internal const string ExpirationKey = "EXPIRATION";
 }

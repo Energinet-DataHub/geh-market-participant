@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Parameters;
-
-public sealed class Signature()
+public abstract partial class SignatureParameter
 {
-    private const string ExpirationKey = "EXPIRATION";
-    private List<SignatureParameter> _parameters = [];
+    /// <summary>
+    /// Gets the data of the restriction value.
+    /// </summary>
+    public byte[] Data { get; }
+
+    /// <summary>
+    /// Key used to identify this signature parameter in the signature.
+    /// </summary>
+    public string Key { get; }
 }
