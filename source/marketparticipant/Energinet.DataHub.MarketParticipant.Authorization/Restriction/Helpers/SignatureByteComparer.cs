@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction.Parameters;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction.Helpers;
 
-public abstract partial class SignatureParameter
+internal class SignatureByteComparer : IComparer<byte[]>
 {
-    /// <summary>
-    /// Gets or sets the Key used to identify this signature parameter in the signature.
-    /// </summary>
-    public required string Key { get; set; }
+    public int Compare(byte[]? x, byte[]? y)
+    {
+        if (x == null || y == null)
+        {
+            return x == y ? 0 : x == null ? -1 : 1;
+        }
 
-    /// <summary>
-    /// Gets the byte array representing the Signature parameter value.
-    /// </summary>
-    internal abstract byte[] ParameterData { get; }
-
-    public static SignatureParameterLong FromLong(long value, string key) => new SignatureParameterLong(value) { Key = key };
+        return x.AsSpan().SequenceCompareTo(y);
+    }
 }

@@ -14,17 +14,17 @@
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction.Parameters;
 
-public abstract partial class SignatureParameter
+public class SignatureParameterLong : SignatureParameter
 {
-    /// <summary>
-    /// Gets or sets the Key used to identify this signature parameter in the signature.
-    /// </summary>
-    public required string Key { get; set; }
+    // <summary>
+    // Initializes a new instance of the <see cref="SignatureParameterLong"/> for <see cref="long"/>class.
+    // </summary>
+    // <param name="value">The long value.</param>
+    internal SignatureParameterLong(long value)
+    {
+        ParameterData = BitConverter.GetBytes(value);
+    }
 
-    /// <summary>
-    /// Gets the byte array representing the Signature parameter value.
-    /// </summary>
-    internal abstract byte[] ParameterData { get; }
-
-    public static SignatureParameterLong FromLong(long value, string key) => new SignatureParameterLong(value) { Key = key };
+    // <inheritdoc />
+    internal override byte[] ParameterData { get; }
 }
