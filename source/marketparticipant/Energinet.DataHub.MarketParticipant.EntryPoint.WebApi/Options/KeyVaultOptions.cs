@@ -30,6 +30,5 @@ public sealed record KeyVaultOptions
     [Required]
     public Uri CertificatesKeyVault { get; set; } = null!;
 
-    [Required]
     public string AuthSignKeyName { get; set; } = null!;
 }
