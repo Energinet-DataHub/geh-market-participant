@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization;
-using MediatR;
+using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-public record CreateSignatureCommand(string Access) : IRequest<CreateSignatureResponse>;
+[JsonDerivedType(typeof(MeteringPointMasterDataAccessValidation), typeDiscriminator: "mpm")]
+public abstract class AccessValidation
+{
+    protected AccessValidation()
+    {
+    }
+
+    public abstract bool Validate();
+}

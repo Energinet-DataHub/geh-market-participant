@@ -40,9 +40,9 @@ public class AuthorizationController : ControllerBase
 
     [HttpPost("createSignature")]
     [AllowAnonymous]
-    public async Task<ActionResult> CreateSignatureAsync()
+    public async Task<ActionResult> CreateSignatureAsync([FromBody] string access)
     {
-        var command = new CreateSignatureCommand();
+        var command = new CreateSignatureCommand(access);
 
         var result = await _mediator
             .Send(command)
