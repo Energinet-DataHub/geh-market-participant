@@ -34,7 +34,6 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Common;
 
