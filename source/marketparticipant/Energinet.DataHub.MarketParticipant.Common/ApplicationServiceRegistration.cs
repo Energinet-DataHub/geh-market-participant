@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Identity;
+using Azure.Security.KeyVault.Keys;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
@@ -35,6 +37,8 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Common;
 
@@ -136,6 +140,6 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IActorCredentialsRemovalService, ActorCredentialsRemovalService>();
 
         // services.AddScoped<IAuthorizationService, AuthorizationService>();
-        services.AddSingleton<IAuthorizationService, AuthorizationService>();
+        // services.AddSingleton<IAuthorizationService, AuthorizationService>();
     }
 }
