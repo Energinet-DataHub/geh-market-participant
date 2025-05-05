@@ -44,8 +44,8 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             // Create signature should always simply use the current version.
             // Verify should use the version it gets from a input parameter.
             // Currently it just load once the current version from the key vault.
-            //_key.Properties.Version
-            //_cryptoClient = _keyClient.GetCryptographyClient(_keyName, "KeyVersion");
+            // _key.Properties.Version
+            // _cryptoClient = _keyClient.GetCryptographyClient(_keyName, "KeyVersion");
             _cryptoClient = new CryptographyClient(_key.Id, new DefaultAzureCredential());
         }
 
@@ -57,7 +57,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             // For now just return a static signature
             // Will be later something like this:
             // Var binaryRestriction = restriction.ToByteArray();
-            var keyVersion = _key.Properties.Version;
             byte[] binaryRestriction = [1, 2, 3, 4];
             var signature = await _cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, binaryRestriction).ConfigureAwait(false);
             return new RestrictionSignatureDto(Convert.ToBase64String(signature.Signature));
