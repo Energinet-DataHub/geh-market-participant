@@ -17,11 +17,7 @@ using System.Text.Json.Serialization;
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
 [JsonDerivedType(typeof(MeteringPointMasterDataAccessValidation), typeDiscriminator: "mpm")]
-public abstract class AccessValidation
+public interface IAccessValidation
 {
-    protected AccessValidation()
-    {
-    }
-
-    public abstract bool Validate();
+    bool Validate();
 }

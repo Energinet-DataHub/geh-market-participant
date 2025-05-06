@@ -50,7 +50,7 @@ public sealed class CreateSignatureHandlerIntegrationTests
 
         var meteringPointMasterDataAccess = new MeteringPointMasterDataAccessValidation(EicFunction.DataHubAdministrator);
 
-        var jsonString = JsonSerializer.Serialize<AccessValidation>(meteringPointMasterDataAccess);
+        var jsonString = JsonSerializer.Serialize<IAccessValidation>(meteringPointMasterDataAccess);
         var jsonBytes = System.Text.Encoding.UTF8.GetBytes(jsonString);
         var accessJsonString = Convert.ToBase64String(jsonBytes);
 

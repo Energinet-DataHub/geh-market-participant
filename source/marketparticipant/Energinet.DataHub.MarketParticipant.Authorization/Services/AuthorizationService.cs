@@ -82,8 +82,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 
                         if (accessValidation != null)
                         {
-                            // Call the Validate method on the accessValidation object
-                            // This will be a polymorphic call to the correct derived class
                             isValid = accessValidation.Validate();
                         }
                         else
@@ -101,11 +99,11 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             return isValid;
         }
 
-        private AccessValidation? DeserializeAccessValidation(string jsonString)
+        private IAccessValidation? DeserializeAccessValidation(string jsonString)
         {
             try
             {
-                return JsonSerializer.Deserialize<AccessValidation>(jsonString);
+                return JsonSerializer.Deserialize<IAccessValidation>(jsonString);
             }
             catch (JsonException)
             {

@@ -17,7 +17,7 @@ using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-public sealed class MeteringPointMasterDataAccessValidation : AccessValidation
+public sealed class MeteringPointMasterDataAccessValidation : IAccessValidation
 {
     public MeteringPointMasterDataAccessValidation()
     {
@@ -33,7 +33,7 @@ public sealed class MeteringPointMasterDataAccessValidation : AccessValidation
 
     public EicFunction MarketRole { get; }
 
-    public override bool Validate()
+    public bool Validate()
     {
         return MarketRole == EicFunction.DataHubAdministrator;
     }
