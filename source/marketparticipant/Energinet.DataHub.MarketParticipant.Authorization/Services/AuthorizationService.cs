@@ -39,7 +39,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
         // Later this task has AuthorizationRestriction and UserIdentification as input
         public async Task<RestrictionSignatureDto> CreateSignatureAsync(string accessValidation)
         {
-            // Returns currently always true
             if (!ValidateAccess(accessValidation))
                 throw new ArgumentException("Invalid request");
 
@@ -68,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 
         private bool ValidateAccess(string access)
         {
-            var isValid = false;
+            var isValid = true;
 
             try
             {
