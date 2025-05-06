@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 
         private bool ValidateAccess(string access)
         {
-            var isValid = true;
+            var isValid = false;
 
             try
             {
