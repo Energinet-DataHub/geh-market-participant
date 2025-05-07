@@ -84,7 +84,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.ExternalMetadataAddress)}", "fake_value"),
             new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.InternalMetadataAddress)}", "fake_value"),
             new($"{nameof(UserAuthentication)}:{nameof(UserAuthentication.BackendBffAppId)}", "fake_value"),
-            new("KeyVault:TokenSignKeyVault", "https://fake_value"),
+            new("KeyVault:TokenSignKeyVault", "https://kvmarkpartdwe002.vault.azure.net/"),
             new("KeyVault:TokenSignKeyName", "fake_value"),
             new("KeyVault:CertificatesKeyVault", "https://fake_value"),
             new("AzureB2c:Tenant", "fake_value"),
@@ -93,6 +93,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             new("AzureB2c:BackendObjectId", "fake_value"),
             new("AzureB2c:BackendSpnObjectId", "fake_value"),
             new("AzureB2c:BackendId", "fake_value"),
+            new("KeyVault:AuthSignKeyName", "token-sign")
         ];
 
         return new ConfigurationBuilder()
