@@ -27,6 +27,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.FeatureManagement;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
@@ -40,6 +41,8 @@ public static class MarketParticipantWebApiModuleExtensions
         services
             .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
             .AddScoped<IAuditIdentityProvider, FrontendUserAuditIdentityProvider>();
+
+        services.AddFeatureManagement();
 
         services.AddOptions<UserAuthentication>().BindConfiguration(nameof(UserAuthentication)).ValidateDataAnnotations();
         services.AddOptions<KeyVaultOptions>().BindConfiguration(KeyVaultOptions.SectionName).ValidateDataAnnotations();

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
-using Energinet.DataHub.MarketParticipant.Application.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
@@ -26,22 +26,33 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 [Route("authorization")]
 public class AuthorizationController : ControllerBase
 {
+    private const string BlockSignatureAuthorizationFeatureKey = "BlockSignatureAuthorization";
+
     private readonly IMediator _mediator;
-    private readonly IUserContext<FrontendUser> _userContext;
-
     private readonly IAuthorizationService _authorizationService;
+    private readonly IFeatureManager _featureManager;
 
-    public AuthorizationController(IAuthorizationService authorizationService, IMediator mediator, IUserContext<FrontendUser> userContext)
+    public AuthorizationController(
+        IAuthorizationService authorizationService,
+        IFeatureManager featureManager,
+        IMediator mediator)
     {
         _authorizationService = authorizationService;
+        _featureManager = featureManager;
         _mediator = mediator;
-        _userContext = userContext;
     }
 
     [HttpPost("createSignature")]
     [AllowAnonymous]
     public async Task<ActionResult> CreateSignatureAsync()
     {
+        var blockSignatureAuthorization = await _featureManager
+            .IsEnabledAsync(BlockSignatureAuthorizationFeatureKey)
+            .ConfigureAwait(false);
+
+        if (blockSignatureAuthorization)
+            throw new UnauthorizedAccessException("Signature authorization is not allowed.");
+
         var command = new CreateSignatureCommand();
 
         var result = await _mediator
@@ -55,6 +66,13 @@ public class AuthorizationController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult> VerifySignatureAsync(string signature)
     {
+        var blockSignatureAuthorization = await _featureManager
+            .IsEnabledAsync(BlockSignatureAuthorizationFeatureKey)
+            .ConfigureAwait(false);
+
+        if (blockSignatureAuthorization)
+            throw new UnauthorizedAccessException("Signature authorization is not allowed.");
+
         var command = new VerifySignatureCommand(signature);
 
         var result = await _mediator
