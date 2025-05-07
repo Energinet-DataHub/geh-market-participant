@@ -12,28 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
 using System.Security.Cryptography;
+using Azure.Core;
+using Azure.Identity;
+using Azure.Security.KeyVault.Keys;
+using Azure.Security.KeyVault.Keys.Cryptography;
+using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+using static NodaTime.TimeZones.ZoneEqualityComparer;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
-using Microsoft.Extensions.Logging;
+
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 {
     public sealed class AuthorizationService : IAuthorizationService
     {
-        private readonly ECDsa _ecdsa = ECDsa.Create();
-        private readonly ILogger<AuthorizationService> _logger;
+        private readonly KeyClient _keyClient;
+        private readonly Uri _keyVault;
+        private readonly string _keyName;
+        private readonly KeyVaultKey _key;
+        private readonly CryptographyClient _cryptoClient;
 
-        public AuthorizationService(ILogger<AuthorizationService> logger)
+        public AuthorizationService(Uri keyVault, string keyName, ILogger<AuthorizationService> logger)
         {
+            _keyVault = keyVault;
+            _keyName = keyName;
+            _keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
+            _key = _keyClient.GetKey(_keyName);
             _logger = logger;
-        }
 
-        // Copied from example. Not sure when it is called.
-        public void Dispose()
-        {
-            _ecdsa.Dispose();
+            // Todo:
+            // Because of keyRotation, multiple versions of the key can be in use.
+            // The versions used should be stored in an array or something like that and updated overtime.
+            // Create signature should always simply use the current version.
+            // Verify should use the version it gets from a input parameter.
+            // Currently it just load once the current version from the key vault.
+            // _key.Properties.Version
+            // _cryptoClient = _keyClient.GetCryptographyClient(_keyName, "KeyVersion");
+            _cryptoClient = new CryptographyClient(_key.Id, new DefaultAzureCredential());
         }
 
         // Later this task has AuthorizationRestriction and UserIdentification as input
@@ -48,9 +66,8 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             // Will be later something like this:
             // Var binaryRestriction = restriction.ToByteArray();
             byte[] binaryRestriction = [1, 2, 3, 4];
-            var signature = _ecdsa.SignData(binaryRestriction, HashAlgorithmName.SHA256);
-
-            return new RestrictionSignatureDto(Convert.ToBase64String(signature));
+            var signature = await _cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, binaryRestriction).ConfigureAwait(false);
+            return new RestrictionSignatureDto(Convert.ToBase64String(signature.Signature));
         }
 
         public async Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, string signature)
@@ -59,10 +76,9 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             // Var binaryRestriction = restriction.ToByteArray();
             // For now Static
             byte[] binaryRestriction = [1, 2, 3, 4];
-
             var conversionResult = Convert.FromBase64String(signature);
-
-            return _ecdsa.VerifyData(binaryRestriction, conversionResult, HashAlgorithmName.SHA256);
+            var verifyResult = await _cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, binaryRestriction, conversionResult).ConfigureAwait(false);
+            return verifyResult.IsValid;
         }
 
         private bool ValidateAccess(string access)

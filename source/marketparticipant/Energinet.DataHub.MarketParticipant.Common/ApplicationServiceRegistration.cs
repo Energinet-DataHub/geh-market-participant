@@ -29,7 +29,6 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Users;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Integration;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
-using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
@@ -136,6 +135,6 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IActorCredentialsRemovalService, ActorCredentialsRemovalService>();
 
         // services.AddScoped<IAuthorizationService, AuthorizationService>();
-        services.AddSingleton<IAuthorizationService, AuthorizationService>();
+        // services.AddSingleton<IAuthorizationService, AuthorizationService>();
     }
 }
