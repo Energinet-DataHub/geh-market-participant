@@ -62,37 +62,37 @@ public sealed class CreateSignatureHandlerIntegrationTests
         Assert.False(string.IsNullOrWhiteSpace(actual.Signature.Signature));
     }
 
-    //[Fact]
-    //public async Task CreateSignature_Wrong_Object_ThrowsException()
-    //{
-    //    // arrange
-    //    var expectedActor = await _databaseFixture.PrepareActorAsync();
+    [Fact]
+    public async Task CreateSignature_Wrong_Object_ThrowsException()
+    {
+        // arrange
+        var expectedActor = await _databaseFixture.PrepareActorAsync();
 
-    //    await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
-    //    await using var scope = host.BeginScope();
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
 
-    //    var target = scope.ServiceProvider.GetRequiredService<IMediator>();
+        var target = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-    //    var jsonString = JsonSerializer.Serialize<object>(new object());
-    //    var jsonBytes = System.Text.Encoding.UTF8.GetBytes(jsonString);
-    //    var accessJsonString = Convert.ToBase64String(jsonBytes);
+        var jsonString = JsonSerializer.Serialize<object>(new object());
+        var jsonBytes = System.Text.Encoding.UTF8.GetBytes(jsonString);
+        var accessJsonString = Convert.ToBase64String(jsonBytes);
 
-    //    // act + assert
-    //    await Assert.ThrowsAsync<ArgumentException>(() => target.Send(new CreateSignatureCommand(accessJsonString)));
-    //}
+        // act + assert
+        await Assert.ThrowsAsync<ArgumentException>(() => target.Send(new CreateSignatureCommand(accessJsonString)));
+    }
 
-    //[Fact]
-    //public async Task CreateSignature_Empty_ThrowsException()
-    //{
-    //    // arrange
-    //    var expectedActor = await _databaseFixture.PrepareActorAsync();
+    [Fact]
+    public async Task CreateSignature_Empty_ThrowsException()
+    {
+        // arrange
+        var expectedActor = await _databaseFixture.PrepareActorAsync();
 
-    //    await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
-    //    await using var scope = host.BeginScope();
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
 
-    //    var target = scope.ServiceProvider.GetRequiredService<IMediator>();
+        var target = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-    //    // act + assert
-    //    await Assert.ThrowsAsync<ArgumentException>(() => target.Send(new CreateSignatureCommand(string.Empty)));
-    //}
+        // act + assert
+        await Assert.ThrowsAsync<ArgumentException>(() => target.Send(new CreateSignatureCommand(string.Empty)));
+    }
 }
