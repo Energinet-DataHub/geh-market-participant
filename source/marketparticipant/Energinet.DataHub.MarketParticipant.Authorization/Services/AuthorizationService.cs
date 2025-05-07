@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net;
-using System.Security.Cryptography;
+// using System.Net;
+// using System.Security.Cryptography;
 using System.Text.Json;
-using Azure.Core;
+
+// using Azure.Core;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 using Microsoft.Extensions.Logging;
-using static NodaTime.TimeZones.ZoneEqualityComparer;
 
+// using static NodaTime.TimeZones.ZoneEqualityComparer;
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 {
     public sealed class AuthorizationService : IAuthorizationService
@@ -40,7 +41,9 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             _keyVault = keyVault;
             _keyName = keyName;
             _keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
-            _key = _keyClient.GetKey(_keyName);
+
+            // NOT working
+            // _key = _keyClient.GetKey(_keyName);
             _logger = logger;
 
             // Todo:
@@ -51,7 +54,8 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             // Currently it just load once the current version from the key vault.
             // _key.Properties.Version
             // _cryptoClient = _keyClient.GetCryptographyClient(_keyName, "KeyVersion");
-            _cryptoClient = new CryptographyClient(_key.Id, new DefaultAzureCredential());
+            // NOT working
+            // _cryptoClient = new CryptographyClient(_key.Id, new DefaultAzureCredential());
         }
 
         // Later this task has AuthorizationRestriction and UserIdentification as input
@@ -66,8 +70,13 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             // Will be later something like this:
             // Var binaryRestriction = restriction.ToByteArray();
             byte[] binaryRestriction = [1, 2, 3, 4];
-            var signature = await _cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, binaryRestriction).ConfigureAwait(false);
-            return new RestrictionSignatureDto(Convert.ToBase64String(signature.Signature));
+
+            // NOT working
+            // var signature = await _cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, binaryRestriction).ConfigureAwait(false);
+            // Should be removed
+            return new RestrictionSignatureDto(Convert.ToBase64String(binaryRestriction));
+
+            // return new RestrictionSignatureDto(Convert.ToBase64String(signature.Signature));
         }
 
         public async Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, string signature)
