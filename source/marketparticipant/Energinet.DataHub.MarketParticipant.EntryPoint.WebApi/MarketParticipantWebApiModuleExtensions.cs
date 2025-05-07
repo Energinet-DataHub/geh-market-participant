@@ -66,7 +66,8 @@ public static class MarketParticipantWebApiModuleExtensions
             var tokenCredentials = new DefaultAzureCredential();
             var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
             var keyClient = new KeyClient(options.Value.TokenSignKeyVault, tokenCredentials);
-            return new AuthorizationService(options.Value.TokenSignKeyVault, options.Value.AuthSignKeyName);
+            var logger = provider.GetRequiredService<ILogger<AuthorizationService>>();
+            return new AuthorizationService(options.Value.TokenSignKeyVault, options.Value.AuthSignKeyName, logger);
         });
 
         services.AddSingleton(provider =>
