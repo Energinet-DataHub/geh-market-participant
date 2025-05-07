@@ -52,7 +52,7 @@ public class AuthorizationController : ControllerBase
 
         if (blockSignatureAuthorization)
             throw new UnauthorizedAccessException("Signature authorization is not allowed.");
-        
+
         var command = new CreateSignatureCommand(access);
 
         var result = await _mediator
