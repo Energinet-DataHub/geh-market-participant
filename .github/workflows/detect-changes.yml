@@ -55,6 +55,8 @@ jobs:
               - '.github/workflows/ci-dotnet.yml'
               - '.github/actions/dotnet-*/**'
               - 'source/marketparticipant/!(Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp/**)**'
+            ci_authorization_package:
+              - 'source/marketparticipant/Energinet.DataHub.MarketParticipant.Authorization/**'
             db_migrations:
               - 'source/marketparticipant/Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp/**'
             render_c4model_views:
