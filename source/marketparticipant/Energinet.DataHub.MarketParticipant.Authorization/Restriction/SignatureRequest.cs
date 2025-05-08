@@ -38,13 +38,25 @@ public sealed class SignatureRequest()
 
         var byteArray = new byte[arrayLength];
         var offset = 0;
-        foreach (var param in _params)
+        foreach (var param in sortedParams)
         {
             Buffer.BlockCopy(param.ParameterData, 0, byteArray, offset, param.ParameterData.Length);
             offset += param.ParameterData.Length;
         }
 
         return byteArray;
+    }
+
+    public void AddSignatureParameter(SignatureParameter signatureParameter)
+    {
+        ArgumentNullException.ThrowIfNull(signatureParameter);
+
+        if (ContainsKey(signatureParameter.Key)) throw new InvalidOperationException("Key already exists");
+
+        if (_params.Any(i => KeyExistsWithDifferentType(i, signatureParameter)))
+            throw new ArgumentException("Adding Param to signature failed, Param Key already exists with different type");
+
+        _params.Add(signatureParameter);
     }
 
     internal void SetExpiration(long expiration)

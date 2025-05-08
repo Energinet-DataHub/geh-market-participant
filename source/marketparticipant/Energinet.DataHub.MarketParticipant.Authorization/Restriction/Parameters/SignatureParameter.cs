@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
+
 namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction.Parameters;
 
 public abstract partial class SignatureParameter
@@ -27,4 +29,9 @@ public abstract partial class SignatureParameter
     internal abstract byte[] ParameterData { get; }
 
     public static SignatureParameterLong FromLong(long value, string key) => new SignatureParameterLong(value) { Key = key };
+    public static SignatureParameterEicFunction FromEicFunction(EicFunction value, string key) => new SignatureParameterEicFunction(value) { Key = key };
+    public static SignatureParameterString FromString(string value, string key) => new SignatureParameterString(value) { Key = key };
+    public static SignatureParameterEnum<T> FromEnum<T>(T value, string key)
+        where T : Enum
+        => new SignatureParameterEnum<T>(value) { Key = key };
 }

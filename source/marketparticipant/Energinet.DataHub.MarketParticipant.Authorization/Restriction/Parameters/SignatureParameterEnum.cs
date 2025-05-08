@@ -16,14 +16,16 @@ using System.Text;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction.Parameters;
 
-public class SignatureParameterEnums<T> : SignatureParameter
+ #pragma warning disable CA1711
+public class SignatureParameterEnum<T> : SignatureParameter
+ #pragma warning restore CA1711
     where T : Enum
 {
     // <summary>
-    // Initializes a new instance of the <see cref="SignatureParameterLong"/> for <see cref="long"/>class.
+    // Initializes a new instance of the <see cref="SignatureParameterEnum"/> for <see cref="long"/>class.
     // </summary>
     // <param name="value">The long value.</param>
-    internal SignatureParameterEnums(T value)
+    internal SignatureParameterEnum(T value)
     {
         var nameBytes = Encoding.UTF8.GetBytes(value.GetType().Name);
         var valueBytes = Encoding.UTF8.GetBytes(value.ToString());

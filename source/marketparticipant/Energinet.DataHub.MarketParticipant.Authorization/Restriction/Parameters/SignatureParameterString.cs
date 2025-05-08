@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
-
 namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction.Parameters;
 
-public class SignatureParameterEicFunction : SignatureParameterEnum<EicFunction>
+public class SignatureParameterString : SignatureParameter
 {
     // <summary>
-    // Initializes a new instance of the <see cref="SignatureParameterLong"/> for <see cref="long"/>class.
+    // Initializes a new instance of the <see cref="SignatureParameterString"/> for <see cref="string"/>classes.
     // </summary>
-    // <param name="value">The long value.</param>
-    internal SignatureParameterEicFunction(EicFunction value)
-    : base(value)
+    // <param name="value">The string value.</param>
+    internal SignatureParameterString(string value)
     {
+        ParameterData = System.Text.Encoding.UTF8.GetBytes(value);
     }
+
+    // <inheritdoc />
+    internal override byte[] ParameterData { get; }
 }
