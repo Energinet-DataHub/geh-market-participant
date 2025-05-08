@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction.Helpers;
 
-internal class SignatureByteComparer : IComparer<byte[]>
+internal sealed class SignatureByteComparer : IComparer<byte[]>
 {
     public int Compare(byte[]? x, byte[]? y)
     {
