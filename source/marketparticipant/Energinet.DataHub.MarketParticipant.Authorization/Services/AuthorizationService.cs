@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net;
-using System.Security.Cryptography;
-using System.Text.Json;
-using Azure.Core;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 using Microsoft.Extensions.Logging;
-using static NodaTime.TimeZones.ZoneEqualityComparer;
+
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 {

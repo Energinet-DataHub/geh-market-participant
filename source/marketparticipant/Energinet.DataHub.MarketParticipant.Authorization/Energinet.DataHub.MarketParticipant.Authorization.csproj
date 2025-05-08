@@ -4,16 +4,50 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageVersion>0.1.0$(VersionSuffix)</PackageVersion>
+    <Title>Energinet DataHub App Authentication</Title>
+    <Company>Energinet-DataHub</Company>
+    <Authors>Energinet-DataHub</Authors>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageProjectUrl>https://github.com/Energinet-DataHub</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Energinet-DataHub/geh-market-participant</RepositoryUrl>
+
+    <!-- PackageReleaseNotes:
+      Is shown in Azure DevOps artifacts Release Notes section.
+    -->
+    <PackageReleaseNotes>
+      [Release Notes](https://github.com/Energinet-DataHub/geh-market-participant/blob/master/docs/Energinet.DataHub.MarketParticipant.Authorization/release-notes/release-notes.md)
+      [Documentation](https://github.com/Energinet-DataHub/geh-market-participant/blob/master/docs/Energinet.DataHub.MarketParticipant.Authorization/documentation.md)
+    </PackageReleaseNotes>
+
+    <!-- PackageDescription:
+      Is shown in GitHub packages "About this package" section,
+      and in Visual Studio package manager view.
+    -->
+    <PackageDescription>
+      [Release Notes](https://github.com/Energinet-DataHub/geh-market-participant/blob/master/docs/Energinet.DataHub.MarketParticipant.Authorization/release-notes/release-notes.md)
+      [Documentation](https://github.com/Energinet-DataHub/geh-market-participant/blob/master/docs/Energinet.DataHub.MarketParticipant.Authorization/documentation.md)
+    </PackageDescription>
+
+    <Description>Integration library for Energinet DataHub app authentication.</Description>
+    <PackageTags>energinet;datahub;authentication;</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+
   <ItemGroup>
+    <PackageReference Include="NodaTime" Version="3.2.1" />
     <PackageReference Include="Azure.Identity" Version="1.13.2" />
     <PackageReference Include="Azure.Security.KeyVault.Keys" Version="4.7.0" />
 	<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Domain\Energinet.DataHub.MarketParticipant.Domain.csproj" />
   </ItemGroup>
 
 </Project>
