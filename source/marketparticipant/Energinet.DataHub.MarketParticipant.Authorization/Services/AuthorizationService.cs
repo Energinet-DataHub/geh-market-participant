@@ -50,6 +50,22 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             _cryptoClient = new CryptographyClient(_key.Id, new DefaultAzureCredential());
         }
 
+        public static IAccessValidation? DeserializeAccessValidation(string jsonString)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<IAccessValidation>(jsonString);
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+            catch (NotSupportedException)
+            {
+                return null;
+            }
+        }
+
         // Later this task has AuthorizationRestriction and UserIdentification as input
         public async Task<RestrictionSignatureDto> CreateSignatureAsync(string accessValidation)
         {
@@ -109,22 +125,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             }
 
             return isValid;
-        }
-
-        private IAccessValidation? DeserializeAccessValidation(string jsonString)
-        {
-            try
-            {
-                return JsonSerializer.Deserialize<IAccessValidation>(jsonString);
-            }
-            catch (JsonException)
-            {
-                return null;
-            }
-            catch (NotSupportedException)
-            {
-                return null;
-            }
         }
     }
 }
