@@ -21,12 +21,9 @@ public sealed class Signature
     [JsonPropertyName("signature")]
     public required string Value { get; set; }
 
-    [JsonPropertyName("created")]
-    public long Created { get; set; }
-
     [JsonPropertyName("expires")]
     public long Expires { get; set; }
 
-    [JsonPropertyName("alg")]
-    public required string AlgorithmName { get; set; }
+    [JsonPropertyName("keyVersion")]
+    public required string KeyVersion { get; set; }
 }
