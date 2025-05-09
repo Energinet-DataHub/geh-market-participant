@@ -33,11 +33,34 @@ on:
 env:
   # Conditions
   PUSH_PACKAGES: ${{ github.event_name != 'pull_request' }}
+  # TRIGGERED_BY_PR_COMMIT is true if this run is automatically triggered by a commit in a Pull Request (feature branch)
+  TRIGGERED_BY_PR_COMMIT: ${{ github.event_name == 'pull_request' }}
+  # BASE_SHA must be set to 'main' if this run is triggered manually; otherwise file changes will not be detected correctly
+  BASE_SHA: ${{ (github.event_name == 'workflow_dispatch') && 'main' || '' }}
+  # Necessary to manage Azure resources from automated tests
+  AZURE_KEYVAULT_URL: ${{ vars.integration_test_azure_keyvault_url }}
+  # Set value used by 'AzuriteManager'
+  #  Use 'AzuriteBlobFolderPath' for TestCommon version 4.2.0 and lower
+  AzuriteBlobFolderPath: ${{ github.workspace }}\node_modules\.bin\
+  #  Use 'AzuriteFolderPath' for TestCommon version 4.3.0 and higher
+  AzuriteFolderPath: ${{ github.workspace }}\node_modules\.bin\
+  # Overrides settings in 'functionhost.settings.json'
+  FunctionAppHostPath: ${{ github.workspace }}\node_modules\azure-functions-core-tools\bin\func.dll
 
 jobs:
   build_and_publish:
     runs-on: windows-2022
     name: Publish bundle to NuGet.org
+
+    environment: AzureAuth
+
+    # We need to have permissions here to be able to support manually triggering this workflow for releasing a pre-release.
+    permissions:
+      id-token: write # Needed by 'dotnet-solution-build-and-test' to login to Azure
+      contents: read # Needed by https://github.com/EnricoMi/publish-unit-test-result-action
+      issues: read # Needed by https://github.com/EnricoMi/publish-unit-test-result-action
+      checks: write # Needed by https://github.com/EnricoMi/publish-unit-test-result-action
+      pull-requests: write # Needed by https://github.com/EnricoMi/publish-unit-test-result-action
 
     steps:
       - name: Checkout repository
@@ -50,6 +73,9 @@ jobs:
         uses: Energinet-DataHub/.github/.github/actions/dotnet-solution-build-and-test@v14
         with:
           solution_file_path: ./source/marketparticipant/Energinet.DataHub.MarketParticipant.sln
+          azure_tenant_id: ${{ vars.integration_test_azure_tenant_id }}
+          azure_subscription_id: ${{ vars.integration_test_azure_subscription_id }}
+          azure_spn_id: ${{ vars.integration_test_azure_spn_id_oidc }}
           publish_test_report: "true"
 
       - name: Pack project
