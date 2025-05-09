@@ -12,21 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel;
-using System.Text.Json.Serialization;
-
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
 public sealed class MeteringPointMasterDataAccessValidation : IAccessValidation
 {
-    public MeteringPointMasterDataAccessValidation()
-    {
-    }
-
-    [JsonConstructor]
-    [Browsable(false)]
     public MeteringPointMasterDataAccessValidation(EicFunction marketRole)
-        : base()
     {
         MarketRole = marketRole;
     }

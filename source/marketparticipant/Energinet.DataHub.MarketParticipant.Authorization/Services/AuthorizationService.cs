@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
@@ -50,26 +49,12 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             _cryptoClient = new CryptographyClient(_key.Id, new DefaultAzureCredential());
         }
 
-        public static IAccessValidation? DeserializeAccessValidation(string jsonString)
-        {
-            try
-            {
-                return JsonSerializer.Deserialize<IAccessValidation>(jsonString);
-            }
-            catch (JsonException)
-            {
-                return null;
-            }
-            catch (NotSupportedException)
-            {
-                return null;
-            }
-        }
-
         // Later this task has AuthorizationRestriction and UserIdentification as input
-        public async Task<RestrictionSignatureDto> CreateSignatureAsync(string accessValidation)
+        public async Task<RestrictionSignatureDto> CreateSignatureAsync(SecurityValidation securityValidation)
         {
-            if (!ValidateAccess(accessValidation))
+            ArgumentNullException.ThrowIfNull(securityValidation);
+
+            if (!ValidateAccess(securityValidation))
                 throw new ArgumentException("Invalid request");
 
             // 1. Call api to make authorization check. (Input: AuthorizationRestriction and UserIdentification)
@@ -93,38 +78,10 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             return verifyResult.IsValid;
         }
 
-        private bool ValidateAccess(string access)
+        private static bool ValidateAccess(SecurityValidation securityValidation)
         {
-            var isValid = false;
-
-            try
-            {
-                if (!string.IsNullOrEmpty(access))
-                {
-                    var signatureBytes = new byte[access.Length];
-                    if (Convert.TryFromBase64String(access, signatureBytes, out var bytesWritten))
-                    {
-                        var data = Convert.FromBase64String(access);
-                        var decodedString = System.Text.Encoding.UTF8.GetString(data);
-                        var accessValidation = DeserializeAccessValidation(decodedString)!;
-
-                        if (accessValidation != null)
-                        {
-                            isValid = accessValidation.Validate();
-                        }
-                        else
-                        {
-                            _logger.LogDebug("Deserializing access validation failed, accessValidation is null");
-                        }
-                    }
-                }
-            }
-            catch (FormatException e)
-            {
-                _logger.LogDebug(e, "Deserializing access validation failed due to invalid format, inner message: {EInnerException}", e.InnerException);
-            }
-
-            return isValid;
+            IAccessValidation accessValidation = new MeteringPointMasterDataAccessValidation(securityValidation.GetMarketRole());
+            return accessValidation.Validate();
         }
     }
 }
