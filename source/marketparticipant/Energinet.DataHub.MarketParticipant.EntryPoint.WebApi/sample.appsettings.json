@@ -1,6 +1,4 @@
 {
-  "SQL_MP_DB_CONNECTION_STRING": "Connection string to 'mssqldb-registry-markpart-<environment>' database.",
-
   "UserAuthentication:InternalMetadataAddress": "The OpenId configuration endpoint for internal token. When testing locally, use for example https://localhost:6001/.well-known/openid-configuration",
   "UserAuthentication:MitIdExternalMetadataAddress": "The MitId OpenId configuration endpoint for external Azure token, formatted as https://<tentant-id>.b2clogin.com/<tentant-id>.onmicrosoft.com/<sign-in-user-flow>/v2.0/.well-known/openid-configuration",
   "UserAuthentication:ExternalMetadataAddress": "The OpenId configuration endpoint for external Azure token, formatted as https://<tentant-id>.b2clogin.com/<tentant-id>.onmicrosoft.com/<sign-in-user-flow>/v2.0/.well-known/openid-configuration",
@@ -19,9 +17,10 @@
 
   "ENFORCE_2FA": true,
 
-  "CvrRegister:BaseAddress": "https://localhost",
-  "CvrRegister:Username": "cvr-username",
-  "CvrRegister:Password": "cvr-password",
-  
-  "Database:ConnectionString": ""
+  "CvrRegister:BaseAddress": "",
+  "CvrRegister:Username": "",
+  "CvrRegister:Password": "",
+
+  "Database:ConnectionString": "",
+  "RevisionLogOptions:ApiAddress": ""
 }
