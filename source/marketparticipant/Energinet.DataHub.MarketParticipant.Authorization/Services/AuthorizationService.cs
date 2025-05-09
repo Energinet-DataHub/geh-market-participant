@@ -15,7 +15,9 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 {
@@ -26,13 +28,15 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
         private readonly string _keyName;
         private readonly KeyVaultKey _key;
         private readonly CryptographyClient _cryptoClient;
+        private readonly ILogger<AuthorizationService> _logger;
 
-        public AuthorizationService(Uri keyVault, string keyName)
+        public AuthorizationService(Uri keyVault, string keyName, ILogger<AuthorizationService> logger)
         {
             _keyVault = keyVault;
             _keyName = keyName;
             _keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
             _key = _keyClient.GetKey(_keyName);
+            _logger = logger;
 
             // Todo:
             // Because of keyRotation, multiple versions of the key can be in use.
@@ -46,8 +50,13 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
         }
 
         // Later this task has AuthorizationRestriction and UserIdentification as input
-        public async Task<RestrictionSignatureDto> CreateSignatureAsync()
+        public async Task<RestrictionSignatureDto> CreateSignatureAsync(SecurityValidation securityValidation)
         {
+            ArgumentNullException.ThrowIfNull(securityValidation);
+
+            if (!ValidateAccess(securityValidation))
+                throw new ArgumentException("Invalid request");
+
             // 1. Call api to make authorization check. (Input: AuthorizationRestriction and UserIdentification)
             // 2. If authorization succesfull: Create a signature (Input: AuthorizationRestriction) if unautorised return null
             // For now just return a static signature
@@ -67,6 +76,12 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             var conversionResult = Convert.FromBase64String(signature);
             var verifyResult = await _cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, binaryRestriction, conversionResult).ConfigureAwait(false);
             return verifyResult.IsValid;
+        }
+
+        private static bool ValidateAccess(SecurityValidation securityValidation)
+        {
+            IAccessValidation accessValidation = new MeteringPointMasterDataAccessValidation(securityValidation.GetMarketRole());
+            return accessValidation.Validate();
         }
     }
 }

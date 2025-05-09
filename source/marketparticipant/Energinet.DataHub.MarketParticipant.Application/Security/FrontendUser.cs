@@ -13,23 +13,27 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Security;
 
 public sealed class FrontendUser
 {
-    public FrontendUser(Guid userId, Guid organizationId, Guid actorId, bool isFas)
+    public FrontendUser(Guid userId, Guid organizationId, Guid actorId, bool isFas, IEnumerable<Claim>? claim = null)
     {
         UserId = userId;
         OrganizationId = organizationId;
         ActorId = actorId;
         IsFas = isFas;
+        Claims = claim;
     }
 
     public Guid UserId { get; }
     public Guid OrganizationId { get; }
     public Guid ActorId { get; }
     public bool IsFas { get; }
+    public IEnumerable<Claim>? Claims { get; }
 
     public bool IsFasOrAssignedToOrganization(Guid organizationId)
     {
