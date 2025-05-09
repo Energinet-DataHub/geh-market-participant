@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Monitor;
 using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Options;
@@ -27,6 +28,8 @@ internal static class MarketParticipantAuthApiModuleExtensions
     public static IServiceCollection AddMarketParticipantAuthApiModule(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMarketParticipantCore();
+
+        services.AddScoped<IAuditIdentityProvider>(_ => KnownAuditIdentityProvider.AuthApiBackgroundService);
         services.AddFeatureManagement();
 
         services.AddOptions<KeyVaultOptions>().BindConfiguration(KeyVaultOptions.SectionName).ValidateDataAnnotations();
