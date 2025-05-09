@@ -149,6 +149,9 @@ public static class KnownPermissions
         new(PermissionId.CalculationsView, "calculations:view", InstantPattern.ExtendedIso.Parse("2024-08-09T00:00:00Z").Value, [
             EicFunction.DataHubAdministrator
         ]),
+        new(PermissionId.MissingMeasurementsLogView, "missing-measurements-log:view", InstantPattern.ExtendedIso.Parse("2025-05-08T00:00:00Z").Value, [
+            EicFunction.GridAccessProvider
+        ]),
         new(PermissionId.ImbalancePricesView, "imbalance-prices:view", InstantPattern.ExtendedIso.Parse("2024-08-13T00:00:00Z").Value, [
             EicFunction.BalanceResponsibleParty,
             EicFunction.BillingAgent,
