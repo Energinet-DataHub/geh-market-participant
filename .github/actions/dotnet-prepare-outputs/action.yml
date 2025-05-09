@@ -62,6 +62,16 @@ runs:
           --configuration Release \
           --output '${{ inputs.output_path }}\functions\webapi'
 
+    - name: Publish Auth Api Function
+      shell: bash
+      run: |
+        dotnet publish \
+          '.\source\marketparticipant\Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi\Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.csproj' \
+          --no-build \
+          --no-restore \
+          --configuration Release \
+          --output '${{ inputs.output_path }}\functions\authapi'
+
     - name: Publish Database Migration
       shell: bash
       run: |
