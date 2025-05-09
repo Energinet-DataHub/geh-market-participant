@@ -193,6 +193,7 @@ csharp_style_conditional_delegate_call = true:suggestion
 
 # Code block preferences
 csharp_prefer_braces = when_multiline:error
+resharper_remove_redundant_braces_highlighting = suggestion
 
 # Unused value preferences
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
