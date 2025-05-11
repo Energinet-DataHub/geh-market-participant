@@ -28,6 +28,7 @@ public sealed class KnownAuditIdentityProvider : IAuditIdentityProvider
     public static KnownAuditIdentityProvider Migration { get; } = new("Datamigrering", "00000000-FFFF-FFFF-FFFF-000000000000");
     public static KnownAuditIdentityProvider TestFramework { get; } = new("Test Framework", "AAAAAAAA-BBBB-CCCC-DDDD-000000000000");
     public static KnownAuditIdentityProvider OrganizationBackgroundService { get; } = new("Aktørsynkronisering", "00000000-1111-0000-0001-000000000000");
+    public static KnownAuditIdentityProvider AuthApiBackgroundService { get; } = new("Auth API", "00000000-1111-0000-0002-000000000000");
     public static KnownAuditIdentityProvider ProcessManagerBackgroundJobs { get; } = new("Baggrundsjob", "C861C5E2-8DDA-43E5-A5D0-B94834EE3FF6");
 
     public AuditIdentity IdentityId { get; }
