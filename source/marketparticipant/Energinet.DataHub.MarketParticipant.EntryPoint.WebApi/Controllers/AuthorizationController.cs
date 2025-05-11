@@ -33,7 +33,6 @@ public class AuthorizationController : ControllerBase
     private readonly IMediator _mediator;
     private readonly IAuthorizationService _authorizationService;
     private readonly IFeatureManager _featureManager;
-    private readonly IUserContext<FrontendUser> _userContext;
 
     public AuthorizationController(
         IUserContext<FrontendUser> userContext,
@@ -44,12 +43,11 @@ public class AuthorizationController : ControllerBase
         _authorizationService = authorizationService;
         _featureManager = featureManager;
         _mediator = mediator;
-        _userContext = userContext;
     }
 
     [HttpPost("createSignature")]
     [AllowAnonymous]
-    public async Task<ActionResult> CreateSignatureAsync()
+    public async Task<ActionResult> CreateSignatureAsync([FromBody] string validationRequestJson)
     {
         var blockSignatureAuthorization = await _featureManager
             .IsEnabledAsync(BlockSignatureAuthorizationFeatureKey)
@@ -58,7 +56,7 @@ public class AuthorizationController : ControllerBase
         if (blockSignatureAuthorization)
             throw new UnauthorizedAccessException("Signature authorization is not allowed.");
 
-        var command = new CreateSignatureCommand(_userContext);
+        var command = new CreateSignatureCommand(validationRequestJson);
 
         var result = await _mediator
             .Send(command)

@@ -12,9 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json.Serialization;
+using Energinet.DataHub.MarketParticipant.Authorization.AccessValidation;
+
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-public interface IAccessValidation
+[JsonDerivedType(typeof(MeteringPointMasterDataAccessValidationRequest), typeDiscriminator: "mpm")]
+public abstract class AccessValidationRequest
 {
-    bool Validate();
+    protected AccessValidationRequest()
+    {
+    }
 }

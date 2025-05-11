@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+using Energinet.DataHub.MarketParticipant.Authorization.Services.Factories;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
@@ -50,11 +52,11 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
         }
 
         // Later this task has AuthorizationRestriction and UserIdentification as input
-        public async Task<RestrictionSignatureDto> CreateSignatureAsync(SecurityValidation securityValidation)
+        public async Task<RestrictionSignatureDto> CreateSignatureAsync(string validationRequestJson)
         {
-            ArgumentNullException.ThrowIfNull(securityValidation);
+            ArgumentNullException.ThrowIfNull(validationRequestJson);
 
-            if (!ValidateAccess(securityValidation))
+            if (!ValidateAccess(validationRequestJson))
                 throw new ArgumentException("Invalid request");
 
             // 1. Call api to make authorization check. (Input: AuthorizationRestriction and UserIdentification)
@@ -78,10 +80,29 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             return verifyResult.IsValid;
         }
 
-        private static bool ValidateAccess(SecurityValidation securityValidation)
+        private bool ValidateAccess(string validationRequestJson)
         {
-            IAccessValidation accessValidation = new MeteringPointMasterDataAccessValidation(securityValidation.GetMarketRole());
-            return accessValidation.Validate();
+            try
+            {
+                var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
+                var accessValidation = AccessValidatorFactory.GetAccessValidator(accessValidationRequest);
+
+                return accessValidation.Validate();
+            }
+            catch (JsonException jsonEx)
+            {
+                _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON.");
+            }
+            catch (InvalidOperationException invalidOpEx)
+            {
+                _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation.");
+            }
+            catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentException)
+            {
+                _logger.LogDebug(ex, "An argument-related error occurred during access validation.");
+            }
+
+            return false;
         }
     }
 }

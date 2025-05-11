@@ -13,34 +13,35 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Authorization.AccessValidation;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
+using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class CreateSignatureIntegrationTests : IClassFixture<KeyClientFixture>
+public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFixture<KeyClientFixture>
 {
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
     private readonly KeyClientFixture _keyClientFixture;
 
-    public CreateSignatureIntegrationTests(MarketParticipantDatabaseFixture databaseFixture, KeyClientFixture keyClientFixture)
+    public CreateSignatureRoleAuthorizationIntegrationTests(MarketParticipantDatabaseFixture databaseFixture, KeyClientFixture keyClientFixture)
     {
         _databaseFixture = databaseFixture;
         _keyClientFixture = keyClientFixture;
     }
 
     [Fact]
-    public async Task CreateSignature_WhenCalledWithGridAccessProvider_ThrowsException()
+    public async Task CreateSignature_WhenCalledWithRoleDataHubAdministrator_ReturnsSignature()
     {
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
@@ -48,42 +49,44 @@ public sealed class CreateSignatureIntegrationTests : IClassFixture<KeyClientFix
 
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<AuthorizationService>>();
 
-        var claims = new List<Claim>
+        var request = new MeteringPointMasterDataAccessValidationRequest
         {
-            new Claim("marketroles", "GridAccessProvider")
+            MarketRole = EicFunction.DataHubAdministrator
         };
 
-        var securityValidation = new SecurityValidation(claims);
+        var jsonString = JsonSerializer.Serialize<AccessValidationRequest>(request);
 
         // act
         var target = new AuthorizationService(_keyClientFixture.KeyClient.VaultUri, _keyClientFixture.KeyName, logger);
-
-        // assert
-        await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(securityValidation));
-    }
-
-    [Fact]
-    public async Task CreateSignature_WhenCalledWithDataHubAdministrator_ReturnsSignature()
-    {
-        // arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
-        await using var scope = host.BeginScope();
-
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<AuthorizationService>>();
-
-        var claims = new List<Claim>
-        {
-            new Claim("marketroles", "DataHubAdministrator")
-        };
-
-        var securityValidation = new SecurityValidation(claims);
-
-        // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient.VaultUri, _keyClientFixture.KeyName, logger);
-        var actual = await target.CreateSignatureAsync(securityValidation);
+        var actual = await target.CreateSignatureAsync(jsonString);
 
         // assert
         Assert.NotNull(actual);
         Assert.False(string.IsNullOrWhiteSpace(actual.Signature));
+    }
+
+    [Fact]
+    public async Task CreateSignature_WhenCalledWithRoleGridAccessProvider_ThrowsException()
+    {
+        // arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<AuthorizationService>>();
+
+        var request = new MeteringPointMasterDataAccessValidationRequest
+        {
+            MarketRole = EicFunction.GridAccessProvider
+        };
+
+        var meteringPointMasterDataAccess = new MeteringPointMasterDataAccessValidation(request);
+
+        var jsonString = JsonSerializer.Serialize<AccessValidationRequest>(request);
+
+        // act
+        var target = new AuthorizationService(_keyClientFixture.KeyClient.VaultUri, _keyClientFixture.KeyName, logger);
+
+        // assert
+        await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(jsonString));
     }
 }

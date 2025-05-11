@@ -13,15 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
-using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Authorization;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using MediatR;
 
@@ -44,24 +39,10 @@ public sealed class CreateSignatureHandler
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        var securityValidation = new SecurityValidation(GetSecurityValidation(request.UserContext));
-
         var restrictionSignatureDto = await _authorizationService
-            .CreateSignatureAsync(securityValidation)
+            .CreateSignatureAsync(request.AccessvalidationRequestJson)
             .ConfigureAwait(false);
 
         return new CreateSignatureResponse(restrictionSignatureDto);
-    }
-
-    private static IEnumerable<Claim>? GetSecurityValidation(IUserContext<FrontendUser> userContext)
-    {
-        try
-        {
-            return userContext.CurrentUser.Claims;
-        }
-        catch (InvalidOperationException)
-        {
-            return null;
-        }
     }
 }
