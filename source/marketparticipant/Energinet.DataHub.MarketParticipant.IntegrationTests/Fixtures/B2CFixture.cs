@@ -24,7 +24,9 @@ using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
-public sealed class B2CFixture : IAsyncLifetime, System.IDisposable
+#pragma warning disable CA1001
+public sealed class B2CFixture : IAsyncLifetime
+#pragma warning restore CA1001
 {
     private GraphServiceClient? _graphClient;
 
@@ -67,13 +69,7 @@ public sealed class B2CFixture : IAsyncLifetime, System.IDisposable
 
     public Task DisposeAsync()
     {
-        Dispose();
-        return Task.CompletedTask;
-    }
-
-    public void Dispose()
-    {
         _graphClient?.Dispose();
-        System.GC.SuppressFinalize(this);
+        return Task.CompletedTask;
     }
 }
