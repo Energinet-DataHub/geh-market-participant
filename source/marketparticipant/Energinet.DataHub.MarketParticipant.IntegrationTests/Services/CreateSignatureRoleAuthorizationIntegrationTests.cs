@@ -61,8 +61,8 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         var actual = await target.CreateSignatureAsync(jsonString);
 
         // assert
-        Assert.NotNull(actual);
-        Assert.False(string.IsNullOrWhiteSpace(actual.Signature));
+        Assert.NotNull(actual.Signature);
+        Assert.NotEmpty(actual.Signature);
     }
 
     [Fact]
