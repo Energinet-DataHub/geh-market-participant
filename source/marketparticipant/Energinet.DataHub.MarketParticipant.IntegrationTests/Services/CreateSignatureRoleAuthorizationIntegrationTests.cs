@@ -55,7 +55,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
             MeteringPointId = "1234"
         };
 
-        var jsonString = JsonSerializer.Serialize<AccessValidationRequest>(request);
+        var jsonString = SerializeAccessRestriction(request);
 
         // act
         var target = new AuthorizationService(_keyClientFixture.KeyClient.VaultUri, _keyClientFixture.KeyName, logger);
@@ -81,14 +81,17 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
             MeteringPointId = "1234"
         };
 
-        var meteringPointMasterDataAccess = new MeteringPointMasterDataAccessValidation(request);
-
-        var jsonString = JsonSerializer.Serialize<AccessValidationRequest>(request);
+        var jsonString = SerializeAccessRestriction(request);
 
         // act
         var target = new AuthorizationService(_keyClientFixture.KeyClient.VaultUri, _keyClientFixture.KeyName, logger);
 
         // assert
         await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(jsonString));
+    }
+
+    private string SerializeAccessRestriction(AccessValidationRequest accessValidationRequest)
+    {
+        return JsonSerializer.Serialize(accessValidationRequest);
     }
 }
