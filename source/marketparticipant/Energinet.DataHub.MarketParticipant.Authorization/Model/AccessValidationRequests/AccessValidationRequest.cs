@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using System.Text.Json.Serialization;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction.Parameters;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-public class SignatureParameterEicFunction : SignatureParameterEnum<EicFunction>
+[JsonDerivedType(typeof(MeteringPointMasterDataAccessValidationRequest), typeDiscriminator: "mpm")]
+public abstract class AccessValidationRequest : IAccessRequestSignatureParams
 {
-    // <summary>
-    // Initializes a new instance of the <see cref="SignatureParameterLong"/> for <see cref="long"/>class.
-    // </summary>
-    // <param name="value">The long value.</param>
-    internal SignatureParameterEicFunction(EicFunction value)
-    : base(value)
+    protected AccessValidationRequest()
     {
     }
+
+    public abstract IReadOnlyCollection<SignatureParameter> GetSignatureParams();
 }

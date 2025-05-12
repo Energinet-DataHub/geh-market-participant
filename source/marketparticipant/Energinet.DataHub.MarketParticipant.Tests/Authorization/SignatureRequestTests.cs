@@ -14,8 +14,9 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction.Parameters;
+using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Xunit;
 using Xunit.Categories;
 

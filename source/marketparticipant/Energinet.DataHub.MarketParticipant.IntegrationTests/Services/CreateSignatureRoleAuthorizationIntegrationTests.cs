@@ -15,8 +15,8 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Authorization.AccessValidation;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -51,7 +51,8 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
 
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
-            MarketRole = EicFunction.DataHubAdministrator
+            MarketRole = EicFunction.DataHubAdministrator,
+            MeteringPointId = "1234"
         };
 
         var jsonString = JsonSerializer.Serialize<AccessValidationRequest>(request);
@@ -61,8 +62,8 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         var actual = await target.CreateSignatureAsync(jsonString);
 
         // assert
-        Assert.NotNull(actual.Signature);
-        Assert.NotEmpty(actual.Signature);
+        Assert.NotNull(actual.Value);
+        Assert.NotEmpty(actual.Value);
     }
 
     [Fact]
@@ -76,7 +77,8 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
 
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
-            MarketRole = EicFunction.GridAccessProvider
+            MarketRole = EicFunction.GridAccessProvider,
+            MeteringPointId = "1234"
         };
 
         var meteringPointMasterDataAccess = new MeteringPointMasterDataAccessValidation(request);

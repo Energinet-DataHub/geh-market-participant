@@ -14,15 +14,15 @@
 
 using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Authorization.Config;
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction.Helpers;
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction.Parameters;
+using Energinet.DataHub.MarketParticipant.Authorization.Helpers;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
 public sealed class SignatureRequest()
 {
     private static readonly IComparer<byte[]> _signatureByteComparer = new SignatureByteComparer();
-    private List<SignatureParameter> _params = [];
+    private readonly List<SignatureParameter> _params = [];
 
     /// <summary>
     /// Creates the Byte array for representing the Signature params.

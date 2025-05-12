@@ -21,6 +21,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement;
+using IAuthorizationService = Microsoft.AspNetCore.Authorization.IAuthorizationService;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
@@ -57,26 +58,6 @@ public class AuthorizationController : ControllerBase
             throw new UnauthorizedAccessException("Signature authorization is not allowed.");
 
         var command = new CreateSignatureCommand(validationRequestJson);
-
-        var result = await _mediator
-            .Send(command)
-            .ConfigureAwait(false);
-
-        return Ok(result);
-    }
-
-    [HttpPost("verifySignature")]
-    [AllowAnonymous]
-    public async Task<ActionResult> VerifySignatureAsync(string signature)
-    {
-        var blockSignatureAuthorization = await _featureManager
-            .IsEnabledAsync(BlockSignatureAuthorizationFeatureKey)
-            .ConfigureAwait(false);
-
-        if (blockSignatureAuthorization)
-            throw new UnauthorizedAccessException("Signature authorization is not allowed.");
-
-        var command = new VerifySignatureCommand(signature);
 
         var result = await _mediator
             .Send(command)

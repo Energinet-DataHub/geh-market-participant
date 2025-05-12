@@ -12,7 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Helpers;
 
-public sealed record RestrictionSignatureDto(
-    string Signature);
+internal sealed class SignatureByteComparer : IComparer<byte[]>
+{
+    public int Compare(byte[]? x, byte[]? y)
+    {
+        if (x == null || y == null)
+        {
+            return x == y ? 0 : x == null ? -1 : 1;
+        }
+
+        return x.AsSpan().SequenceCompareTo(y);
+    }
+}

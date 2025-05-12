@@ -11,20 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction.Parameters;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-public class SignatureParameterLong : SignatureParameter
+public interface IAccessRequestSignatureParams
 {
-    // <summary>
-    // Initializes a new instance of the <see cref="SignatureParameterLong"/> for <see cref="long"/>class.
-    // </summary>
-    // <param name="value">The long value.</param>
-    internal SignatureParameterLong(long value)
-    {
-        ParameterData = BitConverter.GetBytes(value);
-    }
-
-    // <inheritdoc />
-    internal override byte[] ParameterData { get; }
+    IReadOnlyCollection<SignatureParameter> GetSignatureParams();
 }

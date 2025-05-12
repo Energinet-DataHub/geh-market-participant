@@ -12,9 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization;
-using MediatR;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+public class SignatureParameterLong : SignatureParameter
+{
+    // <summary>
+    // Initializes a new instance of the <see cref="SignatureParameterLong"/> for <see cref="long"/>class.
+    // </summary>
+    // <param name="value">The long value.</param>
+    internal SignatureParameterLong(long value)
+    {
+        ParameterData = BitConverter.GetBytes(value);
+    }
 
-public record VerifySignatureCommand(string Signature) : IRequest<VerifySignatureResponse>;
+    // <inheritdoc />
+    internal override byte[] ParameterData { get; }
+}

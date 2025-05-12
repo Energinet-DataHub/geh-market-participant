@@ -16,7 +16,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
-using Energinet.DataHub.MarketParticipant.Authorization;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using MediatR;
 

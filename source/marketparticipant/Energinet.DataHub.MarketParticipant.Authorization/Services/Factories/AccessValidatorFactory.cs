@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.AccessValidation;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services.Factories
@@ -24,13 +23,11 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services.Factories
         {
             ArgumentNullException.ThrowIfNull(request);
 
-            switch (request.GetType())
+            return request.GetType() switch
             {
-                case Type t when t == typeof(MeteringPointMasterDataAccessValidationRequest):
-                    return new MeteringPointMasterDataAccessValidation((MeteringPointMasterDataAccessValidationRequest)request);
-                default:
-                    throw new NotImplementedException($"No access validator found for {request.GetType()}");
-            }
+                { } t when t == typeof(MeteringPointMasterDataAccessValidationRequest) => new MeteringPointMasterDataAccessValidation((MeteringPointMasterDataAccessValidationRequest)request),
+                _ => throw new NotImplementedException($"No access validator found for {request.GetType()}")
+            };
         }
     }
 }

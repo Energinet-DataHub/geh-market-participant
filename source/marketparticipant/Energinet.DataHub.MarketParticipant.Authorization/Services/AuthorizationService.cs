@@ -16,7 +16,7 @@ using System.Text.Json;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 using Energinet.DataHub.MarketParticipant.Authorization.Services.Factories;
 using Microsoft.Extensions.Logging;
@@ -26,7 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
     public sealed class AuthorizationService : IAuthorizationService
     {
         private readonly KeyClient _keyClient;
-        private readonly Uri _keyVault;
         private readonly string _keyName;
         private readonly KeyVaultKey _key;
         private readonly CryptographyClient _cryptoClient;
@@ -34,7 +33,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 
         public AuthorizationService(Uri keyVault, string keyName, ILogger<AuthorizationService> logger)
         {
-            _keyVault = keyVault;
             _keyName = keyName;
             _keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
             _key = _keyClient.GetKey(_keyName);
@@ -52,57 +50,79 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
         }
 
         // Later this task has AuthorizationRestriction and UserIdentification as input
-        public async Task<RestrictionSignatureDto> CreateSignatureAsync(string validationRequestJson)
+        public async Task<Signature> CreateSignatureAsync(string validationRequestJson)
         {
             ArgumentNullException.ThrowIfNull(validationRequestJson);
+            var accessValidationRequest = DeserializeAccessValidationRequest(validationRequestJson);
+            if (accessValidationRequest == null)
+            {
+                _logger.LogDebug("Failed to deserialize access validation request");
+                throw new ArgumentException("CreateSignatureAsync: Invalid validation request string");
+            }
 
-            if (!ValidateAccess(validationRequestJson))
-                throw new ArgumentException("Invalid request");
+            var validator = AccessValidatorFactory.GetAccessValidator(accessValidationRequest);
+            if (validator == null)
+            {
+                _logger.LogDebug("No validator found for the given access validation request");
+                throw new ArgumentException("CreateSignatureAsync: validator for the request does not exist");
+            }
+
+            if (!validator.Validate())
+                throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
 
             // 1. Call api to make authorization check. (Input: AuthorizationRestriction and UserIdentification)
             // 2. If authorization succesfull: Create a signature (Input: AuthorizationRestriction) if unautorised return null
             // For now just return a static signature
             // Will be later something like this:
             // Var binaryRestriction = restriction.ToByteArray();
-            byte[] binaryRestriction = [1, 2, 3, 4];
-            var signature = await _cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, binaryRestriction).ConfigureAwait(false);
-            return new RestrictionSignatureDto(Convert.ToBase64String(signature.Signature));
+            var signatureRequest = new SignatureRequest();
+            foreach (var signatureParam in accessValidationRequest.GetSignatureParams())
+            {
+                signatureRequest.AddSignatureParameter(signatureParam);
+            }
+
+            var expires = DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds();
+            signatureRequest.SetExpiration(expires);
+            var signature = await _cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes()).ConfigureAwait(false);
+            return new Signature
+            {
+                Value = Convert.ToBase64String(signature.Signature),
+                KeyVersion = _key.Properties.Version,
+                Expires = expires
+            };
         }
 
-        public async Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, string signature)
+        public async Task<bool> VerifySignatureAsync(SignatureRequest restriction, string signature)
         {
-            // Will be later something like this:
-            // Var binaryRestriction = restriction.ToByteArray();
-            // For now Static
-            byte[] binaryRestriction = [1, 2, 3, 4];
+            ArgumentNullException.ThrowIfNull(restriction);
+
             var conversionResult = Convert.FromBase64String(signature);
-            var verifyResult = await _cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, binaryRestriction, conversionResult).ConfigureAwait(false);
+            var verifyResult = await _cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, restriction.CreateSignatureParamBytes(), conversionResult).ConfigureAwait(false);
             return verifyResult.IsValid;
         }
 
-        private bool ValidateAccess(string validationRequestJson)
+        private AccessValidationRequest? DeserializeAccessValidationRequest(string validationRequestJson)
         {
             try
             {
                 var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
-                var accessValidation = AccessValidatorFactory.GetAccessValidator(accessValidationRequest);
 
-                return accessValidation.Validate();
+                return accessValidationRequest;
             }
             catch (JsonException jsonEx)
             {
-                _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON.");
+                _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON");
             }
             catch (InvalidOperationException invalidOpEx)
             {
-                _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation.");
+                _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation");
             }
-            catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentException)
+            catch (Exception ex) when (ex is ArgumentNullException or ArgumentException)
             {
-                _logger.LogDebug(ex, "An argument-related error occurred during access validation.");
+                _logger.LogDebug(ex, "An argument-related error occurred during access validation");
             }
 
-            return false;
+            return null;
         }
     }
 }

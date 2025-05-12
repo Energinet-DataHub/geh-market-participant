@@ -12,17 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction.Parameters;
+using System.Text;
 
-public class SignatureParameterString : SignatureParameter
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
+
+ #pragma warning disable CA1711
+public class SignatureParameterEnum<T> : SignatureParameter
+ #pragma warning restore CA1711
+    where T : Enum
 {
     // <summary>
-    // Initializes a new instance of the <see cref="SignatureParameterString"/> for <see cref="string"/>classes.
+    // Initializes a new instance of the <see cref="SignatureParameterEnum"/> for <see cref="long"/>class.
     // </summary>
-    // <param name="value">The string value.</param>
-    internal SignatureParameterString(string value)
+    // <param name="value">The long value.</param>
+    internal SignatureParameterEnum(T value)
     {
-        ParameterData = System.Text.Encoding.UTF8.GetBytes(value);
+        var nameBytes = Encoding.UTF8.GetBytes(value.GetType().Name);
+        var valueBytes = Encoding.UTF8.GetBytes(value.ToString());
+        ParameterData = nameBytes.Concat(valueBytes).ToArray();
     }
 
     // <inheritdoc />

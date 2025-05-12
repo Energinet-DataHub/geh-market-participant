@@ -12,22 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel;
-using System.Text.Json.Serialization;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.AccessValidation
+public class SignatureParameterString : SignatureParameter
 {
-    public class MeteringPointMasterDataAccessValidationRequest : AccessValidationRequest
+    // <summary>
+    // Initializes a new instance of the <see cref="SignatureParameterString"/> for <see cref="string"/>classes.
+    // </summary>
+    // <param name="value">The string value.</param>
+    internal SignatureParameterString(string value)
     {
-        [JsonConstructor]
-        [Browsable(false)]
-        public MeteringPointMasterDataAccessValidationRequest()
-        {
-        }
-
-        public EicFunction MarketRole { get; set; }
-
-        public string MeteringPointId { get; set; } = null!;
+        ParameterData = System.Text.Encoding.UTF8.GetBytes(value);
     }
+
+    // <inheritdoc />
+    internal override byte[] ParameterData { get; }
 }
