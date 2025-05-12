@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+using System.Text.Json.Serialization;
+using Energinet.DataHub.MarketParticipant.Authorization.AccessValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-public interface IAuthorizationService
+[JsonDerivedType(typeof(MeteringPointMasterDataAccessValidationRequest), typeDiscriminator: "mpm")]
+public abstract class AccessValidationRequest
 {
-    Task<RestrictionSignatureDto> CreateSignatureAsync(string validationRequestJson);
-    Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, string signature);
+    protected AccessValidationRequest()
+    {
+    }
 }

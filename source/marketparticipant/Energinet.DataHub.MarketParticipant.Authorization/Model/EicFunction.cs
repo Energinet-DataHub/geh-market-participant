@@ -12,12 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
-
-public interface IAuthorizationService
+public enum EicFunction
 {
-    Task<RestrictionSignatureDto> CreateSignatureAsync(string validationRequestJson);
-    Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, string signature);
+    BalanceResponsibleParty = 1,
+    BillingAgent = 3,
+    EnergySupplier = 12,
+    GridAccessProvider = 14,
+    ImbalanceSettlementResponsible = 15,
+    MeterOperator = 22,
+    MeteredDataAdministrator = 23,
+    MeteredDataResponsible = 26,
+    MeteringPointAdministrator = 27,
+    SystemOperator = 45,
+    DanishEnergyAgency = 48,
+    DataHubAdministrator = 50,
+    IndependentAggregator = 51,
+    SerialEnergyTrader = 52,
+    Delegated = 53,
+    ItSupplier = 54,
 }
