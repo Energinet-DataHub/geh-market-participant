@@ -89,7 +89,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             if (!validator.Validate())
                 throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
 
-
             // 2. If authorization succesfull: Create a signature (Input: AuthorizationRestriction) if unautorised return null
             // For now just return a static signature
             // Will be later something like this:
