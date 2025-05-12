@@ -38,9 +38,12 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator
         };
     }
 
-    public bool ValidateMeteringPointIsOfOwnedGridArea()
+    private bool ValidateMeteringPointIsOfOwnedGridArea()
     {
         //TODO: Call elecitricity market
+        var marketRole = MarketRole;
+        //USE GLN and market rol for look up Grid Area
+        //lookup metering point to compare the registered grid
         return false;
     }
 }

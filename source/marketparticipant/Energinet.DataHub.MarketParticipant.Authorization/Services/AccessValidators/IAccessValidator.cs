@@ -17,5 +17,4 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValid
 internal interface IAccessValidator
 {
     bool Validate();
-    bool ValidateMeteringPointIsOfOwnedGridArea();
 }
