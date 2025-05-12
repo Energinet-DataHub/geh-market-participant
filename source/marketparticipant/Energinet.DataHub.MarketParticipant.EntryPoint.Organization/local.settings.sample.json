@@ -3,19 +3,6 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "SQL_MP_DB_CONNECTION_STRING": "Connection string to the database containing market participants.",
-    "SERVICE_BUS_CONNECTION_STRING": "Connection string to the storage account for the integration events.",
-    "SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING": "Health connection string to the storage account for the integration events.",
-    "SBT_MARKET_PARTICIPANT_CHANGED_NAME": "The name of the topic where the integration events are published.",
-    "SEND_GRID_APIKEY": "send grid api key",
-    "SENDER_EMAIL": "from email for user invites",
-    "BCC_EMAIL": "bcc email for user invites",
-    "ENVIRONMENT_DESC": "The environment description",
-    "CvrRegister:BaseAddress": "CVR lookup base address",
-    "CvrRegister:Username": "CVR lookup username",
-    "CvrRegister:Password": "CVR lookup password",
-    "CVR_ORG_UPDATED_NOTIFICATION_TO_EMAIL": "CVR update notification to email",
-    "BALANCE_RESPONSIBLE_CHANGED_NOTIFICATION_TO_EMAIL": "Balance responsible changed notification to email",
 
     "AzureB2c:Tenant": "The tenant id of the current tenant, e.g. devDataHubB2C.onmicrosoft.com",
     "AzureB2c:SpnId": "The client id of the 'sp-b2c-<environment>' service principal with management permissions.",
@@ -24,14 +11,30 @@
     "AzureB2c:BackendSpnObjectId": "The object id of the 'backend-b2b-app' service principal (the enterprise application for the application registration).",
     "AzureB2c:BackendId": "The client id of the 'backend-b2b-app' application registration.",
 
-    "ConsumeServiceBusSettings:ConnectionString": "",
-    "ConsumeServiceBusSettings:SharedIntegrationEventTopic": "",
-    "ConsumeServiceBusSettings:IntegrationEventSubscription": "",
+    "BalanceResponsibleChanged:NotificationToEmail": "",
+
+    "CvrRegister:BaseAddress": "",
+    "CvrRegister:Username": "",
+    "CvrRegister:Password": "",
 
     "Database:ConnectionString": "",
+    "RevisionLogOptions:ApiAddress": "",
+
+    "Environment:Description": "",
+
+    "SendGrid:ApiKey": "",
+    "SendGrid:SenderEmail": "",
+    "SendGrid:BccEmail": "",
+
+    "ServiceBus:FullyQualifiedNamespace": "",
+    "IntegrationEvents:SubscriptionName": "",
+    "IntegrationEvents:TopicName": "",
 
     "UserInvite:InviteFlowUrl": "",
 
-    "KeyVault:CertificatesKeyVault": "The address of the key vault containing the actor certificates"
+    "KeyVault:CertificatesKeyVault": "The address of the key vault containing the actor certificates",
+
+    "FeatureManagement:EnabledOrganizationIdentityUpdateEmail": false,
+    "FeatureManagement:EnabledOrganizationIdentityUpdateTrigger": false
   }
 }
