@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+using Energinet.DataHub.MarketParticipant.Authorization.Services.Factories;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 {
@@ -26,13 +30,15 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
         private readonly string _keyName;
         private readonly KeyVaultKey _key;
         private readonly CryptographyClient _cryptoClient;
+        private readonly ILogger<AuthorizationService> _logger;
 
-        public AuthorizationService(Uri keyVault, string keyName)
+        public AuthorizationService(Uri keyVault, string keyName, ILogger<AuthorizationService> logger)
         {
             _keyVault = keyVault;
             _keyName = keyName;
             _keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
             _key = _keyClient.GetKey(_keyName);
+            _logger = logger;
 
             // Todo:
             // Because of keyRotation, multiple versions of the key can be in use.
@@ -46,8 +52,13 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
         }
 
         // Later this task has AuthorizationRestriction and UserIdentification as input
-        public async Task<RestrictionSignatureDto> CreateSignatureAsync()
+        public async Task<RestrictionSignatureDto> CreateSignatureAsync(string validationRequestJson)
         {
+            ArgumentNullException.ThrowIfNull(validationRequestJson);
+
+            if (!ValidateAccess(validationRequestJson))
+                throw new ArgumentException("Invalid request");
+
             // 1. Call api to make authorization check. (Input: AuthorizationRestriction and UserIdentification)
             // 2. If authorization succesfull: Create a signature (Input: AuthorizationRestriction) if unautorised return null
             // For now just return a static signature
@@ -67,6 +78,31 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             var conversionResult = Convert.FromBase64String(signature);
             var verifyResult = await _cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, binaryRestriction, conversionResult).ConfigureAwait(false);
             return verifyResult.IsValid;
+        }
+
+        private bool ValidateAccess(string validationRequestJson)
+        {
+            try
+            {
+                var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
+                var accessValidation = AccessValidatorFactory.GetAccessValidator(accessValidationRequest);
+
+                return accessValidation.Validate();
+            }
+            catch (JsonException jsonEx)
+            {
+                _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON.");
+            }
+            catch (InvalidOperationException invalidOpEx)
+            {
+                _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation.");
+            }
+            catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentException)
+            {
+                _logger.LogDebug(ex, "An argument-related error occurred during access validation.");
+            }
+
+            return false;
         }
     }
 }

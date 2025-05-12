@@ -14,7 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +35,7 @@ public class AuthorizationController : ControllerBase
     private readonly IFeatureManager _featureManager;
 
     public AuthorizationController(
+        IUserContext<FrontendUser> userContext,
         IAuthorizationService authorizationService,
         IFeatureManager featureManager,
         IMediator mediator)
@@ -44,7 +47,7 @@ public class AuthorizationController : ControllerBase
 
     [HttpPost("createSignature")]
     [AllowAnonymous]
-    public async Task<ActionResult> CreateSignatureAsync()
+    public async Task<ActionResult> CreateSignatureAsync([FromBody] string validationRequestJson)
     {
         var blockSignatureAuthorization = await _featureManager
             .IsEnabledAsync(BlockSignatureAuthorizationFeatureKey)
@@ -53,7 +56,7 @@ public class AuthorizationController : ControllerBase
         if (blockSignatureAuthorization)
             throw new UnauthorizedAccessException("Signature authorization is not allowed.");
 
-        var command = new CreateSignatureCommand();
+        var command = new CreateSignatureCommand(validationRequestJson);
 
         var result = await _mediator
             .Send(command)

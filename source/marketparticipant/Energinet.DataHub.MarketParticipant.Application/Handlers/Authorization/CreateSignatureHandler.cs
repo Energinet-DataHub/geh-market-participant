@@ -40,7 +40,7 @@ public sealed class CreateSignatureHandler
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
         var restrictionSignatureDto = await _authorizationService
-            .CreateSignatureAsync()
+            .CreateSignatureAsync(request.AccessvalidationRequestJson)
             .ConfigureAwait(false);
 
         return new CreateSignatureResponse(restrictionSignatureDto);
