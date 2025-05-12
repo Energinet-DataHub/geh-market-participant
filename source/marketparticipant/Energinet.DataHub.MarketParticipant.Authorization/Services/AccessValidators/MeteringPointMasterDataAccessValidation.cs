@@ -30,6 +30,17 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator
 
     public bool Validate()
     {
-        return MarketRole == EicFunction.DataHubAdministrator;
+        return MarketRole switch
+        {
+            EicFunction.DataHubAdministrator => true,
+            EicFunction.GridAccessProvider => ValidateMeteringPointIsOfOwnedGridArea(),
+           _ => false,
+        };
+    }
+
+    public bool ValidateMeteringPointIsOfOwnedGridArea()
+    {
+        //TODO: Call elecitricity market
+        return false;
     }
 }
