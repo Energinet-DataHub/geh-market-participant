@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net.Http.Json;
 using System.Text.Json;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
@@ -31,7 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
         private readonly CryptographyClient _cryptoClient;
         private readonly ILogger<AuthorizationService> _logger;
 
-        public AuthorizationService(Uri keyVault, string keyName, ILogger<AuthorizationService> logger)
+        public AuthorizationService(
+            Uri keyVault,
+            string keyName,
+            ILogger<AuthorizationService> logger)
         {
             _keyName = keyName;
             _keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
@@ -49,7 +53,22 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             _cryptoClient = new CryptographyClient(_key.Id, new DefaultAzureCredential());
         }
 
-        // Later this task has AuthorizationRestriction and UserIdentification as input
+        public async Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest)
+        {
+            // 1. Call api to make authorization check.
+            using var request = new HttpRequestMessage(HttpMethod.Post, "api/request-signature");
+            request.Content = JsonContent.Create(accessValidationRequest);
+            using var httpClient = new HttpClient(); // TODO: Use DI to inject HttpClient
+            using var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content
+                .ReadFromJsonAsync<Signature>()
+                .ConfigureAwait(false) ?? throw new InvalidOperationException("Failed to deserialize signature response content");
+            return result;
+        }
+
         public async Task<Signature> CreateSignatureAsync(string validationRequestJson)
         {
             ArgumentNullException.ThrowIfNull(validationRequestJson);
@@ -70,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             if (!validator.Validate())
                 throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
 
-            // 1. Call api to make authorization check. (Input: AuthorizationRestriction and UserIdentification)
+
             // 2. If authorization succesfull: Create a signature (Input: AuthorizationRestriction) if unautorised return null
             // For now just return a static signature
             // Will be later something like this:
@@ -92,12 +111,12 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             };
         }
 
-        public async Task<bool> VerifySignatureAsync(SignatureRequest restriction, string signature)
+        public async Task<bool> VerifySignatureAsync(SignatureRequest signatureRequest, string signature)
         {
-            ArgumentNullException.ThrowIfNull(restriction);
+            ArgumentNullException.ThrowIfNull(signatureRequest);
 
             var conversionResult = Convert.FromBase64String(signature);
-            var verifyResult = await _cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, restriction.CreateSignatureParamBytes(), conversionResult).ConfigureAwait(false);
+            var verifyResult = await _cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), conversionResult).ConfigureAwait(false);
             return verifyResult.IsValid;
         }
 

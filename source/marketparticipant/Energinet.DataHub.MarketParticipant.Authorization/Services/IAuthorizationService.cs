@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
 public interface IAuthorizationService
 {
+    Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest);
     Task<Signature> CreateSignatureAsync(string validationRequestJson);
-    Task<bool> VerifySignatureAsync(SignatureRequest restriction, string signature);
+    Task<bool> VerifySignatureAsync(SignatureRequest signatureRequest, string signature);
 }

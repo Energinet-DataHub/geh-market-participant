@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
@@ -90,7 +91,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(jsonString));
     }
 
-    private string SerializeAccessRestriction(AccessValidationRequest accessValidationRequest)
+    private static string SerializeAccessRestriction(AccessValidationRequest accessValidationRequest)
     {
         return JsonSerializer.Serialize(accessValidationRequest);
     }
