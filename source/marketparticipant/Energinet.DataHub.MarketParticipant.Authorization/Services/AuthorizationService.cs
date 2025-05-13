@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 
         public async Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, "api/request-signature");
+            using var request = new HttpRequestMessage(HttpMethod.Post, string.Empty);
             request.Content = JsonContent.Create(accessValidationRequest);
             using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
 

@@ -45,6 +45,14 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
         var host = new WebApiIntegrationTestHost();
         host.ServiceCollection.AddSingleton(configuration);
+        host.ServiceCollection.AddSingleton<AuthorizationService>(provider =>
+        {
+            var tokenCredentials = new DefaultAzureCredential();
+            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
+            var keyClient = new KeyClient(options.Value.AuthSignKeyVault, tokenCredentials);
+            return new AuthorizationService(provider.GetRequiredService<ILogger<AuthorizationService>>(), keyClient.GetKey(options.Value.AuthSignKeyName).Value);
+        });
+
         host.ServiceCollection.AddMarketParticipantWebApiModule(configuration);
         InitUserIdProvider(host.ServiceCollection);
 
@@ -58,13 +66,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             host.ServiceCollection.Replace(ServiceDescriptor.Scoped<ICertificateService>(_ => certificateFixture.CertificateService));
         }
 
-        host.ServiceCollection.AddSingleton<AuthorizationService>(provider =>
-        {
-            var tokenCredentials = new DefaultAzureCredential();
-            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
-            var keyClient = new KeyClient(options.Value.AuthSignKeyVault, tokenCredentials);
-            return new AuthorizationService(provider.GetRequiredService<ILogger<AuthorizationService>>(), keyClient.GetKey(options.Value.AuthSignKeyName).Value);
-        });
+
 
         return Task.FromResult(host);
     }
