@@ -24,10 +24,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services.Factories
         {
             ArgumentNullException.ThrowIfNull(request);
 
-            return request.GetType() switch
+            return request switch
             {
-                { } t when t == typeof(MeteringPointMasterDataAccessValidationRequest) => new MeteringPointMasterDataAccessValidation((MeteringPointMasterDataAccessValidationRequest)request),
-                _ => throw new NotImplementedException($"No access validator found for {request.GetType()}")
+                MeteringPointMasterDataAccessValidationRequest meteringPointMasterDataAccessValidationRequest =>
+                    new MeteringPointMasterDataAccessValidation(meteringPointMasterDataAccessValidationRequest),
+                _ => throw new ArgumentOutOfRangeException(nameof(request))
             };
         }
     }
