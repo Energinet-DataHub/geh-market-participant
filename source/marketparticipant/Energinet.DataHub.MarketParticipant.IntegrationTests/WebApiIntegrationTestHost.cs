@@ -66,8 +66,6 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             host.ServiceCollection.Replace(ServiceDescriptor.Scoped<ICertificateService>(_ => certificateFixture.CertificateService));
         }
 
-
-
         return Task.FromResult(host);
     }
 
