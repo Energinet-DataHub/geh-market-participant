@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using Azure.Identity;
+using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Secrets;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Monitor;
@@ -21,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Options;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 
@@ -42,6 +45,14 @@ internal static class MarketParticipantAuthApiModuleExtensions
             var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
             var defaultCredentials = new DefaultAzureCredential();
             return new SecretClient(options.Value.AuthSignKeyVault, defaultCredentials);
+        });
+
+        services.AddSingleton<AuthorizationService>(provider =>
+        {
+            var tokenCredentials = new DefaultAzureCredential();
+            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
+            var keyClient = new KeyClient(options.Value.AuthSignKeyVault, tokenCredentials);
+            return new AuthorizationService(provider.GetRequiredService<ILogger<AuthorizationService>>(), keyClient.GetKey(options.Value.AuthSignKeyName).Value);
         });
 
         AddHealthChecks(services);

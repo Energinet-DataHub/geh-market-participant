@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Options;
 
-public interface IAuthorizationService
+public sealed record KeyVaultOptions
 {
-    Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest);
-    Task<Signature> CreateSignatureAsync(string validationRequestJson);
-    Task<bool> VerifySignatureAsync(SignatureRequest signatureRequest, string signature);
+    public const string SectionName = "AuthorizationKeyVault";
+
+    [Required]
+    public Uri AuthSignKeyVault { get; set; } = null!;
+
+    [Required]
+    public string AuthSignKeyName { get; set; } = null!;
 }

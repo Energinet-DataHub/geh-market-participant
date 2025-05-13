@@ -14,6 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.FeatureManagement;
@@ -25,15 +27,20 @@ public sealed class AuthorizationHttpTrigger
     private const string BlockSignatureAuthorizationFeatureKey = "BlockSignatureAuthorization";
 
     private readonly IFeatureManager _featureManager;
+    private readonly IMediator _mediator;
 
-    public AuthorizationHttpTrigger(IFeatureManager featureManager)
+    public AuthorizationHttpTrigger(
+        IFeatureManager featureManager,
+        IMediator mediator)
     {
         _featureManager = featureManager;
+        _mediator = mediator;
     }
 
     [Function("CreateSignature")]
     public async Task CreateSignatureAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "createSignature")]
+        string validationRequestJson,
         HttpRequestData httpRequest)
     {
         var blockSignatureAuthorization = await _featureManager
@@ -42,5 +49,26 @@ public sealed class AuthorizationHttpTrigger
 
         if (blockSignatureAuthorization)
             throw new UnauthorizedAccessException("Signature authorization is not allowed.");
+
+        var command = new CreateSignatureCommand(validationRequestJson);
+
+        var result = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        // TODO: Set the response body with the result
     }
 }
+
+/*
+
+
+        var command = new CreateSignatureCommand(validationRequestJson);
+
+        var result = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok(result);
+
+        */

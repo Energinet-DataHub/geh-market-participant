@@ -64,15 +64,6 @@ public static class MarketParticipantWebApiModuleExtensions
             return new SigningKeyRing(clock, keyClient, options.Value.TokenSignKeyName);
         });
 
-        _ = services.AddSingleton<IAuthorizationService>(provider =>
-        {
-            var tokenCredentials = new DefaultAzureCredential();
-            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
-            var keyClient = new KeyClient(options.Value.TokenSignKeyVault, tokenCredentials);
-            var logger = provider.GetRequiredService<ILogger<AuthorizationService>>();
-            return new AuthorizationService(options.Value.TokenSignKeyVault, options.Value.AuthSignKeyName, logger);
-        });
-
         services.AddSingleton(provider =>
         {
             var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();

@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services.Factories
+namespace Energinet.DataHub.MarketParticipant.Application.Services.Factories
 {
-    internal sealed class AccessValidatorFactory
+    public static class AccessValidatorFactory
     {
-        public static IAccessValidator GetAccessValidator(AccessValidationRequest? request)
+        public static IAccessValidator GetAccessValidator(AccessValidationRequest request)
         {
             ArgumentNullException.ThrowIfNull(request);
 

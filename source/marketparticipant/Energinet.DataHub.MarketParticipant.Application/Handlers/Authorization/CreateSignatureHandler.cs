@@ -18,30 +18,32 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using MediatR;
+using AuthorizationService = Energinet.DataHub.MarketParticipant.Application.Security.AuthorizationService;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Authorization;
 
 public sealed class CreateSignatureHandler
     : IRequestHandler<CreateSignatureCommand, CreateSignatureResponse>
 {
-    private readonly IAuthorizationService _authorizationService;
+    private readonly AuthorizationService _authorizationService;
 
-    public CreateSignatureHandler(
-        IAuthorizationService authorizationService)
+    public CreateSignatureHandler(AuthorizationService authorizationService)
     {
         _authorizationService = authorizationService;
     }
+
 
     public async Task<CreateSignatureResponse> Handle(
         CreateSignatureCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
+        ArgumentNullException.ThrowIfNull(request.AccessvalidationRequestJson);
 
-        var restrictionSignatureDto = await _authorizationService
-            .CreateSignatureAsync(request.AccessvalidationRequestJson)
-            .ConfigureAwait(false);
+        var signature = await _authorizationService
+        .CreateSignatureAsync(request.AccessvalidationRequestJson, cancellationToken)
+        .ConfigureAwait(false);
 
-        return new CreateSignatureResponse(restrictionSignatureDto);
+        return new CreateSignatureResponse(signature);
     }
 }

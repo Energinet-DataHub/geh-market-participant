@@ -1,0 +1,107 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Azure.Identity;
+using Azure.Security.KeyVault.Keys;
+using Azure.Security.KeyVault.Keys.Cryptography;
+using Energinet.DataHub.MarketParticipant.Application.Services.Factories;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+using Energinet.DataHub.MarketParticipant.Authorization.Services;
+using Microsoft.Extensions.Logging;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Security;
+
+public class AuthorizationService
+{
+    private readonly ILogger<AuthorizationService> _logger;
+    private readonly KeyVaultKey _key;
+    private readonly CryptographyClient _cryptoClient;
+
+    public AuthorizationService(
+        ILogger<AuthorizationService> logger,
+        KeyVaultKey key)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+
+        _logger = logger;
+        _key = key;
+        _cryptoClient = new CryptographyClient(key.Id, new DefaultAzureCredential());
+    }
+
+    public async Task<Signature> CreateSignatureAsync(string accessvalidationRequestJson, CancellationToken cancellationToken)
+    {
+        var accessValidationRequest = DeserializeAccessValidationRequest(accessvalidationRequestJson);
+        if (accessValidationRequest == null)
+        {
+            _logger.LogDebug("Failed to deserialize access validation request");
+            throw new ArgumentException("CreateSignatureAsync: Invalid validation request string");
+        }
+
+        var validator = AccessValidatorFactory.GetAccessValidator(accessValidationRequest);
+        if (validator == null)
+        {
+            _logger.LogDebug("No validator found for the given access validation request");
+            throw new ArgumentException("CreateSignatureAsync: validator for the request does not exist");
+        }
+
+        if (!validator.Validate())
+            throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
+
+        var expires = DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds();
+        var signatureRequest = new SignatureRequest();
+        foreach (var signatureParam in accessValidationRequest.GetSignatureParams())
+        {
+            signatureRequest.AddSignatureParameter(signatureParam);
+        }
+
+        signatureRequest.SetExpiration(expires);
+        var signResult = await _cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), cancellationToken).ConfigureAwait(false);
+
+        return new Signature
+        {
+            Value = Convert.ToBase64String(signResult.Signature),
+            KeyVersion = _key.Properties.Version,
+            Expires = expires
+        };
+    }
+
+    private AccessValidationRequest? DeserializeAccessValidationRequest(string validationRequestJson)
+    {
+        try
+        {
+            var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
+
+            return accessValidationRequest;
+        }
+        catch (JsonException jsonEx)
+        {
+            _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON");
+        }
+        catch (InvalidOperationException invalidOpEx)
+        {
+            _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation");
+        }
+        catch (Exception ex) when (ex is ArgumentNullException or ArgumentException)
+        {
+            _logger.LogDebug(ex, "An argument-related error occurred during access validation");
+        }
+
+        return null;
+    }
+}

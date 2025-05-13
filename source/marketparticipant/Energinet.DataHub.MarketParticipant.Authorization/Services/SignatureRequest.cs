@@ -59,7 +59,7 @@ public sealed class SignatureRequest()
         _params.Add(signatureParameter);
     }
 
-    internal void SetExpiration(long expiration)
+    public void SetExpiration(long expiration)
     {
         ArgumentNullException.ThrowIfNull(expiration);
 
