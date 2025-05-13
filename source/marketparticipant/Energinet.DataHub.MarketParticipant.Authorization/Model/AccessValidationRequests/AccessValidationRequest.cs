@@ -24,5 +24,5 @@ public abstract class AccessValidationRequest : IAccessRequestSignatureParams
     {
     }
 
-    public abstract IReadOnlyCollection<SignatureParameter> GetSignatureParams();
+    public abstract IReadOnlyList<SignatureParameter> GetSignatureParams();
 }

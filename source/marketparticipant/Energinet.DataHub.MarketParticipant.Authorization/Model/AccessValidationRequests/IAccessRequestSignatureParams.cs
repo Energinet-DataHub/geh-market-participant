@@ -17,5 +17,5 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidati
 
 public interface IAccessRequestSignatureParams
 {
-    IReadOnlyCollection<SignatureParameter> GetSignatureParams();
+    IReadOnlyList<SignatureParameter> GetSignatureParams();
 }

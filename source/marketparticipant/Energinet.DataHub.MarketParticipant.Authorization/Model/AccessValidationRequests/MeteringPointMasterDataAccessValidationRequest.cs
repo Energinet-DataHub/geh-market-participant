@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidati
         public required EicFunction MarketRole { get; set; }
 
         public required string MeteringPointId { get; set; } = null!;
-        public override IReadOnlyCollection<SignatureParameter> GetSignatureParams()
+        public override IReadOnlyList<SignatureParameter> GetSignatureParams()
         {
             return
             [
