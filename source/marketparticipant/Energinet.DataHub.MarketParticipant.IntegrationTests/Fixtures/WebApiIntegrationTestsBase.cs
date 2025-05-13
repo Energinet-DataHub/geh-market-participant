@@ -80,6 +80,8 @@ public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFacto
         builder.UseSetting("KeyVault:TokenSignKeyVault", "https://fake_value");
         builder.UseSetting("KeyVault:TokenSignKeyName", "fake_value");
         builder.UseSetting("KeyVault:CertificatesKeyVault", "https://fake_value");
+        builder.UseSetting("KeyVault:AuthSignKeyVault", "fake_value");
+        builder.UseSetting("KeyVault:AuthSignKeyName", "fake_value");
 
         builder.ConfigureServices(services =>
         {
