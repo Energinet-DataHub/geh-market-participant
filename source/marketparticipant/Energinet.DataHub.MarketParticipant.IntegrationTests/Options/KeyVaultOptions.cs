@@ -15,18 +15,15 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Options;
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Options;
 
 public sealed record KeyVaultOptions
 {
     public const string SectionName = "KeyVault";
 
     [Required]
-    public Uri TokenSignKeyVault { get; set; } = null!;
+    public Uri AuthSignKeyVault { get; set; } = null!;
 
     [Required]
-    public string TokenSignKeyName { get; set; } = null!;
-
-    [Required]
-    public Uri CertificatesKeyVault { get; set; } = null!;
+    public string AuthSignKeyName { get; set; } = null!;
 }
