@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -54,11 +56,9 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
             MeteringPointId = "1234"
         };
 
-        var jsonString = SerializeAccessRestriction(request);
-
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient.VaultUri, _keyClientFixture.KeyName, logger);
-        var actual = await target.CreateSignatureAsync(jsonString);
+        var target = new AuthorizationService(logger, await _keyClientFixture.KeyClient.GetKeyAsync(_keyClientFixture.KeyName));
+        var actual = await target.CreateSignatureAsync(request, CancellationToken.None);
 
         // assert
         Assert.NotNull(actual.Value);
@@ -80,13 +80,11 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
             MeteringPointId = "1234"
         };
 
-        var jsonString = SerializeAccessRestriction(request);
-
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient.VaultUri, _keyClientFixture.KeyName, logger);
+        var target = new AuthorizationService(logger, await _keyClientFixture.KeyClient.GetKeyAsync(_keyClientFixture.KeyName));
 
         // assert
-        await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(jsonString));
+        await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(request, cancellationToken: CancellationToken.None));
     }
 
     private static string SerializeAccessRestriction(AccessValidationRequest accessValidationRequest)
