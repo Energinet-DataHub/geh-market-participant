@@ -32,7 +32,6 @@ public sealed class CreateSignatureHandler
         _authorizationService = authorizationService;
     }
 
-
     public async Task<CreateSignatureResponse> Handle(
         CreateSignatureCommand request,
         CancellationToken cancellationToken)
