@@ -167,25 +167,11 @@ public sealed class SignatureRequestTests
     }
 
     [Fact]
-    public void SignatureRequest_ToArray_SingleEnumParam_AlwaysProducesSameResult()
-    {
-        // Arrange
-        var target = new SignatureRequest();
-        target.AddSignatureParameter(SignatureParameter.FromEnum(EicFunction.BalanceResponsibleParty, "TestParameter"));
-
-        // Act + Assert
-        var expected = target.CreateSignatureParamBytes();
-        var actual = target.CreateSignatureParamBytes();
-
-        Assert.Equal(expected, actual);
-    }
-
-    [Fact]
     public void SignatureRequest_Add_SameKey_DifferentTypes_ThrowsException()
     {
         // Arrange
         var target = new SignatureRequest();
-        target.AddSignatureParameter(SignatureParameter.FromEnum(EicFunction.BalanceResponsibleParty, "TestParameter"));
+        target.AddSignatureParameter(SignatureParameter.FromLong(123, "TestParameter"));
 
         // Act + Assert
         Assert.Throws<ArgumentException>(() => target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter")));

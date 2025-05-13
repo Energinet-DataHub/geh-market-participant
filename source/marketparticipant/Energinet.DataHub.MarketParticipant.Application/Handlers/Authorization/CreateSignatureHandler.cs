@@ -37,10 +37,9 @@ public sealed class CreateSignatureHandler
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
-        ArgumentNullException.ThrowIfNull(request.AccessvalidationRequestJson);
 
         var signature = await _authorizationService
-        .CreateSignatureAsync(request.AccessvalidationRequestJson, cancellationToken)
+        .CreateSignatureAsync(request.AccessValidationRequest, cancellationToken)
         .ConfigureAwait(false);
 
         return new CreateSignatureResponse(signature);

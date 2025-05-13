@@ -44,14 +44,9 @@ public class AuthorizationService
         _cryptoClient = new CryptographyClient(key.Id, new DefaultAzureCredential());
     }
 
-    public async Task<Signature> CreateSignatureAsync(string accessvalidationRequestJson, CancellationToken cancellationToken)
+    public async Task<Signature> CreateSignatureAsync(AccessValidationRequest accessValidationRequest, CancellationToken cancellationToken)
     {
-        var accessValidationRequest = DeserializeAccessValidationRequest(accessvalidationRequestJson);
-        if (accessValidationRequest == null)
-        {
-            _logger.LogDebug("Failed to deserialize access validation request");
-            throw new ArgumentException("CreateSignatureAsync: Invalid validation request string");
-        }
+        ArgumentNullException.ThrowIfNull(accessValidationRequest);
 
         var validator = AccessValidatorFactory.GetAccessValidator(accessValidationRequest);
         if (validator == null)
@@ -79,29 +74,5 @@ public class AuthorizationService
             KeyVersion = _key.Properties.Version,
             Expires = expires
         };
-    }
-
-    private AccessValidationRequest? DeserializeAccessValidationRequest(string validationRequestJson)
-    {
-        try
-        {
-            var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
-
-            return accessValidationRequest;
-        }
-        catch (JsonException jsonEx)
-        {
-            _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON");
-        }
-        catch (InvalidOperationException invalidOpEx)
-        {
-            _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation");
-        }
-        catch (Exception ex) when (ex is ArgumentNullException or ArgumentException)
-        {
-            _logger.LogDebug(ex, "An argument-related error occurred during access validation");
-        }
-
-        return null;
     }
 }

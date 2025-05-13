@@ -13,11 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Functions;
@@ -28,13 +31,16 @@ public sealed class AuthorizationHttpTrigger
 
     private readonly IFeatureManager _featureManager;
     private readonly IMediator _mediator;
+    private readonly ILogger<AuthorizationHttpTrigger> _logger;
 
     public AuthorizationHttpTrigger(
         IFeatureManager featureManager,
-        IMediator mediator)
+        IMediator mediator,
+        ILogger<AuthorizationHttpTrigger> logger)
     {
         _featureManager = featureManager;
         _mediator = mediator;
+        _logger = logger;
     }
 
     [Function("CreateSignature")]
@@ -50,7 +56,14 @@ public sealed class AuthorizationHttpTrigger
         if (blockSignatureAuthorization)
             throw new UnauthorizedAccessException("Signature authorization is not allowed.");
 
-        var command = new CreateSignatureCommand(validationRequestJson);
+        var accessValidationRequest = DeserializeAccessValidationRequest(validationRequestJson);
+        if (accessValidationRequest == null)
+        {
+            _logger.LogDebug("Failed to deserialize access validation request");
+            throw new ArgumentException("CreateSignatureAsync: Invalid validation request string");
+        }
+
+        var command = new CreateSignatureCommand(accessValidationRequest);
 
         var result = await _mediator
             .Send(command)
@@ -58,17 +71,28 @@ public sealed class AuthorizationHttpTrigger
 
         // TODO: Set the response body with the result
     }
+
+    private AccessValidationRequest? DeserializeAccessValidationRequest(string validationRequestJson)
+    {
+        try
+        {
+            var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
+
+            return accessValidationRequest;
+        }
+        catch (JsonException jsonEx)
+        {
+            _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON");
+        }
+        catch (InvalidOperationException invalidOpEx)
+        {
+            _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation");
+        }
+        catch (Exception ex) when (ex is ArgumentNullException or ArgumentException)
+        {
+            _logger.LogDebug(ex, "An argument-related error occurred during access validation");
+        }
+
+        return null;
+    }
 }
-
-/*
-
-
-        var command = new CreateSignatureCommand(validationRequestJson);
-
-        var result = await _mediator
-            .Send(command)
-            .ConfigureAwait(false);
-
-        return Ok(result);
-
-        */
