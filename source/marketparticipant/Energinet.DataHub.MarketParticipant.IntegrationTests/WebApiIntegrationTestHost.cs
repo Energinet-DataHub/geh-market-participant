@@ -15,20 +15,15 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Azure.Identity;
-using Azure.Security.KeyVault.Keys;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Options;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Energinet.DataHub.MarketParticipant.IntegrationTests.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests;
@@ -45,13 +40,6 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
         var host = new WebApiIntegrationTestHost();
         host.ServiceCollection.AddSingleton(configuration);
-        host.ServiceCollection.AddSingleton<AuthorizationService>(provider =>
-        {
-            var tokenCredentials = new DefaultAzureCredential();
-            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
-            var keyClient = new KeyClient(options.Value.AuthSignKeyVault, tokenCredentials);
-            return new AuthorizationService(provider.GetRequiredService<ILogger<AuthorizationService>>(), keyClient.GetKey(options.Value.AuthSignKeyName).Value);
-        });
 
         host.ServiceCollection.AddMarketParticipantWebApiModule(configuration);
         InitUserIdProvider(host.ServiceCollection);
