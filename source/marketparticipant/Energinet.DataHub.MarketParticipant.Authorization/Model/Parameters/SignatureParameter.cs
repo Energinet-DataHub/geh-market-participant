@@ -29,7 +29,7 @@ public abstract partial class SignatureParameter
     public static SignatureParameterLong FromLong(long value, string key) => new SignatureParameterLong(value) { Key = key };
     public static SignatureParameterEicFunction FromEicFunction(EicFunction value, string key) => new SignatureParameterEicFunction(value) { Key = key };
     public static SignatureParameterString FromString(string value, string key) => new SignatureParameterString(value) { Key = key };
-    public static SignatureParameterEnum<T> FromEnum<T>(T value, string key)
+    internal static SignatureParameterEnum<T> FromEnum<T>(T value, string key)
         where T : Enum
         => new SignatureParameterEnum<T>(value) { Key = key };
 }

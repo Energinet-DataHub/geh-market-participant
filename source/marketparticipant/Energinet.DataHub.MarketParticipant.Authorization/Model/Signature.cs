@@ -14,7 +14,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
 public sealed class Signature
 {

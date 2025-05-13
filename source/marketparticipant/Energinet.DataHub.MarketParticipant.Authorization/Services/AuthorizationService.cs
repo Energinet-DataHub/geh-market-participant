@@ -16,8 +16,8 @@ using System.Net.Http.Json;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
