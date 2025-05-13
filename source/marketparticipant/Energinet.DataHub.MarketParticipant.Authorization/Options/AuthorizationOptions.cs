@@ -16,13 +16,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Options;
 
-public sealed record KeyVaultOptions
+public sealed record AuthorizationOptions
 {
-    public const string SectionName = "AuthorizationKeyVault";
+    public const string SectionName = "AuthorizationClient";
 
     [Required]
     public Uri AuthSignKeyVault { get; set; } = null!;
 
     [Required]
     public string AuthSignKeyName { get; set; } = null!;
+
+    [Required]
+    public Uri BaseUrl { get; set; } = null!;
 }

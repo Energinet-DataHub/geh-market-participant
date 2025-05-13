@@ -26,15 +26,18 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
     {
         private readonly CryptographyClient _cryptoClient;
         private readonly ILogger<AuthorizationService> _logger;
+        private readonly HttpClient _apiHttpClient;
 
         public AuthorizationService(
             Uri keyVault,
             string keyName,
+            HttpClient apiHttpClient,
             ILogger<AuthorizationService> logger)
         {
             var keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
             KeyVaultKey key = keyClient.GetKey(keyName);
             _logger = logger;
+            _apiHttpClient = apiHttpClient;
 
             // Todo:
             // Because of keyRotation, multiple versions of the key can be in use.
@@ -49,11 +52,9 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 
         public async Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest)
         {
-            // 1. Call api to make authorization check.
             using var request = new HttpRequestMessage(HttpMethod.Post, "api/request-signature");
             request.Content = JsonContent.Create(accessValidationRequest);
-            using var httpClient = new HttpClient(); // TODO: Use DI to inject HttpClient
-            using var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
 

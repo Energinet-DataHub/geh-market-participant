@@ -24,18 +24,32 @@ internal static class MarketParticipantAuthApiModuleExtensions
 {
     public static IServiceCollection AddAuthorizationModule(this IServiceCollection services)
     {
-        services.AddOptions<KeyVaultOptions>().BindConfiguration(KeyVaultOptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<AuthorizationOptions>().BindConfiguration(AuthorizationOptions.SectionName).ValidateDataAnnotations();
 
-        services.AddSingleton<IVerifyAuthorization>(provider =>
+        services.AddHttpClient("AuthorizationClient", (provider, client) =>
         {
-            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
-            return new AuthorizationService(options.Value.AuthSignKeyVault, options.Value.AuthSignKeyName, provider.GetRequiredService<ILogger<AuthorizationService>>());
+            var options = provider.GetRequiredService<IOptions<AuthorizationOptions>>();
+            client.BaseAddress = options.Value.BaseUrl;
         });
 
         services.AddSingleton<IRequestAuthorization>(provider =>
         {
-            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
-            return new AuthorizationService(options.Value.AuthSignKeyVault, options.Value.AuthSignKeyName, provider.GetRequiredService<ILogger<AuthorizationService>>());
+            var options = provider.GetRequiredService<IOptions<AuthorizationOptions>>();
+            return new AuthorizationService(
+                options.Value.AuthSignKeyVault,
+                options.Value.AuthSignKeyName,
+                provider.GetRequiredService<IHttpClientFactory>().CreateClient("AuthorizationClient"),
+                provider.GetRequiredService<ILogger<AuthorizationService>>());
+        });
+
+        services.AddSingleton<IVerifyAuthorization>(provider =>
+        {
+            var options = provider.GetRequiredService<IOptions<AuthorizationOptions>>();
+            return new AuthorizationService(
+                options.Value.AuthSignKeyVault,
+                options.Value.AuthSignKeyName,
+                provider.GetRequiredService<IHttpClientFactory>().CreateClient("AuthorizationClient"),
+                provider.GetRequiredService<ILogger<AuthorizationService>>());
         });
 
         return services;
