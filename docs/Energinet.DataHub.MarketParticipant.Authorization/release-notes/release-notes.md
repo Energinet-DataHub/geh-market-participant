@@ -1,8 +1,8 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
-## Version 0.1.2
+## Version 1.0.0
 
-- Implemented the Signature Parameters into the service.
+- First implementation of Authorization
 
 ## Version 0.1.1
 
