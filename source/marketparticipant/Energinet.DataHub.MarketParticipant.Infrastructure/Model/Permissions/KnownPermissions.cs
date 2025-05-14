@@ -184,6 +184,9 @@ public static class KnownPermissions
             EicFunction.DataHubAdministrator
         ]),
         new(PermissionId.MeasurementReportsManage, "measurement-reports:manage", InstantPattern.ExtendedIso.Parse("2025-05-14T00:00:00Z").Value, [
+            EicFunction.EnergySupplier,
+            EicFunction.GridAccessProvider,
+            EicFunction.SystemOperator,
             EicFunction.DataHubAdministrator
         ]),
     ];
