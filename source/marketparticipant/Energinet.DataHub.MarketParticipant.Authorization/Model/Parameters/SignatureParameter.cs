@@ -26,10 +26,10 @@ public abstract partial class SignatureParameter
     /// </summary>
     internal abstract byte[] ParameterData { get; }
 
-    public static SignatureParameterLong FromLong(string key, long value) => new SignatureParameterLong(value) { Key = key };
-    public static SignatureParameterDatetimeOffset FromDateTimeOffset(string key, DateTimeOffset value) => new SignatureParameterDatetimeOffset(value) { Key = key };
-    public static SignatureParameterEicFunction FromEicFunction(string key, EicFunction value) => new SignatureParameterEicFunction(value) { Key = key };
-    public static SignatureParameterString FromString(string key, string value) => new SignatureParameterString(value) { Key = key };
+    public static SignatureParameterLong FromLong(string key, long value) => new(value) { Key = key };
+    public static SignatureParameterDatetimeOffset FromDateTimeOffset(string key, DateTimeOffset value) => new(value) { Key = key };
+    public static SignatureParameterEicFunction FromEicFunction(string key, EicFunction value) => new(value) { Key = key };
+    public static SignatureParameterString FromString(string key, string value) => new(value) { Key = key };
     internal static SignatureParameterEnum<T> FromEnum<T>(string key, T value)
         where T : Enum
         => new SignatureParameterEnum<T>(value) { Key = key };
