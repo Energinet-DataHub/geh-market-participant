@@ -27,6 +27,7 @@ public abstract partial class SignatureParameter
     internal abstract byte[] ParameterData { get; }
 
     public static SignatureParameterLong FromLong(string key, long value) => new SignatureParameterLong(value) { Key = key };
+    public static SignatureParameterDatetimeOffset FromDateTimeOffset(string key, DateTimeOffset value) => new SignatureParameterDatetimeOffset(value) { Key = key };
     public static SignatureParameterEicFunction FromEicFunction(string key, EicFunction value) => new SignatureParameterEicFunction(value) { Key = key };
     public static SignatureParameterString FromString(string key, string value) => new SignatureParameterString(value) { Key = key };
     internal static SignatureParameterEnum<T> FromEnum<T>(string key, T value)

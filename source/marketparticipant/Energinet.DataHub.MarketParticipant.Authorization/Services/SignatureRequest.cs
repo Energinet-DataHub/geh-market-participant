@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Globalization;
-using Energinet.DataHub.MarketParticipant.Authorization.Config;
 using Energinet.DataHub.MarketParticipant.Authorization.Helpers;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
@@ -25,7 +24,7 @@ public sealed class SignatureRequest
     private static readonly IComparer<byte[]> _signatureByteComparer = new SignatureByteComparer();
     private readonly List<SignatureParameter> _params = [];
 
-    public SignatureRequest(long expiration)
+    public SignatureRequest(DateTimeOffset expiration)
     {
         SetExpiration(expiration);
     }
@@ -70,13 +69,13 @@ public sealed class SignatureRequest
         return existingEntry.Key == newEntry.Key && existingEntry.GetType() != newEntry.GetType();
     }
 
-    private void SetExpiration(long expiration)
+    private void SetExpiration(DateTimeOffset expiration)
     {
         ArgumentNullException.ThrowIfNull(expiration);
 
         if (ContainsKey(ExpirationKey)) throw new InvalidOperationException("Expiration already set");
 
-        SignatureParameter expirationParameter = SignatureParameter.FromLong(ExpirationKey, expiration);
+        SignatureParameter expirationParameter = SignatureParameter.FromDateTimeOffset(ExpirationKey, expiration);
 
         if (_params.Any(i => KeyExistsWithDifferentType(i, expirationParameter)))
             throw new ArgumentException("Adding expiration Param to signature failed, Param Key already exists with different type");

@@ -22,7 +22,7 @@ public sealed class Signature
     public required string Value { get; set; }
 
     [JsonPropertyName("expires")]
-    public long Expires { get; set; }
+    public DateTimeOffset Expires { get; set; }
 
     [JsonPropertyName("keyVersion")]
     public required string KeyVersion { get; set; }
