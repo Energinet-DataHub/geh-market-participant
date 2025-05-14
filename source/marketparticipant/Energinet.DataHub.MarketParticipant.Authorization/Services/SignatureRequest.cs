@@ -19,10 +19,15 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
-public sealed class SignatureRequest()
+public sealed class SignatureRequest
 {
     private static readonly IComparer<byte[]> _signatureByteComparer = new SignatureByteComparer();
     private readonly List<SignatureParameter> _params = [];
+
+    public SignatureRequest(long expiration)
+    {
+        SetExpiration(expiration);
+    }
 
     /// <summary>
     /// Creates the Byte array for representing the Signature params.
@@ -59,7 +64,12 @@ public sealed class SignatureRequest()
         _params.Add(signatureParameter);
     }
 
-    public void SetExpiration(long expiration)
+    private static bool KeyExistsWithDifferentType(SignatureParameter existingEntry, SignatureParameter newEntry)
+    {
+        return existingEntry.Key == newEntry.Key && existingEntry.GetType() != newEntry.GetType();
+    }
+
+    private void SetExpiration(long expiration)
     {
         ArgumentNullException.ThrowIfNull(expiration);
 
@@ -71,11 +81,6 @@ public sealed class SignatureRequest()
             throw new ArgumentException("Adding expiration Param to signature failed, Param Key already exists with different type");
 
         _params.Add(expirationParameter);
-    }
-
-    private static bool KeyExistsWithDifferentType(SignatureParameter existingEntry, SignatureParameter newEntry)
-    {
-        return existingEntry.Key == newEntry.Key && existingEntry.GetType() != newEntry.GetType();
     }
 
     private bool ContainsKey(string key)

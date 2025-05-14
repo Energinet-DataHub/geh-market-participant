@@ -69,13 +69,12 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             ArgumentNullException.ThrowIfNull(validationRequest);
             ArgumentNullException.ThrowIfNull(signature);
 
-            var signatureRequest = new SignatureRequest();
+            var signatureRequest = new SignatureRequest(signature.Expires);
             foreach (var signatureParam in validationRequest.GetSignatureParams())
             {
                 signatureRequest.AddSignatureParameter(signatureParam);
             }
 
-            signatureRequest.SetExpiration(signature.Expires);
             var conversionResult = Convert.FromBase64String(signature.Value);
             var verifyResult = await _cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), conversionResult).ConfigureAwait(false);
             return verifyResult.IsValid;

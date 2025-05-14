@@ -28,7 +28,7 @@ public sealed class SignatureRequestTests
     public void SignatureRequest_ToArray_SingleParam_AlwaysProducesSameResult()
     {
         // Arrange
-        var target = new SignatureRequest();
+        var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target.AddSignatureParameter(SignatureParameter.FromLong(1, "TestParameter"));
 
         // Act + Assert
@@ -42,7 +42,7 @@ public sealed class SignatureRequestTests
     public void SignatureRequest_GetBytes_MultipleParams_AlwaysProducesSameResult()
     {
         // Arrange
-        var target = new SignatureRequest();
+        var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target.AddSignatureParameter(SignatureParameter.FromLong(1, "TestParameter"));
         target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter2"));
 
@@ -57,7 +57,7 @@ public sealed class SignatureRequestTests
     public void SignatureRequest_GetBytes_MultipleParams_SameKey_SameTypes_AlwaysProducesSameResult()
     {
         // Arrange
-        var target = new SignatureRequest();
+        var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target.AddSignatureParameter(SignatureParameter.FromString("test2", "TestParameter"));
         target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter"));
 
@@ -72,11 +72,11 @@ public sealed class SignatureRequestTests
     public void SignatureRequest_GetBytes_MultipleParams_SameKey_SameTypes_DifferentOrder_AlwaysProducesSameResult()
     {
         // Arrange
-        var target = new SignatureRequest();
+        var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target.AddSignatureParameter(SignatureParameter.FromString("test2", "MeteringPointPeriod"));
         target.AddSignatureParameter(SignatureParameter.FromString("test", "MeteringPointPeriod"));
 
-        var target2 = new SignatureRequest();
+        var target2 = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target2.AddSignatureParameter(SignatureParameter.FromString("test", "MeteringPointPeriod"));
         target2.AddSignatureParameter(SignatureParameter.FromString("test2", "MeteringPointPeriod"));
 
@@ -91,11 +91,11 @@ public sealed class SignatureRequestTests
     public void SignatureRequest_GetBytes_MultipleParams_DifferentOrder_AlwaysProducesSameResult()
     {
         // Arrange
-        var target = new SignatureRequest();
+        var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target.AddSignatureParameter(SignatureParameter.FromLong(1, "TestParameter"));
         target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter2"));
 
-        var target2 = new SignatureRequest();
+        var target2 = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target2.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter2"));
         target2.AddSignatureParameter(SignatureParameter.FromLong(1, "TestParameter"));
 
@@ -110,10 +110,10 @@ public sealed class SignatureRequestTests
     public void SignatureRequest_GetBytes_DifferentMultipleParams_SameKey_DifferentValues_ProducesDifferentResults()
     {
         // Arrange
-        var target = new SignatureRequest();
+        var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter"));
 
-        var target2 = new SignatureRequest();
+        var target2 = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target2.AddSignatureParameter(SignatureParameter.FromString("test2", "TestParameter"));
         target2.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter"));
 
@@ -128,7 +128,7 @@ public sealed class SignatureRequestTests
     public void SignatureRequest_ToArray_SingleLongParam_AlwaysProducesSameResult()
     {
         // Arrange
-        var target = new SignatureRequest();
+        var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target.AddSignatureParameter(SignatureParameter.FromLong(1, "TestParameter"));
 
         // Act + Assert
@@ -142,7 +142,7 @@ public sealed class SignatureRequestTests
     public void SignatureRequest_ToArray_SingleStringParam_AlwaysProducesSameResult()
     {
         // Arrange
-        var target = new SignatureRequest();
+        var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter"));
 
         // Act + Assert
@@ -156,7 +156,7 @@ public sealed class SignatureRequestTests
     public void SignatureRequest_ToArray_SingleEicFunctionParam_AlwaysProducesSameResult()
     {
         // Arrange
-        var target = new SignatureRequest();
+        var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target.AddSignatureParameter(SignatureParameter.FromEicFunction(EicFunction.BalanceResponsibleParty, "TestParameter"));
 
         // Act + Assert
@@ -170,7 +170,7 @@ public sealed class SignatureRequestTests
     public void SignatureRequest_Add_SameKey_DifferentTypes_ThrowsException()
     {
         // Arrange
-        var target = new SignatureRequest();
+        var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
         target.AddSignatureParameter(SignatureParameter.FromLong(123, "TestParameter"));
 
         // Act + Assert
