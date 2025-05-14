@@ -22,22 +22,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 {
-    public sealed class AuthorizationService : IRequestAuthorization, IVerifyAuthorization
+    public sealed class AuthorizationVerifyService : IVerifyAuthorization
     {
         private readonly CryptographyClient _cryptoClient;
-        private readonly ILogger<AuthorizationService> _logger;
-        private readonly HttpClient _apiHttpClient;
+        private readonly ILogger<AuthorizationVerifyService> _logger;
 
-        public AuthorizationService(
+        public AuthorizationVerifyService(
             Uri keyVault,
             string keyName,
-            HttpClient apiHttpClient,
-            ILogger<AuthorizationService> logger)
+            ILogger<AuthorizationVerifyService> logger)
         {
             var keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
             KeyVaultKey key = keyClient.GetKey(keyName);
             _logger = logger;
-            _apiHttpClient = apiHttpClient;
 
             // Todo:
             // Because of keyRotation, multiple versions of the key can be in use.
@@ -48,20 +45,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             // _key.Properties.Version
             // _cryptoClient = _keyClient.GetCryptographyClient(_keyName, "KeyVersion");
             _cryptoClient = new CryptographyClient(key.Id, new DefaultAzureCredential());
-        }
-
-        public async Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest)
-        {
-            using var request = new HttpRequestMessage(HttpMethod.Post, string.Empty);
-            request.Content = JsonContent.Create(accessValidationRequest);
-            using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
-
-            response.EnsureSuccessStatusCode();
-
-            var result = await response.Content
-                .ReadFromJsonAsync<Signature>()
-                .ConfigureAwait(false) ?? throw new InvalidOperationException("Failed to deserialize signature response content");
-            return result;
         }
 
         public async Task<bool> VerifySignatureAsync(AccessValidationRequest validationRequest, Signature signature)

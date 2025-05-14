@@ -21,5 +21,8 @@ public sealed record AuthorizationVerifyOptions
     public const string SectionName = "AuthorizationVerify";
 
     [Required]
-    public Uri EndpointUrl { get; set; } = null!;
+    public Uri AuthSignKeyVault { get; set; } = null!;
+
+    [Required]
+    public string AuthSignKeyName { get; set; } = null!;
 }

@@ -21,10 +21,5 @@ public sealed record AuthorizationRequestOptions
     public const string SectionName = "AuthorizationRequest";
 
     [Required]
-    public Uri AuthSignKeyVault { get; set; } = null!;
-
-    [Required]
-    public string AuthSignKeyName { get; set; } = null!;
-
-
+    public Uri EndpointUrl { get; set; } = null!;
 }

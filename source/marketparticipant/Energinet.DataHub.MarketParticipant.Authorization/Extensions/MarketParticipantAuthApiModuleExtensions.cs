@@ -27,30 +27,21 @@ internal static class MarketParticipantAuthApiModuleExtensions
         services.AddOptions<AuthorizationRequestOptions>().BindConfiguration(AuthorizationRequestOptions.SectionName).ValidateDataAnnotations();
         services.AddOptions<AuthorizationVerifyOptions>().BindConfiguration(AuthorizationVerifyOptions.SectionName).ValidateDataAnnotations();
 
-        services.AddHttpClient("AuthorizationClient", (provider, client) =>
+        services.AddHttpClient("AuthorizationRequestClient", (provider, client) =>
         {
-            var options = provider.GetRequiredService<IOptions<AuthorizationVerifyOptions>>();
+            var options = provider.GetRequiredService<IOptions<AuthorizationRequestOptions>>();
             client.BaseAddress = options.Value.EndpointUrl;
         });
 
-        services.AddSingleton<IRequestAuthorization>(provider =>
-        {
-            var options = provider.GetRequiredService<IOptions<AuthorizationRequestOptions>>();
-            return new AuthorizationService(
-                options.Value.AuthSignKeyVault,
-                options.Value.AuthSignKeyName,
-                provider.GetRequiredService<IHttpClientFactory>().CreateClient("AuthorizationClient"),
-                provider.GetRequiredService<ILogger<AuthorizationService>>());
-        });
+        services.AddSingleton<IRequestAuthorization>(provider => new AuthorizationRequestService(provider.GetRequiredService<IHttpClientFactory>().CreateClient("AuthorizationRequestClient")));
 
         services.AddSingleton<IVerifyAuthorization>(provider =>
         {
-            var options = provider.GetRequiredService<IOptions<AuthorizationRequestOptions>>();
-            return new AuthorizationService(
+            var options = provider.GetRequiredService<IOptions<AuthorizationVerifyOptions>>();
+            return new AuthorizationVerifyService(
                 options.Value.AuthSignKeyVault,
                 options.Value.AuthSignKeyName,
-                provider.GetRequiredService<IHttpClientFactory>().CreateClient("AuthorizationClient"),
-                provider.GetRequiredService<ILogger<AuthorizationService>>());
+                provider.GetRequiredService<ILogger<AuthorizationVerifyService>>());
         });
 
         return services;
