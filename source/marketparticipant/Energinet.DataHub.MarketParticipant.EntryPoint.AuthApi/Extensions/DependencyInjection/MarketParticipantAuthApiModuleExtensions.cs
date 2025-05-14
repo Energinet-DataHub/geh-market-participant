@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Monitor;
 using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Options;
+using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

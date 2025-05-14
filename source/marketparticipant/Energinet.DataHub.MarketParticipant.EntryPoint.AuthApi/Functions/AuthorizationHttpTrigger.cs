@@ -13,10 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Net;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -30,21 +33,21 @@ public sealed class AuthorizationHttpTrigger
     private const string BlockSignatureAuthorizationFeatureKey = "BlockSignatureAuthorization";
 
     private readonly IFeatureManager _featureManager;
-    private readonly IMediator _mediator;
+    private readonly AuthorizationService _authorizationService;
     private readonly ILogger<AuthorizationHttpTrigger> _logger;
 
     public AuthorizationHttpTrigger(
         IFeatureManager featureManager,
-        IMediator mediator,
+        AuthorizationService authorizationService,
         ILogger<AuthorizationHttpTrigger> logger)
     {
         _featureManager = featureManager;
-        _mediator = mediator;
+        _authorizationService = authorizationService;
         _logger = logger;
     }
 
     [Function("CreateSignature")]
-    public async Task CreateSignatureAsync(
+    public async Task<HttpResponseData> CreateSignatureAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "createSignature")]
         string validationRequestJson,
         HttpRequestData httpRequest)
@@ -63,13 +66,17 @@ public sealed class AuthorizationHttpTrigger
             throw new ArgumentException("CreateSignatureAsync: Invalid validation request string");
         }
 
-        var command = new CreateSignatureCommand(accessValidationRequest);
-
-        var result = await _mediator
-            .Send(command)
+        var result = await _authorizationService
+            .CreateSignatureAsync(accessValidationRequest, CancellationToken.None)
             .ConfigureAwait(false);
 
-        // TODO: Set the response body with the result
+        HttpResponseData response;
+        response = httpRequest.CreateResponse(HttpStatusCode.OK);
+        await response
+            .WriteAsJsonAsync(result)
+            .ConfigureAwait(false);
+
+        return response;
     }
 
     private AccessValidationRequest? DeserializeAccessValidationRequest(string validationRequestJson)

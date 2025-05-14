@@ -24,7 +24,7 @@ using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Security;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 
 public class AuthorizationService
 {
