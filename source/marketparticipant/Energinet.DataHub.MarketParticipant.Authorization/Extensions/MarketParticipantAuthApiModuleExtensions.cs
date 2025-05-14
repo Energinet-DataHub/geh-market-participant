@@ -24,17 +24,18 @@ internal static class MarketParticipantAuthApiModuleExtensions
 {
     public static IServiceCollection AddAuthorizationModule(this IServiceCollection services)
     {
-        services.AddOptions<AuthorizationOptions>().BindConfiguration(AuthorizationOptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<AuthorizationRequestOptions>().BindConfiguration(AuthorizationRequestOptions.SectionName).ValidateDataAnnotations();
+        services.AddOptions<AuthorizationVerifyOptions>().BindConfiguration(AuthorizationVerifyOptions.SectionName).ValidateDataAnnotations();
 
         services.AddHttpClient("AuthorizationClient", (provider, client) =>
         {
-            var options = provider.GetRequiredService<IOptions<AuthorizationOptions>>();
-            client.BaseAddress = options.Value.BaseUrl;
+            var options = provider.GetRequiredService<IOptions<AuthorizationVerifyOptions>>();
+            client.BaseAddress = options.Value.EndpointUrl;
         });
 
         services.AddSingleton<IRequestAuthorization>(provider =>
         {
-            var options = provider.GetRequiredService<IOptions<AuthorizationOptions>>();
+            var options = provider.GetRequiredService<IOptions<AuthorizationRequestOptions>>();
             return new AuthorizationService(
                 options.Value.AuthSignKeyVault,
                 options.Value.AuthSignKeyName,
@@ -44,7 +45,7 @@ internal static class MarketParticipantAuthApiModuleExtensions
 
         services.AddSingleton<IVerifyAuthorization>(provider =>
         {
-            var options = provider.GetRequiredService<IOptions<AuthorizationOptions>>();
+            var options = provider.GetRequiredService<IOptions<AuthorizationRequestOptions>>();
             return new AuthorizationService(
                 options.Value.AuthSignKeyVault,
                 options.Value.AuthSignKeyName,
