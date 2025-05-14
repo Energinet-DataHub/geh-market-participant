@@ -56,6 +56,9 @@ public sealed class SignatureRequest
     {
         ArgumentNullException.ThrowIfNull(signatureParameter);
 
+        if (signatureParameter.Key == ExpirationKey)
+            throw new InvalidOperationException("The signature parameter key cannot be the same as the expiration parameter");
+
         if (_params.Any(i => KeyExistsWithDifferentType(i, signatureParameter)))
             throw new ArgumentException("Adding Param to signature failed, Param Key already exists with different type");
 
