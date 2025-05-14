@@ -26,7 +26,7 @@ public abstract class AccessValidationRequest : IAccessRequestSignatureParams
 
     public IReadOnlyList<SignatureParameter> GetSignatureParams()
     {
-        return GetSignatureParamsCore().Append(SignatureParameter.FromString(GetType().Name)).ToList();
+        return GetSignatureParamsCore().Append(SignatureParameter.FromString("ValidationContext", GetType().Name)).ToList();
     }
 
     protected abstract IEnumerable<SignatureParameter> GetSignatureParamsCore();

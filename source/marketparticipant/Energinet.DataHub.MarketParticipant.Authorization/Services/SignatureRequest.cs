@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Authorization.Helpers;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
@@ -35,7 +36,8 @@ public sealed class SignatureRequest
     public byte[] CreateSignatureParamBytes()
     {
         var sortedParams = _params
-            .OrderBy(i => i.ParameterData, _signatureByteComparer);
+            .OrderBy(i => i.Key)
+            .ThenBy(i => i.ParameterData, _signatureByteComparer);
 
         var arrayLength = _params.Sum(i => i.ParameterData.Length);
 
