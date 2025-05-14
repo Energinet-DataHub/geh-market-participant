@@ -36,8 +36,7 @@ public sealed class SignatureRequest
     public byte[] CreateSignatureParamBytes()
     {
         var sortedParams = _params
-            .OrderBy(i => i.Key)
-            .ThenBy(i => i.ParameterData, _signatureByteComparer);
+            .OrderBy(i => i.ParameterData, _signatureByteComparer);
 
         var arrayLength = _params.Sum(i => i.ParameterData.Length);
 
