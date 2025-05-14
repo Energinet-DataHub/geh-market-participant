@@ -19,6 +19,7 @@ limitations under the License.
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <IsPublishable>false</IsPublishable >
   </PropertyGroup>
 
   <ItemGroup>
