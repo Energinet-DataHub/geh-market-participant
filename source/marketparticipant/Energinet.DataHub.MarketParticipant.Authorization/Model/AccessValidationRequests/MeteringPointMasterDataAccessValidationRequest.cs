@@ -33,8 +33,8 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidati
         {
             return
             [
-                SignatureParameter.FromString(MeteringPointId),
-                SignatureParameter.FromEicFunction(MarketRole)
+                SignatureParameter.FromString("MeteringPointId", MeteringPointId),
+                SignatureParameter.FromEicFunction("MarketRole", MarketRole)
             ];
         }
     }
