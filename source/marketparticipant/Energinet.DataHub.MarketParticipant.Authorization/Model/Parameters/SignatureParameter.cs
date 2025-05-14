@@ -17,20 +17,12 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 public abstract partial class SignatureParameter
 {
     /// <summary>
-    /// Gets or sets the Key used to identify this signature parameter in the signature.
-    /// </summary>
-    public required string Key { get; set; }
-
-    /// <summary>
     /// Gets the byte array representing the Signature parameter value.
     /// </summary>
     internal abstract byte[] ParameterData { get; }
 
-    public static SignatureParameterLong FromLong(string key, long value) => new(value) { Key = key };
-    public static SignatureParameterDatetimeOffset FromDateTimeOffset(string key, DateTimeOffset value) => new(value) { Key = key };
-    public static SignatureParameterEicFunction FromEicFunction(string key, EicFunction value) => new(value) { Key = key };
-    public static SignatureParameterString FromString(string key, string value) => new(value) { Key = key };
-    internal static SignatureParameterEnum<T> FromEnum<T>(string key, T value)
-        where T : Enum
-        => new SignatureParameterEnum<T>(value) { Key = key };
+    public static SignatureParameterLong FromLong(long value) => new(value);
+    public static SignatureParameterDatetimeOffset FromDateTimeOffset(DateTimeOffset value) => new(value);
+    public static SignatureParameterEicFunction FromEicFunction(EicFunction value) => new(value);
+    public static SignatureParameterString FromString(string value) => new(value);
 }

@@ -20,7 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
 public sealed class SignatureRequest
 {
-    private const string ExpirationKey = "EXPIRATION";
     private static readonly IComparer<byte[]> _signatureByteComparer = new SignatureByteComparer();
     private readonly List<SignatureParameter> _params = [];
 
@@ -55,38 +54,14 @@ public sealed class SignatureRequest
     {
         ArgumentNullException.ThrowIfNull(signatureParameter);
 
-        if (ContainsKey(signatureParameter.Key)) throw new InvalidOperationException("Key already exists");
-
-        if (_params.Any(i => KeyExistsWithDifferentType(i, signatureParameter)))
-            throw new ArgumentException("Adding Param to signature failed, Param Key already exists with different type");
-
         _params.Add(signatureParameter);
-    }
-
-    private static bool KeyExistsWithDifferentType(SignatureParameter existingEntry, SignatureParameter newEntry)
-    {
-        return existingEntry.Key == newEntry.Key && existingEntry.GetType() != newEntry.GetType();
     }
 
     private void SetExpiration(DateTimeOffset expiration)
     {
         ArgumentNullException.ThrowIfNull(expiration);
 
-        if (ContainsKey(ExpirationKey)) throw new InvalidOperationException("Expiration already set");
-
-        SignatureParameter expirationParameter = SignatureParameter.FromDateTimeOffset(ExpirationKey, expiration);
-
-        if (_params.Any(i => KeyExistsWithDifferentType(i, expirationParameter)))
-            throw new ArgumentException("Adding expiration Param to signature failed, Param Key already exists with different type");
-
+        SignatureParameter expirationParameter = SignatureParameter.FromDateTimeOffset(expiration);
         _params.Add(expirationParameter);
-    }
-
-    private bool ContainsKey(string key)
-    {
-        ArgumentNullException.ThrowIfNull(key);
-
-        var internalKey = key.ToUpper(CultureInfo.InvariantCulture);
-        return _params.Any(i => i.Key == internalKey);
     }
 }
