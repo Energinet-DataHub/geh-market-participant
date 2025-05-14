@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
