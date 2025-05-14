@@ -24,7 +24,6 @@ public class SignatureParameterDatetimeOffset : SignatureParameter
     {
         var ticks = value.UtcTicks; // Preserves precision without time zone conversion
         var offsetMinutes = (short)value.Offset.TotalMinutes; // Preserve offset in minutes
-
         var array = new byte[10];
 
         var ticksBytes = BitConverter.GetBytes(ticks);
