@@ -183,5 +183,11 @@ public static class KnownPermissions
         new(PermissionId.ElectricityMarketTransactionImport, "electricity-market:import", InstantPattern.ExtendedIso.Parse("2025-02-26T00:00:00Z").Value, [
             EicFunction.DataHubAdministrator
         ]),
+        new(PermissionId.MeasurementReportsManage, "measurement-reports:manage", InstantPattern.ExtendedIso.Parse("2025-05-14T00:00:00Z").Value, [
+            EicFunction.EnergySupplier,
+            EicFunction.GridAccessProvider,
+            EicFunction.SystemOperator,
+            EicFunction.DataHubAdministrator
+        ]),
     ];
 }
