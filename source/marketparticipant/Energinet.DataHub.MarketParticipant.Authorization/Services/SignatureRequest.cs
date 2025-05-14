@@ -71,7 +71,10 @@ public sealed class SignatureRequest
     {
         ArgumentNullException.ThrowIfNull(expiration);
 
-        if (ContainsKey(ExpirationKey)) throw new InvalidOperationException("Expiration already set");
+        if (_params.Any(i => i.Key.Equals(ExpirationKey, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException("Expiration already set");
+        }
 
         SignatureParameter expirationParameter = SignatureParameter.FromDateTimeOffset(ExpirationKey, expiration);
 
@@ -86,6 +89,6 @@ public sealed class SignatureRequest
         ArgumentNullException.ThrowIfNull(key);
 
         var internalKey = key.ToUpper(CultureInfo.InvariantCulture);
-        return _params.Any(i => i.Key == internalKey);
+        return _params.Any(i => i.Key.Equals(internalKey, StringComparison.OrdinalIgnoreCase));
     }
 }
