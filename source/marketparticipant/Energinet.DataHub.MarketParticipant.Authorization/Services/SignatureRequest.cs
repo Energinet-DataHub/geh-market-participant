@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Authorization.Helpers;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
