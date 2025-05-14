@@ -22,10 +22,9 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Extensions;
 
 internal static class MarketParticipantAuthApiModuleExtensions
 {
-    public static IServiceCollection AddAuthorizationModule(this IServiceCollection services)
+    public static IServiceCollection AddAuthorizationRequestModule(this IServiceCollection services)
     {
         services.AddOptions<AuthorizationRequestOptions>().BindConfiguration(AuthorizationRequestOptions.SectionName).ValidateDataAnnotations();
-        services.AddOptions<AuthorizationVerifyOptions>().BindConfiguration(AuthorizationVerifyOptions.SectionName).ValidateDataAnnotations();
 
         services.AddHttpClient("AuthorizationRequestClient", (provider, client) =>
         {
@@ -34,6 +33,13 @@ internal static class MarketParticipantAuthApiModuleExtensions
         });
 
         services.AddSingleton<IRequestAuthorization>(provider => new AuthorizationRequestService(provider.GetRequiredService<IHttpClientFactory>().CreateClient("AuthorizationRequestClient")));
+
+        return services;
+    }
+
+    public static IServiceCollection AddAuthorizationVerifyModule(this IServiceCollection services)
+    {
+        services.AddOptions<AuthorizationVerifyOptions>().BindConfiguration(AuthorizationVerifyOptions.SectionName).ValidateDataAnnotations();
 
         services.AddSingleton<IVerifyAuthorization>(provider =>
         {
