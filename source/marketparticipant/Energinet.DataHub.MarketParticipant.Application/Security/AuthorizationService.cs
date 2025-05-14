@@ -18,10 +18,10 @@ using System.Threading.Tasks;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
-using Energinet.DataHub.MarketParticipant.Application.Services.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
+using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Security;
@@ -47,12 +47,7 @@ public class AuthorizationService
     {
         ArgumentNullException.ThrowIfNull(accessValidationRequest);
 
-        var validator = AccessValidatorFactory.GetAccessValidator(accessValidationRequest);
-        if (validator == null)
-        {
-            _logger.LogDebug("No validator found for the given access validation request");
-            throw new ArgumentException("CreateSignatureAsync: validator for the request does not exist");
-        }
+        var validator = GetAccessValidator(accessValidationRequest);
 
         if (!validator.Validate())
             throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
@@ -72,6 +67,16 @@ public class AuthorizationService
             Value = Convert.ToBase64String(signResult.Signature),
             KeyVersion = _key.Properties.Version,
             Expires = expires
+        };
+    }
+
+    private static MeteringPointMasterDataAccessValidation GetAccessValidator(AccessValidationRequest accessValidationRequest)
+    {
+        return accessValidationRequest switch
+        {
+            MeteringPointMasterDataAccessValidationRequest meteringPointMasterDataAccessValidationRequest =>
+                new MeteringPointMasterDataAccessValidation(meteringPointMasterDataAccessValidationRequest),
+            _ => throw new ArgumentOutOfRangeException(nameof(accessValidationRequest))
         };
     }
 }
