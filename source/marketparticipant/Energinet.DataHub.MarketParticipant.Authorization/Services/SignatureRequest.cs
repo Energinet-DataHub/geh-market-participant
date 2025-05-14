@@ -21,6 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
 public sealed class SignatureRequest
 {
+    private const string ExpirationKey = "EXPIRATION";
     private static readonly IComparer<byte[]> _signatureByteComparer = new SignatureByteComparer();
     private readonly List<SignatureParameter> _params = [];
 
@@ -73,9 +74,9 @@ public sealed class SignatureRequest
     {
         ArgumentNullException.ThrowIfNull(expiration);
 
-        if (ContainsKey(Settings.ExpirationKey)) throw new InvalidOperationException("Expiration already set");
+        if (ContainsKey(ExpirationKey)) throw new InvalidOperationException("Expiration already set");
 
-        SignatureParameter expirationParameter = SignatureParameter.FromLong(expiration, Settings.ExpirationKey);
+        SignatureParameter expirationParameter = SignatureParameter.FromLong(ExpirationKey, expiration);
 
         if (_params.Any(i => KeyExistsWithDifferentType(i, expirationParameter)))
             throw new ArgumentException("Adding expiration Param to signature failed, Param Key already exists with different type");

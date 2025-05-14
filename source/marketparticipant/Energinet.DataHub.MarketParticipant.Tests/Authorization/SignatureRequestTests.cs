@@ -29,7 +29,7 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target.AddSignatureParameter(SignatureParameter.FromLong(1, "TestParameter"));
+        target.AddSignatureParameter(SignatureParameter.FromLong("TestParameter", 1));
 
         // Act + Assert
         var expected = target.CreateSignatureParamBytes();
@@ -43,8 +43,8 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target.AddSignatureParameter(SignatureParameter.FromLong(1, "TestParameter"));
-        target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter2"));
+        target.AddSignatureParameter(SignatureParameter.FromLong("TestParameter", 1));
+        target.AddSignatureParameter(SignatureParameter.FromString("TestParameter2", "test"));
 
         // Act + Assert
         var expected = target.CreateSignatureParamBytes();
@@ -58,8 +58,8 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target.AddSignatureParameter(SignatureParameter.FromString("test2", "TestParameter"));
-        target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter"));
+        target.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test2"));
+        target.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
 
         // Act + Assert
         var expected = target.CreateSignatureParamBytes();
@@ -73,12 +73,12 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target.AddSignatureParameter(SignatureParameter.FromString("test2", "MeteringPointPeriod"));
-        target.AddSignatureParameter(SignatureParameter.FromString("test", "MeteringPointPeriod"));
+        target.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test2"));
+        target.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test"));
 
         var target2 = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target2.AddSignatureParameter(SignatureParameter.FromString("test", "MeteringPointPeriod"));
-        target2.AddSignatureParameter(SignatureParameter.FromString("test2", "MeteringPointPeriod"));
+        target2.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test"));
+        target2.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test2"));
 
         // Act + Assert
         var expected = target.CreateSignatureParamBytes();
@@ -92,12 +92,12 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target.AddSignatureParameter(SignatureParameter.FromLong(1, "TestParameter"));
-        target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter2"));
+        target.AddSignatureParameter(SignatureParameter.FromLong("TestParameter", 1));
+        target.AddSignatureParameter(SignatureParameter.FromString("TestParameter2", "test"));
 
         var target2 = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target2.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter2"));
-        target2.AddSignatureParameter(SignatureParameter.FromLong(1, "TestParameter"));
+        target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter2", "test"));
+        target2.AddSignatureParameter(SignatureParameter.FromLong("TestParameter", 1));
 
         // Act + Assert
         var expected = target.CreateSignatureParamBytes();
@@ -111,11 +111,11 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter"));
+        target.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
 
         var target2 = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target2.AddSignatureParameter(SignatureParameter.FromString("test2", "TestParameter"));
-        target2.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter"));
+        target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test2"));
+        target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
 
         // Act + Assert
         var expected = target.CreateSignatureParamBytes();
@@ -129,7 +129,7 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target.AddSignatureParameter(SignatureParameter.FromLong(1, "TestParameter"));
+        target.AddSignatureParameter(SignatureParameter.FromLong("TestParameter", 1));
 
         // Act + Assert
         var expected = target.CreateSignatureParamBytes();
@@ -143,7 +143,7 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter"));
+        target.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
 
         // Act + Assert
         var expected = target.CreateSignatureParamBytes();
@@ -157,7 +157,7 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target.AddSignatureParameter(SignatureParameter.FromEicFunction(EicFunction.BalanceResponsibleParty, "TestParameter"));
+        target.AddSignatureParameter(SignatureParameter.FromEicFunction("TestParameter", EicFunction.BalanceResponsibleParty));
 
         // Act + Assert
         var expected = target.CreateSignatureParamBytes();
@@ -171,7 +171,7 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest(DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds());
-        target.AddSignatureParameter(SignatureParameter.FromLong(123, "TestParameter"));
+        target.AddSignatureParameter(SignatureParameter.FromLong("TestParameter", 123));
 
         // Act + Assert
         Assert.Throws<ArgumentException>(() => target.AddSignatureParameter(SignatureParameter.FromString("test", "TestParameter")));
