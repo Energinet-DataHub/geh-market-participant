@@ -107,13 +107,13 @@ public sealed class SignatureRequestTests
     }
 
     [Fact]
-    public void SignatureAndVerifyRequest_GetBytes_DifferentMultipleParams_SameKey_DifferentValues_ProducesDifferentResults()
+    public void SignatureRequest_GetBytes_DifferentMultipleParams_SameKey_DifferentValues_ProducesDifferentResults()
     {
         // Arrange
         var target = new SignatureRequest();
         target.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
 
-        var target2 = new VerifyRequest(target.Expiration);
+        var target2 = new SignatureRequest(target.Expiration);
         target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test2"));
         target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
 
@@ -178,7 +178,7 @@ public sealed class SignatureRequestTests
     }
 
     [Fact]
-    public void SignatureRequest_GetBytes_DifferentDateTime__DifferentValues_ProducesDifferentResults()
+    public void SignatureRequest_GetBytes_DifferentDateTime_DifferentValues_ProducesDifferentResults()
     {
         // Arrange
         var start = DateTimeOffset.Now;
@@ -197,7 +197,7 @@ public sealed class SignatureRequestTests
     }
 
     [Fact]
-    public void SignatureRequest_GetBytes_DifferentDateTime__DifferentTimezones_ProducesDifferentResults()
+    public void SignatureRequest_GetBytes_DifferentDateTime_DifferentTimezones_ProducesDifferentResults()
     {
         // Arrange
         var start = DateTimeOffset.Now;
