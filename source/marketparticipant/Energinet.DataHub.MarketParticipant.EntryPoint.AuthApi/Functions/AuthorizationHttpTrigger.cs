@@ -17,31 +17,40 @@ using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
+using Energinet.DataHub.RevisionLog.Integration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
+using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Functions;
 
 public sealed class AuthorizationHttpTrigger
 {
     private const string BlockSignatureAuthorizationFeatureKey = "BlockSignatureAuthorization";
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        .ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
     private readonly IFeatureManager _featureManager;
     private readonly AuthorizationService _authorizationService;
     private readonly ILogger<AuthorizationHttpTrigger> _logger;
+    private readonly IRevisionLogClient _revisionLogClient;
 
     public AuthorizationHttpTrigger(
         IFeatureManager featureManager,
         AuthorizationService authorizationService,
-        ILogger<AuthorizationHttpTrigger> logger)
+        ILogger<AuthorizationHttpTrigger> logger,
+        IRevisionLogClient revisionLogClient)
     {
         _featureManager = featureManager;
         _authorizationService = authorizationService;
         _logger = logger;
+        _revisionLogClient = revisionLogClient;
     }
 
     [Function("CreateSignature")]
@@ -66,6 +75,17 @@ public sealed class AuthorizationHttpTrigger
 
         var result = await _authorizationService
             .CreateSignatureAsync(accessValidationRequest, CancellationToken.None)
+            .ConfigureAwait(false);
+
+        // TODO: Add revision log
+        await _revisionLogClient
+            .LogAsync(new RevisionLogEntry(
+                logId: Guid.NewGuid(),
+                systemId: SubsystemInformation.Id,
+                activity: "CreateSignature",
+                occurredOn: SystemClock.Instance.GetCurrentInstant(),
+                origin: nameof(CreateSignatureAsync),
+                payload: JsonSerializer.Serialize(result, _jsonSerializerOptions)))
             .ConfigureAwait(false);
 
         HttpResponseData response;

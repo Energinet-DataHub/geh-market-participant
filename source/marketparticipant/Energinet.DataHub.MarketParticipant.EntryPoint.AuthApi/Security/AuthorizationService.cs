@@ -22,23 +22,18 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 
 public class AuthorizationService
 {
-    private readonly ILogger<AuthorizationService> _logger;
     private readonly KeyVaultKey _key;
     private readonly CryptographyClient _cryptoClient;
 
-    public AuthorizationService(
-        ILogger<AuthorizationService> logger,
-        KeyVaultKey key)
+    public AuthorizationService(KeyVaultKey key)
     {
         ArgumentNullException.ThrowIfNull(key);
 
-        _logger = logger;
         _key = key;
         _cryptoClient = new CryptographyClient(key.Id, new DefaultAzureCredential());
     }
@@ -64,7 +59,8 @@ public class AuthorizationService
         {
             Value = Convert.ToBase64String(signResult.Signature),
             KeyVersion = _key.Properties.Version,
-            Expires = signatureRequest.Expiration
+            Expires = signatureRequest.Expiration,
+            RequestId = signatureRequest.RequestId,
         };
     }
 

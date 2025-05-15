@@ -19,11 +19,14 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 public sealed class Signature
 {
     [JsonPropertyName("signature")]
-    public required string Value { get; set; }
+    public required string Value { get; init; }
 
     [JsonPropertyName("expires")]
-    public DateTimeOffset Expires { get; set; }
+    public required DateTimeOffset Expires { get; init; }
 
     [JsonPropertyName("keyVersion")]
-    public required string KeyVersion { get; set; }
+    public required string KeyVersion { get; init; }
+
+    [JsonPropertyName("requestId")]
+    public required Guid RequestId { get; init; }
 }

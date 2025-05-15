@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             ArgumentNullException.ThrowIfNull(validationRequest);
             ArgumentNullException.ThrowIfNull(signature);
 
-            var signatureRequest = new VerifyRequest(signature.Expires);
+            var signatureRequest = new VerifyRequest(signature.Expires, signature.RequestId);
             foreach (var signatureParam in validationRequest.GetSignatureParams())
             {
                 signatureRequest.AddSignatureParameter(signatureParam);
