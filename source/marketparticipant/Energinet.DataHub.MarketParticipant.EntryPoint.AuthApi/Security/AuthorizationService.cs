@@ -52,7 +52,7 @@ public class AuthorizationService
         if (!validator.Validate())
             throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
 
-        var expires = DateTimeOffset.UtcNow.AddMinutes(15);
+        var expires = DateTimeOffset.UtcNow.AddMinutes(1);
         var signatureRequest = new SignatureRequest(expires);
         foreach (var signatureParam in accessValidationRequest.GetSignatureParams())
         {
