@@ -26,8 +26,11 @@ public class SignatureRequest
 
     public SignatureRequest()
     {
-        SetExpiration(DateTimeOffset.UtcNow.AddMinutes(1));
+        Expiration = DateTimeOffset.UtcNow.AddMinutes(1);
+        SetExpiration(Expiration);
     }
+
+    public DateTimeOffset Expiration { get; init; }
 
     /// <summary>
     /// Creates the Byte array for representing the Signature params.

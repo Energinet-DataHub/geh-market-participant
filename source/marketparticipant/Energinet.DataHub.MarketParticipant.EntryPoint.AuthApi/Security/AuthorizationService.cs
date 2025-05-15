@@ -52,8 +52,7 @@ public class AuthorizationService
         if (!validator.Validate())
             throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
 
-        var expires = DateTimeOffset.UtcNow.AddMinutes(1);
-        var signatureRequest = new SignatureRequest(expires);
+        var signatureRequest = new SignatureRequest();
         foreach (var signatureParam in accessValidationRequest.GetSignatureParams())
         {
             signatureRequest.AddSignatureParameter(signatureParam);
@@ -65,7 +64,7 @@ public class AuthorizationService
         {
             Value = Convert.ToBase64String(signResult.Signature),
             KeyVersion = _key.Properties.Version,
-            Expires = expires
+            Expires = signatureRequest.Expiration
         };
     }
 
