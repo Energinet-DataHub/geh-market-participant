@@ -107,13 +107,13 @@ public sealed class SignatureRequestTests
     }
 
     [Fact]
-    public void SignatureRequest_GetBytes_DifferentMultipleParams_SameKey_DifferentValues_ProducesDifferentResults()
+    public void SignatureAndVerifyRequest_GetBytes_DifferentMultipleParams_SameKey_DifferentValues_ProducesDifferentResults()
     {
         // Arrange
         var target = new SignatureRequest();
         target.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
 
-        var target2 = new SignatureRequest(target.Expiration);
+        var target2 = new VerifyRequest(target.Expiration);
         target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test2"));
         target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
 
