@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Energinet.DataHub.MarketParticipant.Authorization.AccessValidation;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
-
-[JsonDerivedType(typeof(MeteringPointMasterDataAccessValidationRequest), typeDiscriminator: "mpm")]
-public abstract class AccessValidationRequest
+public class SignatureParameterLong : SignatureParameter
 {
-    protected AccessValidationRequest()
+    // <summary>
+    // Initializes a new instance of the <see cref="SignatureParameterLong"/> for <see cref="long"/>class.
+    // </summary>
+    // <param name="value">The long value.</param>
+    internal SignatureParameterLong(long value)
     {
+        ParameterData = BitConverter.GetBytes(value);
     }
+
+    // <inheritdoc />
+    internal override byte[] ParameterData { get; }
 }

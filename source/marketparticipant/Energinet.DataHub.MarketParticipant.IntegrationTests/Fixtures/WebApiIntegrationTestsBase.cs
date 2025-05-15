@@ -16,7 +16,6 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.MarketParticipant.Common.Options;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.RevisionLog.Integration;
@@ -80,6 +79,8 @@ public abstract class WebApiIntegrationTestsBase<TStartup> : WebApplicationFacto
         builder.UseSetting("KeyVault:TokenSignKeyVault", "https://fake_value");
         builder.UseSetting("KeyVault:TokenSignKeyName", "fake_value");
         builder.UseSetting("KeyVault:CertificatesKeyVault", "https://fake_value");
+        builder.UseSetting("KeyVault:AuthSignKeyVault", "fake_value");
+        builder.UseSetting("KeyVault:AuthSignKeyName", "fake_value");
 
         builder.ConfigureServices(services =>
         {

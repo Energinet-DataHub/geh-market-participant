@@ -40,6 +40,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
         var host = new WebApiIntegrationTestHost();
         host.ServiceCollection.AddSingleton(configuration);
+
         host.ServiceCollection.AddMarketParticipantWebApiModule(configuration);
         InitUserIdProvider(host.ServiceCollection);
 
@@ -93,7 +94,8 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             new("AzureB2c:BackendObjectId", "fake_value"),
             new("AzureB2c:BackendSpnObjectId", "fake_value"),
             new("AzureB2c:BackendId", "fake_value"),
-            new("KeyVault:AuthSignKeyName", "token-sign")
+            new("KeyVault:AuthSignKeyName", "token-fake_value"),
+            new("KeyVault:AuthSignKeyVault", "token-fake_value")
         ];
 
         return new ConfigurationBuilder()
