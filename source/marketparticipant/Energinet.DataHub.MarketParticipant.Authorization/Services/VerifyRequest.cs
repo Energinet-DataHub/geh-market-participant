@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
-public interface IAccessValidator
-{
-    bool Validate();
-}
+public sealed class VerifyRequest(DateTimeOffset expiration) : SignatureRequest(expiration);

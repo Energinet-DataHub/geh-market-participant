@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
-public sealed record CreateSignatureResponse(RestrictionSignatureDto Signature);
+public interface IVerifyAuthorization
+{
+    Task<bool> VerifySignatureAsync(AccessValidationRequest validationRequest, Signature signature);
+}

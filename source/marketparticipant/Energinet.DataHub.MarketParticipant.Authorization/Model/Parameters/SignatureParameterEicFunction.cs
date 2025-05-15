@@ -12,26 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-public sealed class AuthorizationRestriction
+public class SignatureParameterEicFunction : SignatureParameterEnum<EicFunction>
 {
-    public AuthorizationRestriction()
+    // <summary>
+    // Initializes a new instance of the <see cref="SignatureParameterLong"/> for <see cref="long"/>class.
+    // </summary>
+    // <param name="value">The long value.</param>
+    internal SignatureParameterEicFunction(EicFunction value)
+    : base(value)
     {
-        MeasurementId = string.Empty;
-        MeasurementDate = string.Empty;
     }
-
-    public AuthorizationRestriction(
-        string measurementId,
-        string measurementDate)
-    {
-        MeasurementId = measurementId;
-        MeasurementDate = measurementDate;
-    }
-
-    public string MeasurementId { get; set; }
-    public string MeasurementDate { get; set; }
-    public long Expires { get; set; }
-    public long Created { get; set; }
 }

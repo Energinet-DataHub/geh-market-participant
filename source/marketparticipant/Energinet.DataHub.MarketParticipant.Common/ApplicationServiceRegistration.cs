@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actors;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.BalanceResponsibility;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contacts;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Delegations;
@@ -119,8 +118,6 @@ internal static class ApplicationServiceRegistration
         services.AddScoped<IValidator<ConsolidateActorsCommand>, ConsolidateActorsCommandRuleSet>();
         services.AddScoped<IValidator<ScheduleConsolidateActorsCommand>, ScheduleConsolidateActorsCommandRuleSet>();
         services.AddScoped<IValidator<GetActorConsolidationsCommand>, GetActorConsolidationsCommandRuleSet>();
-        services.AddScoped<IValidator<CreateSignatureCommand>, CreateSignatureCommandRuleSet>();
-        services.AddScoped<IValidator<VerifySignatureCommand>, VerifySignatureCommandRuleSet>();
 
         services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
         services.AddScoped<IActorCertificateExpirationService, ActorCertificateExpirationService>();

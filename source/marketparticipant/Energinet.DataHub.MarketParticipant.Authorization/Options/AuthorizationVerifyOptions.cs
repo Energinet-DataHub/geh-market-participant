@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization;
-using MediatR;
+using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Options;
 
-public record CreateSignatureCommand(string AccessvalidationRequestJson) : IRequest<CreateSignatureResponse>;
+public sealed record AuthorizationVerifyOptions
+{
+    public const string SectionName = "AuthorizationVerify";
+
+    [Required]
+    public Uri AuthSignKeyVault { get; set; } = null!;
+
+    [Required]
+    public string AuthSignKeyName { get; set; } = null!;
+}

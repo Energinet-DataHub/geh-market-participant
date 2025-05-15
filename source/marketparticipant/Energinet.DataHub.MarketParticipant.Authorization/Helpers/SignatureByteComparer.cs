@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization;
-using MediatR;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Helpers;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+internal sealed class SignatureByteComparer : IComparer<byte[]>
+{
+    public int Compare(byte[]? x, byte[]? y)
+    {
+        if (x == null || y == null)
+        {
+            return x == y ? 0 : x == null ? -1 : 1;
+        }
 
-public record VerifySignatureCommand(string Signature) : IRequest<VerifySignatureResponse>;
+        return x.AsSpan().SequenceCompareTo(y);
+    }
+}

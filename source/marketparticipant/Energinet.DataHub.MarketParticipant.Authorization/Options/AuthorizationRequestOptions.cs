@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
-using FluentValidation;
+using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Options;
 
-public sealed class CreateSignatureCommandRuleSet : AbstractValidator<CreateSignatureCommand>
+public sealed record AuthorizationRequestOptions
 {
-    public CreateSignatureCommandRuleSet()
-    {
-    }
+    public const string SectionName = "AuthorizationRequest";
+
+    [Required]
+    public Uri EndpointUrl { get; set; } = null!;
 }
