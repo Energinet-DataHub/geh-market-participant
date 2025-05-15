@@ -30,6 +30,12 @@ public class SignatureRequest
         SetExpiration(Expiration);
     }
 
+    public SignatureRequest(DateTimeOffset expiration)
+    {
+        Expiration = expiration;
+        SetExpiration(Expiration);
+    }
+
     public DateTimeOffset Expiration { get; init; }
 
     /// <summary>

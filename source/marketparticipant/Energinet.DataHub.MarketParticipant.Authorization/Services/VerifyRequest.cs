@@ -14,10 +14,4 @@
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
-public sealed class VerifyRequest : SignatureRequest
-{
-    public VerifyRequest(DateTimeOffset expiration)
-    {
-        SetExpiration(expiration);
-    }
-}
+public sealed class VerifyRequest(DateTimeOffset expiration) : SignatureRequest(expiration);
