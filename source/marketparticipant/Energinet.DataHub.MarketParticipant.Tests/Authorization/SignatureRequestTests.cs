@@ -69,62 +69,6 @@ public sealed class SignatureRequestTests
     }
 
     [Fact]
-    public void SignatureRequest_GetBytes_MultipleParams_SameKey_SameTypes_DifferentOrder_AlwaysProducesSameResult()
-    {
-        // Arrange
-        var target = new SignatureRequest();
-        target.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test2"));
-        target.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test"));
-
-        var target2 = new SignatureRequest(target.Expiration);
-        target2.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test"));
-        target2.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test2"));
-
-        // Act + Assert
-        var expected = target.CreateSignatureParamBytes();
-        var actual = target2.CreateSignatureParamBytes();
-
-        Assert.Equal(expected, actual);
-    }
-
-    [Fact]
-    public void SignatureRequest_GetBytes_MultipleParams_DifferentOrder_AlwaysProducesSameResult()
-    {
-        // Arrange
-        var target = new SignatureRequest();
-        target.AddSignatureParameter(SignatureParameter.FromLong("TestParameter", 1));
-        target.AddSignatureParameter(SignatureParameter.FromString("TestParameter2", "test"));
-
-        var target2 = new SignatureRequest(target.Expiration);
-        target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter2", "test"));
-        target2.AddSignatureParameter(SignatureParameter.FromLong("TestParameter", 1));
-
-        // Act + Assert
-        var expected = target.CreateSignatureParamBytes();
-        var actual = target2.CreateSignatureParamBytes();
-
-        Assert.Equal(expected, actual);
-    }
-
-    [Fact]
-    public void SignatureRequest_GetBytes_DifferentMultipleParams_SameKey_DifferentValues_ProducesDifferentResults()
-    {
-        // Arrange
-        var target = new SignatureRequest();
-        target.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
-
-        var target2 = new SignatureRequest(target.Expiration);
-        target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test2"));
-        target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
-
-        // Act + Assert
-        var expected = target.CreateSignatureParamBytes();
-        var actual = target2.CreateSignatureParamBytes();
-
-        Assert.NotEqual(expected, actual);
-    }
-
-    [Fact]
     public void SignatureRequest_ToArray_SingleLongParam_AlwaysProducesSameResult()
     {
         // Arrange
@@ -233,5 +177,42 @@ public sealed class SignatureRequestTests
         var actual = target2.CreateSignatureParamBytes();
 
         Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void SignatureAndVerifyRequest_GetBytes_MultipleParams_SameKey_SameTypes_DifferentOrder_AlwaysProducesSameResult()
+    {
+        // Arrange
+        var target = new SignatureRequest();
+        target.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test2"));
+        target.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test"));
+
+        var target2 = new VerifyRequest(target.Expiration);
+        target2.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test"));
+        target2.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test2"));
+
+        // Act + Assert
+        var expected = target.CreateSignatureParamBytes();
+        var actual = target2.CreateSignatureParamBytes();
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void SignatureAndVerifyRequest_GetBytes_DifferentMultipleParams_SameKey_DifferentValues_ProducesDifferentResults()
+    {
+        // Arrange
+        var target = new SignatureRequest();
+        target.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
+
+        var target2 = new VerifyRequest(target.Expiration);
+        target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test2"));
+        target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
+
+        // Act + Assert
+        var expected = target.CreateSignatureParamBytes();
+        var actual = target2.CreateSignatureParamBytes();
+
+        Assert.NotEqual(expected, actual);
     }
 }

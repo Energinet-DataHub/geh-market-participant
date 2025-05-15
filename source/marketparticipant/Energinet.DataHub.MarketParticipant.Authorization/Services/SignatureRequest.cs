@@ -30,7 +30,7 @@ public class SignatureRequest
         SetExpiration(Expiration);
     }
 
-    public SignatureRequest(DateTimeOffset expiration)
+    protected SignatureRequest(DateTimeOffset expiration)
     {
         Expiration = expiration;
         SetExpiration(Expiration);
