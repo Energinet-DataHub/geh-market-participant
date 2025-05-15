@@ -28,18 +28,19 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 
 public class AuthorizationService
 {
-    private readonly KeyClient _keyClient;
-    private readonly string _keyName;
     private readonly ILogger<AuthorizationService> _logger;
+    private readonly KeyVaultKey _key;
+    private readonly CryptographyClient _cryptoClient;
 
     public AuthorizationService(
-        KeyClient keyClient,
-        string keyName,
-        ILogger<AuthorizationService> logger)
+        ILogger<AuthorizationService> logger,
+        KeyVaultKey key)
     {
-        _keyName = keyName;
-        _keyClient = keyClient;
+        ArgumentNullException.ThrowIfNull(key);
+
         _logger = logger;
+        _key = key;
+        _cryptoClient = new CryptographyClient(key.Id, new DefaultAzureCredential());
     }
 
     public async Task<Signature> CreateSignatureAsync(AccessValidationRequest accessValidationRequest, CancellationToken cancellationToken)
@@ -57,14 +58,12 @@ public class AuthorizationService
             signatureRequest.AddSignatureParameter(signatureParam);
         }
 
-        var key = await _keyClient.GetKeyAsync(_keyName, cancellationToken: cancellationToken).ConfigureAwait(false);
-        var cryptoClient = _keyClient.GetCryptographyClient(_keyName, key.Value.Properties.Version);
-        var signResult = await cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), cancellationToken).ConfigureAwait(false);
+        var signResult = await _cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), cancellationToken).ConfigureAwait(false);
 
         return new Signature
         {
             Value = Convert.ToBase64String(signResult.Signature),
-            KeyVersion = key.Value.Properties.Version,
+            KeyVersion = _key.Properties.Version,
             Expires = signatureRequest.Expiration
         };
     }

@@ -56,7 +56,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger);
+        var target = new AuthorizationService(logger, await _keyClientFixture.KeyClient.GetKeyAsync(_keyClientFixture.KeyName));
         var actual = await target.CreateSignatureAsync(request, CancellationToken.None);
 
         // assert
@@ -80,7 +80,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger);
+        var target = new AuthorizationService(logger, await _keyClientFixture.KeyClient.GetKeyAsync(_keyClientFixture.KeyName));
 
         // assert
         await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(request, cancellationToken: CancellationToken.None));
