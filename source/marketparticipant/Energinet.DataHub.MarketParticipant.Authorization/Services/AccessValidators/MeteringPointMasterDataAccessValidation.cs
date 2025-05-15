@@ -30,6 +30,6 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator
 
     public bool Validate()
     {
-        return MarketRole == EicFunction.DataHubAdministrator;
+        return MarketRole == EicFunction.DataHubAdministrator || MarketRole == EicFunction.EnergySupplier;
     }
 }
