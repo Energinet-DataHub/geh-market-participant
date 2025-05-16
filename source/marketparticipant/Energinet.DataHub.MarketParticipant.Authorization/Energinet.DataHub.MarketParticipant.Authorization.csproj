@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageVersion>1.0.2$(VersionSuffix)</PackageVersion>
+    <PackageVersion>1.0.3$(VersionSuffix)</PackageVersion>
     <Title>Energinet DataHub App Authentication</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>

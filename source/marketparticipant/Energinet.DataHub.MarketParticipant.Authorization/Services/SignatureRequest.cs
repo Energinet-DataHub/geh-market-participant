@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Authorization.Helpers;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
@@ -20,23 +19,29 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
 public class SignatureRequest
 {
-    private const string ExpirationKey = "EXPIRATION";
+    private const string ExpirationKey = "Expiration";
+    private const string RequestIdKey = "RequestId";
     private static readonly IComparer<byte[]> _signatureByteComparer = new SignatureByteComparer();
     private readonly List<SignatureParameter> _params = [];
 
     public SignatureRequest()
     {
         Expiration = DateTimeOffset.UtcNow.AddMinutes(1);
+        RequestId = Guid.NewGuid();
         SetExpiration(Expiration);
+        SetRequestId(RequestId);
     }
 
-    protected SignatureRequest(DateTimeOffset expiration)
+    protected SignatureRequest(DateTimeOffset expiration, Guid requestId)
     {
         Expiration = expiration;
+        RequestId = requestId;
         SetExpiration(Expiration);
+        SetRequestId(RequestId);
     }
 
-    public DateTimeOffset Expiration { get; init; }
+    public DateTimeOffset Expiration { get; }
+    public Guid RequestId { get; }
 
     /// <summary>
     /// Creates the Byte array for representing the Signature params.
@@ -65,8 +70,8 @@ public class SignatureRequest
     {
         ArgumentNullException.ThrowIfNull(signatureParameter);
 
-        if (signatureParameter.Key == ExpirationKey)
-            throw new InvalidOperationException("The signature parameter key cannot be the same as the expiration parameter");
+        if (signatureParameter.Key.Equals(ExpirationKey, StringComparison.OrdinalIgnoreCase) || signatureParameter.Key.Equals(RequestIdKey, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("The signature parameter key cannot be the same as the expiration or identifier parameter");
 
         if (_params.Any(i => KeyExistsWithDifferentType(i, signatureParameter)))
             throw new ArgumentException("Adding Param to signature failed, Param Key already exists with different type");
@@ -74,7 +79,12 @@ public class SignatureRequest
         _params.Add(signatureParameter);
     }
 
-    protected void SetExpiration(DateTimeOffset expiration)
+    private static bool KeyExistsWithDifferentType(SignatureParameter existingEntry, SignatureParameter newEntry)
+    {
+        return existingEntry.Key == newEntry.Key && existingEntry.GetType() != newEntry.GetType();
+    }
+
+    private void SetExpiration(DateTimeOffset expiration)
     {
         ArgumentNullException.ThrowIfNull(expiration);
 
@@ -85,22 +95,20 @@ public class SignatureRequest
 
         SignatureParameter expirationParameter = SignatureParameter.FromDateTimeOffset(ExpirationKey, expiration);
 
-        if (_params.Any(i => KeyExistsWithDifferentType(i, expirationParameter)))
-            throw new ArgumentException("Adding expiration Param to signature failed, Param Key already exists with different type");
-
         _params.Add(expirationParameter);
     }
 
-    private static bool KeyExistsWithDifferentType(SignatureParameter existingEntry, SignatureParameter newEntry)
+    private void SetRequestId(Guid requestId)
     {
-        return existingEntry.Key == newEntry.Key && existingEntry.GetType() != newEntry.GetType();
-    }
+        ArgumentNullException.ThrowIfNull(requestId);
 
-    private bool ContainsKey(string key)
-    {
-        ArgumentNullException.ThrowIfNull(key);
+        if (_params.Any(i => i.Key.Equals(RequestIdKey, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException("Identifier already set");
+        }
 
-        var internalKey = key.ToUpper(CultureInfo.InvariantCulture);
-        return _params.Any(i => i.Key.Equals(internalKey, StringComparison.OrdinalIgnoreCase));
+        SignatureParameter identifierParameter = SignatureParameter.FromString(RequestIdKey, requestId.ToString());
+
+        _params.Add(identifierParameter);
     }
 }

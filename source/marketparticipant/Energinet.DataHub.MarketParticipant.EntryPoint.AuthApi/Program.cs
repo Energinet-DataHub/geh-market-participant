@@ -16,6 +16,7 @@ using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Extensions.DependencyInjection;
+using Energinet.DataHub.RevisionLog.Integration.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
@@ -25,6 +26,7 @@ var host = new HostBuilder()
         services.AddApplicationInsightsForIsolatedWorker("mark-part-auth-api");
         services.AddHealthChecksForIsolatedWorker();
 
+        services.AddRevisionLogIntegrationModule(context.Configuration);
         services.AddMarketParticipantAuthApiModule(context.Configuration);
     })
     .ConfigureLogging((hostingContext, logging) =>

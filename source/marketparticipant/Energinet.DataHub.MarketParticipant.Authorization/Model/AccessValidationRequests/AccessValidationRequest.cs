@@ -24,6 +24,10 @@ public abstract class AccessValidationRequest : IAccessRequestSignatureParams
     {
     }
 
+    public Guid UserId { get; set; } = Guid.Empty;
+    public string ActorNumber { get; set; } = string.Empty;
+    public EicFunction MarketRole { get; set; } = EicFunction.BalanceResponsibleParty;
+
     public IReadOnlyList<SignatureParameter> GetSignatureParams()
     {
         return GetSignatureParamsCore().Append(SignatureParameter.FromString("ValidationContext", GetType().Name)).ToList();

@@ -1,5 +1,10 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
+## Version 1.0.3
+
+- Add RequestId to Signature
+- Add several userinfo parameters to to AccessRequests
+
 ## Version 1.0.2
 
 - Added energysupplier role validation for access validation.
