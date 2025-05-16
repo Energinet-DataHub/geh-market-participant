@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+    <PackageReference Include="Microsoft.Graph" Version="5.68.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Authorization\Energinet.DataHub.MarketParticipant.Authorization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Model\Contracts\actor_activated.proto">
+      <Access>Public</Access>
+      <GrpcServices>None</GrpcServices>
+      <ProtoCompile>True</ProtoCompile>
+      <OutputDir>obj\contracts</OutputDir>
+      <CompileOutputs>True</CompileOutputs>
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Model\Contracts\actor_certificate_credentials_assigned.proto">
+      <Access>Public</Access>
+      <GrpcServices>None</GrpcServices>
+      <ProtoCompile>True</ProtoCompile>
+      <OutputDir>obj\contracts</OutputDir>
+      <CompileOutputs>True</CompileOutputs>
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Model\Contracts\actor_certificate_credentials_removed.proto">
+      <Access>Public</Access>
+      <GrpcServices>None</GrpcServices>
+      <ProtoCompile>True</ProtoCompile>
+      <OutputDir>obj\contracts</OutputDir>
+      <CompileOutputs>True</CompileOutputs>
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Model\Contracts\eic_function.proto">
+      <Access>Public</Access>
+      <GrpcServices>None</GrpcServices>
+      <ProtoCompile>True</ProtoCompile>
+      <OutputDir>obj\contracts</OutputDir>
+      <CompileOutputs>True</CompileOutputs>
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Model\Contracts\grid_area_ownership_assigned.proto">
+      <Access>Public</Access>
+      <GrpcServices>None</GrpcServices>
+      <ProtoCompile>True</ProtoCompile>
+      <OutputDir>obj\contracts</OutputDir>
+      <CompileOutputs>True</CompileOutputs>
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Model\Contracts\process_delegation_configured.proto">
+      <Access>Public</Access>
+      <GrpcServices>None</GrpcServices>
+      <ProtoCompile>True</ProtoCompile>
+      <OutputDir>obj\contracts</OutputDir>
+      <CompileOutputs>True</CompileOutputs>
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Model\Contracts\user_notification_triggered.proto">
+      <Access>Public</Access>
+      <GrpcServices>None</GrpcServices>
+      <ProtoCompile>True</ProtoCompile>
+      <OutputDir>obj\contracts</OutputDir>
+      <CompileOutputs>True</CompileOutputs>
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
+
+</Project>
