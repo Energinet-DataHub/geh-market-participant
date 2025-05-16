@@ -2,8 +2,7 @@
 
 ## Version 1.0.2
 
-- Add RequestId to Signature
-- Add several userinfo parameters to to AccessRequests
+- Added energysupplier role validation for access validation.
 
 ## Version 1.0.1
 
