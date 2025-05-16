@@ -1,8 +1,12 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
-## Version 1.0.1
+## Version 1.0.2
 
 - Add RequestId to Signature
+
+## Version 1.0.1
+
+- Added support for key rotation.
 
 ## Version 1.0.0
 

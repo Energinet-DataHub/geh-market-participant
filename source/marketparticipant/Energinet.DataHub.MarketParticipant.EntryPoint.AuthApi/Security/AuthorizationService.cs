@@ -15,7 +15,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
@@ -27,15 +26,16 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 
 public class AuthorizationService
 {
-    private readonly KeyVaultKey _key;
-    private readonly CryptographyClient _cryptoClient;
+    private readonly KeyClient _keyClient;
+    private readonly string _keyName;
 
-    public AuthorizationService(KeyVaultKey key)
+    public AuthorizationService(
+        KeyClient keyClient,
+        string keyName)
     {
-        ArgumentNullException.ThrowIfNull(key);
-
-        _key = key;
-        _cryptoClient = new CryptographyClient(key.Id, new DefaultAzureCredential());
+        _keyName = keyName;
+        _keyClient = keyClient;
+        _logger = logger;
     }
 
     public async Task<Signature> CreateSignatureAsync(AccessValidationRequest accessValidationRequest, CancellationToken cancellationToken)
@@ -53,12 +53,14 @@ public class AuthorizationService
             signatureRequest.AddSignatureParameter(signatureParam);
         }
 
-        var signResult = await _cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), cancellationToken).ConfigureAwait(false);
+        var key = await _keyClient.GetKeyAsync(_keyName, cancellationToken: cancellationToken).ConfigureAwait(false);
+        var cryptoClient = _keyClient.GetCryptographyClient(_keyName, key.Value.Properties.Version);
+        var signResult = await cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), cancellationToken).ConfigureAwait(false);
 
         return new Signature
         {
             Value = Convert.ToBase64String(signResult.Signature),
-            KeyVersion = _key.Properties.Version,
+            KeyVersion = key.Value.Properties.Version,
             Expires = signatureRequest.Expiration,
             RequestId = signatureRequest.RequestId,
         };

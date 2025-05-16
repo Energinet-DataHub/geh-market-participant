@@ -23,7 +23,9 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
 {
     public sealed class AuthorizationVerifyService : IVerifyAuthorization
     {
-        private readonly CryptographyClient _cryptoClient;
+        private readonly KeyClient _keyClient;
+        private readonly Uri _keyVault;
+        private readonly string _keyName;
         private readonly ILogger<AuthorizationVerifyService> _logger;
 
         public AuthorizationVerifyService(
@@ -31,19 +33,10 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             string keyName,
             ILogger<AuthorizationVerifyService> logger)
         {
-            var keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
-            KeyVaultKey key = keyClient.GetKey(keyName);
+            _keyVault = keyVault;
+            _keyName = keyName;
+            _keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
             _logger = logger;
-
-            // Todo:
-            // Because of keyRotation, multiple versions of the key can be in use.
-            // The versions used should be stored in an array or something like that and updated overtime.
-            // Create signature should always simply use the current version.
-            // Verify should use the version it gets from a input parameter.
-            // Currently it just load once the current version from the key vault.
-            // _key.Properties.Version
-            // _cryptoClient = _keyClient.GetCryptographyClient(_keyName, "KeyVersion");
-            _cryptoClient = new CryptographyClient(key.Id, new DefaultAzureCredential());
         }
 
         public async Task<bool> VerifySignatureAsync(AccessValidationRequest validationRequest, Signature signature)
@@ -58,7 +51,8 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services
             }
 
             var conversionResult = Convert.FromBase64String(signature.Value);
-            var verifyResult = await _cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), conversionResult).ConfigureAwait(false);
+            var cryptoClient = _keyClient.GetCryptographyClient(_keyName, signature.KeyVersion);
+            var verifyResult = await cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), conversionResult).ConfigureAwait(false);
             return verifyResult.IsValid;
         }
     }
