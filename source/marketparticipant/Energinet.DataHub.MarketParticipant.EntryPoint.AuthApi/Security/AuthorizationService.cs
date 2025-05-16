@@ -35,7 +35,6 @@ public class AuthorizationService
     {
         _keyName = keyName;
         _keyClient = keyClient;
-        _logger = logger;
     }
 
     public async Task<Signature> CreateSignatureAsync(AccessValidationRequest accessValidationRequest, CancellationToken cancellationToken)

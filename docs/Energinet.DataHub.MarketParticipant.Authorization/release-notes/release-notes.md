@@ -3,6 +3,7 @@
 ## Version 1.0.2
 
 - Add RequestId to Signature
+- Add several userinfo parameters to to AccessRequests
 
 ## Version 1.0.1
 
