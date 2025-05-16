@@ -77,14 +77,17 @@ public sealed class AuthorizationHttpTrigger
             .CreateSignatureAsync(accessValidationRequest, CancellationToken.None)
             .ConfigureAwait(false);
 
-        // TODO: Add revision log
+        // TODO: User info
         await _revisionLogClient
             .LogAsync(new RevisionLogEntry(
                 logId: Guid.NewGuid(),
+                userId: accessValidationRequest.UserId,
                 systemId: SubsystemInformation.Id,
                 activity: "CreateSignature",
                 occurredOn: SystemClock.Instance.GetCurrentInstant(),
                 origin: nameof(CreateSignatureAsync),
+                actorNumber: accessValidationRequest.ActorNumber,
+                marketRoles: accessValidationRequest.MarketRole.ToString(),
                 payload: JsonSerializer.Serialize(result, _jsonSerializerOptions)))
             .ConfigureAwait(false);
 
