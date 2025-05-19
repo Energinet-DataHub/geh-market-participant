@@ -91,8 +91,7 @@ public sealed class AuthorizationHttpTrigger
                 payload: JsonSerializer.Serialize(result, _jsonSerializerOptions)))
             .ConfigureAwait(false);
 
-        HttpResponseData response;
-        response = httpRequest.CreateResponse(HttpStatusCode.OK);
+        var response = httpRequest.CreateResponse(HttpStatusCode.OK);
         await response
             .WriteAsJsonAsync(result)
             .ConfigureAwait(false);
