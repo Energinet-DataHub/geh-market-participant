@@ -77,7 +77,6 @@ public sealed class AuthorizationHttpTrigger
             .CreateSignatureAsync(accessValidationRequest, CancellationToken.None)
             .ConfigureAwait(false);
 
-        // TODO: User info
         await _revisionLogClient
             .LogAsync(new RevisionLogEntry(
                 logId: Guid.NewGuid(),
