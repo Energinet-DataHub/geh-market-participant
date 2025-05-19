@@ -13,9 +13,15 @@
 // limitations under the License.
 
 using System;
+using System.Net;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Functions;
@@ -25,15 +31,23 @@ public sealed class AuthorizationHttpTrigger
     private const string BlockSignatureAuthorizationFeatureKey = "BlockSignatureAuthorization";
 
     private readonly IFeatureManager _featureManager;
+    private readonly AuthorizationService _authorizationService;
+    private readonly ILogger<AuthorizationHttpTrigger> _logger;
 
-    public AuthorizationHttpTrigger(IFeatureManager featureManager)
+    public AuthorizationHttpTrigger(
+        IFeatureManager featureManager,
+        AuthorizationService authorizationService,
+        ILogger<AuthorizationHttpTrigger> logger)
     {
         _featureManager = featureManager;
+        _authorizationService = authorizationService;
+        _logger = logger;
     }
 
     [Function("CreateSignature")]
-    public async Task CreateSignatureAsync(
+    public async Task<HttpResponseData> CreateSignatureAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "createSignature")]
+        string validationRequestJson,
         HttpRequestData httpRequest)
     {
         var blockSignatureAuthorization = await _featureManager
@@ -42,5 +56,48 @@ public sealed class AuthorizationHttpTrigger
 
         if (blockSignatureAuthorization)
             throw new UnauthorizedAccessException("Signature authorization is not allowed.");
+
+        var accessValidationRequest = DeserializeAccessValidationRequest(validationRequestJson);
+        if (accessValidationRequest == null)
+        {
+            _logger.LogDebug("Failed to deserialize access validation request");
+            throw new ArgumentException("CreateSignatureAsync: Invalid validation request string");
+        }
+
+        var result = await _authorizationService
+            .CreateSignatureAsync(accessValidationRequest, CancellationToken.None)
+            .ConfigureAwait(false);
+
+        HttpResponseData response;
+        response = httpRequest.CreateResponse(HttpStatusCode.OK);
+        await response
+            .WriteAsJsonAsync(result)
+            .ConfigureAwait(false);
+
+        return response;
+    }
+
+    private AccessValidationRequest? DeserializeAccessValidationRequest(string validationRequestJson)
+    {
+        try
+        {
+            var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
+
+            return accessValidationRequest;
+        }
+        catch (JsonException jsonEx)
+        {
+            _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON");
+        }
+        catch (InvalidOperationException invalidOpEx)
+        {
+            _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation");
+        }
+        catch (Exception ex) when (ex is ArgumentNullException or ArgumentException)
+        {
+            _logger.LogDebug(ex, "An argument-related error occurred during access validation");
+        }
+
+        return null;
     }
 }

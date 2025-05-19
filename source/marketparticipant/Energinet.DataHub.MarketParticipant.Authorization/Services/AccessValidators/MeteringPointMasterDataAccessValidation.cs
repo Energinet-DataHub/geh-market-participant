@@ -20,6 +20,8 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.MasterData;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
 
@@ -60,6 +62,8 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator, 
             EicFunction.DataHubAdministrator => true,
             EicFunction.GridAccessProvider => ValidateMeteringPointIsOfOwnedGridArea(),
            _ => false,
+            EicFunction.EnergySupplier => true,
+            _ => false,
         };
     }
 

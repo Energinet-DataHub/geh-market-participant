@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Restriction;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
-
-public interface IAuthorizationService
+public class SignatureParameterString : SignatureParameter
 {
-    Task<RestrictionSignatureDto> CreateSignatureAsync(string validationRequestJson);
-    Task<bool> VerifySignatureAsync(AuthorizationRestriction restriction, string signature);
+    // <summary>
+    // Initializes a new instance of the <see cref="SignatureParameterString"/> for <see cref="string"/>classes.
+    // </summary>
+    // <param name="value">The string value.</param>
+    internal SignatureParameterString(string value)
+    {
+        ParameterData = System.Text.Encoding.UTF8.GetBytes(value);
+    }
+
+    // <inheritdoc />
+    internal override byte[] ParameterData { get; }
 }

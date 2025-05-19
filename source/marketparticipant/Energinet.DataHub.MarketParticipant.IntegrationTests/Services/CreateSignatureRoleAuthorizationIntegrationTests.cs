@@ -14,11 +14,11 @@
 
 using System;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Authorization.AccessValidation;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
-using Energinet.DataHub.MarketParticipant.Authorization.Services;
-using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -51,18 +51,17 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
 
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
-            MarketRole = EicFunction.DataHubAdministrator
+            MarketRole = EicFunction.DataHubAdministrator,
+            MeteringPointId = "1234"
         };
 
-        var jsonString = JsonSerializer.Serialize<AccessValidationRequest>(request);
-
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient.VaultUri, _keyClientFixture.KeyName, logger);
-        var actual = await target.CreateSignatureAsync(jsonString);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger);
+        var actual = await target.CreateSignatureAsync(request, CancellationToken.None);
 
         // assert
-        Assert.NotNull(actual.Signature);
-        Assert.NotEmpty(actual.Signature);
+        Assert.NotNull(actual.Value);
+        Assert.NotEmpty(actual.Value);
     }
 
     [Fact]
@@ -76,17 +75,19 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
 
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
-            MarketRole = EicFunction.GridAccessProvider
+            MarketRole = EicFunction.GridAccessProvider,
+            MeteringPointId = "1234"
         };
 
-        var meteringPointMasterDataAccess = new MeteringPointMasterDataAccessValidation(request);
-
-        var jsonString = JsonSerializer.Serialize<AccessValidationRequest>(request);
-
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient.VaultUri, _keyClientFixture.KeyName, logger);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger);
 
         // assert
-        await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(jsonString));
+        await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(request, cancellationToken: CancellationToken.None));
+    }
+
+    private static string SerializeAccessRestriction(AccessValidationRequest accessValidationRequest)
+    {
+        return JsonSerializer.Serialize(accessValidationRequest);
     }
 }
