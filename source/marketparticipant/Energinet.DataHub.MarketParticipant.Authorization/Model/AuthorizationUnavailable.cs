@@ -14,14 +14,4 @@
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-public enum AuthorizationCode
-{
-    Unavailable = 1,
-    Unauthorized,
-    Authorized
-}
-
-public abstract class AuthorizationResult(AuthorizationCode result)
-{
-    public AuthorizationCode Result { get; } = result;
-}
+internal sealed class AuthorizationUnavailable() : AuthorizationResult(AuthorizationCode.Unavailable);

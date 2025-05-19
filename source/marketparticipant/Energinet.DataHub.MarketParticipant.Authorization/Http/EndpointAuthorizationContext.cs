@@ -45,15 +45,15 @@ public sealed class EndpointAuthorizationContext : IEndpointAuthorizationContext
             throw new InvalidOperationException("HttpContext required for endpoint authorization.");
         }
 
-        if (!httpContext.Request.Headers.TryGetValue("Authorization", out var headers))
+        if (!httpContext.Request.Headers.TryGetValue(EndpointAuthorizationConfig.AuthorizationHeaderName, out var headers))
         {
-            return new AuthorizationResult(Guid.Empty, AuthorizationCode.Unavailable);
+            return new AuthorizationUnavailable();
         }
 
         if (headers.Count != 1)
         {
             await _endpointAuthorizationLogger.LogAsync(accessValidationRequest, null).ConfigureAwait(false);
-            return new AuthorizationResult(Guid.Empty, AuthorizationCode.Unauthorized);
+            return new AuthorizationFailure();
         }
 
         var signatureBase64 = Convert.FromBase64String(headers!);
@@ -63,7 +63,7 @@ public sealed class EndpointAuthorizationContext : IEndpointAuthorizationContext
         if (signature == null)
         {
             await _endpointAuthorizationLogger.LogAsync(accessValidationRequest, signature).ConfigureAwait(false);
-            return new AuthorizationResult(Guid.Empty, AuthorizationCode.Unauthorized);
+            return new AuthorizationFailure();
         }
 
         var result = await _verifyAuthorization
@@ -73,10 +73,10 @@ public sealed class EndpointAuthorizationContext : IEndpointAuthorizationContext
         if (result)
         {
             await _endpointAuthorizationLogger.LogAsync(accessValidationRequest, signature).ConfigureAwait(false);
-            return new AuthorizationResult(signature.RequestId, AuthorizationCode.Authorized);
+            return new AuthorizationSuccess(signature.RequestId);
         }
 
         await _endpointAuthorizationLogger.LogAsync(accessValidationRequest, signature).ConfigureAwait(false);
-        return new AuthorizationResult(signature.RequestId, AuthorizationCode.Unauthorized);
+        return new AuthorizationFailure(signature.RequestId);
     }
 }

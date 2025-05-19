@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Http;
 
-public enum AuthorizationCode
+public sealed class EndpointAuthorizationConfig
 {
-    Unavailable = 1,
-    Unauthorized,
-    Authorized
-}
-
-public abstract class AuthorizationResult(AuthorizationCode result)
-{
-    public AuthorizationCode Result { get; } = result;
+    public static string AuthorizationHeaderName => "Authorization";
 }
