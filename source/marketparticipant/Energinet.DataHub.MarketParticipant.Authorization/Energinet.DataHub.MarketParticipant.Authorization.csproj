@@ -56,4 +56,9 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Authorization.Application\Energinet.DataHub.MarketParticipant.Authorization.Application.csproj" />
+  </ItemGroup>
+
 </Project>

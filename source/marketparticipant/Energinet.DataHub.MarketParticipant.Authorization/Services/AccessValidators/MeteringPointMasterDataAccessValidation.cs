@@ -15,8 +15,12 @@
 
 
 
+using Energinet.DataHub.MarketParticipant.Authorization.Application;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Models.MasterData;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using NodaTime;
+
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
 
@@ -39,16 +43,9 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator
         ArgumentNullException.ThrowIfNull(validationRequest);
 
         MarketRole = validationRequest.MarketRole;
-        //_apiHttpClient = new HttpClient();
-        //_apiHttpClient.BaseAddress = new Uri("test.test");
     }
 
     public EicFunction MarketRole { get; }
-
-    //public void Dispose()
-    //{
-    //    _apiHttpClient.Dispose();
-    //}
 
     public bool Validate()
     {
@@ -65,33 +62,10 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator
     {
         //TODO: Call elecitricity market
         var marketRole = MarketRole;
+        //var electricityMarket = new ElectricityMarket(( new MeteringPointIdentification() {  Value='123'}, interval);
+
         //USE GLN and market role for look up Grid Area
         //lookup metering point to compare the registered grid
         return false;
     }
-
-   // private async Task<IEnumerable<MeteringPointMasterData>> GetMeteringPointMasterDataChangesAsync(
-   //MeteringPointIdentification meteringPointId,
-   //Interval period)
-   // {
-   //     ArgumentNullException.ThrowIfNull(meteringPointId);
-
-   //     var f = period.Start.ToDateTimeOffset();
-   //     var t = period.End.ToDateTimeOffset();
-
-   //     using var request = new HttpRequestMessage(HttpMethod.Post, "api/get-metering-point-master-data");
-   //     request.Content = JsonContent.Create(new MeteringPointMasterDataRequestDto(meteringPointId.Value, f, t));
-   //     using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
-
-   //     if (response.StatusCode is HttpStatusCode.NotFound)
-   //         return [];
-
-   //     var result = await response.Content
-   //         .ReadFromJsonAsync<IEnumerable<MeteringPointMasterData>>(_jsonSerializerOptions)
-   //         .ConfigureAwait(false) ?? [];
-
-   //     return result;
-   // }
-
-
 }
