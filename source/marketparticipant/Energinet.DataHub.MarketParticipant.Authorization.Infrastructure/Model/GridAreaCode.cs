@@ -12,17 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
-
-public sealed class MarketRoleEntity
-{
-    public Guid Id { get; set; }
-    public Guid ActorId { get; set; }
-    public EicFunction Function { get; set; }
-    public Collection<MarketRoleGridAreaEntity> GridAreas { get; } = new();
-    public string? Comment { get; set; }
-}
+public sealed record GridAreaCode(string Value);

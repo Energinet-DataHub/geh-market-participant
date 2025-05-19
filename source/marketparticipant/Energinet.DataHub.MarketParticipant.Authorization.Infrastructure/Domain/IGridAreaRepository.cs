@@ -12,23 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Mappers;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
 
-internal sealed class GridAreaLinkMapper
+/// <summary>
+/// Provides access to the Grid Areas.
+/// </summary>
+public interface IGridAreaRepository
 {
-    public static void MapToEntity(GridAreaLink from, GridAreaLinkEntity to)
-    {
-        to.Id = from.Id.Value;
-        to.GridAreaId = from.GridAreaId.Value;
-    }
+    /// <summary>
+    /// Gets an GridArea with the specified id.
+    /// </summary>
+    /// <param name="id">The id of the GridArea to get.</param>
+    /// <returns>The specified grid area or null if not found.</returns>
+    Task<GridArea?> GetAsync(GridAreaId id);
 
-    public static GridAreaLink MapFromEntity(GridAreaLinkEntity from)
-    {
-        return new GridAreaLink(
-            new GridAreaLinkId(from.Id),
-            new GridAreaId(from.GridAreaId));
-    }
+    /// <summary>
+    /// Retrieves all grid areas.
+    /// </summary>
+    Task<IEnumerable<GridArea>> GetAsync();
 }

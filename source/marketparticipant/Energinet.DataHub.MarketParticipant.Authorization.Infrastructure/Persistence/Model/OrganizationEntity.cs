@@ -14,7 +14,7 @@
 
 using System;
 using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Audit;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 

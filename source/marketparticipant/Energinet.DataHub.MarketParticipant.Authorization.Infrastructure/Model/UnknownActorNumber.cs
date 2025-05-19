@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using System.ComponentModel;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
-public sealed class MarketRoleEntity
+public sealed record UnknownActorNumber : ActorNumber
 {
-    public Guid Id { get; set; }
-    public Guid ActorId { get; set; }
-    public EicFunction Function { get; set; }
-    public Collection<MarketRoleGridAreaEntity> GridAreas { get; } = new();
-    public string? Comment { get; set; }
+    [Browsable(false)]
+    public UnknownActorNumber(string value)
+        : base(value)
+    {
+    }
+
+    public override ActorNumberType Type => ActorNumberType.Unknown;
 }

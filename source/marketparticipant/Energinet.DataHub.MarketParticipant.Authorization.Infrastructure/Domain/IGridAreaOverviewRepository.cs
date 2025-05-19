@@ -12,17 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
 
-public sealed class MarketRoleEntity
+/// <summary>
+/// Provides access to an overview of grid areas.
+/// </summary>
+public interface IGridAreaOverviewRepository
 {
-    public Guid Id { get; set; }
-    public Guid ActorId { get; set; }
-    public EicFunction Function { get; set; }
-    public Collection<MarketRoleGridAreaEntity> GridAreas { get; } = new();
-    public string? Comment { get; set; }
+    /// <summary>
+    /// Gets an overview of grid areas.
+    /// </summary>
+    Task<IEnumerable<GridAreaOverviewItem>> GetAsync();
 }

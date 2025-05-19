@@ -12,17 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using System.Threading.Tasks;
+using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
-public sealed class MarketRoleEntity
+public sealed class AuthorizationDatabaseFixture : IAsyncLifetime
 {
-    public Guid Id { get; set; }
-    public Guid ActorId { get; set; }
-    public EicFunction Function { get; set; }
-    public Collection<MarketRoleGridAreaEntity> GridAreas { get; } = new();
-    public string? Comment { get; set; }
+    public AuthorizationDatabaseManager DatabaseManager { get; } = new();
+
+    public Task InitializeAsync()
+    {
+        return DatabaseManager.CreateDatabaseAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        return DatabaseManager.DeleteDatabaseAsync();
+    }
 }

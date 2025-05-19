@@ -15,17 +15,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Repositories;
 
 public class GridAreaOverviewRepository : IGridAreaOverviewRepository
 {
-    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+    private readonly IAuthorizationDbContext _marketParticipantDbContext;
 
-    public GridAreaOverviewRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public GridAreaOverviewRepository(IAuthorizationDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
     }

@@ -43,6 +43,20 @@ public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
         return Task.FromResult(host);
     }
 
+    public static Task<OrganizationIntegrationTestHost> InitializeAsync(AuthorizationDatabaseFixture databaseFixture)
+    {
+        ArgumentNullException.ThrowIfNull(databaseFixture);
+
+        var configuration = BuildConfig(databaseFixture.DatabaseManager.ConnectionString);
+
+        var host = new OrganizationIntegrationTestHost();
+        host.ServiceCollection.AddSingleton(configuration);
+        host.ServiceCollection.AddMarketParticipantOrganizationModule(configuration);
+        InitEmailSender(host.ServiceCollection);
+
+        return Task.FromResult(host);
+    }
+
     public AsyncServiceScope BeginScope()
     {
         var serviceProvider = ServiceCollection.BuildServiceProvider();

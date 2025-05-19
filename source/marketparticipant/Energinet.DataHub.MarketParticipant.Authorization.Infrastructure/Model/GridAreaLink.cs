@@ -13,16 +13,23 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
-public sealed class MarketRoleEntity
+public sealed class GridAreaLink
 {
-    public Guid Id { get; set; }
-    public Guid ActorId { get; set; }
-    public EicFunction Function { get; set; }
-    public Collection<MarketRoleGridAreaEntity> GridAreas { get; } = new();
-    public string? Comment { get; set; }
+    public GridAreaLink(GridAreaId gridAreaId)
+    {
+        Id = new GridAreaLinkId(Guid.Empty);
+        GridAreaId = gridAreaId;
+    }
+
+    public GridAreaLink(GridAreaLinkId id, GridAreaId gridAreaId)
+    {
+        Id = id;
+        GridAreaId = gridAreaId;
+    }
+
+    public GridAreaLinkId Id { get; init; }
+    public GridAreaId GridAreaId { get; init; }
 }

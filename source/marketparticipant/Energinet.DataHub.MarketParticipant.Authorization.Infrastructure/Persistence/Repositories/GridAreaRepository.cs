@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -26,38 +26,11 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persi
 
 public class GridAreaRepository : IGridAreaRepository
 {
-    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+    private readonly IAuthorizationDbContext _marketParticipantDbContext;
 
-    public GridAreaRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public GridAreaRepository(IAuthorizationDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
-    }
-
-    public async Task<GridAreaId> AddOrUpdateAsync(GridArea gridArea)
-    {
-        ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
-
-        GridAreaEntity destination;
-        if (gridArea.Id.Value == default)
-        {
-            destination = new GridAreaEntity();
-        }
-        else
-        {
-            destination = await _marketParticipantDbContext
-                .GridAreas
-                .FindAsync(gridArea.Id.Value)
-                .ConfigureAwait(false) ?? throw new InvalidOperationException($"GridArea with id {gridArea.Id.Value} is missing, even though it cannot be deleted.");
-        }
-
-        GridAreaMapper.MapToEntity(gridArea, destination);
-        _marketParticipantDbContext.GridAreas.Update(destination);
-
-        await _marketParticipantDbContext
-            .SaveChangesAsync()
-            .ConfigureAwait(false);
-
-        return new GridAreaId(destination.Id);
     }
 
     public async Task<GridArea?> GetAsync(GridAreaId id)

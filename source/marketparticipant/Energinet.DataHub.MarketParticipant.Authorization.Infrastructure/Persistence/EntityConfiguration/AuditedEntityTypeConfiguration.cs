@@ -14,20 +14,24 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.EntityConfiguration;
 
-public class GridAreaEntityConfiguration : AuditedEntityTypeConfiguration<GridAreaEntity>
+public abstract class AuditedEntityTypeConfiguration<TEntity> : IEntityTypeConfiguration<TEntity>
+    where TEntity : class, IAuditedEntity
 {
-    protected override void ConfigureEntity(EntityTypeBuilder<GridAreaEntity> builder)
+    public void Configure(EntityTypeBuilder<TEntity> builder)
     {
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
 
-        builder.ToTable("GridArea");
-        builder.HasKey(gridArea => gridArea.Id);
-        builder.Property(p => p.Id).ValueGeneratedOnAdd();
+        builder.ToTable(t => t.IsTemporal());
+        builder.Property(e => e.Version).IsConcurrencyToken();
+        builder.Property(e => e.ChangedByIdentityId).IsRequired();
+
+        ConfigureEntity(builder);
     }
+
+    protected abstract void ConfigureEntity(EntityTypeBuilder<TEntity> builder);
 }

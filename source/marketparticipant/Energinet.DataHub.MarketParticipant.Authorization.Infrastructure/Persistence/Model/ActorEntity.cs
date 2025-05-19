@@ -14,8 +14,8 @@
 
 using System;
 using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Audit;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 
@@ -28,11 +28,11 @@ public sealed class ActorEntity : IAuditedEntity
     public bool IsFas { get; set; }
     public string ActorNumber { get; set; } = null!;
     public string Name { get; set; } = null!;
-    public ActorStatus Status { get; set; }
-    public MarketRoleEntity MarketRole { get; set; } = null!;
-    public ActorCertificateCredentialsEntity? CertificateCredential { get; set; }
-    public ActorClientSecretCredentialsEntity? ClientSecretCredential { get; set; }
-    public Collection<UsedActorCertificatesEntity> UsedActorCertificates { get; } = new();
+    // public ActorStatus Status { get; set; }
+    // public MarketRoleEntity MarketRole { get; set; } = null!;
+    // public ActorCertificateCredentialsEntity? CertificateCredential { get; set; }
+    // public ActorClientSecretCredentialsEntity? ClientSecretCredential { get; set; }
+    // public Collection<UsedActorCertificatesEntity> UsedActorCertificates { get; } = new();
     public int Version { get; set; }
     public Guid ChangedByIdentityId { get; set; }
 }

@@ -13,16 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
 
-public sealed class MarketRoleEntity
+public interface IAuditedEntity
 {
-    public Guid Id { get; set; }
-    public Guid ActorId { get; set; }
-    public EicFunction Function { get; set; }
-    public Collection<MarketRoleGridAreaEntity> GridAreas { get; } = new();
-    public string? Comment { get; set; }
+    int Version { get; set; }
+    Guid ChangedByIdentityId { get; set; }
 }

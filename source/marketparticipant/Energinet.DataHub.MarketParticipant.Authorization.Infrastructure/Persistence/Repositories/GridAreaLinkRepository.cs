@@ -15,8 +15,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -25,37 +25,11 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persi
 
 public sealed class GridAreaLinkRepository : IGridAreaLinkRepository
 {
-    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+    private readonly IAuthorizationDbContext _marketParticipantDbContext;
 
-    public GridAreaLinkRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public GridAreaLinkRepository(IAuthorizationDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
-    }
-
-    public async Task<GridAreaLinkId> AddOrUpdateAsync(GridAreaLink gridAreaLink)
-    {
-        ArgumentNullException.ThrowIfNull(gridAreaLink, nameof(gridAreaLink));
-
-        GridAreaLinkEntity destination;
-        if (gridAreaLink.Id.Value == default)
-        {
-            destination = new GridAreaLinkEntity();
-        }
-        else
-        {
-            destination = await _marketParticipantDbContext
-                              .GridAreaLinks
-                              .FindAsync(gridAreaLink.Id.Value)
-                              .ConfigureAwait(false)
-                          ?? throw new InvalidOperationException($"GridAreaLink with id {gridAreaLink.Id.Value} is missing, even though it cannot be deleted.");
-        }
-
-        GridAreaLinkMapper.MapToEntity(gridAreaLink, destination);
-        _marketParticipantDbContext.GridAreaLinks.Update(destination);
-
-        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-
-        return new GridAreaLinkId(destination.Id);
     }
 
     public async Task<GridAreaLink?> GetAsync(GridAreaLinkId id)

@@ -13,16 +13,18 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
-public sealed class MarketRoleEntity
-{
-    public Guid Id { get; set; }
-    public Guid ActorId { get; set; }
-    public EicFunction Function { get; set; }
-    public Collection<MarketRoleGridAreaEntity> GridAreas { get; } = new();
-    public string? Comment { get; set; }
-}
+public sealed record GridAreaOverviewItem(
+    GridAreaId Id,
+    GridAreaName Name,
+    GridAreaCode Code,
+    PriceAreaCode PriceAreaCode,
+    DateTimeOffset ValidFrom,
+    DateTimeOffset? ValidTo,
+    ActorNumber? ActorNumber,
+    ActorName? ActorName,
+    string? OrganizationName,
+    DateTimeOffset? FullFlexDate,
+    GridAreaType Type);
