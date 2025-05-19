@@ -12,16 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-public class SignatureParameterEicFunction : SignatureParameterEnum<EicFunction>
+public interface ILoggedAccessRequest
 {
-    // <summary>
-    // Initializes a new instance of the <see cref="SignatureParameterLong"/> for <see cref="long"/>class.
-    // </summary>
-    // <param name="value">The long value.</param>
-    internal SignatureParameterEicFunction(EicFunction value)
-    : base(value)
-    {
-    }
+    bool LogOnSuccess { get; }
+    string LoggedActivity { get; }
+    string LoggedEntityType { get; }
+    string LoggedEntityKey { get; }
 }

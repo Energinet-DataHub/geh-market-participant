@@ -12,13 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
-
-public interface IRequestAuthorization
-{
-    Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest);
-    Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest, Guid userId);
-}
+public sealed record EndpointAuthorizationLog(Guid RequestId, string Endpoint, string Activity, string EntityType, string EntityKey);

@@ -11,11 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-public interface IAccessRequestSignatureParams
+public enum AuthorizationCode
 {
-    IReadOnlyList<SignatureParameter> GetSignatureParams();
+    Unavailable = 1,
+    Unauthorized,
+    Authorized
+}
+
+public sealed class AuthorizationResult(Guid requestId, AuthorizationCode result)
+{
+    public Guid RequestId { get; } = requestId;
+    public AuthorizationCode Result { get; } = result;
 }

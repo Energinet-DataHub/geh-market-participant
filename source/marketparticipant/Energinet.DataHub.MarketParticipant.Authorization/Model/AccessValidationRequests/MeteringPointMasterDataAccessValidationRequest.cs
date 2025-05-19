@@ -16,24 +16,33 @@ using System.ComponentModel;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests
-{
-    public class MeteringPointMasterDataAccessValidationRequest : AccessValidationRequest
-    {
-        [JsonConstructor]
-        [Browsable(false)]
-        public MeteringPointMasterDataAccessValidationRequest()
-        {
-        }
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-        public required string MeteringPointId { get; init; } = null!;
-        protected override IEnumerable<SignatureParameter> GetSignatureParamsCore()
-        {
-            return
-            [
-                SignatureParameter.FromString("MeteringPointId", MeteringPointId),
-                SignatureParameter.FromEicFunction("MarketRole", MarketRole)
-            ];
-        }
+public sealed class MeteringPointMasterDataAccessValidationRequest : AccessValidationRequest
+{
+    [JsonConstructor]
+    [Browsable(false)]
+    public MeteringPointMasterDataAccessValidationRequest()
+    {
+    }
+
+    public required string ActorNumber { get; init; }
+
+    public required EicFunction MarketRole { get; init; }
+
+    public required string MeteringPointId { get; init; }
+
+    public override string LoggedEntityType => "MeteringPoint";
+
+    public override string LoggedEntityKey => MeteringPointId;
+
+    protected override IEnumerable<SignatureParameter> GetSignatureParamsCore()
+    {
+        return
+        [
+            SignatureParameter.FromString("MeteringPointId", MeteringPointId),
+            SignatureParameter.FromString("ActorNumber", ActorNumber),
+            SignatureParameter.FromEnum("MarketRole", MarketRole)
+        ];
     }
 }

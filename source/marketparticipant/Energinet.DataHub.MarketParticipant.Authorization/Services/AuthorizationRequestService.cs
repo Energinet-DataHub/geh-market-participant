@@ -16,30 +16,41 @@ using System.Net.Http.Json;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services
+namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
+
+public sealed class AuthorizationRequestService : IRequestAuthorization
 {
-    public sealed class AuthorizationRequestService : IRequestAuthorization
+    private readonly HttpClient _apiHttpClient;
+
+    public AuthorizationRequestService(
+        HttpClient apiHttpClient)
     {
-        private readonly HttpClient _apiHttpClient;
+        _apiHttpClient = apiHttpClient;
+    }
 
-        public AuthorizationRequestService(
-            HttpClient apiHttpClient)
-        {
-            _apiHttpClient = apiHttpClient;
-        }
+    public Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest)
+    {
+        ArgumentNullException.ThrowIfNull(accessValidationRequest);
+        return SubmitRequestAsync(accessValidationRequest);
+    }
 
-        public async Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest)
-        {
-            using var request = new HttpRequestMessage(HttpMethod.Post, string.Empty);
-            request.Content = JsonContent.Create(accessValidationRequest);
-            using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
+    public Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest, Guid userId)
+    {
+        ArgumentNullException.ThrowIfNull(accessValidationRequest);
+        return SubmitRequestAsync(accessValidationRequest, userId);
+    }
 
-            response.EnsureSuccessStatusCode();
+    private async Task<Signature> SubmitRequestAsync(AccessValidationRequest accessValidationRequest, Guid? userId = default)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, userId.HasValue ? $"?userId={userId}" : string.Empty);
+        request.Content = JsonContent.Create(accessValidationRequest);
+        using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
 
-            var result = await response.Content
-                .ReadFromJsonAsync<Signature>()
-                .ConfigureAwait(false) ?? throw new InvalidOperationException("Failed to deserialize signature response content");
-            return result;
-        }
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content
+            .ReadFromJsonAsync<Signature>()
+            .ConfigureAwait(false) ?? throw new InvalidOperationException("Failed to deserialize signature response content");
+        return result;
     }
 }

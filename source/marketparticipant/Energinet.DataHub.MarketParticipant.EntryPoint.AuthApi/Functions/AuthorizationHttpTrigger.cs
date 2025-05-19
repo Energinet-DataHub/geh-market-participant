@@ -26,15 +26,12 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
 using NodaTime;
-using NodaTime.Serialization.SystemTextJson;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Functions;
 
 public sealed class AuthorizationHttpTrigger
 {
     private const string BlockSignatureAuthorizationFeatureKey = "BlockSignatureAuthorization";
-    private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
-        .ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
     private readonly IFeatureManager _featureManager;
     private readonly AuthorizationService _authorizationService;
@@ -59,36 +56,45 @@ public sealed class AuthorizationHttpTrigger
         string validationRequestJson,
         HttpRequestData httpRequest)
     {
+        ArgumentNullException.ThrowIfNull(httpRequest);
+
         var blockSignatureAuthorization = await _featureManager
             .IsEnabledAsync(BlockSignatureAuthorizationFeatureKey)
             .ConfigureAwait(false);
 
         if (blockSignatureAuthorization)
-            throw new UnauthorizedAccessException("Signature authorization is not allowed.");
+        {
+            _logger.LogInformation("Rejecting request as signature authorization is blocked.");
+            return httpRequest.CreateResponse(HttpStatusCode.Forbidden);
+        }
 
         var accessValidationRequest = DeserializeAccessValidationRequest(validationRequestJson);
         if (accessValidationRequest == null)
         {
-            _logger.LogDebug("Failed to deserialize access validation request");
-            throw new ArgumentException("CreateSignatureAsync: Invalid validation request string");
+            _logger.LogWarning("Rejecting request as deserialization failed.");
+            return httpRequest.CreateResponse(HttpStatusCode.Forbidden);
+        }
+
+        if (Guid.TryParse(httpRequest.Query["userId"], out var userId))
+        {
+            // Currently, only BFF is able to make these requests, so this constraint is valid.
+            _logger.LogWarning("Rejecting request as userId was not provided.");
+            return httpRequest.CreateResponse(HttpStatusCode.Forbidden);
         }
 
         var result = await _authorizationService
             .CreateSignatureAsync(accessValidationRequest, CancellationToken.None)
             .ConfigureAwait(false);
 
-        // TODO: User info
         await _revisionLogClient
             .LogAsync(new RevisionLogEntry(
                 logId: Guid.NewGuid(),
-                userId: accessValidationRequest.UserId,
                 systemId: SubsystemInformation.Id,
                 activity: "CreateSignature",
                 occurredOn: SystemClock.Instance.GetCurrentInstant(),
-                origin: nameof(CreateSignatureAsync),
-                actorNumber: accessValidationRequest.ActorNumber,
-                marketRoles: accessValidationRequest.MarketRole.ToString(),
-                payload: JsonSerializer.Serialize(result, _jsonSerializerOptions)))
+                origin: nameof(AuthorizationHttpTrigger),
+                userId: userId,
+                payload: validationRequestJson))
             .ConfigureAwait(false);
 
         var response = httpRequest.CreateResponse(HttpStatusCode.OK);

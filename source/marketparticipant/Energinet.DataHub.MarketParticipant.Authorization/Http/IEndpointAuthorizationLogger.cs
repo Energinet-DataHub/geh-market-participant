@@ -15,10 +15,9 @@
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Http;
 
-public interface IRequestAuthorization
+public interface IEndpointAuthorizationLogger
 {
-    Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest);
-    Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest, Guid userId);
+    Task LogAsync(AccessValidationRequest accessValidationRequest, Signature? signature);
 }

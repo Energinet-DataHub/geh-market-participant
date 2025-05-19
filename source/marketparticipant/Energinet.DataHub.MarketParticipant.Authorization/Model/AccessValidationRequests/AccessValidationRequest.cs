@@ -18,15 +18,12 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
 [JsonDerivedType(typeof(MeteringPointMasterDataAccessValidationRequest), typeDiscriminator: "mpm")]
-public abstract class AccessValidationRequest : IAccessRequestSignatureParams
+public abstract class AccessValidationRequest : ILoggedAccessRequest
 {
-    protected AccessValidationRequest()
-    {
-    }
-
-    public Guid UserId { get; set; } = Guid.Empty;
-    public string ActorNumber { get; set; } = string.Empty;
-    public EicFunction MarketRole { get; set; } = EicFunction.BalanceResponsibleParty;
+    public virtual bool LogOnSuccess { get; init; }
+    public virtual string LoggedActivity => GetType().Name;
+    public abstract string LoggedEntityType { get; }
+    public abstract string LoggedEntityKey { get; }
 
     public IReadOnlyList<SignatureParameter> GetSignatureParams()
     {
