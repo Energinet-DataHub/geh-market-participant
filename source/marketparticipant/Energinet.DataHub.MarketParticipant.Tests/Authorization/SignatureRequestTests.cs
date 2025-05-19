@@ -101,7 +101,7 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest();
-        target.AddSignatureParameter(SignatureParameter.FromEicFunction("TestParameter", EicFunction.BalanceResponsibleParty));
+        target.AddSignatureParameter(SignatureParameter.FromEnum("TestParameter", EicFunction.BalanceResponsibleParty));
 
         // Act + Assert
         var expected = target.CreateSignatureParamBytes();

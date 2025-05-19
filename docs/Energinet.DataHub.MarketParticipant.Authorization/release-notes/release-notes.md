@@ -1,9 +1,10 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
-## Version 1.0.3
+## Version 1.1.0
 
-- Add RequestId to Signature
-- Add several userinfo parameters to to AccessRequests
+- Added IEndpointAuthorizationContext.
+- Added logging support through IEndpointAuthorizationLogger.
+- Added RequestSignatureAsync with User Id.
 
 ## Version 1.0.2
 
