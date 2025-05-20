@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
 [JsonDerivedType(typeof(MeteringPointMasterDataAccessValidationRequest), typeDiscriminator: "mpm")]
-public abstract class AccessValidationRequest : ILoggedAccessRequest
+public abstract class AccessValidationRequest : ILoggableAccessRequest
 {
     public virtual bool LogOnSuccess { get; init; }
     public virtual string LoggedActivity => GetType().Name;

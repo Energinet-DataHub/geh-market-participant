@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-public interface ILoggedAccessRequest
+public interface ILoggableAccessRequest
 {
     bool LogOnSuccess { get; }
     string LoggedActivity { get; }
