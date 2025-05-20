@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Authorization.Http;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Options;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Extensions;
