@@ -12,21 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-public sealed class Signature
+public enum AuthorizationCode
 {
-    [JsonPropertyName("signature")]
-    public required string Value { get; init; }
+    Unavailable = 1,
+    Unauthorized,
+    Authorized
+}
 
-    [JsonPropertyName("expires")]
-    public required DateTimeOffset Expires { get; init; }
-
-    [JsonPropertyName("keyVersion")]
-    public required string KeyVersion { get; init; }
-
-    [JsonPropertyName("requestId")]
-    public required Guid RequestId { get; init; }
+public abstract class AuthorizationResult(AuthorizationCode result)
+{
+    public AuthorizationCode Result { get; } = result;
 }

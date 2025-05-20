@@ -21,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 
@@ -29,16 +28,13 @@ public class AuthorizationService
 {
     private readonly KeyClient _keyClient;
     private readonly string _keyName;
-    private readonly ILogger<AuthorizationService> _logger;
 
     public AuthorizationService(
         KeyClient keyClient,
-        string keyName,
-        ILogger<AuthorizationService> logger)
+        string keyName)
     {
         _keyName = keyName;
         _keyClient = keyClient;
-        _logger = logger;
     }
 
     public async Task<Signature> CreateSignatureAsync(AccessValidationRequest accessValidationRequest, CancellationToken cancellationToken)
@@ -64,7 +60,8 @@ public class AuthorizationService
         {
             Value = Convert.ToBase64String(signResult.Signature),
             KeyVersion = key.Value.Properties.Version,
-            Expires = signatureRequest.Expiration
+            Expires = signatureRequest.Expiration,
+            RequestId = signatureRequest.RequestId,
         };
     }
 

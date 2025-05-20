@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-public abstract partial class SignatureParameter
+public abstract class SignatureParameter
 {
     /// <summary>
     /// Gets or sets the Key used to identify this signature parameter in the signature.
@@ -28,9 +28,8 @@ public abstract partial class SignatureParameter
 
     public static SignatureParameterLong FromLong(string key, long value) => new(value) { Key = key };
     public static SignatureParameterDatetimeOffset FromDateTimeOffset(string key, DateTimeOffset value) => new(value) { Key = key };
-    public static SignatureParameterEicFunction FromEicFunction(string key, EicFunction value) => new(value) { Key = key };
     public static SignatureParameterString FromString(string key, string value) => new(value) { Key = key };
-    internal static SignatureParameterEnum<T> FromEnum<T>(string key, T value)
-        where T : Enum
-        => new SignatureParameterEnum<T>(value) { Key = key };
+
+    public static SignatureParameterEnum<T> FromEnum<T>(string key, T value)
+        where T : Enum => new(value) { Key = key };
 }

@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageVersion>1.0.2$(VersionSuffix)</PackageVersion>
+    <PackageVersion>1.1.0$(VersionSuffix)</PackageVersion>
     <Title>Energinet DataHub App Authentication</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
@@ -42,9 +42,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-
   <ItemGroup>
     <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.7.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />

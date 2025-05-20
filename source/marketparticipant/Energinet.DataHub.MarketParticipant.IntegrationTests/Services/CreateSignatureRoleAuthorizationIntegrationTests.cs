@@ -20,8 +20,6 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Categories;
 
@@ -47,16 +45,15 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<AuthorizationService>>();
-
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
             MarketRole = EicFunction.DataHubAdministrator,
-            MeteringPointId = "1234"
+            MeteringPointId = "1234",
+            ActorNumber = "56789"
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName);
         var actual = await target.CreateSignatureAsync(request, CancellationToken.None);
 
         // assert
@@ -71,16 +68,15 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<AuthorizationService>>();
-
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
             MarketRole = EicFunction.GridAccessProvider,
-            MeteringPointId = "1234"
+            MeteringPointId = "1234",
+            ActorNumber = "56789"
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName);
 
         // assert
         await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(request, cancellationToken: CancellationToken.None));

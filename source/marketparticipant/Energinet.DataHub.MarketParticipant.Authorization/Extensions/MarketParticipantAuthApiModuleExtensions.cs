@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Authorization.Http;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Options;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Extensions;
 
-internal static class MarketParticipantAuthApiModuleExtensions
+public static class MarketParticipantAuthApiModuleExtensions
 {
     public static IServiceCollection AddAuthorizationRequestModule(this IServiceCollection services)
     {
@@ -46,8 +48,19 @@ internal static class MarketParticipantAuthApiModuleExtensions
             var options = provider.GetRequiredService<IOptions<AuthorizationVerifyOptions>>();
             return new AuthorizationVerifyService(
                 options.Value.AuthSignKeyVault,
-                options.Value.AuthSignKeyName,
-                provider.GetRequiredService<ILogger<AuthorizationVerifyService>>());
+                options.Value.AuthSignKeyName);
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddEndpointAuthorizationModule(this IServiceCollection services, Func<EndpointAuthorizationLog, Task> logAction)
+    {
+        services.AddScoped<IEndpointAuthorizationContext, EndpointAuthorizationContext>();
+        services.AddScoped<IEndpointAuthorizationLogger>(x =>
+        {
+            var httpContextAccessor = x.GetRequiredService<IHttpContextAccessor>();
+            return new EndpointAuthorizationLogger(httpContextAccessor, logAction);
         });
 
         return services;
