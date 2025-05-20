@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
+## Version 1.1.1
+
+- Improve IEndpointAuthorizationLogger registration.
+
 ## Version 1.1.0
 
 - Added IEndpointAuthorizationContext.
