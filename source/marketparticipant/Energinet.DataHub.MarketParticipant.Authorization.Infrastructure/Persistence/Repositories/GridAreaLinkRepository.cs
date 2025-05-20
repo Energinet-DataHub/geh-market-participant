@@ -15,10 +15,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Authorization.Repositories;
-using Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Repositories;

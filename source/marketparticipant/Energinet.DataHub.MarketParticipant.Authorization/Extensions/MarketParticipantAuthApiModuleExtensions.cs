@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Authorization.Options;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -51,5 +53,17 @@ internal static class MarketParticipantAuthApiModuleExtensions
         });
 
         return services;
+    }
+
+    public static void AddDbContexts(this IServiceCollection services)
+    {
+        services.AddOptions();
+        services.AddOptions<DatabaseOptions>().BindConfiguration(DatabaseOptions.SectionName).ValidateDataAnnotations();
+
+        services.AddDbContext<IAuthorizationDbContext, AuthorizationDbContext>((provider, options) =>
+        {
+            var databaseOptions = provider.GetRequiredService<IOptions<DatabaseOptions>>();
+            options.UseSqlServer(databaseOptions.Value.ConnectionString);
+        });
     }
 }

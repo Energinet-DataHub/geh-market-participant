@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Options;
 
-public sealed record GridAreaLinkId(Guid Value);
+public sealed record DatabaseOptions
+{
+    public const string SectionName = "Database";
+
+    [Required]
+    public string ConnectionString { get; set; } = null!;
+}

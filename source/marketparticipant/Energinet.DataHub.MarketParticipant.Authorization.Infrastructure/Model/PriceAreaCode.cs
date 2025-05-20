@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
-public enum ActorNumberType
+public enum PriceAreaCode
 {
-    Unknown = 0,
-    Gln = 1,
-    Eic = 2
+    Dk1 = 1,
+    Dk2 = 2
 }

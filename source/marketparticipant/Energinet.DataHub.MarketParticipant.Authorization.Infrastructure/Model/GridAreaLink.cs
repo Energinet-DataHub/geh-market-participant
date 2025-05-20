@@ -12,10 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
+using System;
 
-public enum PriceAreaCode
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+
+public sealed class GridAreaLink
 {
-    Dk1 = 1,
-    Dk2 = 2
+    public GridAreaLink(GridAreaId gridAreaId)
+    {
+        Id = new GridAreaLinkId(Guid.Empty);
+        GridAreaId = gridAreaId;
+    }
+
+    public GridAreaLink(GridAreaLinkId id, GridAreaId gridAreaId)
+    {
+        Id = id;
+        GridAreaId = gridAreaId;
+    }
+
+    public GridAreaLinkId Id { get; init; }
+    public GridAreaId GridAreaId { get; init; }
 }

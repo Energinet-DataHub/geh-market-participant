@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.EntityConfiguration;
-using Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 

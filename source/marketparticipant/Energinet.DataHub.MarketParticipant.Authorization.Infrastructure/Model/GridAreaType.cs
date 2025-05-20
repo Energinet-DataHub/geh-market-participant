@@ -12,24 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
-
-public sealed class GridAreaLink
+public enum GridAreaType
 {
-    public GridAreaLink(GridAreaId gridAreaId)
-    {
-        Id = new GridAreaLinkId(Guid.Empty);
-        GridAreaId = gridAreaId;
-    }
-
-    public GridAreaLink(GridAreaLinkId id, GridAreaId gridAreaId)
-    {
-        Id = id;
-        GridAreaId = gridAreaId;
-    }
-
-    public GridAreaLinkId Id { get; init; }
-    public GridAreaId GridAreaId { get; init; }
+    NotSet = 0,
+    Transmission = 1,
+    Distribution = 2,
+    Other = 3,
+    Test = 4,
+    GridLossDK = 5,
+    GridLossAbroad = 6,
+    Aboard = 7
 }

@@ -12,17 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
-
-public sealed record UnknownActorNumber : ActorNumber
+public enum EicFunction
 {
-    [Browsable(false)]
-    public UnknownActorNumber(string value)
-        : base(value)
-    {
-    }
-
-    public override ActorNumberType Type => ActorNumberType.Unknown;
+    BalanceResponsibleParty = 1,
+    BillingAgent = 3,
+    EnergySupplier = 12,
+    GridAccessProvider = 14,
+    ImbalanceSettlementResponsible = 15,
+    MeterOperator = 22,
+    MeteredDataAdministrator = 23,
+    MeteredDataResponsible = 26,
+    MeteringPointAdministrator = 27,
+    SystemOperator = 45,
+    DanishEnergyAgency = 48,
+    DataHubAdministrator = 50,
+    IndependentAggregator = 51,
+    SerialEnergyTrader = 52,
+    Delegated = 53,
+    ItSupplier = 54,
 }

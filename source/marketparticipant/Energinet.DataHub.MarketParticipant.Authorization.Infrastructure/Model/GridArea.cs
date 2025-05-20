@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
 public sealed class GridArea
 {

@@ -12,12 +12,4 @@
     <PackageReference Include="Microsoft.Graph" Version="5.68.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Authorization\Energinet.DataHub.MarketParticipant.Authorization.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Model\" />
-  </ItemGroup>
-
 </Project>

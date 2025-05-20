@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Repositories;
 
 /// <summary>
 /// Provides access to the Grid Areas Links.
