@@ -51,8 +51,6 @@ public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
 
         var host = new OrganizationIntegrationTestHost();
         host.ServiceCollection.AddSingleton(configuration);
-        host.ServiceCollection.AddMarketParticipantOrganizationModule(configuration);
-        InitEmailSender(host.ServiceCollection);
 
         return Task.FromResult(host);
     }

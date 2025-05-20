@@ -14,9 +14,10 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
-public interface IDeletableAuditedEntity : IAuditedEntity
+public sealed class ActorConsolidationActorAndDate
 {
-    Guid? DeletedByIdentityId { get; set; }
+    public Guid ActorId { get; set; }
+    public DateTimeOffset ConsolidateAt { get; set; }
 }

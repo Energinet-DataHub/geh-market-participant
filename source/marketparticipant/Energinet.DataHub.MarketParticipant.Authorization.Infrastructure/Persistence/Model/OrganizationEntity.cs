@@ -14,11 +14,10 @@
 
 using System;
 using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 
-public sealed class OrganizationEntity : IAuditedEntity
+public sealed class OrganizationEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;

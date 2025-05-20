@@ -14,22 +14,6 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
-public sealed class GridAreaLink
-{
-    public GridAreaLink(GridAreaId gridAreaId)
-    {
-        Id = new GridAreaLinkId(Guid.Empty);
-        GridAreaId = gridAreaId;
-    }
-
-    public GridAreaLink(GridAreaLinkId id, GridAreaId gridAreaId)
-    {
-        Id = id;
-        GridAreaId = gridAreaId;
-    }
-
-    public GridAreaLinkId Id { get; init; }
-    public GridAreaId GridAreaId { get; init; }
-}
+public sealed record GridAreaLinkId(Guid Value);

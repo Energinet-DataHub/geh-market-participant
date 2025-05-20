@@ -17,7 +17,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
 public sealed record EicActorNumber : ActorNumber
 {

@@ -15,7 +15,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -29,17 +28,11 @@ public class AuthorizationDbContext : DbContext, IAuthorizationDbContext
         DbContextOptions<AuthorizationDbContext> options)
         : base(options)
     {
-        // ReSharper disable VirtualMemberCallInConstructor // Follows MS example.
-        ChangeTracker.Tracked += (_, e) => OnEntityStateChanged(e.Entry);
-        ChangeTracker.StateChanged += (_, e) => OnEntityStateChanged(e.Entry);
     }
 
     // Used for mocking.
     protected AuthorizationDbContext()
     {
-        // ReSharper disable VirtualMemberCallInConstructor // Follows MS example.
-        ChangeTracker.Tracked += (_, e) => OnEntityStateChanged(e.Entry);
-        ChangeTracker.StateChanged += (_, e) => OnEntityStateChanged(e.Entry);
     }
 
     public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;

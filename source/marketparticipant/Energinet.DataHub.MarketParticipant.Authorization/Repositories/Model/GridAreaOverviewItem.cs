@@ -14,10 +14,17 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
-public interface IAuditedEntity
-{
-    int Version { get; set; }
-    Guid ChangedByIdentityId { get; set; }
-}
+public sealed record GridAreaOverviewItem(
+    GridAreaId Id,
+    GridAreaName Name,
+    GridAreaCode Code,
+    PriceAreaCode PriceAreaCode,
+    DateTimeOffset ValidFrom,
+    DateTimeOffset? ValidTo,
+    ActorNumber? ActorNumber,
+    ActorName? ActorName,
+    string? OrganizationName,
+    DateTimeOffset? FullFlexDate,
+    GridAreaType Type);

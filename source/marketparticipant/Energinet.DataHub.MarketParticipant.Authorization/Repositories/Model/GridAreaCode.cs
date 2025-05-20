@@ -12,19 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
-
-/// <summary>
-/// Provides access to an overview of grid areas.
-/// </summary>
-public interface IGridAreaOverviewRepository
-{
-    /// <summary>
-    /// Gets an overview of grid areas.
-    /// </summary>
-    Task<IEnumerable<GridAreaOverviewItem>> GetAsync();
-}
+public sealed record GridAreaCode(string Value);

@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
-public enum GridAreaType
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories;
+
+/// <summary>
+/// Provides access to an overview of grid areas.
+/// </summary>
+public interface IGridAreaOverviewRepository
 {
-    NotSet = 0,
-    Transmission = 1,
-    Distribution = 2,
-    Other = 3,
-    Test = 4,
-    GridLossDK = 5,
-    GridLossAbroad = 6,
-    Aboard = 7
+    /// <summary>
+    /// Gets an overview of grid areas.
+    /// </summary>
+    Task<IEnumerable<GridAreaOverviewItem>> GetAsync();
 }

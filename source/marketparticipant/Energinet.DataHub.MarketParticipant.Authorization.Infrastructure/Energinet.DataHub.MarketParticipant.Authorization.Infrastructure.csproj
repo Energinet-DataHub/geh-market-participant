@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Authorization\Energinet.DataHub.MarketParticipant.Authorization.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Model\" />
+  </ItemGroup>
+
 </Project>

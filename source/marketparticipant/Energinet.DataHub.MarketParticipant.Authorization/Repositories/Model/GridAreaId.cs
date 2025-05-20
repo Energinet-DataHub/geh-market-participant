@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+using System;
 
-public sealed record ActorName(string Value);
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
+
+public sealed record GridAreaId(Guid Value);

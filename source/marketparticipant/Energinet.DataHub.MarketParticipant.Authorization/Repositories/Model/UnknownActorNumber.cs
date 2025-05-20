@@ -12,6 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+using System.ComponentModel;
 
-public sealed record GridAreaName(string Value);
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
+
+public sealed record UnknownActorNumber : ActorNumber
+{
+    [Browsable(false)]
+    public UnknownActorNumber(string value)
+        : base(value)
+    {
+    }
+
+    public override ActorNumberType Type => ActorNumberType.Unknown;
+}

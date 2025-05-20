@@ -14,7 +14,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
 [JsonDerivedType(typeof(EicActorNumber), typeDiscriminator: "eic")]
 [JsonDerivedType(typeof(GlnActorNumber), typeDiscriminator: "gln")]

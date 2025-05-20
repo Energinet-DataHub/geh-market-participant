@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
-
-public sealed record GridAreaId(Guid Value);
+public enum PriceAreaCode
+{
+    Dk1 = 1,
+    Dk2 = 2
+}

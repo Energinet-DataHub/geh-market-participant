@@ -14,9 +14,9 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+using Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories;
 
 /// <summary>
 /// Provides access to the Grid Areas.

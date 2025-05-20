@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 
-public sealed class OrganizationDomainEntity : IDeletableAuditedEntity
+public sealed class OrganizationDomainEntity
 {
     public Guid Id { get; set; }
     public Guid OrganizationId { get; set; }

@@ -13,13 +13,12 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.EntityConfiguration;
+using Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 
-public sealed class GridAreaEntity : IAuditedEntity
+public sealed class GridAreaEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;

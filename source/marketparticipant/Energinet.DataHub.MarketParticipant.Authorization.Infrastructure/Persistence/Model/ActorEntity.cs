@@ -14,12 +14,10 @@
 
 using System;
 using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 
-public sealed class ActorEntity : IAuditedEntity
+public sealed class ActorEntity
 {
     public Guid Id { get; set; }
     public Guid? ActorId { get; set; }

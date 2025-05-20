@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+using Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories;
 
 /// <summary>
 /// Provides access to the Grid Areas Links.

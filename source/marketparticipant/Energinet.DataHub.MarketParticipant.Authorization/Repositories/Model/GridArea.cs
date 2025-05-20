@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Repositories.Model;
 
 public sealed class GridArea
 {
@@ -27,6 +27,7 @@ public sealed class GridArea
         Type = gridAreaType;
         ValidFrom = validFrom;
         ValidTo = validTo;
+        ChangedByIdentityId = Guid.NewGuid();
     }
 
     public GridArea(GridAreaId id, GridAreaName name, GridAreaCode code, PriceAreaCode priceAreaCode, GridAreaType gridAreaType, DateTimeOffset validFrom, DateTimeOffset? validTo)
@@ -38,6 +39,7 @@ public sealed class GridArea
         Type = gridAreaType;
         ValidFrom = validFrom;
         ValidTo = validTo;
+        ChangedByIdentityId = Guid.NewGuid();
     }
 
     public GridAreaId Id { get; init; }
@@ -47,4 +49,7 @@ public sealed class GridArea
     public PriceAreaCode PriceAreaCode { get; init; }
     public DateTimeOffset ValidFrom { get; set; }
     public DateTimeOffset? ValidTo { get; set; }
+
+    public int Version { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
 }

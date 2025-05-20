@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Domain;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
