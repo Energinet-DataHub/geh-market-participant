@@ -22,8 +22,7 @@ public sealed class AuthorizationRequestService : IRequestAuthorization
 {
     private readonly HttpClient _apiHttpClient;
 
-    public AuthorizationRequestService(
-        HttpClient apiHttpClient)
+    public AuthorizationRequestService(HttpClient apiHttpClient)
     {
         _apiHttpClient = apiHttpClient;
     }
@@ -40,7 +39,7 @@ public sealed class AuthorizationRequestService : IRequestAuthorization
         return SubmitRequestAsync(accessValidationRequest, userId);
     }
 
-    private async Task<Signature> SubmitRequestAsync(AccessValidationRequest accessValidationRequest, Guid? userId = default)
+    private async Task<Signature> SubmitRequestAsync(AccessValidationRequest accessValidationRequest, Guid? userId = null)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, userId.HasValue ? $"?userId={userId}" : string.Empty);
         request.Content = JsonContent.Create(accessValidationRequest);
@@ -51,6 +50,7 @@ public sealed class AuthorizationRequestService : IRequestAuthorization
         var result = await response.Content
             .ReadFromJsonAsync<Signature>()
             .ConfigureAwait(false) ?? throw new InvalidOperationException("Failed to deserialize signature response content");
+
         return result;
     }
 }
