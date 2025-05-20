@@ -54,13 +54,13 @@ public static class MarketParticipantAuthApiModuleExtensions
         return services;
     }
 
-    public static IServiceCollection AddEndpointAuthorizationModule(this IServiceCollection services, Func<EndpointAuthorizationLog, Task> logAction)
+    public static IServiceCollection AddEndpointAuthorizationModule(this IServiceCollection services, Func<IServiceProvider, Func<EndpointAuthorizationLog, Task>> logActionConfiguration)
     {
         services.AddScoped<IEndpointAuthorizationContext, EndpointAuthorizationContext>();
         services.AddScoped<IEndpointAuthorizationLogger>(x =>
         {
             var httpContextAccessor = x.GetRequiredService<IHttpContextAccessor>();
-            return new EndpointAuthorizationLogger(httpContextAccessor, logAction);
+            return new EndpointAuthorizationLogger(httpContextAccessor, logActionConfiguration(x));
         });
 
         return services;
