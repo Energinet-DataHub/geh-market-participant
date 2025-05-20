@@ -15,32 +15,26 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 
 public class AuthorizationService
 {
-    private readonly ILogger<AuthorizationService> _logger;
-    private readonly KeyVaultKey _key;
-    private readonly CryptographyClient _cryptoClient;
+    private readonly KeyClient _keyClient;
+    private readonly string _keyName;
 
     public AuthorizationService(
-        ILogger<AuthorizationService> logger,
-        KeyVaultKey key)
+        KeyClient keyClient,
+        string keyName)
     {
-        ArgumentNullException.ThrowIfNull(key);
-
-        _logger = logger;
-        _key = key;
-        _cryptoClient = new CryptographyClient(key.Id, new DefaultAzureCredential());
+        _keyName = keyName;
+        _keyClient = keyClient;
     }
 
     public async Task<Signature> CreateSignatureAsync(AccessValidationRequest accessValidationRequest, CancellationToken cancellationToken)
@@ -58,13 +52,16 @@ public class AuthorizationService
             signatureRequest.AddSignatureParameter(signatureParam);
         }
 
-        var signResult = await _cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), cancellationToken).ConfigureAwait(false);
+        var key = await _keyClient.GetKeyAsync(_keyName, cancellationToken: cancellationToken).ConfigureAwait(false);
+        var cryptoClient = _keyClient.GetCryptographyClient(_keyName, key.Value.Properties.Version);
+        var signResult = await cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), cancellationToken).ConfigureAwait(false);
 
         return new Signature
         {
             Value = Convert.ToBase64String(signResult.Signature),
-            KeyVersion = _key.Properties.Version,
-            Expires = signatureRequest.Expiration
+            KeyVersion = key.Value.Properties.Version,
+            Expires = signatureRequest.Expiration,
+            RequestId = signatureRequest.RequestId,
         };
     }
 
