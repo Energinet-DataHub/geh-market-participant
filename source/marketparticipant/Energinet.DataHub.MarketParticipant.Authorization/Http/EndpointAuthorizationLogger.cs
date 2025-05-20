@@ -32,16 +32,16 @@ public sealed class EndpointAuthorizationLogger : IEndpointAuthorizationLogger
         _logCallback = logCallback;
     }
 
-    public Task LogAsync(AccessValidationRequest accessValidationRequest, AuthorizationResult authorizationResult)
+    public Task LogAsync(ILoggableAccessRequest accessRequest, AuthorizationResult authorizationResult)
     {
-        ArgumentNullException.ThrowIfNull(accessValidationRequest);
+        ArgumentNullException.ThrowIfNull(accessRequest);
 
         switch (authorizationResult)
         {
-            case AuthorizationSuccess authorizationSuccess when accessValidationRequest.LogOnSuccess:
-                return LogAsync(authorizationSuccess.RequestId, accessValidationRequest);
+            case AuthorizationSuccess authorizationSuccess when accessRequest.LogOnSuccess:
+                return LogAsync(authorizationSuccess.RequestId, accessRequest);
             case AuthorizationFailure authorizationFailure:
-                return LogAsync(authorizationFailure.RequestId ?? Guid.Empty, accessValidationRequest);
+                return LogAsync(authorizationFailure.RequestId ?? Guid.Empty, accessRequest);
             case AuthorizationSuccess:
             case AuthorizationUnavailable:
                 return Task.CompletedTask;
@@ -50,7 +50,7 @@ public sealed class EndpointAuthorizationLogger : IEndpointAuthorizationLogger
         }
     }
 
-    private Task LogAsync(Guid requestId, AccessValidationRequest accessValidationRequest)
+    private Task LogAsync(Guid requestId, ILoggableAccessRequest accessRequest)
     {
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext == null)
@@ -61,9 +61,9 @@ public sealed class EndpointAuthorizationLogger : IEndpointAuthorizationLogger
         var log = new EndpointAuthorizationLog(
             requestId,
             httpContext.Request.GetEncodedPathAndQuery(),
-            accessValidationRequest.LoggedActivity,
-            accessValidationRequest.LoggedEntityType,
-            accessValidationRequest.LoggedEntityKey);
+            accessRequest.LoggedActivity,
+            accessRequest.LoggedEntityType,
+            accessRequest.LoggedEntityKey);
 
         return _logCallback(log);
     }
