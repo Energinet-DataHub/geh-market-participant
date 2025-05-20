@@ -32,24 +32,39 @@ public sealed class EndpointAuthorizationLogger : IEndpointAuthorizationLogger
         _logCallback = logCallback;
     }
 
-    public Task LogAsync(AccessValidationRequest accessValidationRequest, Signature? signature)
+    public Task LogAsync(AccessValidationRequest accessValidationRequest, AuthorizationResult authorizationResult)
     {
         ArgumentNullException.ThrowIfNull(accessValidationRequest);
 
+        switch (authorizationResult)
+        {
+            case AuthorizationSuccess authorizationSuccess when accessValidationRequest.LogOnSuccess:
+                return LogAsync(authorizationSuccess.RequestId, accessValidationRequest);
+            case AuthorizationFailure authorizationFailure:
+                return LogAsync(authorizationFailure.RequestId ?? Guid.Empty, accessValidationRequest);
+            case AuthorizationSuccess:
+            case AuthorizationUnavailable:
+                return Task.CompletedTask;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(authorizationResult));
+        }
+    }
+
+    private Task LogAsync(Guid requestId, AccessValidationRequest accessValidationRequest)
+    {
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext == null)
         {
             throw new InvalidOperationException("HttpContext required for endpoint authorization.");
         }
 
-        if (!accessValidationRequest.LogOnSuccess)
-            return Task.CompletedTask;
-
-        return _logCallback(new EndpointAuthorizationLog(
-            signature?.RequestId ?? Guid.Empty,
+        var log = new EndpointAuthorizationLog(
+            requestId,
             httpContext.Request.GetEncodedPathAndQuery(),
             accessValidationRequest.LoggedActivity,
             accessValidationRequest.LoggedEntityType,
-            accessValidationRequest.LoggedEntityKey));
+            accessValidationRequest.LoggedEntityKey);
+
+        return _logCallback(log);
     }
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
@@ -45,38 +46,45 @@ public sealed class EndpointAuthorizationContext : IEndpointAuthorizationContext
             throw new InvalidOperationException("HttpContext required for endpoint authorization.");
         }
 
-        if (!httpContext.Request.Headers.TryGetValue(EndpointAuthorizationConfig.AuthorizationHeaderName, out var headers))
+        AuthorizationResult authorizationResult;
+
+        if (TryReadSignature(httpContext, out var signature))
         {
-            return new AuthorizationUnavailable();
+            var result = await _verifyAuthorization
+                .VerifySignatureAsync(accessValidationRequest, signature)
+                .ConfigureAwait(false);
+
+            authorizationResult = result
+                ? new AuthorizationSuccess(signature.RequestId)
+                : new AuthorizationFailure(signature.RequestId);
+        }
+        else
+        {
+            authorizationResult = httpContext.Request.Headers.ContainsKey(EndpointAuthorizationConfig.AuthorizationHeaderName)
+                ? new AuthorizationFailure()
+                : new AuthorizationUnavailable();
         }
 
-        if (headers.Count != 1)
-        {
-            await _endpointAuthorizationLogger.LogAsync(accessValidationRequest, null).ConfigureAwait(false);
-            return new AuthorizationFailure();
-        }
-
-        var signatureBase64 = Convert.FromBase64String(headers!);
-        var signatureJson = Encoding.UTF8.GetString(signatureBase64);
-        var signature = JsonSerializer.Deserialize<Signature>(signatureJson);
-
-        if (signature == null)
-        {
-            await _endpointAuthorizationLogger.LogAsync(accessValidationRequest, signature).ConfigureAwait(false);
-            return new AuthorizationFailure();
-        }
-
-        var result = await _verifyAuthorization
-            .VerifySignatureAsync(accessValidationRequest, signature)
+        await _endpointAuthorizationLogger
+            .LogAsync(accessValidationRequest, authorizationResult)
             .ConfigureAwait(false);
 
-        if (result)
+        return authorizationResult;
+    }
+
+    private static bool TryReadSignature(HttpContext httpContext, [NotNullWhen(true)] out Signature? signature)
+    {
+        if (!httpContext.Request.Headers.TryGetValue(EndpointAuthorizationConfig.AuthorizationHeaderName, out var headers)
+            || headers.Count != 1
+            || headers[0] == null)
         {
-            await _endpointAuthorizationLogger.LogAsync(accessValidationRequest, signature).ConfigureAwait(false);
-            return new AuthorizationSuccess(signature.RequestId);
+            signature = null;
+            return false;
         }
 
-        await _endpointAuthorizationLogger.LogAsync(accessValidationRequest, signature).ConfigureAwait(false);
-        return new AuthorizationFailure(signature.RequestId);
+        var signatureBase64 = Convert.FromBase64String(headers[0]!);
+        var signatureJson = Encoding.UTF8.GetString(signatureBase64);
+        signature = JsonSerializer.Deserialize<Signature>(signatureJson);
+        return signature != null;
     }
 }

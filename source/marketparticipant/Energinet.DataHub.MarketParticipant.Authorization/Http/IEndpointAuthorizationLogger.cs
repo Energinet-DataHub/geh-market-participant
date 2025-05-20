@@ -19,5 +19,5 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Http;
 
 public interface IEndpointAuthorizationLogger
 {
-    Task LogAsync(AccessValidationRequest accessValidationRequest, Signature? signature);
+    Task LogAsync(AccessValidationRequest accessValidationRequest, AuthorizationResult authorizationResult);
 }
