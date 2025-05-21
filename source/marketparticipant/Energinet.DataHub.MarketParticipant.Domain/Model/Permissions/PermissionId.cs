@@ -40,5 +40,5 @@ public enum PermissionId
     CPRView = 23,
     ElectricityMarketTransactionImport = 25,
     MissingMeasurementsLogView = 26,
-    MeasurementReportsManage = 27,
+    MeasurementsReportsManage = 27,
 }
