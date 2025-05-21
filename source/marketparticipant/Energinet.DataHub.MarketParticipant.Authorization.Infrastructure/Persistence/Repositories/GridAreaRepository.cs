@@ -12,13 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Mappers;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,18 +21,18 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persi
 
 public class GridAreaRepository : IGridAreaRepository
 {
-    private readonly IAuthorizationDbContext _marketParticipantDbContext;
+    private readonly IAuthorizationDbContext _authorizationDbContext;
 
-    public GridAreaRepository(IAuthorizationDbContext marketParticipantDbContext)
+    public GridAreaRepository(IAuthorizationDbContext authorizationDbContext)
     {
-        _marketParticipantDbContext = marketParticipantDbContext;
+        _authorizationDbContext = authorizationDbContext;
     }
 
     public async Task<GridArea?> GetAsync(GridAreaId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
-        var gridArea = await _marketParticipantDbContext.GridAreas
+        var gridArea = await _authorizationDbContext.GridAreas
             .FindAsync(id.Value)
             .ConfigureAwait(false);
 
@@ -46,7 +41,7 @@ public class GridAreaRepository : IGridAreaRepository
 
     public async Task<IEnumerable<GridArea>> GetAsync()
     {
-        var entities = await _marketParticipantDbContext
+        var entities = await _authorizationDbContext
             .GridAreas
             .ToListAsync()
             .ConfigureAwait(false);

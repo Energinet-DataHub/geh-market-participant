@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -23,22 +20,22 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persi
 
 public class GridAreaOverviewRepository : IGridAreaOverviewRepository
 {
-    private readonly IAuthorizationDbContext _marketParticipantDbContext;
+    private readonly IAuthorizationDbContext _authorizationDbContext;
 
-    public GridAreaOverviewRepository(IAuthorizationDbContext marketParticipantDbContext)
+    public GridAreaOverviewRepository(IAuthorizationDbContext authorizationDbContext)
     {
-        _marketParticipantDbContext = marketParticipantDbContext;
+        _authorizationDbContext = authorizationDbContext;
     }
 
     public async Task<IEnumerable<GridAreaOverviewItem>> GetAsync()
     {
         var actorsWithMarketRoleGridArea =
-            from actor in _marketParticipantDbContext.Actors
-            join marketRole in _marketParticipantDbContext.MarketRoles
+            from actor in _authorizationDbContext.Actors
+            join marketRole in _authorizationDbContext.MarketRoles
                 on actor.Id equals marketRole.ActorId
-            join marketRoleGridArea in _marketParticipantDbContext.MarketRoleGridAreas
+            join marketRoleGridArea in _authorizationDbContext.MarketRoleGridAreas
                 on marketRole.Id equals marketRoleGridArea.MarketRoleId
-            join organization in _marketParticipantDbContext.Organizations
+            join organization in _authorizationDbContext.Organizations
                 on actor.OrganizationId equals organization.Id
             where marketRole.Function == EicFunction.GridAccessProvider
             select new
@@ -50,7 +47,7 @@ public class GridAreaOverviewRepository : IGridAreaOverviewRepository
             };
 
         var gridAreas =
-            from gridArea in _marketParticipantDbContext.GridAreas
+            from gridArea in _authorizationDbContext.GridAreas
             join actorWithMarketRoleGridArea in actorsWithMarketRoleGridArea
                 on gridArea.Id equals actorWithMarketRoleGridArea.marketRoleGridArea.GridAreaId into gr
             from actorWithMarketRoleGridArea in gr.DefaultIfEmpty()

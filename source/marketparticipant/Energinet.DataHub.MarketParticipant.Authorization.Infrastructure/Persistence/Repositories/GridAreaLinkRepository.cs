@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Mappers;
-using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,18 +21,18 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persi
 
 public sealed class GridAreaLinkRepository : IGridAreaLinkRepository
 {
-    private readonly IAuthorizationDbContext _marketParticipantDbContext;
+    private readonly IAuthorizationDbContext _authorizationDbContext;
 
-    public GridAreaLinkRepository(IAuthorizationDbContext marketParticipantDbContext)
+    public GridAreaLinkRepository(IAuthorizationDbContext authorizationDbContext)
     {
-        _marketParticipantDbContext = marketParticipantDbContext;
+        _authorizationDbContext = authorizationDbContext;
     }
 
     public async Task<GridAreaLink?> GetAsync(GridAreaLinkId id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
-        var gridAreaLink = await _marketParticipantDbContext.GridAreaLinks
+        var gridAreaLink = await _authorizationDbContext.GridAreaLinks
             .FindAsync(id.Value)
             .ConfigureAwait(false);
 
@@ -48,7 +44,7 @@ public sealed class GridAreaLinkRepository : IGridAreaLinkRepository
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
         var query =
-            from link in _marketParticipantDbContext.GridAreaLinks
+            from link in _authorizationDbContext.GridAreaLinks
             where link.GridAreaId == id.Value
             select link;
 

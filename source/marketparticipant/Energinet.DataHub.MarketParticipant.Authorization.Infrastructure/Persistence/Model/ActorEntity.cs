@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.ObjectModel;
-
 namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence.Model;
 
 public sealed class ActorEntity
@@ -26,6 +23,7 @@ public sealed class ActorEntity
     public bool IsFas { get; set; }
     public string ActorNumber { get; set; } = null!;
     public string Name { get; set; } = null!;
+
     // public ActorStatus Status { get; set; }
     // public MarketRoleEntity MarketRole { get; set; } = null!;
     // public ActorCertificateCredentialsEntity? CertificateCredential { get; set; }
