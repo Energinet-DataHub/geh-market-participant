@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Authorization.Http;
+using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Options;
 using Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Options;

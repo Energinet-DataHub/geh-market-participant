@@ -14,7 +14,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Options;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Infrastructure.Options;
 
 public sealed record DatabaseOptions
 {
