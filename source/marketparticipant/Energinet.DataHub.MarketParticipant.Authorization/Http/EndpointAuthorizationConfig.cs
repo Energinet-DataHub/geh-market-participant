@@ -16,5 +16,5 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Http;
 
 public sealed class EndpointAuthorizationConfig
 {
-    public static string AuthorizationHeaderName => "Authorization";
+    public static string AuthorizationHeaderName => "Signature";
 }
