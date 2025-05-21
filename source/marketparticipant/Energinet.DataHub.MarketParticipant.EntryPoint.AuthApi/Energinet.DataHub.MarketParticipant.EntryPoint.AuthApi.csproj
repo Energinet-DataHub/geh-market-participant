@@ -40,6 +40,7 @@ limitations under the License.
     <PackageReference Include="Microsoft.FeatureManagement" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Authorization.Application\Energinet.DataHub.MarketParticipant.Authorization.Application.csproj" />
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Common\Energinet.DataHub.MarketParticipant.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
