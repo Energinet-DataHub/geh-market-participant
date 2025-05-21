@@ -22,7 +22,7 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRe
 using NodaTime;
 
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 
 public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator
 {
