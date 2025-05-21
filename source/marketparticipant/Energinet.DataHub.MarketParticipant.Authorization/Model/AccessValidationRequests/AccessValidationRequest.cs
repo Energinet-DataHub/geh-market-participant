@@ -20,10 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidati
 [JsonDerivedType(typeof(MeteringPointMasterDataAccessValidationRequest), typeDiscriminator: "mpm")]
 public abstract class AccessValidationRequest : IAccessRequestSignatureParams
 {
-    protected AccessValidationRequest()
-    {
-    }
-
     public IReadOnlyList<SignatureParameter> GetSignatureParams()
     {
         return GetSignatureParamsCore().Append(SignatureParameter.FromString("ValidationContext", GetType().Name)).ToList();

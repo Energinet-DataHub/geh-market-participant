@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
@@ -51,8 +52,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         await using var scope = host.BeginScope();
 
         var logger = new Mock<ILogger<AuthorizationService>>().Object;
-
-        var electricityMarketClient = new Mock<IElectricityMarketClient>().Object;
+        var validatorFactory = new Mock<IAccessValidatorFactory>().Object;
 
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
@@ -61,7 +61,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger, electricityMarketClient);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger, validatorFactory);
         var actual = await target.CreateSignatureAsync(request, CancellationToken.None);
 
         // assert
@@ -77,7 +77,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         await using var scope = host.BeginScope();
 
         var logger = new Mock<ILogger<AuthorizationService>>().Object;
-        var electricityMarketClient = new Mock<IElectricityMarketClient>().Object;
+        var validatorFactory = new Mock<IAccessValidatorFactory>().Object;
 
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
@@ -86,7 +86,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger, electricityMarketClient);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger, validatorFactory);
 
         // assert
         await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(request, cancellationToken: CancellationToken.None));

@@ -12,17 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Extensions.HealthChecks;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Options;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,13 +62,16 @@ internal static class AuthApiModuleExtensions
             return new ElectricityMarketClient(client);
         });
 
+        services.AddSingleton<IAccessValidatorFactory, AccessValidatorFactory>();
+
         services.AddSingleton<AuthorizationService>(provider =>
         {
             var tokenCredentials = new DefaultAzureCredential();
             var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
             var electricityMarketClient = provider.GetRequiredService<IElectricityMarketClient>();
+            var accessValidatorFactory = provider.GetRequiredService<IAccessValidatorFactory>();
             var keyClient = new KeyClient(options.Value.AuthSignKeyVault, tokenCredentials);
-            return new AuthorizationService(keyClient, options.Value.AuthSignKeyName, provider.GetRequiredService<ILogger<AuthorizationService>>(), electricityMarketClient);
+            return new AuthorizationService(keyClient, options.Value.AuthSignKeyName, provider.GetRequiredService<ILogger<AuthorizationService>>(), accessValidatorFactory);
         });
 
         services.AddHealthChecks()

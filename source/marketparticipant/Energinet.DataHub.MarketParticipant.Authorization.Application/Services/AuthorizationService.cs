@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
@@ -31,25 +27,25 @@ public class AuthorizationService
     private readonly KeyClient _keyClient;
     private readonly string _keyName;
     private readonly ILogger<AuthorizationService> _logger;
-    private readonly IElectricityMarketClient _electricityMarketClient;
+    private readonly IAccessValidatorFactory _accessValidatorFactory;
 
     public AuthorizationService(
         KeyClient keyClient,
         string keyName,
         ILogger<AuthorizationService> logger,
-        IElectricityMarketClient electricityMarketClient)
+        IAccessValidatorFactory accessValidatorFactory)
     {
         _keyName = keyName;
         _keyClient = keyClient;
         _logger = logger;
-        _electricityMarketClient = electricityMarketClient;
+        _accessValidatorFactory = accessValidatorFactory;
     }
 
     public async Task<Signature> CreateSignatureAsync(AccessValidationRequest accessValidationRequest, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(accessValidationRequest);
 
-        var validator = GetAccessValidator(accessValidationRequest);
+        var validator = _accessValidatorFactory.Create(accessValidationRequest);
 
         if (!await validator.ValidateAsync().ConfigureAwait(false))
             throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
@@ -69,16 +65,6 @@ public class AuthorizationService
             Value = Convert.ToBase64String(signResult.Signature),
             KeyVersion = key.Value.Properties.Version,
             Expires = signatureRequest.Expiration
-        };
-    }
-
-    private MeteringPointMasterDataAccessValidation GetAccessValidator(AccessValidationRequest accessValidationRequest)
-    {
-        return accessValidationRequest switch
-        {
-            MeteringPointMasterDataAccessValidationRequest meteringPointMasterDataAccessValidationRequest =>
-                new MeteringPointMasterDataAccessValidation(meteringPointMasterDataAccessValidationRequest, _electricityMarketClient),
-            _ => throw new ArgumentOutOfRangeException(nameof(accessValidationRequest))
         };
     }
 }
