@@ -16,5 +16,5 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authoriz
 
 public interface IAccessValidator
 {
-    bool Validate();
+    Task<bool> ValidateAsync();
 }

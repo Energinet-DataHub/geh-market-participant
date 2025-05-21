@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Models.MasterData;
-
-public sealed record MeteringPointMasterDataRequestDto(
-    string MeteringPointIdentification,
-    DateTimeOffset StartDate,
-    DateTimeOffset EndDate);
+public interface IElectricityMarketClient
+{
+    /// <summary>
+    /// Gets the master data changes in the specified period for the specified metering point.
+    /// </summary>
+    /// <param name="meteringPointId">The identifier of the metering point.</param>
+    /// <returns>The list of metering point master data changes within the specified period.</returns>
+    Task<bool> GetMeteringPointMasterDataAsync(string meteringPointId);
+}

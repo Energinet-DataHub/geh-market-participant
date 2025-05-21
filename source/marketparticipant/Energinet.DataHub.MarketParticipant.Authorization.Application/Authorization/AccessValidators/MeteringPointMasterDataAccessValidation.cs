@@ -16,7 +16,7 @@
 
 
 using Energinet.DataHub.MarketParticipant.Authorization.Application;
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Models.MasterData;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using NodaTime;
@@ -26,46 +26,29 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authoriz
 
 public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator
 {
-    //private readonly HttpClient _apiHttpClient;
-    //private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-    //internal MeteringPointMasterDataAccessValidation(HttpClient apiHttpClient)
-    //{
-    //    _apiHttpClient = apiHttpClient;
-    //}
+    private readonly IElectricityMarketClient _electricityMarketClient;
+    private readonly MeteringPointMasterDataAccessValidationRequest _validationRequest;
 
-    //internal MeteringPointMasterDataAccessValidation()
-    //{
-    //    _apiHttpClient = new HttpClient();
-    //    _apiHttpClient.BaseAddress = new Uri("test.test");
-    //}
-    public MeteringPointMasterDataAccessValidation(MeteringPointMasterDataAccessValidationRequest validationRequest)
+    public MeteringPointMasterDataAccessValidation(MeteringPointMasterDataAccessValidationRequest validationRequest, IElectricityMarketClient electricityMarketClient)
     {
         ArgumentNullException.ThrowIfNull(validationRequest);
-
-        MarketRole = validationRequest.MarketRole;
+        _electricityMarketClient = electricityMarketClient;
+        _validationRequest = validationRequest;
     }
 
-    public EicFunction MarketRole { get; }
-
-    public bool Validate()
+    public async Task<bool> ValidateAsync()
     {
-        return MarketRole switch
+        return _validationRequest.MarketRole switch
         {
             EicFunction.DataHubAdministrator => true,
-            EicFunction.GridAccessProvider => ValidateMeteringPointIsOfOwnedGridArea(),
+            EicFunction.GridAccessProvider => await ValidateMeteringPointIsOfOwnedGridAreaAsync().ConfigureAwait(false),
             EicFunction.EnergySupplier => true,
             _ => false,
         };
     }
 
-    private bool ValidateMeteringPointIsOfOwnedGridArea()
+    private async Task<bool> ValidateMeteringPointIsOfOwnedGridAreaAsync()
     {
-        //TODO: Call elecitricity market
-        var marketRole = MarketRole;
-        //var electricityMarket = new ElectricityMarket(( new MeteringPointIdentification() {  Value='123'}, interval);
-
-        //USE GLN and market role for look up Grid Area
-        //lookup metering point to compare the registered grid
-        return false;
+       return await _electricityMarketClient.GetMeteringPointMasterDataAsync(_validationRequest.MeteringPointId).ConfigureAwait(false);
     }
 }

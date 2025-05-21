@@ -15,7 +15,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Options;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Options;
 
 public sealed record KeyVaultOptions
 {

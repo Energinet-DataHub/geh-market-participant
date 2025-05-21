@@ -15,42 +15,36 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Models.MasterData;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Application;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 
-public sealed class ElectricityMarket : IElectricityMarket
+public sealed class ElectricityMarketClient : IElectricityMarketClient
 {
     private readonly HttpClient _apiHttpClient;
     private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
-    internal ElectricityMarket(HttpClient apiHttpClient)
+    internal ElectricityMarketClient(HttpClient apiHttpClient)
     {
         _apiHttpClient = apiHttpClient;
     }
 
-    public async Task<IEnumerable<MeteringPointMasterData>> GetMeteringPointMasterDataAsync(
-        MeteringPointIdentification meteringPointId,
-        Interval period)
+    public async Task<bool> GetMeteringPointMasterDataAsync(string meteringPointId)
     {
         ArgumentNullException.ThrowIfNull(meteringPointId);
 
-        var f = period.Start.ToDateTimeOffset();
-        var t = period.End.ToDateTimeOffset();
-
         using var request = new HttpRequestMessage(HttpMethod.Post, "api/get-metering-point-master-data");
-        request.Content = JsonContent.Create(new MeteringPointMasterDataRequestDto(meteringPointId.Value, f, t));
+        request.Content = JsonContent.Create(meteringPointId);
         using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
 
         if (response.StatusCode is HttpStatusCode.NotFound)
-            return [];
+            return false;
 
-        var result = await response.Content
-            .ReadFromJsonAsync<IEnumerable<MeteringPointMasterData>>(_jsonSerializerOptions)
-            .ConfigureAwait(false) ?? [];
+        //var result = await response.Content
+        //    .ReadFromJsonAsync<IEnumerable<MeteringPointMasterData>>(_jsonSerializerOptions)
+        //    .ConfigureAwait(false) ?? [];
 
-        return result;
+        return true;
     }
 }

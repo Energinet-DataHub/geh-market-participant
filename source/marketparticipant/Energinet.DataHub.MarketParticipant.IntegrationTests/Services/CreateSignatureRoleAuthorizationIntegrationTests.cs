@@ -16,12 +16,15 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -47,7 +50,9 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<AuthorizationService>>();
+        var logger = new Mock<ILogger<AuthorizationService>>().Object;
+
+        var electricityMarketClient = new Mock<IElectricityMarketClient>().Object;
 
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
@@ -56,7 +61,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger, electricityMarketClient);
         var actual = await target.CreateSignatureAsync(request, CancellationToken.None);
 
         // assert
@@ -71,7 +76,8 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<AuthorizationService>>();
+        var logger = new Mock<ILogger<AuthorizationService>>().Object;
+        var electricityMarketClient = new Mock<IElectricityMarketClient>().Object;
 
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
@@ -80,14 +86,9 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger, electricityMarketClient);
 
         // assert
         await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(request, cancellationToken: CancellationToken.None));
-    }
-
-    private static string SerializeAccessRestriction(AccessValidationRequest accessValidationRequest)
-    {
-        return JsonSerializer.Serialize(accessValidationRequest);
     }
 }

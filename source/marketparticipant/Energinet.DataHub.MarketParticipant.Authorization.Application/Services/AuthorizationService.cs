@@ -18,27 +18,31 @@ using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 
 public class AuthorizationService
 {
     private readonly KeyClient _keyClient;
     private readonly string _keyName;
     private readonly ILogger<AuthorizationService> _logger;
+    private readonly IElectricityMarketClient _electricityMarketClient;
 
     public AuthorizationService(
         KeyClient keyClient,
         string keyName,
-        ILogger<AuthorizationService> logger)
+        ILogger<AuthorizationService> logger,
+        IElectricityMarketClient electricityMarketClient)
     {
         _keyName = keyName;
         _keyClient = keyClient;
         _logger = logger;
+        _electricityMarketClient = electricityMarketClient;
     }
 
     public async Task<Signature> CreateSignatureAsync(AccessValidationRequest accessValidationRequest, CancellationToken cancellationToken)
@@ -47,7 +51,7 @@ public class AuthorizationService
 
         var validator = GetAccessValidator(accessValidationRequest);
 
-        if (!validator.Validate())
+        if (!await validator.ValidateAsync().ConfigureAwait(false))
             throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
 
         var signatureRequest = new SignatureRequest();
@@ -68,12 +72,12 @@ public class AuthorizationService
         };
     }
 
-    private static MeteringPointMasterDataAccessValidation GetAccessValidator(AccessValidationRequest accessValidationRequest)
+    private MeteringPointMasterDataAccessValidation GetAccessValidator(AccessValidationRequest accessValidationRequest)
     {
         return accessValidationRequest switch
         {
             MeteringPointMasterDataAccessValidationRequest meteringPointMasterDataAccessValidationRequest =>
-                new MeteringPointMasterDataAccessValidation(meteringPointMasterDataAccessValidationRequest),
+                new MeteringPointMasterDataAccessValidation(meteringPointMasterDataAccessValidationRequest, _electricityMarketClient),
             _ => throw new ArgumentOutOfRangeException(nameof(accessValidationRequest))
         };
     }

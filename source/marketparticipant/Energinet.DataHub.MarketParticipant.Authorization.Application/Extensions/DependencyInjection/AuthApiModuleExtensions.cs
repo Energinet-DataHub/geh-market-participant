@@ -19,18 +19,22 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Azure.Identity;
+using Azure.Security.KeyVault.Keys;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Extensions.HealthChecks;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Options;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Extensions.DependencyInjection;
 
-internal static class ElectricityMarketAuthApiModuleExtensions
+internal static class AuthApiModuleExtensions
 {
-    public static IServiceCollection AddElectricityMarketModule(this IServiceCollection services)
+    public static IServiceCollection AddAuthorizationCore(this IServiceCollection services)
     {
         services
             .AddOptions<ElectricityMarketClientOptions>()
@@ -57,10 +61,19 @@ internal static class ElectricityMarketAuthApiModuleExtensions
             client.BaseAddress = options.Value.BaseUrl;
         });
 
-        services.TryAddScoped<IElectricityMarket>(s =>
+        services.TryAddScoped<IElectricityMarketClient>(s =>
         {
             var client = s.GetRequiredService<IHttpClientFactory>().CreateClient("ElectricityMarketClient");
-            return new ElectricityMarket(client);
+            return new ElectricityMarketClient(client);
+        });
+
+        services.AddSingleton<AuthorizationService>(provider =>
+        {
+            var tokenCredentials = new DefaultAzureCredential();
+            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
+            var electricityMarketClient = provider.GetRequiredService<IElectricityMarketClient>();
+            var keyClient = new KeyClient(options.Value.AuthSignKeyVault, tokenCredentials);
+            return new AuthorizationService(keyClient, options.Value.AuthSignKeyName, provider.GetRequiredService<ILogger<AuthorizationService>>(), electricityMarketClient);
         });
 
         services.AddHealthChecks()
