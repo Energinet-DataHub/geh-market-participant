@@ -19,5 +19,5 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Factorie
 
 public interface IAccessValidatorFactory
 {
-    public IAccessValidator Create(AccessValidationRequest request);
+    IAccessValidator Create(AccessValidationRequest request);
 }

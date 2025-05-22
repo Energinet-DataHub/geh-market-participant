@@ -14,6 +14,8 @@
 
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
@@ -49,7 +51,7 @@ public class AuthorizationService
     {
         ArgumentNullException.ThrowIfNull(accessValidationRequest);
 
-        var validator = _accessValidatorFactory.Create(accessValidationRequest);
+        var validator = GetAccessValidator(accessValidationRequest);
 
         if (!await validator.ValidateAsync().ConfigureAwait(false))
             throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");

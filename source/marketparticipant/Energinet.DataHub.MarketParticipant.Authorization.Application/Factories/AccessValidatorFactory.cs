@@ -15,6 +15,7 @@
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
@@ -35,7 +36,8 @@ public class AccessValidatorFactory : IAccessValidatorFactory
             MeteringPointMasterDataAccessValidationRequest masterRequest =>
                 new MeteringPointMasterDataAccessValidation(
                     masterRequest,
-                    _provider.GetRequiredService<IElectricityMarketClient>()),
+                    _provider.GetRequiredService<IElectricityMarketClient>(),
+                    _provider.GetRequiredService<IGridAreaOverviewRepository>()),
 
             _ => throw new ArgumentException(
                 $"No validator registered for request type {request.GetType().Name}")
