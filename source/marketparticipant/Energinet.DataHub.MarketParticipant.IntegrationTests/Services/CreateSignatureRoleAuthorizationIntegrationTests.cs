@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
@@ -52,6 +53,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         await using var scope = host.BeginScope();
 
         var logger = new Mock<ILogger<AuthorizationService>>().Object;
+        var validatorFactory = new Mock<IAccessValidatorFactory>().Object;
 
         var electricityMarketClient = new Mock<IElectricityMarketClient>().Object;
         var gridareaOverViewClient = new Mock<IGridAreaOverviewRepository>().Object;

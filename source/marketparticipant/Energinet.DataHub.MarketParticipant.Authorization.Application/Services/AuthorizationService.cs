@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
@@ -53,7 +49,7 @@ public class AuthorizationService
     {
         ArgumentNullException.ThrowIfNull(accessValidationRequest);
 
-        var validator = GetAccessValidator(accessValidationRequest);
+        var validator = _accessValidatorFactory.Create(accessValidationRequest);
 
         if (!await validator.ValidateAsync().ConfigureAwait(false))
             throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");

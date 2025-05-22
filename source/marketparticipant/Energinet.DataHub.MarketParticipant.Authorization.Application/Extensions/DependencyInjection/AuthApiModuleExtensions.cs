@@ -12,17 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Extensions.HealthChecks;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Options;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -67,6 +62,8 @@ internal static class AuthApiModuleExtensions
             var client = s.GetRequiredService<IHttpClientFactory>().CreateClient("ElectricityMarketClient");
             return new ElectricityMarketClient(client);
         });
+
+        services.AddSingleton<IAccessValidatorFactory, AccessValidatorFactory>();
 
         services.AddSingleton<AuthorizationService>(provider =>
         {
