@@ -25,6 +25,7 @@ using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorizatio
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Extensions.HealthChecks;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Options;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -72,8 +73,9 @@ internal static class AuthApiModuleExtensions
             var tokenCredentials = new DefaultAzureCredential();
             var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
             var electricityMarketClient = provider.GetRequiredService<IElectricityMarketClient>();
+            var gridAreaRepository = provider.GetRequiredService<IGridAreaOverviewRepository>();
             var keyClient = new KeyClient(options.Value.AuthSignKeyVault, tokenCredentials);
-            return new AuthorizationService(keyClient, options.Value.AuthSignKeyName, provider.GetRequiredService<ILogger<AuthorizationService>>(), electricityMarketClient);
+            return new AuthorizationService(keyClient, options.Value.AuthSignKeyName, provider.GetRequiredService<ILogger<AuthorizationService>>(), electricityMarketClient, gridAreaRepository);
         });
 
         services.AddHealthChecks()

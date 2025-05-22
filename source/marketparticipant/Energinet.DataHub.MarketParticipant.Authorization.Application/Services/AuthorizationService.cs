@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorizatio
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
@@ -32,17 +33,20 @@ public class AuthorizationService
     private readonly string _keyName;
     private readonly ILogger<AuthorizationService> _logger;
     private readonly IElectricityMarketClient _electricityMarketClient;
+    private readonly IGridAreaOverviewRepository _gridAreaRepository;
 
     public AuthorizationService(
         KeyClient keyClient,
         string keyName,
         ILogger<AuthorizationService> logger,
-        IElectricityMarketClient electricityMarketClient)
+        IElectricityMarketClient electricityMarketClient,
+        IGridAreaOverviewRepository gridAreaRepository)
     {
         _keyName = keyName;
         _keyClient = keyClient;
         _logger = logger;
         _electricityMarketClient = electricityMarketClient;
+        _gridAreaRepository = gridAreaRepository;
     }
 
     public async Task<Signature> CreateSignatureAsync(AccessValidationRequest accessValidationRequest, CancellationToken cancellationToken)
@@ -77,7 +81,7 @@ public class AuthorizationService
         return accessValidationRequest switch
         {
             MeteringPointMasterDataAccessValidationRequest meteringPointMasterDataAccessValidationRequest =>
-                new MeteringPointMasterDataAccessValidation(meteringPointMasterDataAccessValidationRequest, _electricityMarketClient),
+                new MeteringPointMasterDataAccessValidation(meteringPointMasterDataAccessValidationRequest, _electricityMarketClient, _gridAreaRepository),
             _ => throw new ArgumentOutOfRangeException(nameof(accessValidationRequest))
         };
     }

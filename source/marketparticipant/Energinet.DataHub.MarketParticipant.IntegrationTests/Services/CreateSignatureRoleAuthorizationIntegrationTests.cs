@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorizatio
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -53,6 +54,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         var logger = new Mock<ILogger<AuthorizationService>>().Object;
 
         var electricityMarketClient = new Mock<IElectricityMarketClient>().Object;
+        var gridareaOverViewClient = new Mock<IGridAreaOverviewRepository>().Object;
 
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
@@ -61,7 +63,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger, electricityMarketClient);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger, electricityMarketClient, gridareaOverViewClient);
         var actual = await target.CreateSignatureAsync(request, CancellationToken.None);
 
         // assert
@@ -78,6 +80,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
 
         var logger = new Mock<ILogger<AuthorizationService>>().Object;
         var electricityMarketClient = new Mock<IElectricityMarketClient>().Object;
+        var gridareaOverViewClient = new Mock<IGridAreaOverviewRepository>().Object;
 
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
@@ -86,7 +89,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger, electricityMarketClient);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, logger, electricityMarketClient, gridareaOverViewClient);
 
         // assert
         await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(request, cancellationToken: CancellationToken.None));

@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Authorization\Energinet.DataHub.MarketParticipant.Authorization.csproj" />
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Domain\Energinet.DataHub.MarketParticipant.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
