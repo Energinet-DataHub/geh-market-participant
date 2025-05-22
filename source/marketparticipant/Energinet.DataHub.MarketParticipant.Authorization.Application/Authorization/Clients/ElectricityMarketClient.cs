@@ -34,7 +34,7 @@ public sealed class ElectricityMarketClient : IElectricityMarketClient
     {
         ArgumentNullException.ThrowIfNull(meteringPointId);
         //TODO: Make new API in electricity market
-        using var request = new HttpRequestMessage(HttpMethod.Post, "api/verify-grid-owner");
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/metering-point/verify-grid-owner");
         request.Content = JsonContent.Create(meteringPointId);
         using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
 
