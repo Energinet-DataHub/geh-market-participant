@@ -17,9 +17,10 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authoriz
 public interface IElectricityMarketClient
 {
     /// <summary>
-    /// Gets the master data changes in the specified period for the specified metering point.
+    /// Verify that get master data is allowed for the current user.
     /// </summary>
     /// <param name="meteringPointId">The identifier of the metering point.</param>
+    /// <param name="gridAreas">List of grid Areas that are valid for the grid access provider as of now.</param>
     /// <returns>The list of metering point master data changes within the specified period.</returns>
-    Task<bool> GetMeteringPointMasterDataAsync(string meteringPointId);
+    Task<bool> GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(string meteringPointId, List<string> gridAreas);
 }
