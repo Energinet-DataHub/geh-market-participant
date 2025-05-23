@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-public class SignatureParameterEicFunction : SignatureParameterEnum<EicFunction>
+public enum AuthorizationCode
 {
-    // <summary>
-    // Initializes a new instance of the <see cref="SignatureParameterLong"/> for <see cref="long"/>class.
-    // </summary>
-    // <param name="value">The long value.</param>
-    internal SignatureParameterEicFunction(EicFunction value)
-    : base(value)
-    {
-    }
+    Unavailable = 1,
+    Unauthorized,
+    Authorized
+}
+
+public abstract class AuthorizationResult(AuthorizationCode result)
+{
+    public AuthorizationCode Result { get; } = result;
 }

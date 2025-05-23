@@ -44,6 +44,15 @@ internal static class MarketParticipantAuthApiModuleExtensions
             var defaultCredentials = new DefaultAzureCredential();
             return new SecretClient(options.Value.AuthSignKeyVault, defaultCredentials);
         });
+
+        services.AddSingleton<AuthorizationService>(provider =>
+        {
+            var tokenCredentials = new DefaultAzureCredential();
+            var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
+            var keyClient = new KeyClient(options.Value.AuthSignKeyVault, tokenCredentials);
+            return new AuthorizationService(keyClient, options.Value.AuthSignKeyName);
+        });
+
         AddHealthChecks(services);
 
         return services;

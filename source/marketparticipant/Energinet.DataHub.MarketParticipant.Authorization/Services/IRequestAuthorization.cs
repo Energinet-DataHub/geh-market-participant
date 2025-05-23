@@ -20,4 +20,5 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 public interface IRequestAuthorization
 {
     Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest);
+    Task<Signature> RequestSignatureAsync(AccessValidationRequest accessValidationRequest, Guid userId);
 }

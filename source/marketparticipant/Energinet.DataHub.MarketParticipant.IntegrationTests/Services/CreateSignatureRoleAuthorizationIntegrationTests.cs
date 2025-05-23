@@ -60,7 +60,8 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
             MarketRole = EicFunction.DataHubAdministrator,
-            MeteringPointId = "1234"
+            MeteringPointId = "1234",
+            ActorNumber = "56789"
         };
 
         // act
@@ -86,7 +87,8 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
             MarketRole = EicFunction.GridAccessProvider,
-            MeteringPointId = "1234"
+            MeteringPointId = "1234",
+            ActorNumber = "56789"
         };
 
         // act

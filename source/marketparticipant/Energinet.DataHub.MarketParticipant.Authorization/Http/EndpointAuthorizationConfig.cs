@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Http;
 
-public sealed record VerifySignatureResponse(bool Success);
+public sealed class EndpointAuthorizationConfig
+{
+    public static string AuthorizationHeaderName => "Signature";
+}

@@ -17,43 +17,34 @@ using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services
+namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
+
+public sealed class AuthorizationVerifyService : IVerifyAuthorization
 {
-    public sealed class AuthorizationVerifyService : IVerifyAuthorization
+    private readonly KeyClient _keyClient;
+    private readonly string _keyName;
+
+    public AuthorizationVerifyService(Uri keyVault, string keyName)
     {
-        private readonly KeyClient _keyClient;
-        private readonly Uri _keyVault;
-        private readonly string _keyName;
-        private readonly ILogger<AuthorizationVerifyService> _logger;
+        _keyName = keyName;
+        _keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
+    }
 
-        public AuthorizationVerifyService(
-            Uri keyVault,
-            string keyName,
-            ILogger<AuthorizationVerifyService> logger)
+    public async Task<bool> VerifySignatureAsync(AccessValidationRequest validationRequest, Signature signature)
+    {
+        ArgumentNullException.ThrowIfNull(validationRequest);
+        ArgumentNullException.ThrowIfNull(signature);
+
+        var signatureRequest = new VerifyRequest(signature.Expires, signature.RequestId);
+        foreach (var signatureParam in validationRequest.GetSignatureParams())
         {
-            _keyVault = keyVault;
-            _keyName = keyName;
-            _keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
-            _logger = logger;
+            signatureRequest.AddSignatureParameter(signatureParam);
         }
 
-        public async Task<bool> VerifySignatureAsync(AccessValidationRequest validationRequest, Signature signature)
-        {
-            ArgumentNullException.ThrowIfNull(validationRequest);
-            ArgumentNullException.ThrowIfNull(signature);
-
-            var signatureRequest = new VerifyRequest(signature.Expires);
-            foreach (var signatureParam in validationRequest.GetSignatureParams())
-            {
-                signatureRequest.AddSignatureParameter(signatureParam);
-            }
-
-            var conversionResult = Convert.FromBase64String(signature.Value);
-            var cryptoClient = _keyClient.GetCryptographyClient(_keyName, signature.KeyVersion);
-            var verifyResult = await cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), conversionResult).ConfigureAwait(false);
-            return verifyResult.IsValid;
-        }
+        var conversionResult = Convert.FromBase64String(signature.Value);
+        var cryptoClient = _keyClient.GetCryptographyClient(_keyName, signature.KeyVersion);
+        var verifyResult = await cryptoClient.VerifyDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), conversionResult).ConfigureAwait(false);
+        return verifyResult.IsValid;
     }
 }

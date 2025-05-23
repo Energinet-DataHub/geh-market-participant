@@ -62,7 +62,8 @@ public class AuthorizationService
         {
             Value = Convert.ToBase64String(signResult.Signature),
             KeyVersion = key.Value.Properties.Version,
-            Expires = signatureRequest.Expiration
+            Expires = signatureRequest.Expiration,
+            RequestId = signatureRequest.RequestId,
         };
     }
 }
