@@ -44,15 +44,18 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator<M
 
     private async Task<bool> ValidateMeteringPointIsOfOwnedGridAreaAsync(MeteringPointMasterDataAccessValidationRequest request)
     {
-        var actorNumber = "test"; // TODO: Have this in the validation request
+        var actorNumber = request.ActorNumber;
         var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
-        var gridAreasForGridOperator = gridAreas
-            .Where(x => x.ActorNumber != null && x.ActorNumber.Value == actorNumber);
 
-        // List of grid areas that are valid as of now.
-        var validGridAreas = gridAreasForGridOperator.Where(x => x.ValidFrom >= DateTime.UtcNow && x.ValidTo >= DateTime.UtcNow).Select(g => new List<string> { g.Code.Value });
+        // TODO: Add new method in repository to get grid areas for actor number that are valid now
+        var activeGridAreas = gridAreas
+            .Where(x => x.ActorNumber != null
+                        && x.ActorNumber.Value == actorNumber
+                        && x.ValidFrom >= DateTime.UtcNow && x.ValidTo >= DateTime.UtcNow)
+            .Select(g => g.Code.Value)
+            .ToList();
 
         // TODO: Make a call to new Electricity market api specially for the signature creation.
-        return await _electricityMarketClient.GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(request.MeteringPointId, (List<string>)validGridAreas).ConfigureAwait(false);
+        return await _electricityMarketClient.GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(request.MeteringPointId, activeGridAreas).ConfigureAwait(false);
     }
 }
