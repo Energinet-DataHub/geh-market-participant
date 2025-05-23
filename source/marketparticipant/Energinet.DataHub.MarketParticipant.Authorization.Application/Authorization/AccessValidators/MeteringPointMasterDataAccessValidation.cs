@@ -13,13 +13,8 @@
 // limitations under the License.
 
 
-
-
-using System.Net;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using EicFunction = Energinet.DataHub.MarketParticipant.Authorization.Model.EicFunction;
 

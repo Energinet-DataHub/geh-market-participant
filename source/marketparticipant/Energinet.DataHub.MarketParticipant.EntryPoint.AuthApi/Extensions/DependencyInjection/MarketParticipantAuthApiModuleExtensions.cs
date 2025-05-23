@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using Azure.Identity;
-using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Options;
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Monitor;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;

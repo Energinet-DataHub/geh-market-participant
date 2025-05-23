@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Net.Http.Headers;
-using System.Threading;
 using Azure.Core;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization;
