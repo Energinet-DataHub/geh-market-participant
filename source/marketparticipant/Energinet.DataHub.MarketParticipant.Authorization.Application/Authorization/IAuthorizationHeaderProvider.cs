@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
+using System.Net.Http.Headers;
 
-public interface IAccessValidator
+namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization;
+
+internal interface IAuthorizationHeaderProvider
 {
-    bool Validate();
+    /// <summary>
+    /// Create an authorization header to be used when calling Electricity Market API's.
+    /// </summary>
+    AuthenticationHeaderValue CreateAuthorizationHeader();
 }

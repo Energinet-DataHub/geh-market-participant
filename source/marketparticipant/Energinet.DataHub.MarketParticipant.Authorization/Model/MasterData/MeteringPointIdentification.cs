@@ -12,18 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Options;
-
-public sealed record KeyVaultOptions
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.MasterData
 {
-    public const string SectionName = "KeyVault";
-
-    [Required]
-    public Uri AuthSignKeyVault { get; set; } = null!;
-
-    [Required]
-    public string AuthSignKeyName { get; set; } = null!;
+    public sealed record MeteringPointIdentification(string Value);
 }
