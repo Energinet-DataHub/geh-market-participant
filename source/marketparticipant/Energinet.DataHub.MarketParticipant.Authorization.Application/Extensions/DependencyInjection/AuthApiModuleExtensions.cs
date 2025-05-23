@@ -15,11 +15,13 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Extensions.HealthChecks;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Options;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -63,16 +65,16 @@ internal static class AuthApiModuleExtensions
             return new ElectricityMarketClient(client);
         });
 
-        services.AddSingleton<IAccessValidatorFactory, AccessValidatorFactory>();
+        services.AddSingleton<IAccessValidatorDispatchService, AccessValidatorDispatchService>();
+        services.AddSingleton<IAccessValidator<MeteringPointMasterDataAccessValidationRequest>, MeteringPointMasterDataAccessValidation>();
 
         services.AddSingleton<AuthorizationService>(provider =>
         {
             var tokenCredentials = new DefaultAzureCredential();
             var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
-            var electricityMarketClient = provider.GetRequiredService<IElectricityMarketClient>();
-            var gridAreaRepository = provider.GetRequiredService<IGridAreaOverviewRepository>();
+            var accessValidatorDispatchService = provider.GetRequiredService<IAccessValidatorDispatchService>();
             var keyClient = new KeyClient(options.Value.AuthSignKeyVault, tokenCredentials);
-            return new AuthorizationService(keyClient, options.Value.AuthSignKeyName, provider.GetRequiredService<ILogger<AuthorizationService>>(), electricityMarketClient, gridAreaRepository);
+            return new AuthorizationService(keyClient, options.Value.AuthSignKeyName, accessValidatorDispatchService);
         });
 
         services.AddHealthChecks()

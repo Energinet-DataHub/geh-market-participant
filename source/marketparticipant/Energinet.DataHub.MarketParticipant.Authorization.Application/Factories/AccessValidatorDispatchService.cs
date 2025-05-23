@@ -13,34 +13,29 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 
-public class AccessValidatorFactory : IAccessValidatorFactory
+public class AccessValidatorDispatchService : IAccessValidatorDispatchService
 {
     private readonly IServiceProvider _provider;
 
-    public AccessValidatorFactory(IServiceProvider provider)
+    public AccessValidatorDispatchService(IServiceProvider provider)
     {
         _provider = provider;
     }
 
-    public IAccessValidator Create(AccessValidationRequest request)
+    public Task<bool> ValidateAsync(AccessValidationRequest request)
     {
-        return request switch
-        {
-            MeteringPointMasterDataAccessValidationRequest masterRequest =>
-                new MeteringPointMasterDataAccessValidation(
-                    masterRequest,
-                    _provider.GetRequiredService<IElectricityMarketClient>(),
-                    _provider.GetRequiredService<IGridAreaOverviewRepository>()),
+       return CreateCoreAsync((dynamic)request);
+    }
 
-            _ => throw new ArgumentException(
-                $"No validator registered for request type {request.GetType().Name}")
-        };
+    private Task<bool> CreateCoreAsync<T>(T request)
+        where T : AccessValidationRequest
+    {
+       var validator = _provider.GetRequiredService<IAccessValidator<T>>();
+       return validator.ValidateAsync(request);
     }
 }

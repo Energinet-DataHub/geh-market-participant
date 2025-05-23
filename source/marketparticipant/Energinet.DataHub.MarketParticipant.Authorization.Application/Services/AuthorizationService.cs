@@ -29,31 +29,23 @@ public class AuthorizationService
 {
     private readonly KeyClient _keyClient;
     private readonly string _keyName;
-    private readonly ILogger<AuthorizationService> _logger;
-    private readonly IElectricityMarketClient _electricityMarketClient;
-    private readonly IGridAreaOverviewRepository _gridAreaRepository;
+    private readonly IAccessValidatorDispatchService _accessValidatorDispatchService;
 
     public AuthorizationService(
         KeyClient keyClient,
         string keyName,
-        ILogger<AuthorizationService> logger,
-        IElectricityMarketClient electricityMarketClient,
-        IGridAreaOverviewRepository gridAreaRepository)
+        IAccessValidatorDispatchService accessValidatorDispatchService)
     {
         _keyName = keyName;
         _keyClient = keyClient;
-        _logger = logger;
-        _electricityMarketClient = electricityMarketClient;
-        _gridAreaRepository = gridAreaRepository;
+        _accessValidatorDispatchService = accessValidatorDispatchService;
     }
 
     public async Task<Signature> CreateSignatureAsync(AccessValidationRequest accessValidationRequest, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(accessValidationRequest);
 
-        var validator = GetAccessValidator(accessValidationRequest);
-
-        if (!await validator.ValidateAsync().ConfigureAwait(false))
+        if (!await _accessValidatorDispatchService.ValidateAsync(accessValidationRequest).ConfigureAwait(false))
             throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
 
         var signatureRequest = new SignatureRequest();
@@ -71,16 +63,6 @@ public class AuthorizationService
             Value = Convert.ToBase64String(signResult.Signature),
             KeyVersion = key.Value.Properties.Version,
             Expires = signatureRequest.Expiration
-        };
-    }
-
-    private MeteringPointMasterDataAccessValidation GetAccessValidator(AccessValidationRequest accessValidationRequest)
-    {
-        return accessValidationRequest switch
-        {
-            MeteringPointMasterDataAccessValidationRequest meteringPointMasterDataAccessValidationRequest =>
-                new MeteringPointMasterDataAccessValidation(meteringPointMasterDataAccessValidationRequest, _electricityMarketClient, _gridAreaRepository),
-            _ => throw new ArgumentOutOfRangeException(nameof(accessValidationRequest))
         };
     }
 }
