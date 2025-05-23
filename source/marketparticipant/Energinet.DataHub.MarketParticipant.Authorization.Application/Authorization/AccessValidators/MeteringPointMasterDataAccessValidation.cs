@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using EicFunction = Energinet.DataHub.MarketParticipant.Authorization.Model.EicFunction;
-
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 
