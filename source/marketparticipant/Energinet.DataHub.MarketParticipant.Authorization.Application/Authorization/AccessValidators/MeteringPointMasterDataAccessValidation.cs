@@ -33,6 +33,7 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator<M
     public async Task<bool> ValidateAsync(MeteringPointMasterDataAccessValidationRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
+
         return request.MarketRole switch
         {
             EicFunction.DataHubAdministrator => true,
@@ -48,14 +49,14 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator<M
         var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
 
         // TODO: Add new method in repository to get grid areas for actor number that are valid now
-        var activeGridAreas = gridAreas
+        var activeGridAreasCode = gridAreas
             .Where(x => x.ActorNumber != null
                         && x.ActorNumber.Value == actorNumber
                         && x.ValidFrom <= DateTime.UtcNow && x.ValidTo >= DateTime.UtcNow)
             .Select(g => g.Code.Value)
-            .ToList();
+            .ToList().AsReadOnly();
 
         // TODO: Make a call to new Electricity market api specially for the signature creation.
-        return await _electricityMarketClient.GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(request.MeteringPointId, activeGridAreas).ConfigureAwait(false);
+        return await _electricityMarketClient.GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(request.MeteringPointId, activeGridAreasCode).ConfigureAwait(false);
     }
 }

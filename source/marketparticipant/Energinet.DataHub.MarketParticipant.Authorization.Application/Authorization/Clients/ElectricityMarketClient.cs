@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Http.Json;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 
@@ -26,13 +29,13 @@ public sealed class ElectricityMarketClient : IElectricityMarketClient
         _apiHttpClient = apiHttpClient;
     }
 
-    public async Task<bool> GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(string meteringPointId, List<string> gridAreas)
+    public async Task<bool> GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(string meteringPointId, ReadOnlyCollection<string> gridAreaCode)
     {
         ArgumentNullException.ThrowIfNull(meteringPointId);
 
-        // TODO: Make new API in electricity market
-        using var request = new HttpRequestMessage(HttpMethod.Post, "api/metering-point/verify-grid-owner");
-        request.Content = JsonContent.Create(meteringPointId);
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"api/metering-point/verify-grid-owner?identification={meteringPointId}");
+        request.Content = JsonContent.Create(gridAreaCode);
+
         using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
 
         return response.StatusCode is not HttpStatusCode.NotFound;
