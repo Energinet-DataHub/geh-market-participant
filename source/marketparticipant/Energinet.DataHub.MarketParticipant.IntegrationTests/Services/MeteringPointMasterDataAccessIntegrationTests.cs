@@ -72,16 +72,18 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
             return new ElectricityMarketClient(client);
         });
 
+
         var electricityMarketClient = await MockElectricityMarketClient("1234", new List<string>());
 
         var validationRequest = new MeteringPointMasterDataAccessValidationRequest
         {
             MarketRole = (Authorization.Model.EicFunction)EicFunction.GridAccessProvider,
-            MeteringPointId = "TestMeteringPointId"
+            MeteringPointId = "TestMeteringPointId",
+            ActorNumber = ValidGln
         };
 
-        var target = new MeteringPointMasterDataAccessValidation(validationRequest, electricityMarketClient, gridAreaOverviewRepository);
-        Assert.True(await target.ValidateAsync());
+        var target = new MeteringPointMasterDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
+        Assert.True(await target.ValidateAsync(validationRequest));
     }
 
     private async Task<IGridAreaOverviewRepository> MockGridAreaOverviewRepository()
