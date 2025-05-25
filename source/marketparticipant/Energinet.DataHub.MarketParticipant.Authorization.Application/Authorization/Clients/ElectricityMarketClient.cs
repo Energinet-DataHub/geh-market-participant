@@ -14,16 +14,12 @@
 
 using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json;
-using NodaTime;
-using NodaTime.Serialization.SystemTextJson;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 
 public sealed class ElectricityMarketClient : IElectricityMarketClient
 {
     private readonly HttpClient _apiHttpClient;
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
     public ElectricityMarketClient(HttpClient apiHttpClient)
     {
@@ -33,18 +29,12 @@ public sealed class ElectricityMarketClient : IElectricityMarketClient
     public async Task<bool> GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(string meteringPointId, List<string> gridAreas)
     {
         ArgumentNullException.ThrowIfNull(meteringPointId);
-        //TODO: Make new API in electricity market
+
+        // TODO: Make new API in electricity market
         using var request = new HttpRequestMessage(HttpMethod.Post, "api/metering-point/verify-grid-owner");
         request.Content = JsonContent.Create(meteringPointId);
         using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
 
-        if (response.StatusCode is HttpStatusCode.NotFound)
-            return false;
-
-        //var result = await response.Content
-        //    .ReadFromJsonAsync<IEnumerable<MeteringPointMasterData>>(_jsonSerializerOptions)
-        //    .ConfigureAwait(false) ?? [];
-
-        return true;
+        return response.StatusCode is not HttpStatusCode.NotFound;
     }
 }

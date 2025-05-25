@@ -12,21 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 
-public sealed class Signature
+public interface IAccessValidatorDispatchService
 {
-    [JsonPropertyName("signature")]
-    public required string Value { get; init; }
-
-    [JsonPropertyName("expires")]
-    public required DateTimeOffset Expires { get; init; }
-
-    [JsonPropertyName("keyVersion")]
-    public required string KeyVersion { get; init; }
-
-    [JsonPropertyName("requestId")]
-    public required Guid RequestId { get; init; }
+    Task<bool> ValidateAsync(AccessValidationRequest request);
 }

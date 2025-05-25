@@ -202,7 +202,7 @@ public static class KnownPermissions
             EicFunction.DataHubAdministrator,
             EicFunction.DanishEnergyAgency,
         ]),
-        new(PermissionId.MeasurementReportsManage, "measurement-reports:manage", InstantPattern.ExtendedIso.Parse("2025-05-14T00:00:00Z").Value, [
+        new(PermissionId.MeasurementsReportsManage, "measurements-reports:manage", InstantPattern.ExtendedIso.Parse("2025-05-14T00:00:00Z").Value, [
             EicFunction.EnergySupplier,
             EicFunction.GridAccessProvider,
             EicFunction.SystemOperator,

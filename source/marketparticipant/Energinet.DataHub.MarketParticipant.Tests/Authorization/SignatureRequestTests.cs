@@ -101,7 +101,7 @@ public sealed class SignatureRequestTests
     {
         // Arrange
         var target = new SignatureRequest();
-        target.AddSignatureParameter(SignatureParameter.FromEicFunction("TestParameter", EicFunction.BalanceResponsibleParty));
+        target.AddSignatureParameter(SignatureParameter.FromEnum("TestParameter", EicFunction.BalanceResponsibleParty));
 
         // Act + Assert
         var expected = target.CreateSignatureParamBytes();
@@ -168,7 +168,7 @@ public sealed class SignatureRequestTests
         target.AddSignatureParameter(SignatureParameter.FromLong("TestParameter", 1));
         target.AddSignatureParameter(SignatureParameter.FromString("TestParameter2", "test"));
 
-        var target2 = new VerifyRequest(target.Expiration);
+        var target2 = new VerifyRequest(target.Expiration, target.RequestId);
         target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter2", "test"));
         target2.AddSignatureParameter(SignatureParameter.FromLong("TestParameter", 1));
 
@@ -187,7 +187,7 @@ public sealed class SignatureRequestTests
         target.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test2"));
         target.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test"));
 
-        var target2 = new VerifyRequest(target.Expiration);
+        var target2 = new VerifyRequest(target.Expiration, target.RequestId);
         target2.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test"));
         target2.AddSignatureParameter(SignatureParameter.FromString("MeteringPointPeriod", "test2"));
 
@@ -205,7 +205,7 @@ public sealed class SignatureRequestTests
         var target = new SignatureRequest();
         target.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
 
-        var target2 = new VerifyRequest(target.Expiration);
+        var target2 = new VerifyRequest(target.Expiration, target.RequestId);
         target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test2"));
         target2.AddSignatureParameter(SignatureParameter.FromString("TestParameter", "test"));
 

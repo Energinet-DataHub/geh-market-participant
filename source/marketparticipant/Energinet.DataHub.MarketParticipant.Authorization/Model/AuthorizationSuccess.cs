@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
-
-public interface IAccessValidatorFactory
+internal sealed class AuthorizationSuccess(Guid requestId) : AuthorizationResult(AuthorizationCode.Authorized)
 {
-    IAccessValidator Create(AccessValidationRequest request);
+    public Guid RequestId { get; } = requestId;
 }

@@ -15,6 +15,7 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Options;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Monitor;
@@ -32,7 +33,7 @@ internal static class MarketParticipantAuthApiModuleExtensions
     {
         services.AddMarketParticipantCore();
         services.AddAuthorizationCore();
-
+        services.AddSignatureAuthorizationCore();
         services.AddScoped<IAuditIdentityProvider>(_ => KnownAuditIdentityProvider.AuthApiBackgroundService);
         services.AddFeatureManagement();
 
@@ -44,6 +45,7 @@ internal static class MarketParticipantAuthApiModuleExtensions
             var defaultCredentials = new DefaultAzureCredential();
             return new SecretClient(options.Value.AuthSignKeyVault, defaultCredentials);
         });
+
         AddHealthChecks(services);
 
         return services;
