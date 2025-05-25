@@ -25,7 +25,7 @@ public sealed class ElectricityMarketClient : IElectricityMarketClient
     private readonly HttpClient _apiHttpClient;
     private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
-    internal ElectricityMarketClient(HttpClient apiHttpClient)
+    public ElectricityMarketClient(HttpClient apiHttpClient)
     {
         _apiHttpClient = apiHttpClient;
     }

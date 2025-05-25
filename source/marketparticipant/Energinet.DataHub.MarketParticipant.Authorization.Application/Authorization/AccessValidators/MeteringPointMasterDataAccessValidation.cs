@@ -53,13 +53,35 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator
 
     private async Task<bool> ValidateMeteringPointIsOfOwnedGridAreaAsync()
     {
-        string actorNumber = "test"; //_validationRequest.ActorNumber TODO Have this in the validation request
+        string actorNumber = "5790000555550"; //_validationRequest.ActorNumber TODO Have this in the validation request
         var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
         if (gridAreas == null) throw new ArgumentNullException(nameof(gridAreas));
-        var gridAreasForGridOperator = gridAreas.Where(x => x.ActorNumber != null && x.ActorNumber.Value == actorNumber).Select(x => new GridAreaOverviewItem(x.Id, x.Name, x.Code, x.PriceAreaCode, x.ValidFrom, x.ValidTo, x.ActorNumber, x.ActorName, x.OrganizationName, x.FullFlexDate, x.Type));
-        //List of grid areas that are valid as of now.
-        var validGridAreas = gridAreasForGridOperator.Where(x => x.ValidFrom >= DateTime.UtcNow && x.ValidTo >= DateTime.UtcNow).Select(g => new List<string> { g.Code.Value });
-        //TODO: Make a call to new Electricity market api specially for the signature creation.
-        return await _electricityMarketClient.GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(_validationRequest.MeteringPointId, (List<string>)validGridAreas).ConfigureAwait(false);
+
+        var gridAreasForGridOperator = gridAreas
+            .Where(x => x.ActorNumber != null && x.ActorNumber.Value == actorNumber)
+            .Select(x => new GridAreaOverviewItem(x.Id, x.Name, x.Code, x.PriceAreaCode, x.ValidFrom, x.ValidTo, x.ActorNumber, x.ActorName, x.OrganizationName, x.FullFlexDate, x.Type))
+            .ToList(); // Materialize the collection to avoid multiple enumerations
+
+        if (gridAreasForGridOperator.Count == 0)
+        {
+            // No grid areas found for the actor number, return false.
+            return false;
+        }
+
+        // List of grid areas that are valid as of now.
+        var validGridAreas = gridAreasForGridOperator
+            .Where(x => x.ValidFrom <= DateTime.UtcNow && x.ValidTo >= DateTime.UtcNow)
+            .Select(g => g.Code.Value)
+            .ToList(); // Materialize the collection to avoid multiple enumerations
+
+        if (validGridAreas.Count == 0)
+        {
+            // No valid grid areas found, return false.
+            return false;
+        }
+
+        return await _electricityMarketClient
+            .GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(_validationRequest.MeteringPointId, validGridAreas)
+            .ConfigureAwait(false);
     }
 }
