@@ -17,7 +17,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Options;
 
-public sealed record CertificateSynchronizationOptions
+internal sealed record CertificateSynchronizationOptions
 {
     public const string SectionName = "CertificateSynchronization";
 

@@ -22,7 +22,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 
-public sealed class ReceiveIntegrationEventsTrigger(ISubscriber subscriber)
+internal sealed class ReceiveIntegrationEventsTrigger(ISubscriber subscriber)
 {
     [Function(nameof(ReceiveIntegrationEventsTrigger))]
     public Task RunAsync(

@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Services;
 
-public enum CertificateState
+internal enum CertificateState
 {
     Valid,
     Expired,

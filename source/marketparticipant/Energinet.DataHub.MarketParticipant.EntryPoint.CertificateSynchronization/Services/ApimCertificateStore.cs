@@ -23,7 +23,7 @@ using Azure.Core;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Services;
 
-public sealed class ApimCertificateStore : IApimCertificateStore
+internal sealed class ApimCertificateStore : IApimCertificateStore
 {
     private const string ApimApiVersion = "2022-08-01";
 

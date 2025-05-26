@@ -35,13 +35,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
 [Route("user")]
-public class UserController : ControllerBase
+public sealed class UserController : ControllerBase
 {
     private readonly IExternalTokenValidator _externalTokenValidator;
     private readonly IUserContext<FrontendUser> _userContext;
     private readonly IMediator _mediator;
 
-    public UserController(
+    internal UserController(
         IExternalTokenValidator externalTokenValidator,
         IUserContext<FrontendUser> userContext,
         IMediator mediator)

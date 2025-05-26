@@ -19,7 +19,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 
-public sealed class DispatchIntegrationEventsTrigger
+internal sealed class DispatchIntegrationEventsTrigger
 {
     private readonly IPublisher _publisher;
 

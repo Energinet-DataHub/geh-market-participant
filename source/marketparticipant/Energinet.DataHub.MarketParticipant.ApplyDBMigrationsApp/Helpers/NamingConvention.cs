@@ -16,7 +16,7 @@ using System.Text.RegularExpressions;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 
-public static class NamingConvention
+internal static class NamingConvention
 {
     // Matches                                                         {type} {timestamp } {name}
     // Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Scripts.Model.202103021434 First.sql

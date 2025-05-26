@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 
-public static class EnvironmentFilter
+internal static class EnvironmentFilter
 {
     private static readonly string[] _validEnvironments = { "TEST-001", "TEST-002", "PREPROD-001", "PREPROD-002", "PROD-001", "SANDBOX-002", "DEV-001", "DEV-002", "DEV-003", "LOCALDEV" };
 

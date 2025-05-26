@@ -15,6 +15,8 @@
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 
 // Used by integration tests to find the current assembly.
+#pragma warning disable CA1515
 public sealed class MarketParticipantNoAuthWebApiAssembly
+#pragma warning restore CA1515
 {
 }

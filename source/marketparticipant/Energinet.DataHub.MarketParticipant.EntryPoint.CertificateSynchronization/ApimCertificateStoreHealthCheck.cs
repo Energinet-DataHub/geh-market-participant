@@ -20,7 +20,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization;
 
-public sealed class ApimCertificateStoreHealthCheck : IHealthCheck
+internal sealed class ApimCertificateStoreHealthCheck : IHealthCheck
 {
     private readonly IApimCertificateStore _apimCertificateStore;
 

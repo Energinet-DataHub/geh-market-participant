@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 
-public sealed class CommonExceptionHandlingBuilder
+internal sealed class CommonExceptionHandlingBuilder
 {
     private readonly List<(Type ExceptionType, Func<Exception, HttpResponse, Task> ExceptionHandler)> _exceptionHandlers = new();
 

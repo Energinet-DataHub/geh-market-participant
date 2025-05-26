@@ -22,7 +22,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 
-public sealed class NotFoundValidationExceptionHandler : CommonExceptionHandlerBase<NotFoundValidationException>
+internal sealed class NotFoundValidationExceptionHandler : CommonExceptionHandlerBase<NotFoundValidationException>
 {
     private static readonly ReadOnlyDictionary<string, object> _emptyArgs = new(new Dictionary<string, object>());
     private readonly string _errorCodePrefix;

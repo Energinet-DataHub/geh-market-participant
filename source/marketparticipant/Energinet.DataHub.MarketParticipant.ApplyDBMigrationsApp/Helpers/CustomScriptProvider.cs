@@ -22,7 +22,7 @@ using DbUp.ScriptProviders;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 
-public class CustomScriptProvider : EmbeddedScriptProvider, IScriptProvider
+internal sealed class CustomScriptProvider : EmbeddedScriptProvider, IScriptProvider
 {
     public CustomScriptProvider(Assembly assembly, Func<string, bool> filter)
         : base(assembly, filter)

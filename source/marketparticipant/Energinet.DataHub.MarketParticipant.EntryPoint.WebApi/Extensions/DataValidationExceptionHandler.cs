@@ -22,7 +22,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 
-public sealed class DataValidationExceptionHandler : CommonExceptionHandlerBase<ValidationException>
+internal sealed class DataValidationExceptionHandler : CommonExceptionHandlerBase<ValidationException>
 {
     private static readonly ReadOnlyDictionary<string, object> _emptyArgs = new(new Dictionary<string, object>());
     private readonly string _errorCodePrefix;

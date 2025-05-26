@@ -86,8 +86,6 @@ public class SignatureRequest
 
     private void SetExpiration(DateTimeOffset expiration)
     {
-        ArgumentNullException.ThrowIfNull(expiration);
-
         if (_params.Any(i => i.Key.Equals(ExpirationKey, StringComparison.OrdinalIgnoreCase)))
         {
             throw new InvalidOperationException("Expiration already set");
@@ -100,8 +98,6 @@ public class SignatureRequest
 
     private void SetRequestId(Guid requestId)
     {
-        ArgumentNullException.ThrowIfNull(requestId);
-
         if (_params.Any(i => i.Key.Equals(RequestIdKey, StringComparison.OrdinalIgnoreCase)))
         {
             throw new InvalidOperationException("Identifier already set");

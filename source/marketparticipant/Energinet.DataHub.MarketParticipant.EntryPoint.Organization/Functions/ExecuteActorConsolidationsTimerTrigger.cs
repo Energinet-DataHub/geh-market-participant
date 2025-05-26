@@ -20,7 +20,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 
-public sealed class ExecuteActorConsolidationsTimerTrigger
+internal sealed class ExecuteActorConsolidationsTimerTrigger
 {
     private readonly IMediator _mediator;
     public ExecuteActorConsolidationsTimerTrigger(IMediator mediator)

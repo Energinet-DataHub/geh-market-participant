@@ -17,7 +17,7 @@ using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 
-public static class ConnectionStringFactory
+internal static class ConnectionStringFactory
 {
     private const string DefaultConnectionString = "Server=(local); Database=MeteringPointData; Trusted_connection=true";
 

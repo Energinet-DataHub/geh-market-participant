@@ -20,7 +20,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
-public sealed class SigningKeyRingHealthCheck : IHealthCheck
+internal sealed class SigningKeyRingHealthCheck : IHealthCheck
 {
     private readonly ISigningKeyRing _signingKeyRing;
 

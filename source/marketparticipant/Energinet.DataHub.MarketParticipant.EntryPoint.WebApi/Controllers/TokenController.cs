@@ -38,7 +38,7 @@ using NodaTime;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
-public class TokenController : ControllerBase
+public sealed class TokenController : ControllerBase
 {
     private const string Issuer = "https://datahub.dk";
     private const string RoleClaim = "role";
@@ -53,7 +53,7 @@ public class TokenController : ControllerBase
     private readonly IOptions<UserAuthentication> _authSettings;
     private readonly IMediator _mediator;
 
-    public TokenController(
+    internal TokenController(
         IExternalTokenValidator externalTokenValidator,
         ISigningKeyRing signingKeyRing,
         IOptions<UserAuthentication> authSettings,

@@ -16,7 +16,7 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 
-public sealed record ErrorDescriptor(
+internal sealed record ErrorDescriptor(
     string Message,
     string Code,
     IReadOnlyDictionary<string, object> Args);

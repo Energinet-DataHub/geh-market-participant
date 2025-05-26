@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Common;
 
-public static class MockedBusinessRegisterIdentifier
+internal static class MockedBusinessRegisterIdentifier
 {
     private static int _no = 10000000;
 
