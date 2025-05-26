@@ -15,8 +15,6 @@
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Http.Json;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 

@@ -14,32 +14,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.MasterData;
-using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
-using Energinet.DataHub.MarketParticipant.IntegrationTests;
-using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using FluentAssertions.Common;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using DatabricksSettings = Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration.DatabricksSettings;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 
@@ -82,8 +68,6 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
 
         await Assert.ThrowsAsync<InvalidOperationException>(async
             () => await target.ValidateAsync(validationRequest));
-
-        // Assert.True(await target.ValidateAsync(validationRequest));
     }
 
     [Fact]
@@ -112,7 +96,6 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
 
         Assert.True(await target.ValidateAsync(validationRequest));
     }
-
 
     private async Task<IGridAreaOverviewRepository> MockGridAreaOverviewRepository()
     {
