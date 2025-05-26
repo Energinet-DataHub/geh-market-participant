@@ -22,7 +22,7 @@ public interface IElectricityMarketClient
     /// Verify that get master data is allowed for the current user.
     /// </summary>
     /// <param name="meteringPointId">The identifier of the metering point.</param>
-    /// <param name="gridAreaCode">List of grid Areas that are valid for the grid access provider as of now.</param>
+    /// <param name="gridAreaCodes">List of grid Areas that are valid for the grid access provider as of now.</param>
     /// <returns>The list of metering point master data changes within the specified period.</returns>
-    Task<bool> GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(string meteringPointId, ReadOnlyCollection<string> gridAreaCode);
+    Task<bool> GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(string meteringPointId, ReadOnlyCollection<string> gridAreaCodes);
 }

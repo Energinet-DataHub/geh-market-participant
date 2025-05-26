@@ -29,12 +29,12 @@ public sealed class ElectricityMarketClient : IElectricityMarketClient
         _apiHttpClient = apiHttpClient;
     }
 
-    public async Task<bool> GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(string meteringPointId, ReadOnlyCollection<string> gridAreaCode)
+    public async Task<bool> GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(string meteringPointId, ReadOnlyCollection<string> gridAreaCodes)
     {
         ArgumentNullException.ThrowIfNull(meteringPointId);
 
         using var request = new HttpRequestMessage(HttpMethod.Post, $"api/metering-point/verify-grid-owner?identification={meteringPointId}");
-        request.Content = JsonContent.Create(gridAreaCode);
+        request.Content = JsonContent.Create(gridAreaCodes);
 
         using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
 
