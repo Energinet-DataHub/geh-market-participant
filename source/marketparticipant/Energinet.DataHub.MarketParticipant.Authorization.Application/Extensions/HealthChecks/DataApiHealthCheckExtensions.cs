@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -26,7 +27,6 @@ public static class DataApiHealthCheckExtensions
         this IHealthChecksBuilder builder,
         string? name = default,
         HealthStatus? failureStatus = default,
-        IEnumerable<string>? tags = default,
         TimeSpan? timeout = default)
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -37,7 +37,7 @@ public static class DataApiHealthCheckExtensions
                 serviceProvider.GetRequiredService<IHttpClientFactory>(),
                 serviceProvider.GetRequiredService<IOptions<ElectricityMarketClientOptions>>()),
             failureStatus,
-            tags,
+            [HealthChecksConstants.StatusHealthCheckTag],
             timeout));
     }
 }

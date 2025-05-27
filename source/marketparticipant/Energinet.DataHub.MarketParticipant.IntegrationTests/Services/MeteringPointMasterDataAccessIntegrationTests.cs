@@ -14,32 +14,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.MasterData;
-using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
-using Energinet.DataHub.MarketParticipant.IntegrationTests;
-using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using FluentAssertions.Common;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using DatabricksSettings = Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration.DatabricksSettings;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 
@@ -55,35 +41,6 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
     public MeteringPointMasterDataAccessIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
-    }
-
-    [Fact]
-    public async Task Validate_MeteringPointIsOfOwnedGridArea_ThrowsException()
-    {
-        // arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-
-        var gridAreaOverviewRepository = await MockGridAreaOverviewRepository();
-
-        var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
-        var httpClient = httpClientFactory.CreateClient(); // Ensure HttpClient is properly resolved - add base adress
-        var electricityMarketClient = new ElectricityMarketClient(httpClient);
-
-        var validationRequest = new MeteringPointMasterDataAccessValidationRequest
-        {
-            MarketRole = (Authorization.Model.EicFunction)EicFunction.GridAccessProvider,
-            MeteringPointId = _gridAreaId.ToString(),
-            ActorNumber = ValidGln
-        };
-
-        var target = new MeteringPointMasterDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
-
-        await Assert.ThrowsAsync<InvalidOperationException>(async
-            () => await target.ValidateAsync(validationRequest));
-
-        // Assert.True(await target.ValidateAsync(validationRequest));
     }
 
     [Fact]
@@ -113,6 +70,32 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
         Assert.True(await target.ValidateAsync(validationRequest));
     }
 
+    [Fact]
+    public async Task Validate_MeteringPointIsOfOwnedGridArea_ReturnsFalse()
+    {
+        // arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var gridAreaOverviewRepository = await MockGridAreaOverviewRepository();
+
+        var service = new Mock<IElectricityMarketClient>();
+        service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync(_gridAreaId.ToString(), new List<string> { "5678" }.AsReadOnly())).ReturnsAsync(true);
+
+        var electricityMarketClient = service.Object;
+
+        var validationRequest = new MeteringPointMasterDataAccessValidationRequest
+        {
+            MarketRole = (Authorization.Model.EicFunction)EicFunction.GridAccessProvider,
+            MeteringPointId = _gridAreaId.ToString(),
+            ActorNumber = ValidGln
+        };
+
+        var target = new MeteringPointMasterDataAccessValidation((IElectricityMarketClient)electricityMarketClient, gridAreaOverviewRepository);
+
+        Assert.False(await target.ValidateAsync(validationRequest));
+    }
 
     private async Task<IGridAreaOverviewRepository> MockGridAreaOverviewRepository()
     {
