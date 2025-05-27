@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Moq;
@@ -38,6 +39,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
     public SigningKeyRingIntegrationTests(KeyClientFixture keyClientFixture)
     {
         _keyClientFixture = keyClientFixture;
+        MarketParticipantWebApiAssembly.EnableIntegrationTestKeys = false;
     }
 
     [Fact]
