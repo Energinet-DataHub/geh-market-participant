@@ -67,8 +67,8 @@ public sealed class ActorConsolidationAuditLogRepositoryTests
         var actual = (await target.GetAsync(gridAreaId)).Single();
 
         // Assert
-        var actualCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.CurrentValue);
-        var actualPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.PreviousValue);
+        var actualCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.CurrentValue!);
+        var actualPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.PreviousValue!);
         Assert.Equal(auditIdentity, actual.AuditIdentity);
         Assert.Equal(GridAreaAuditedChange.ConsolidationRequested, actual.Change);
         Assert.Equal(actorConsolidation.ActorFromId.ToString(), actualPreviousValue!.ActorId.ToString());
@@ -104,8 +104,8 @@ public sealed class ActorConsolidationAuditLogRepositoryTests
         var actual = (await target.GetAsync(actorConsolidation.ActorFromId)).Single();
 
         // Assert
-        var actualCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.CurrentValue);
-        var actualPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.PreviousValue);
+        var actualCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.CurrentValue!);
+        var actualPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(actual.PreviousValue!);
         Assert.Equal(auditIdentity, actual.AuditIdentity);
         Assert.Equal(ActorAuditedChange.ConsolidationRequested, actual.Change);
         Assert.Equal(actorConsolidation.ActorFromId.ToString(), actualPreviousValue!.ActorId.ToString());

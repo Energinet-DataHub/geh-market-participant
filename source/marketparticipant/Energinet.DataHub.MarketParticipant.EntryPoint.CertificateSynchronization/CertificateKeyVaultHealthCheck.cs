@@ -20,7 +20,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization;
 
-public sealed class CertificateKeyVaultHealthCheck : IHealthCheck
+internal sealed class CertificateKeyVaultHealthCheck : IHealthCheck
 {
     private readonly SecretClient _secretClient;
 
@@ -33,7 +33,7 @@ public sealed class CertificateKeyVaultHealthCheck : IHealthCheck
     {
         try
         {
-            await foreach (var unused in _secretClient.GetPropertiesOfSecretsAsync(cancellationToken))
+            await foreach (var unused in _secretClient.GetPropertiesOfSecretsAsync(cancellationToken).ConfigureAwait(false))
             {
                 break;
             }

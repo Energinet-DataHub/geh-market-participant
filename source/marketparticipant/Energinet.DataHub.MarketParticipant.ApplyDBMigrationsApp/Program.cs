@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp;
 
-public static class Program
+internal static class Program
 {
     public static async Task<int> Main(string[] args)
     {

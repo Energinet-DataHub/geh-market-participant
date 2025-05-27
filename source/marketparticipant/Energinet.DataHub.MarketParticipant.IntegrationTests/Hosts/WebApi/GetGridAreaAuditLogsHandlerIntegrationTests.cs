@@ -86,8 +86,8 @@ public sealed class GetGridAreaAuditLogsHandlerIntegrationTests
                     .Where(log => log.AuditIdentityId != KnownAuditIdentityProvider.TestFramework.IdentityId.Value)
                     .Single(log => log.Change == GridAreaAuditedChange.ConsolidationRequested && !string.IsNullOrEmpty(log.CurrentValue));
 
-                var expectedCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.CurrentValue);
-                var expectedPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.PreviousValue);
+                var expectedCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.CurrentValue!);
+                var expectedPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.PreviousValue!);
                 Assert.Equal(expectedTo.Value, expectedCurrentValue!.ActorId);
                 Assert.Equal(consolidateAt.ToDateTimeOffset(), expectedCurrentValue.ConsolidateAt);
                 Assert.Equal(expectedFrom.Value, expectedPreviousValue!.ActorId);
@@ -125,10 +125,10 @@ public sealed class GetGridAreaAuditLogsHandlerIntegrationTests
                     .Where(log => log.AuditIdentityId != KnownAuditIdentityProvider.TestFramework.IdentityId.Value)
                     .Single(log => log.Change == GridAreaAuditedChange.ConsolidationCompleted && !string.IsNullOrEmpty(log.CurrentValue));
 
-                var expectedCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.CurrentValue);
-                var expectedPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.PreviousValue);
-                Assert.Equal(expectedTo.ToString(), expectedCurrentValue.ActorId.ToString());
-                Assert.Equal(expectedFrom.ToString(), expectedPreviousValue.ActorId.ToString());
+                var expectedCurrentValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.CurrentValue!);
+                var expectedPreviousValue = JsonSerializer.Deserialize<ActorConsolidationActorAndDate>(expectedLog.PreviousValue!);
+                Assert.Equal(expectedTo.ToString(), expectedCurrentValue!.ActorId.ToString());
+                Assert.Equal(expectedFrom.ToString(), expectedPreviousValue!.ActorId.ToString());
             },
             async (gridArea, sp) =>
             {

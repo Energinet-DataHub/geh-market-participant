@@ -20,7 +20,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 
-public sealed class AuditLoginAttemptsTrigger
+internal sealed class AuditLoginAttemptsTrigger
 {
     private readonly IMediator _mediator;
 

@@ -19,7 +19,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Monitor;
 
-public sealed class HealthCheckEndpoint
+internal sealed class HealthCheckEndpoint
 {
     public HealthCheckEndpoint(IHealthCheckEndpointHandler healthCheckEndpointHandler)
     {

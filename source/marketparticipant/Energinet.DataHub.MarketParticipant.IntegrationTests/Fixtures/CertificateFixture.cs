@@ -93,7 +93,7 @@ public sealed class CertificateFixture : IAsyncLifetime
         using var reader = new BinaryReader(stream!);
         var certificateBytes = reader.ReadBytes((int)stream!.Length);
 
-        var certificate = new X509Certificate2(certificateBytes);
+        var certificate = X509CertificateLoader.LoadCertificate(certificateBytes);
 
         var convertedCertificateToBase64 = Convert.ToBase64String(certificate.RawData);
         await SecretClient.SetSecretAsync(name, convertedCertificateToBase64);

@@ -31,7 +31,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
-public static class MarketParticipantWebApiModuleExtensions
+internal static class MarketParticipantWebApiModuleExtensions
 {
     public static IServiceCollection AddMarketParticipantWebApiModule(this IServiceCollection services, IConfiguration configuration)
     {

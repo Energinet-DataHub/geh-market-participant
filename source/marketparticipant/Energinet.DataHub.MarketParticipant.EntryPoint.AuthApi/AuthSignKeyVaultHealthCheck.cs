@@ -20,7 +20,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi;
 
-public sealed class AuthSignKeyVaultHealthCheck : IHealthCheck
+internal sealed class AuthSignKeyVaultHealthCheck : IHealthCheck
 {
     private readonly SecretClient _secretClient;
 
@@ -33,7 +33,7 @@ public sealed class AuthSignKeyVaultHealthCheck : IHealthCheck
     {
         try
         {
-            await foreach (var unused in _secretClient.GetPropertiesOfSecretsAsync(cancellationToken))
+            await foreach (var unused in _secretClient.GetPropertiesOfSecretsAsync(cancellationToken).ConfigureAwait(false))
             {
                 break;
             }

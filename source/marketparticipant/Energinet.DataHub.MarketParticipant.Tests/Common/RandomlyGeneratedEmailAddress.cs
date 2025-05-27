@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common;
 
 #pragma warning disable CA1062, CA2225
 
-public sealed class RandomlyGeneratedEmailAddress
+internal sealed class RandomlyGeneratedEmailAddress
 {
     private readonly string _value = $"{Guid.NewGuid()}@test.datahub.dk";
 

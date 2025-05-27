@@ -16,4 +16,4 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Services;
 
-public sealed record CertificateIdentifier(Uri Id, string Name, CertificateState State);
+internal sealed record CertificateIdentifier(Uri Id, string Name, CertificateState State);

@@ -24,7 +24,7 @@ using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidator
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 
-public class AuthorizationService
+internal sealed class AuthorizationService
 {
     private readonly KeyClient _keyClient;
     private readonly string _keyName;

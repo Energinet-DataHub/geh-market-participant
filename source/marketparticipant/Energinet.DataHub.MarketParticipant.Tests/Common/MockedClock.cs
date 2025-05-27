@@ -21,7 +21,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Common;
 
-public static class MockedClock
+internal static class MockedClock
 {
     public static void Set(DateTime dateTime)
     {

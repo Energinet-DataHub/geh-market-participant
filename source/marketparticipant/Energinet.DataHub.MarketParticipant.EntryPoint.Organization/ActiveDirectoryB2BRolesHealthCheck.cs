@@ -20,7 +20,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
 
-public sealed class ActiveDirectoryB2BRolesHealthCheck : IHealthCheck
+internal sealed class ActiveDirectoryB2BRolesHealthCheck : IHealthCheck
 {
     private readonly IActiveDirectoryB2BRolesProvider _activeDirectoryB2BRolesProvider;
 

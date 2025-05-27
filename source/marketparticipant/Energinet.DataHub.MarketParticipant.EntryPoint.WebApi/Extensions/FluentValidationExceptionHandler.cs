@@ -21,7 +21,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 
-public sealed class FluentValidationExceptionHandler : CommonExceptionHandlerBase<ValidationException>
+internal sealed class FluentValidationExceptionHandler : CommonExceptionHandlerBase<ValidationException>
 {
     private readonly string _errorCodePrefix;
 

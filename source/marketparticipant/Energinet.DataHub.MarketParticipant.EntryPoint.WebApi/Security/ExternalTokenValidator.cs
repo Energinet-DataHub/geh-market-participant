@@ -21,7 +21,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 
-public sealed class ExternalTokenValidator : IExternalTokenValidator
+internal sealed class ExternalTokenValidator : IExternalTokenValidator
 {
     private readonly TokenValidationParameters _validationParameters;
 

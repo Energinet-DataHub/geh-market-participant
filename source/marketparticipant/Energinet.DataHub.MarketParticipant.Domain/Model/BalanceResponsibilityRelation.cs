@@ -30,8 +30,11 @@ public sealed record BalanceResponsibilityRelation(ActorId EnergySupplier, GridA
     {
         if (validTo.HasValue != validToAssignedAt.HasValue)
         {
-            ArgumentNullException.ThrowIfNull(validTo);
-            ArgumentNullException.ThrowIfNull(validToAssignedAt);
+            if (validTo == null)
+                throw new ArgumentNullException(nameof(validTo));
+
+            if (validToAssignedAt == null)
+                throw new ArgumentNullException(nameof(validToAssignedAt));
         }
 
         ValidTo = validTo;

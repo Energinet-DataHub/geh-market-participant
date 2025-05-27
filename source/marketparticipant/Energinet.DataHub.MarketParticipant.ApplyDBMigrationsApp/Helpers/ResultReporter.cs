@@ -17,7 +17,7 @@ using DbUp.Engine;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 
-public static class ResultReporter
+internal static class ResultReporter
 {
     private const int SuccessResult = 0;
     private const int FailureResult = -1;

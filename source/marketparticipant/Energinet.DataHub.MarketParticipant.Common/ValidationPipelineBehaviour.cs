@@ -35,6 +35,6 @@ internal sealed class ValidationPipelineBehaviour<TRequest, TResponse> : IPipeli
             .ValidateAndThrowAsync(request, cancellationToken)
             .ConfigureAwait(false);
 
-        return await next().ConfigureAwait(false);
+        return await next(cancellationToken).ConfigureAwait(false);
     }
 }

@@ -27,7 +27,7 @@ using JsonWebKey = Azure.Security.KeyVault.Keys.JsonWebKey;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 
 [SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "SigningKeyRing is a singleton and SemaphoreSlim has a finalizer.")]
-public sealed class SigningKeyRing : ISigningKeyRing
+internal sealed class SigningKeyRing : ISigningKeyRing
 {
     private readonly IClock _clock;
     private readonly KeyClient _keyClient;
@@ -100,7 +100,7 @@ public sealed class SigningKeyRing : ISigningKeyRing
                 .GetCurrentInstant()
                 .ToDateTimeOffset();
 
-            await foreach (var keyDescription in keyVersions)
+            await foreach (var keyDescription in keyVersions.ConfigureAwait(false))
             {
                 if (keyDescription.Enabled != true)
                     continue;

@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
 [Route("actor")]
-public class ActorController : ControllerBase
+public sealed class ActorController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IUserContext<FrontendUser> _userContext;
@@ -217,8 +217,6 @@ public class ActorController : ControllerBase
     [EnableRevision(RevisionActivities.DelegationsForActorViewed, typeof(Actor), "actorId")]
     public async Task<ActionResult<GetDelegationsForActorResponse>> GetDelegationsForActorAsync(Guid actorId)
     {
-        ArgumentNullException.ThrowIfNull(actorId);
-
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
             return Unauthorized();
 

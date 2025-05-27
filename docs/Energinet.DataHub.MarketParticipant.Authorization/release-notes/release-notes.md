@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
+## Version 1.3.0
+
+- Upgraded to .net 9.
+
 ## Version 1.2.0
 
 - Rename authorization header name to 'Signature'.

@@ -51,11 +51,10 @@ public sealed class DownloadTokenRespository : IDownloadTokenRespository
 
     public async Task<string> ExchangeDownloadTokenAsync(Guid downloadToken)
     {
-        ArgumentNullException.ThrowIfNull(downloadToken);
         var onlyValidForFiveMinutes = SystemClock.Instance
-                                .GetCurrentInstant()
-                                .Minus(Duration.FromMinutes(5))
-                                .ToDateTimeOffset();
+            .GetCurrentInstant()
+            .Minus(Duration.FromMinutes(5))
+            .ToDateTimeOffset();
 
         var downloadTokenEntity = await _marketParticipantDbContext
             .DownloadTokens

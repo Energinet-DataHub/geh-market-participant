@@ -29,7 +29,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Functions;
 
-public sealed class AuthorizationHttpTrigger
+internal sealed class AuthorizationHttpTrigger
 {
     private const string BlockSignatureAuthorizationFeatureKey = "BlockSignatureAuthorization";
 

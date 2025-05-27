@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 
-public abstract class CommonExceptionHandlerBase<T>
+internal abstract class CommonExceptionHandlerBase<T>
     where T : Exception
 {
     public abstract Task HandleExceptionAsync(T exception, HttpResponse response);
