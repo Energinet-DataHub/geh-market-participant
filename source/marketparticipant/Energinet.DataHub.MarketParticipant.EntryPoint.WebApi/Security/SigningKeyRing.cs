@@ -61,7 +61,7 @@ internal sealed class SigningKeyRing : ISigningKeyRing
         var latestKey = keyCache
             .Where(key => !key.Properties.NotBefore.HasValue || key.Properties.NotBefore <= currentTime)
             .Where(key => !key.Properties.ExpiresOn.HasValue || key.Properties.ExpiresOn > currentTime)
-            .FirstOrDefault(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < currentTime.AddMinutes(-10) || MarketParticipantWebApiAssembly.EnableIntegrationTestKeys);
+            .FirstOrDefault(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < currentTime.AddMinutes(-10));
 
         if (latestKey == null)
         {
