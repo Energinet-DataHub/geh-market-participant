@@ -48,15 +48,12 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator<M
         var actorNumber = request.ActorNumber;
         var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
 
-        // TODO: Add new method in repository to get grid areas for actor number that are valid now
         var activeGridAreasCodes = gridAreas
             .Where(x => x.ActorNumber != null
                         && x.ActorNumber.Value == actorNumber
                         && x.ValidFrom <= DateTime.UtcNow && x.ValidTo >= DateTime.UtcNow)
             .Select(g => g.Code.Value)
             .ToList().AsReadOnly();
-
-        // TODO: Make a call to new Electricity market api specially for the signature creation.
         return await _electricityMarketClient.GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(request.MeteringPointId, activeGridAreasCodes).ConfigureAwait(false);
     }
 }
