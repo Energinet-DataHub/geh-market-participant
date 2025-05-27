@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 /// <summary>
 /// Compare sql script file names.
 /// </summary>
-public sealed class ScriptComparer : Comparer<string>
+internal sealed class ScriptComparer : Comparer<string>
 {
     private static readonly StringComparer _stringComparer = StringComparer.Ordinal;
 

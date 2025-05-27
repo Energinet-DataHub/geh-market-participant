@@ -24,7 +24,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi;
 
-public sealed class InMemoryUserIdentityRepository : IUserIdentityRepository
+internal sealed class InMemoryUserIdentityRepository : IUserIdentityRepository
 {
     private static readonly List<UserIdentity> _identities = new()
     {

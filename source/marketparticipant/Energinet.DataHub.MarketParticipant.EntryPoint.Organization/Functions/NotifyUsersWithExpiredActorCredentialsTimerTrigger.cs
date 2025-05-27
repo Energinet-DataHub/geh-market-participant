@@ -19,7 +19,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 
-public sealed class NotifyUsersWithExpiredActorCredentialsTimerTrigger
+internal sealed class NotifyUsersWithExpiredActorCredentialsTimerTrigger
 {
     private readonly IMediator _mediator;
 

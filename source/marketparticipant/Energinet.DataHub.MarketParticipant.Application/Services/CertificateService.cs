@@ -91,7 +91,7 @@ public class CertificateService : ICertificateService
 
         try
         {
-            var x509Certificate2 = new X509Certificate2(certificateBytes);
+            var x509Certificate2 = X509CertificateLoader.LoadCertificate(certificateBytes);
             _certificateValidation.Verify(x509Certificate2);
             return x509Certificate2;
         }

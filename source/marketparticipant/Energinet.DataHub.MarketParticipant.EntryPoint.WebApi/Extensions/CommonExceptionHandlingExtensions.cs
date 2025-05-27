@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Builder;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 
-public static class CommonExceptionHandlingExtensions
+internal static class CommonExceptionHandlingExtensions
 {
     public static IApplicationBuilder UseCommonExceptionHandling(this IApplicationBuilder app, Action<CommonExceptionHandlingBuilder> registration)
     {

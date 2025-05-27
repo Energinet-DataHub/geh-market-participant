@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Tests.Common;
 
 #pragma warning disable CA1062, CA2225
-public sealed class MockedDomain
+internal sealed class MockedDomain
 {
     private readonly string _value = $"{Guid.NewGuid()}.dk";
 

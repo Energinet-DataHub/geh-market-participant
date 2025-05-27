@@ -21,7 +21,7 @@ using Energinet.DataHub.MarketParticipant.Authorization.Services;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 
-public class AuthorizationService
+internal sealed class AuthorizationService
 {
     private readonly KeyClient _keyClient;
     private readonly string _keyName;

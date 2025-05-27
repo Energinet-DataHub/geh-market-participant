@@ -21,7 +21,7 @@ using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 
-public class OrganizationIdentityUpdateTrigger
+internal sealed class OrganizationIdentityUpdateTrigger
 {
     private readonly IMediator _mediator;
     private readonly ILogger<OrganizationIdentityUpdateTrigger> _logger;

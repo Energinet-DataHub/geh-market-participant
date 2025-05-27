@@ -19,7 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
-public sealed class FrontendUserAuditIdentityProvider : IAuditIdentityProvider
+internal sealed class FrontendUserAuditIdentityProvider : IAuditIdentityProvider
 {
     private readonly IUserContext<FrontendUser> _userContext;
 

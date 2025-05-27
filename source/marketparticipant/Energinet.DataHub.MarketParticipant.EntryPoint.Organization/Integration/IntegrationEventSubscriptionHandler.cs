@@ -22,7 +22,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Integration;
 
-public class IntegrationEventSubscriptionHandler(
+internal sealed class IntegrationEventSubscriptionHandler(
     IBalanceResponsiblePartiesChangedEventHandler balanceResponsiblePartiesChangedEventHandler,
     ILogger<IntegrationEventSubscriptionHandler> logger) : IIntegrationEventHandler
 {

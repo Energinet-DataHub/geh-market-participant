@@ -19,7 +19,7 @@ using Azure.Security.KeyVault.Secrets;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Services;
 
-public sealed class KeyVaultCertificates : IKeyVaultCertificates
+internal sealed class KeyVaultCertificates : IKeyVaultCertificates
 {
     private readonly SecretClient _secretClient;
 

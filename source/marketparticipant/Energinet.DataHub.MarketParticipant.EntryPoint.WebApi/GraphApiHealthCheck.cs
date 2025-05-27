@@ -20,7 +20,7 @@ using Microsoft.Graph;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
-public sealed class GraphApiHealthCheck : IHealthCheck
+internal sealed class GraphApiHealthCheck : IHealthCheck
 {
     private readonly GraphServiceClient _graphServiceClient;
 

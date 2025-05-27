@@ -20,7 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Common;
 
-public sealed class MockedGln
+internal sealed class MockedGln
 {
     private static readonly Random _rng = new();
     private readonly string _gln = CreateRandomGln();

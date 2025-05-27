@@ -33,13 +33,24 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class IntegrationEventProviderIntegrationTests
+public sealed class IntegrationEventProviderIntegrationTests : IAsyncLifetime
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
     public IntegrationEventProviderIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _fixture.DatabaseManager.DeleteDatabaseAsync();
+        await _fixture.DatabaseManager.CreateDatabaseAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]

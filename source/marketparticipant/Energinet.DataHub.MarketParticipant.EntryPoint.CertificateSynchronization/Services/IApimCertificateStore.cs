@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Services;
 
-public interface IApimCertificateStore
+internal interface IApimCertificateStore
 {
     Task<IReadOnlyCollection<CertificateIdentifier>> GetCertificateIdentifiersAsync();
 

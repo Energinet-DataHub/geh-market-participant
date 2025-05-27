@@ -11,15 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System.Runtime.CompilerServices;
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Services;
-
-internal interface IKeyVaultCertificates
-{
-    Task<IReadOnlyCollection<CertificateIdentifier>> GetCertificateIdentifiersAsync();
-    Task DeleteCertificateAsync(CertificateIdentifier certificate);
-    Task PurgeDeletedCertificateAsync(CertificateIdentifier certificate);
-}
+[assembly: InternalsVisibleTo("Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi")]
+[assembly: InternalsVisibleTo("Energinet.DataHub.MarketParticipant.IntegrationTests")]

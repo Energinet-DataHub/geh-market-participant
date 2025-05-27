@@ -21,7 +21,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.Functions;
 
-public sealed class SynchronizeCertificatesTrigger
+internal sealed class SynchronizeCertificatesTrigger
 {
     private readonly IKeyVaultCertificates _keyVaultCertificates;
     private readonly IApimCertificateStore _apimCertificateStore;

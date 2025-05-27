@@ -19,7 +19,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 
-public sealed class UserInvitationExpiredTimerTrigger
+internal sealed class UserInvitationExpiredTimerTrigger
 {
     private readonly IMediator _mediator;
 

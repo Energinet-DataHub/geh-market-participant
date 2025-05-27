@@ -30,13 +30,24 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class UserRoleRepositoryTests
+public sealed class UserRoleRepositoryTests : IAsyncLifetime
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
     public UserRoleRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _fixture.DatabaseManager.DeleteDatabaseAsync();
+        await _fixture.DatabaseManager.CreateDatabaseAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]

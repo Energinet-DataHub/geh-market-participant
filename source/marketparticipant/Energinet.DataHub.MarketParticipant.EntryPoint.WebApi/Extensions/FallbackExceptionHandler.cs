@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 
-public sealed class FallbackExceptionHandler : CommonExceptionHandlerBase<Exception>
+internal sealed class FallbackExceptionHandler : CommonExceptionHandlerBase<Exception>
 {
     private readonly string _errorCodePrefix;
 

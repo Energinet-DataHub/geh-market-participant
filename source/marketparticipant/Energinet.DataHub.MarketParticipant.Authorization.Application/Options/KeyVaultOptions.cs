@@ -16,7 +16,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Options;
 
-public sealed record KeyVaultOptions
+internal sealed record KeyVaultOptions
 {
     public const string SectionName = "KeyVault";
 
