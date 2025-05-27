@@ -58,6 +58,24 @@ public sealed class AuthorizationHttpTrigger
     {
         ArgumentNullException.ThrowIfNull(httpRequest);
 
+        if (Guid.TryParse(httpRequest.Query["userId"], out var userId))
+        {
+            // Currently, only BFF is able to make these requests, so this constraint is valid.
+            _logger.LogWarning("Rejecting request as userId was not provided.");
+            return httpRequest.CreateResponse(HttpStatusCode.Forbidden);
+        }
+
+        await _revisionLogClient
+            .LogAsync(new RevisionLogEntry(
+                logId: Guid.NewGuid(),
+                systemId: SubsystemInformation.Id,
+                activity: "CreateSignature",
+                occurredOn: SystemClock.Instance.GetCurrentInstant(),
+                origin: nameof(AuthorizationHttpTrigger),
+                userId: userId,
+                payload: validationRequestJson))
+            .ConfigureAwait(false);
+
         var blockSignatureAuthorization = await _featureManager
             .IsEnabledAsync(BlockSignatureAuthorizationFeatureKey)
             .ConfigureAwait(false);
@@ -75,26 +93,8 @@ public sealed class AuthorizationHttpTrigger
             return httpRequest.CreateResponse(HttpStatusCode.Forbidden);
         }
 
-        if (Guid.TryParse(httpRequest.Query["userId"], out var userId))
-        {
-            // Currently, only BFF is able to make these requests, so this constraint is valid.
-            _logger.LogWarning("Rejecting request as userId was not provided.");
-            return httpRequest.CreateResponse(HttpStatusCode.Forbidden);
-        }
-
         var result = await _authorizationService
             .CreateSignatureAsync(accessValidationRequest, CancellationToken.None)
-            .ConfigureAwait(false);
-
-        await _revisionLogClient
-            .LogAsync(new RevisionLogEntry(
-                logId: Guid.NewGuid(),
-                systemId: SubsystemInformation.Id,
-                activity: "CreateSignature",
-                occurredOn: SystemClock.Instance.GetCurrentInstant(),
-                origin: nameof(AuthorizationHttpTrigger),
-                userId: userId,
-                payload: validationRequestJson))
             .ConfigureAwait(false);
 
         var response = httpRequest.CreateResponse(HttpStatusCode.OK);
