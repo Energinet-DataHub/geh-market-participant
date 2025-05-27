@@ -15,6 +15,7 @@
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Http.Json;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 
@@ -27,7 +28,7 @@ public sealed class ElectricityMarketClient : IElectricityMarketClient
         _apiHttpClient = apiHttpClient;
     }
 
-    public async Task<bool> GetMeteringPointMasterDataForGridAccessProviderAllowedAsync(string meteringPointId, ReadOnlyCollection<string> gridAreaCodes)
+    public async Task<bool> VerifyMeteringPointIsInGridAreaAsync(string meteringPointId, IEnumerable<string> gridAreaCodes)
     {
         ArgumentNullException.ThrowIfNull(meteringPointId);
 
@@ -36,6 +37,8 @@ public sealed class ElectricityMarketClient : IElectricityMarketClient
 
         using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
 
-        return response.StatusCode is not HttpStatusCode.NotFound;
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<bool>().ConfigureAwait(false);
     }
 }
