@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 /// <summary>
 /// Manages keys for signing JWT.
 /// </summary>
-internal interface ISigningKeyRing
+public interface ISigningKeyRing
 {
     /// <summary>
     /// The algorithm used to sign a JWT.

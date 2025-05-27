@@ -41,7 +41,7 @@ public sealed class UserController : ControllerBase
     private readonly IUserContext<FrontendUser> _userContext;
     private readonly IMediator _mediator;
 
-    internal UserController(
+    public UserController(
         IExternalTokenValidator externalTokenValidator,
         IUserContext<FrontendUser> userContext,
         IMediator mediator)

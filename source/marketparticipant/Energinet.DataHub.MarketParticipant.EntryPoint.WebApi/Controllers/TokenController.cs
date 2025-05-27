@@ -53,7 +53,7 @@ public sealed class TokenController : ControllerBase
     private readonly IOptions<UserAuthentication> _authSettings;
     private readonly IMediator _mediator;
 
-    internal TokenController(
+    public TokenController(
         IExternalTokenValidator externalTokenValidator,
         ISigningKeyRing signingKeyRing,
         IOptions<UserAuthentication> authSettings,
