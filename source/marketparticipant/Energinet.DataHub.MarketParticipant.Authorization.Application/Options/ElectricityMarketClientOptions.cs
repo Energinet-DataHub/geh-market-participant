@@ -22,7 +22,7 @@ public sealed class ElectricityMarketClientOptions
     [Required]
     public Uri BaseUrl { get; set; } = null!;
 
-    [Required(AllowEmptyStrings = false)]
+    [Required]
 #pragma warning disable CA1056
     public string ApplicationIdUri { get; set; } = string.Empty!;
 #pragma warning restore CA1056
