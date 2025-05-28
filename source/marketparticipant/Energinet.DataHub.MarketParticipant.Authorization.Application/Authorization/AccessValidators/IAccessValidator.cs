@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-public interface IAccessValidator
+namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
+
+public interface IAccessValidator<in TRequest>
+    where TRequest : AccessValidationRequest
 {
-    bool Validate();
+    Task<bool> ValidateAsync(TRequest request);
 }

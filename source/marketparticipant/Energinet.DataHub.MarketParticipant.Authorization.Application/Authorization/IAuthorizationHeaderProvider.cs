@@ -12,18 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.ComponentModel.DataAnnotations;
+using System.Net.Http.Headers;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Options;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization;
 
-internal sealed record KeyVaultOptions
+internal interface IAuthorizationHeaderProvider
 {
-    public const string SectionName = "KeyVault";
-
-    [Required]
-    public Uri AuthSignKeyVault { get; set; } = null!;
-
-    [Required]
-    public string AuthSignKeyName { get; set; } = null!;
+    /// <summary>
+    /// Create an authorization header to be used when calling Electricity Market API's.
+    /// </summary>
+    AuthenticationHeaderValue CreateAuthorizationHeader();
 }

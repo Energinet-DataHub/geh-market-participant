@@ -12,38 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
-using Energinet.DataHub.MarketParticipant.Authorization.Services.AccessValidators;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 
-internal sealed class AuthorizationService
+public sealed class AuthorizationService
 {
     private readonly KeyClient _keyClient;
     private readonly string _keyName;
+    private readonly IAccessValidatorDispatchService _accessValidatorDispatchService;
 
     public AuthorizationService(
         KeyClient keyClient,
-        string keyName)
+        string keyName,
+        IAccessValidatorDispatchService accessValidatorDispatchService)
     {
         _keyName = keyName;
         _keyClient = keyClient;
+        _accessValidatorDispatchService = accessValidatorDispatchService;
     }
 
     public async Task<Signature> CreateSignatureAsync(AccessValidationRequest accessValidationRequest, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(accessValidationRequest);
 
-        var validator = GetAccessValidator(accessValidationRequest);
-
-        if (!validator.Validate())
+        if (!await _accessValidatorDispatchService.ValidateAsync(accessValidationRequest).ConfigureAwait(false))
             throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
 
         var signatureRequest = new SignatureRequest();
@@ -62,16 +60,6 @@ internal sealed class AuthorizationService
             KeyVersion = key.Value.Properties.Version,
             Expires = signatureRequest.Expiration,
             RequestId = signatureRequest.RequestId,
-        };
-    }
-
-    private static MeteringPointMasterDataAccessValidation GetAccessValidator(AccessValidationRequest accessValidationRequest)
-    {
-        return accessValidationRequest switch
-        {
-            MeteringPointMasterDataAccessValidationRequest meteringPointMasterDataAccessValidationRequest =>
-                new MeteringPointMasterDataAccessValidation(meteringPointMasterDataAccessValidationRequest),
-            _ => throw new ArgumentOutOfRangeException(nameof(accessValidationRequest))
         };
     }
 }

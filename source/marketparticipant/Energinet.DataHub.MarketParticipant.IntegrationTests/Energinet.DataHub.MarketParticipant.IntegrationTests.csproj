@@ -37,9 +37,10 @@ limitations under the License.
 
   <ItemGroup>
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.csproj" />
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi\Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.csproj"/>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Domain\Energinet.DataHub.MarketParticipant.Domain.csproj" />
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi\Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.csproj" />
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi\Energinet.DataHub.MarketParticipant.EntryPoint.LocalWebApi.csproj" />
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.Organization\Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj"/>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.Organization\Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj" />
   </ItemGroup>
 
   <ItemGroup>

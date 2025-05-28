@@ -13,13 +13,14 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Security;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -45,6 +46,10 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
+        var accessValidatorDispatchService = new Mock<IAccessValidatorDispatchService>();
+        accessValidatorDispatchService.Setup(x => x.ValidateAsync(It.IsAny<AccessValidationRequest>()))
+            .ReturnsAsync(true);
+
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
             MarketRole = EicFunction.DataHubAdministrator,
@@ -53,7 +58,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, accessValidatorDispatchService.Object);
         var actual = await target.CreateSignatureAsync(request, CancellationToken.None);
 
         // assert
@@ -68,6 +73,10 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
+        var accessValidatorDispatchService = new Mock<IAccessValidatorDispatchService>();
+        accessValidatorDispatchService.Setup(x => x.ValidateAsync(It.IsAny<AccessValidationRequest>()))
+            .ReturnsAsync(false);
+
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
             MarketRole = EicFunction.GridAccessProvider,
@@ -76,14 +85,9 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         };
 
         // act
-        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName);
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, accessValidatorDispatchService.Object);
 
         // assert
         await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(request, cancellationToken: CancellationToken.None));
-    }
-
-    private static string SerializeAccessRestriction(AccessValidationRequest accessValidationRequest)
-    {
-        return JsonSerializer.Serialize(accessValidationRequest);
     }
 }
