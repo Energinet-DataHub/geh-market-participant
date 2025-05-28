@@ -210,5 +210,15 @@ public static class KnownPermissions
             EicFunction.DataHubAdministrator,
             EicFunction.DanishEnergyAgency,
         ]),
+        new(PermissionId.AdditionalRecipientsManage, "additional-recipients:manage", InstantPattern.ExtendedIso.Parse("2025-05-28T00:00:00Z").Value, [
+            EicFunction.DataHubAdministrator,
+            EicFunction.DanishEnergyAgency,
+            EicFunction.SystemOperator,
+        ]),
+        new(PermissionId.AdditionalRecipientsView, "additional-recipients:view", InstantPattern.ExtendedIso.Parse("2025-05-28T00:00:00Z").Value, [
+            EicFunction.DataHubAdministrator,
+            EicFunction.DanishEnergyAgency,
+            EicFunction.SystemOperator,
+        ]),
     ];
 }
