@@ -1,5 +1,10 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
+## Version 1.4.0
+
+- Moved MeteringPointMasterDataAccessValidation logic to new Authorization.Application project
+- implemented verification of MeteringPoint GridArea is owned by requesting Grid Access Provider for the signature creation.
+
 ## Version 1.3.0
 
 - Upgraded to .net 9.

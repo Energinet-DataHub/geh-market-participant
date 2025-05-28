@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
@@ -22,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRe
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -36,7 +34,7 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
 {
     private const string ValidGln = "5790000555550";
     private readonly MarketParticipantDatabaseFixture _fixture;
-    private readonly GridAreaId _gridAreaId = new GridAreaId(Guid.NewGuid());
+    private readonly GridAreaId _gridAreaId = new(Guid.NewGuid());
 
     public MeteringPointMasterDataAccessIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
@@ -51,10 +49,10 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var gridAreaOverviewRepository = await MockGridAreaOverviewRepository();
+        var gridAreaOverviewRepository = MockGridAreaOverviewRepository();
 
         var service = new Mock<IElectricityMarketClient>();
-        service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync(_gridAreaId.ToString(), new List<string> { "1234" }.AsReadOnly())).ReturnsAsync(true);
+        service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync(_gridAreaId.ToString(), new List<string> { "1234" })).ReturnsAsync(true);
 
         var electricityMarketClient = service.Object;
 
@@ -65,7 +63,8 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
             ActorNumber = ValidGln
         };
 
-        var target = new MeteringPointMasterDataAccessValidation((IElectricityMarketClient)electricityMarketClient, gridAreaOverviewRepository);
+        // Act + Assert
+        var target = new MeteringPointMasterDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
 
         Assert.True(await target.ValidateAsync(validationRequest));
     }
@@ -78,10 +77,10 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var gridAreaOverviewRepository = await MockGridAreaOverviewRepository();
+        var gridAreaOverviewRepository = MockGridAreaOverviewRepository();
 
         var service = new Mock<IElectricityMarketClient>();
-        service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync(_gridAreaId.ToString(), new List<string> { "5678" }.AsReadOnly())).ReturnsAsync(true);
+        service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync(_gridAreaId.ToString(), new List<string> { "5678" })).ReturnsAsync(true);
 
         var electricityMarketClient = service.Object;
 
@@ -92,12 +91,13 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
             ActorNumber = ValidGln
         };
 
-        var target = new MeteringPointMasterDataAccessValidation((IElectricityMarketClient)electricityMarketClient, gridAreaOverviewRepository);
+        // Act + Assert
+        var target = new MeteringPointMasterDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
 
         Assert.False(await target.ValidateAsync(validationRequest));
     }
 
-    private async Task<IGridAreaOverviewRepository> MockGridAreaOverviewRepository()
+    private IGridAreaOverviewRepository MockGridAreaOverviewRepository()
     {
         // arrange
         var gridAreaOverviewItem = new GridAreaOverviewItem(
@@ -114,7 +114,7 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
             GridAreaType.Distribution);
 
         var repository = new Mock<IGridAreaOverviewRepository>();
-        repository.Setup(x => x.GetAsync()).ReturnsAsync(new[] { gridAreaOverviewItem });
+        repository.Setup(x => x.GetAsync()).ReturnsAsync([gridAreaOverviewItem]);
 
         return repository.Object;
     }

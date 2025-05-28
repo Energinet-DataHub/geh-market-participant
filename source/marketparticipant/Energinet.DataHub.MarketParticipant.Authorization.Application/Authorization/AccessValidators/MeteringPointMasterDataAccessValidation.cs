@@ -53,7 +53,7 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator<M
                         && x.ActorNumber.Value == actorNumber
                         && x.ValidFrom <= DateTime.UtcNow && x.ValidTo >= DateTime.UtcNow)
             .Select(g => g.Code.Value)
-            .ToList().AsReadOnly();
+            .ToList();
         return await _electricityMarketClient.VerifyMeteringPointIsInGridAreaAsync(request.MeteringPointId, activeGridAreasCodes).ConfigureAwait(false);
     }
 }
