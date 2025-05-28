@@ -41,4 +41,6 @@ public enum PermissionId
     ElectricityMarketTransactionImport = 25,
     MissingMeasurementsLogView = 26,
     MeasurementsReportsManage = 27,
+    AdditionalRecipientView = 28,
+    AdditionalRecipientManage = 29,
 }
