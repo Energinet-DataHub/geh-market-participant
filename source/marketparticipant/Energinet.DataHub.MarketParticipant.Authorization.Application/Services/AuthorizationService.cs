@@ -41,7 +41,9 @@ public sealed class AuthorizationService
     {
         ArgumentNullException.ThrowIfNull(accessValidationRequest);
 
-        if (!await _accessValidatorDispatchService.ValidateAsync(accessValidationRequest).ConfigureAwait(false))
+        var validationResponse = await _accessValidatorDispatchService.ValidateAsync(accessValidationRequest).ConfigureAwait(false);
+
+        if (!validationResponse.Valid)
             throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
 
         var signatureRequest = new SignatureRequest();

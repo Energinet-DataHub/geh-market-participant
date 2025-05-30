@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
-
-public interface IAccessValidatorDispatchService
-{
-    Task<AccessValidatorResponse> ValidateAsync(AccessValidationRequest request);
-}
+namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
+public sealed record AccessValidatorResponse(bool Valid, IEnumerable<AccessPeriod>? ValidAccessPeriods);

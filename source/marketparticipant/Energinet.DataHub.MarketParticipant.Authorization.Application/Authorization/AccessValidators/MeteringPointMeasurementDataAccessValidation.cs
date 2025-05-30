@@ -19,31 +19,31 @@ using EicFunction = Energinet.DataHub.MarketParticipant.Authorization.Model.EicF
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 
-public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator<MeteringPointMasterDataAccessValidationRequest>
+public sealed class MeteringPointMeasurementDataAccessValidation : IAccessValidator<MeteringPointMeasurementDataAccessValidationRequest>
 {
     private readonly IElectricityMarketClient _electricityMarketClient;
     private readonly IGridAreaOverviewRepository _gridAreaRepository;
 
-    public MeteringPointMasterDataAccessValidation(IElectricityMarketClient electricityMarketClient, IGridAreaOverviewRepository gridAreaRepository)
+    public MeteringPointMeasurementDataAccessValidation(IElectricityMarketClient electricityMarketClient, IGridAreaOverviewRepository gridAreaRepository)
     {
         _electricityMarketClient = electricityMarketClient;
         _gridAreaRepository = gridAreaRepository;
     }
 
-    public async Task<AccessValidatorResponse> ValidateAsync(MeteringPointMasterDataAccessValidationRequest request)
+    public async Task<bool> ValidateAsync(MeteringPointMeasurementDataAccessValidationRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         return request.MarketRole switch
         {
-            EicFunction.DataHubAdministrator => new AccessValidatorResponse(true, null),
-            EicFunction.GridAccessProvider => new AccessValidatorResponse(await ValidateMeteringPointIsOfOwnedGridAreaAsync(request).ConfigureAwait(false),null),
-            EicFunction.EnergySupplier => new AccessValidatorResponse(true, null),
-            _ => new AccessValidatorResponse(false, null)
+            EicFunction.DataHubAdministrator => true,
+            EicFunction.GridAccessProvider => await ValidateMeteringPointIsOfOwnedGridAreaAsync(request).ConfigureAwait(false),
+            EicFunction.EnergySupplier => true,
+            _ => false,
         };
     }
 
-    private async Task<bool> ValidateMeteringPointIsOfOwnedGridAreaAsync(MeteringPointMasterDataAccessValidationRequest request)
+    private async Task<bool> ValidateMeteringPointIsOfOwnedGridAreaAsync(MeteringPointMeasurementDataAccessValidationRequest request)
     {
         var actorNumber = request.ActorNumber;
         var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
