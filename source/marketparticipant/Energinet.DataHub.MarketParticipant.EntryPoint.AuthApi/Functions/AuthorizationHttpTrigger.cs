@@ -103,34 +103,4 @@ internal sealed class AuthorizationHttpTrigger
 
         return response;
     }
-
-    private AccessValidationRequest? DeserializeAccessValidationRequest(string? validationRequestJson)
-    {
-        if (string.IsNullOrWhiteSpace(validationRequestJson))
-        {
-            _logger.LogWarning("Can't deserialize validationRequestJson as it is null.");
-            return null;
-        }
-
-        try
-        {
-            var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
-
-            return accessValidationRequest;
-        }
-        catch (JsonException jsonEx)
-        {
-            _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON");
-        }
-        catch (InvalidOperationException invalidOpEx)
-        {
-            _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation");
-        }
-        catch (Exception ex) when (ex is ArgumentNullException or ArgumentException)
-        {
-            _logger.LogDebug(ex, "An argument-related error occurred during access validation");
-        }
-
-        return null;
-    }
 }
