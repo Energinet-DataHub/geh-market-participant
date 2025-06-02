@@ -53,6 +53,7 @@ internal sealed class AuthorizationHttpTrigger
     [Function("CreateAuthorizationSignature")]
     public async Task<HttpResponseData> CreateSignatureAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "authorize")]
+        [FromBody] AccessValidationRequest? accessValidationRequest,
         HttpRequestData httpRequest)
     {
         ArgumentNullException.ThrowIfNull(httpRequest);
@@ -87,7 +88,6 @@ internal sealed class AuthorizationHttpTrigger
             return httpRequest.CreateResponse(HttpStatusCode.Forbidden);
         }
 
-        var accessValidationRequest = DeserializeAccessValidationRequest(validationRequestJson);
         if (accessValidationRequest == null)
         {
             _logger.LogWarning("Rejecting request as deserialization failed.");
@@ -108,7 +108,11 @@ internal sealed class AuthorizationHttpTrigger
 
     private AccessValidationRequest? DeserializeAccessValidationRequest(string? validationRequestJson)
     {
-        if (string.IsNullOrWhiteSpace(validationRequestJson)) return null;
+        if (string.IsNullOrWhiteSpace(validationRequestJson))
+        {
+            _logger.LogWarning("Can't deserialize validationRequestJson as it is null.");
+            return null;
+        }
 
         try
         {
