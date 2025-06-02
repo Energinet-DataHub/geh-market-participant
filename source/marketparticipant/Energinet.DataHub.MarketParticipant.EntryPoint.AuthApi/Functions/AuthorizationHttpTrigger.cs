@@ -118,7 +118,7 @@ internal sealed class AuthorizationHttpTrigger
         {
             _logger.LogWarning("trying to deserialize validationRequestJson: {ValidationRequestJson}", validationRequestJson);
             var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
-
+            _logger.LogWarning("accessValidationRequest is null: {AccessValidationRequest}", accessValidationRequest);
             return accessValidationRequest;
         }
         catch (JsonException jsonEx)
@@ -133,6 +133,7 @@ internal sealed class AuthorizationHttpTrigger
         {
             _logger.LogDebug(ex, "An argument-related error occurred during access validation");
         }
+
 
         return null;
     }
