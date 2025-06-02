@@ -50,9 +50,9 @@ internal sealed class AuthorizationHttpTrigger
         _revisionLogClient = revisionLogClient;
     }
 
-    [Function("CreateSignature")]
+    [Function("CreateAuthorizationSignature")]
     public async Task<HttpResponseData> CreateSignatureAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "createSignature")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "authorize")]
         string validationRequestJson,
         HttpRequestData httpRequest)
     {
