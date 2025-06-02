@@ -53,10 +53,11 @@ internal sealed class AuthorizationHttpTrigger
     [Function("CreateAuthorizationSignature")]
     public async Task<HttpResponseData> CreateSignatureAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "authorize")]
-        [FromBody] AccessValidationRequest? accessValidationRequest,
         HttpRequestData httpRequest)
     {
         ArgumentNullException.ThrowIfNull(httpRequest);
+
+        var validationRequestJson = await httpRequest.ReadAsStringAsync().ConfigureAwait(false);
 
         if (Guid.TryParse(httpRequest.Query["userId"], out var userId))
         {
@@ -73,7 +74,7 @@ internal sealed class AuthorizationHttpTrigger
                 occurredOn: SystemClock.Instance.GetCurrentInstant(),
                 origin: nameof(AuthorizationHttpTrigger),
                 userId: userId,
-                payload: accessValidationRequest is not null ? JsonSerializer.Serialize(accessValidationRequest) : "NO_CONTENT"))
+                payload: validationRequestJson ?? "NO_CONTENT"))
             .ConfigureAwait(false);
 
         var blockSignatureAuthorization = await _featureManager
@@ -86,6 +87,7 @@ internal sealed class AuthorizationHttpTrigger
             return httpRequest.CreateResponse(HttpStatusCode.Forbidden);
         }
 
+        var accessValidationRequest = DeserializeAccessValidationRequest(validationRequestJson);
         if (accessValidationRequest == null)
         {
             _logger.LogWarning("Rejecting request as deserialization failed.");
@@ -102,5 +104,36 @@ internal sealed class AuthorizationHttpTrigger
             .ConfigureAwait(false);
 
         return response;
+    }
+
+    private AccessValidationRequest? DeserializeAccessValidationRequest(string? validationRequestJson)
+    {
+        if (string.IsNullOrWhiteSpace(validationRequestJson))
+        {
+            _logger.LogWarning("Can't deserialize validationRequestJson as it is null.");
+            return null;
+        }
+
+        try
+        {
+            _logger.LogWarning("trying to deserialize validationRequestJson: {ValidationRequestJson}", validationRequestJson);
+            var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
+
+            return accessValidationRequest;
+        }
+        catch (JsonException jsonEx)
+        {
+            _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON");
+        }
+        catch (InvalidOperationException invalidOpEx)
+        {
+            _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation");
+        }
+        catch (Exception ex) when (ex is ArgumentNullException or ArgumentException)
+        {
+            _logger.LogDebug(ex, "An argument-related error occurred during access validation");
+        }
+
+        return null;
     }
 }
