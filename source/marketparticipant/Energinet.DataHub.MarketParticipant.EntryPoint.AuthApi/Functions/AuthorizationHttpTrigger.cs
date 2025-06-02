@@ -58,8 +58,6 @@ internal sealed class AuthorizationHttpTrigger
     {
         ArgumentNullException.ThrowIfNull(httpRequest);
 
-        var validationRequestJson = await httpRequest.ReadAsStringAsync().ConfigureAwait(false);
-
         if (Guid.TryParse(httpRequest.Query["userId"], out var userId))
         {
             // Currently, only BFF is able to make these requests, so this constraint is valid.
