@@ -53,10 +53,11 @@ internal sealed class AuthorizationHttpTrigger
     [Function("CreateAuthorizationSignature")]
     public async Task<HttpResponseData> CreateSignatureAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "authorize")]
-        [FromBody] string? validationRequestJson,
         HttpRequestData httpRequest)
     {
         ArgumentNullException.ThrowIfNull(httpRequest);
+
+        var validationRequestJson = await httpRequest.ReadAsStringAsync().ConfigureAwait(false);
 
         if (Guid.TryParse(httpRequest.Query["userId"], out var userId))
         {
