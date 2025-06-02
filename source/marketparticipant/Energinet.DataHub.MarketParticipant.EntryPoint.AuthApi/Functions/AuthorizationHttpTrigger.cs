@@ -53,7 +53,7 @@ internal sealed class AuthorizationHttpTrigger
     [Function("CreateAuthorizationSignature")]
     public async Task<HttpResponseData> CreateSignatureAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "authorize")]
-        string validationRequestJson,
+        [FromBody] string? validationRequestJson,
         HttpRequestData httpRequest)
     {
         ArgumentNullException.ThrowIfNull(httpRequest);
@@ -73,7 +73,7 @@ internal sealed class AuthorizationHttpTrigger
                 occurredOn: SystemClock.Instance.GetCurrentInstant(),
                 origin: nameof(AuthorizationHttpTrigger),
                 userId: userId,
-                payload: validationRequestJson))
+                payload: validationRequestJson ?? "NO_CONTENT"))
             .ConfigureAwait(false);
 
         var blockSignatureAuthorization = await _featureManager
@@ -105,8 +105,10 @@ internal sealed class AuthorizationHttpTrigger
         return response;
     }
 
-    private AccessValidationRequest? DeserializeAccessValidationRequest(string validationRequestJson)
+    private AccessValidationRequest? DeserializeAccessValidationRequest(string? validationRequestJson)
     {
+        if (string.IsNullOrWhiteSpace(validationRequestJson)) return null;
+
         try
         {
             var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
