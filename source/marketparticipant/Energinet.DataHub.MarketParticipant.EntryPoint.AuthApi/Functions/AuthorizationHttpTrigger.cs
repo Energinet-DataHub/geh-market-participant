@@ -123,15 +123,15 @@ internal sealed class AuthorizationHttpTrigger
         }
         catch (JsonException jsonEx)
         {
-            _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON");
+            _logger.LogWarning(jsonEx, "Failed to deserialize validation request JSON");
         }
         catch (InvalidOperationException invalidOpEx)
         {
-            _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation");
+            _logger.LogWarning(invalidOpEx, "An invalid operation occurred during access validation");
         }
         catch (Exception ex) when (ex is ArgumentNullException or ArgumentException)
         {
-            _logger.LogDebug(ex, "An argument-related error occurred during access validation");
+            _logger.LogWarning(ex, "An argument-related error occurred during access validation");
         }
 
         return null;
