@@ -27,7 +27,7 @@ public class AccessValidatorDispatchService : IAccessValidatorDispatchService
         _provider = provider;
     }
 
-    public Task<bool> ValidateAsync(AccessValidationRequest request)
+    public Task<AccessValidatorResponse> ValidateAsync(AccessValidationRequest request)
     {
        return CreateCoreAsync((dynamic)request);
     }

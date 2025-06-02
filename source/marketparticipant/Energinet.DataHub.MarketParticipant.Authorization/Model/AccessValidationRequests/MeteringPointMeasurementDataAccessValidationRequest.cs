@@ -32,7 +32,7 @@ public sealed class MeteringPointMeasurementDataAccessValidationRequest : Access
 
     public required string MeteringPointId { get; init; }
 
-    public required IEnumerable<AccessPeriod> RequestedPeriod { get; init; }
+    public required AccessPeriod RequestedPeriod { get; init; }
 
     public override string LoggedEntityType => "MeteringPoint";
 

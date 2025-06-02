@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
@@ -48,8 +49,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
 
         var accessValidatorDispatchService = new Mock<IAccessValidatorDispatchService>();
         accessValidatorDispatchService.Setup(x => x.ValidateAsync(It.IsAny<AccessValidationRequest>()))
-            .ReturnsAsync(true);
-
+            .ReturnsAsync(new AccessValidatorResponse(true, null));
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
             MarketRole = EicFunction.DataHubAdministrator,
@@ -75,8 +75,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
 
         var accessValidatorDispatchService = new Mock<IAccessValidatorDispatchService>();
         accessValidatorDispatchService.Setup(x => x.ValidateAsync(It.IsAny<AccessValidationRequest>()))
-            .ReturnsAsync(false);
-
+            .ReturnsAsync(new AccessValidatorResponse(false, null));
         var request = new MeteringPointMasterDataAccessValidationRequest
         {
             MarketRole = EicFunction.GridAccessProvider,

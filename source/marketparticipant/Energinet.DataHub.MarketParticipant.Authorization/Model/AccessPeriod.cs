@@ -20,4 +20,4 @@ using System.Threading.Tasks;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-public sealed record AccessPeriod(DateTimeOffset FromDate, DateTimeOffset ToDate);
+public sealed record AccessPeriod(string MeteringPointId, DateTimeOffset FromDate, DateTimeOffset ToDate);

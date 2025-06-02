@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using EicFunction = Energinet.DataHub.MarketParticipant.Authorization.Model.EicFunction;
@@ -30,30 +31,52 @@ public sealed class MeteringPointMeasurementDataAccessValidation : IAccessValida
         _gridAreaRepository = gridAreaRepository;
     }
 
-    public async Task<bool> ValidateAsync(MeteringPointMeasurementDataAccessValidationRequest request)
+    public async Task<AccessValidatorResponse> ValidateAsync(MeteringPointMeasurementDataAccessValidationRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         return request.MarketRole switch
         {
-            EicFunction.DataHubAdministrator => true,
-            EicFunction.GridAccessProvider => await ValidateMeteringPointIsOfOwnedGridAreaAsync(request).ConfigureAwait(false),
-            EicFunction.EnergySupplier => true,
-            _ => false,
+            EicFunction.DataHubAdministrator => IsAllowedForDataHubAdministrator(request),
+            EicFunction.GridAccessProvider => await IsAllowedForGridAccessProviderAsync(request).ConfigureAwait(false),
+            EicFunction.EnergySupplier => await IsAllowedForBalanceSupplierAsync(request).ConfigureAwait(false),
+            _ => new AccessValidatorResponse(false, null)
         };
     }
 
-    private async Task<bool> ValidateMeteringPointIsOfOwnedGridAreaAsync(MeteringPointMeasurementDataAccessValidationRequest request)
+    private static AccessValidatorResponse IsAllowedForDataHubAdministrator(MeteringPointMeasurementDataAccessValidationRequest request)
     {
-        var actorNumber = request.ActorNumber;
-        var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
+        //For administrator the result is always ok for the requested period
+        var accessPeriods = new List<AccessPeriod>();
 
-        var activeGridAreasCodes = gridAreas
-            .Where(x => x.ActorNumber != null
-                        && x.ActorNumber.Value == actorNumber
-                        && x.ValidFrom <= DateTime.UtcNow && x.ValidTo >= DateTime.UtcNow)
-            .Select(g => g.Code.Value)
-            .ToList();
-        return await _electricityMarketClient.VerifyMeteringPointIsInGridAreaAsync(request.MeteringPointId, activeGridAreasCodes).ConfigureAwait(false);
+        accessPeriods.Add(new AccessPeriod(request.MeteringPointId, request.RequestedPeriod.FromDate, request.RequestedPeriod.ToDate));
+
+        var result = new AccessValidatorResponse(true, accessPeriods);
+
+        return result;
+    }
+
+    private async Task<AccessValidatorResponse> IsAllowedForBalanceSupplierAsync(MeteringPointMeasurementDataAccessValidationRequest request)
+    {
+        var accessPeriods = new List<AccessPeriod>();
+        //Dummy result because no implemention of validation is created yet
+        //TODO implement logic to verify metering point is allowed and requested period is allowed or provide new period within the requested period
+        accessPeriods.Add(new AccessPeriod(request.MeteringPointId, DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)));
+
+        var result = new AccessValidatorResponse(true, accessPeriods);
+
+        return result;
+    }
+
+    private async Task<AccessValidatorResponse> IsAllowedForGridAccessProviderAsync(MeteringPointMeasurementDataAccessValidationRequest request)
+    {
+        var accessPeriods = new List<AccessPeriod>();
+        //Dummy result because no implemention of validation is created yet
+        //TODO implement logic to verify metering point is allowed and requested period is allowed or provide new period within the requested period
+        accessPeriods.Add(new AccessPeriod(request.MeteringPointId, DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)));
+
+        var result = new AccessValidatorResponse(true, accessPeriods);
+
+        return result;
     }
 }

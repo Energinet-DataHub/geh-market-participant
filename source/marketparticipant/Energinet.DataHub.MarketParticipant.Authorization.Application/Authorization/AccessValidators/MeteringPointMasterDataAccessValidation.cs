@@ -37,7 +37,7 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator<M
         return request.MarketRole switch
         {
             EicFunction.DataHubAdministrator => new AccessValidatorResponse(true, null),
-            EicFunction.GridAccessProvider => new AccessValidatorResponse(await ValidateMeteringPointIsOfOwnedGridAreaAsync(request).ConfigureAwait(false),null),
+            EicFunction.GridAccessProvider => new AccessValidatorResponse(await ValidateMeteringPointIsOfOwnedGridAreaAsync(request).ConfigureAwait(false), null),
             EicFunction.EnergySupplier => new AccessValidatorResponse(true, null),
             _ => new AccessValidatorResponse(false, null)
         };
