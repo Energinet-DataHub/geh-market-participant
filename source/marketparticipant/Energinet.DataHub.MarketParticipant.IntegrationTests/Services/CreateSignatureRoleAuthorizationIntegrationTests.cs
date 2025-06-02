@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
@@ -88,5 +90,43 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
 
         // assert
         await Assert.ThrowsAsync<ArgumentException>(() => target.CreateSignatureAsync(request, cancellationToken: CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task CreateSignatureForMeasurementData_WhenCalledWithRoleDataHubAdministrator_ReturnsSignature()
+    {
+        // arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+
+        var accessValidatorDispatchService = new Mock<IAccessValidatorDispatchService>();
+        var accessPeriods = new List<AccessPeriod>();
+        accessPeriods.Add(new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)));
+
+        accessValidatorDispatchService.Setup(x => x.ValidateAsync(It.IsAny<AccessValidationRequest>()))
+            .ReturnsAsync(new AccessValidatorResponse(true, accessPeriods));
+        var request = new MeteringPointMeasurementDataAccessValidationRequest
+        {
+            MarketRole = EicFunction.DataHubAdministrator,
+            MeteringPointId = "1234",
+            ActorNumber = "56789",
+            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10))
+        };
+
+        // act
+        var target = new AuthorizationService(_keyClientFixture.KeyClient, _keyClientFixture.KeyName, accessValidatorDispatchService.Object);
+        var actual = await target.CreateSignatureAsync(request, CancellationToken.None);
+
+        // assert
+        Assert.NotNull(actual.Value);
+        Assert.NotEmpty(actual.Value);
+        Assert.NotNull(actual.AccessPeriods);
+        if (actual.AccessPeriods != null)
+        {
+          var accessPeriod = actual.AccessPeriods.FirstOrDefault(i => i.MeteringPointId == "1234");
+          Assert.NotNull(accessPeriod);
+          Assert.Equal("1234", accessPeriod.MeteringPointId);
+        }
+
     }
 }
