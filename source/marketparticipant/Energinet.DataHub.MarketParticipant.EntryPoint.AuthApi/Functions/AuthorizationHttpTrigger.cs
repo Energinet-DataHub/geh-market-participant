@@ -134,7 +134,6 @@ internal sealed class AuthorizationHttpTrigger
             _logger.LogDebug(ex, "An argument-related error occurred during access validation");
         }
 
-
         return null;
     }
 }
