@@ -17,6 +17,7 @@ using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
@@ -52,6 +53,11 @@ public sealed class AuthorizationService
             signatureRequest.AddSignatureParameter(signatureParam);
         }
 
+        if (validationResponse.ValidAccessPeriods != null)
+        {
+            signatureRequest.AddSignatureParameter(SignatureParameter.FromAccessPeriods("AccessPeriods", validationResponse.ValidAccessPeriods));
+        }
+
         var key = await _keyClient.GetKeyAsync(_keyName, cancellationToken: cancellationToken).ConfigureAwait(false);
         var cryptoClient = _keyClient.GetCryptographyClient(_keyName, key.Value.Properties.Version);
         var signResult = await cryptoClient.SignDataAsync(SignatureAlgorithm.RS256, signatureRequest.CreateSignatureParamBytes(), cancellationToken).ConfigureAwait(false);
@@ -62,6 +68,7 @@ public sealed class AuthorizationService
             KeyVersion = key.Value.Properties.Version,
             Expires = signatureRequest.Expiration,
             RequestId = signatureRequest.RequestId,
+            AccessPeriods = validationResponse.ValidAccessPeriods
         };
     }
 }
