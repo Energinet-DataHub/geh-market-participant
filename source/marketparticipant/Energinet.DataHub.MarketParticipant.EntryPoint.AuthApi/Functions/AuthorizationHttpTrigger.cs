@@ -108,12 +108,17 @@ internal sealed class AuthorizationHttpTrigger
 
     private AccessValidationRequest? DeserializeAccessValidationRequest(string? validationRequestJson)
     {
-        if (string.IsNullOrWhiteSpace(validationRequestJson)) return null;
+        if (string.IsNullOrWhiteSpace(validationRequestJson))
+        {
+            _logger.LogWarning("Can't deserialize validationRequestJson as it is null.");
+            return null;
+        }
 
         try
         {
+            _logger.LogWarning("trying to deserialize validationRequestJson: {ValidationRequestJson}", validationRequestJson);
             var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
-
+            _logger.LogWarning("accessValidationRequest is null: {AccessValidationRequest}", accessValidationRequest);
             return accessValidationRequest;
         }
         catch (JsonException jsonEx)
