@@ -73,7 +73,7 @@ internal sealed class AuthorizationHttpTrigger
                 occurredOn: SystemClock.Instance.GetCurrentInstant(),
                 origin: nameof(AuthorizationHttpTrigger),
                 userId: userId,
-                payload: validationRequestJson ?? "NO_CONTENT"))
+                payload: accessValidationRequest is not null ? JsonSerializer.Serialize(accessValidationRequest) : "NO_CONTENT"))
             .ConfigureAwait(false);
 
         var blockSignatureAuthorization = await _featureManager
