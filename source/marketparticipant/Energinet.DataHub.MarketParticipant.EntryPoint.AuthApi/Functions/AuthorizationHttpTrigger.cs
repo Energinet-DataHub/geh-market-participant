@@ -32,6 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Functions;
 internal sealed class AuthorizationHttpTrigger
 {
     private const string BlockSignatureAuthorizationFeatureKey = "BlockSignatureAuthorization";
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     private readonly IFeatureManager _featureManager;
     private readonly AuthorizationService _authorizationService;
@@ -117,7 +121,7 @@ internal sealed class AuthorizationHttpTrigger
         try
         {
             _logger.LogWarning("trying to deserialize validationRequestJson: {ValidationRequestJson}", validationRequestJson);
-            var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
+            var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson, _jsonSerializerOptions);
             _logger.LogWarning("accessValidationRequest is null: {AccessValidationRequest}", accessValidationRequest);
             return accessValidationRequest;
         }
