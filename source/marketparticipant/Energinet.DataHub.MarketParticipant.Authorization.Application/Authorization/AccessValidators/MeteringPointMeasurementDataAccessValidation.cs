@@ -70,13 +70,24 @@ public sealed class MeteringPointMeasurementDataAccessValidation : IAccessValida
 
     private async Task<AccessValidatorResponse> IsAllowedForGridAccessProviderAsync(MeteringPointMeasurementDataAccessValidationRequest request)
     {
-        var accessPeriods = new List<AccessPeriod>();
-        //Dummy result because no implemention of validation is created yet
-        //TODO implement logic to verify metering point is allowed and requested period is allowed or provide new period within the requested period
-        accessPeriods.Add(new AccessPeriod(request.MeteringPointId, DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)));
-
-        var result = new AccessValidatorResponse(true, accessPeriods);
+        var accessPeriods = new List<AccessPeriod>() { request.RequestedPeriod };
+        var valid = await ValidateMeteringPointIsOfOwnedGridAreaAsync(request).ConfigureAwait(false);
+        var result = new AccessValidatorResponse(valid, valid ? accessPeriods : null);
 
         return result;
+    }
+
+    private async Task<bool> ValidateMeteringPointIsOfOwnedGridAreaAsync(MeteringPointMeasurementDataAccessValidationRequest request)
+    {
+        var actorNumber = request.ActorNumber;
+        var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);
+
+        var activeGridAreasCodes = gridAreas
+            .Where(x => x.ActorNumber != null
+                        && x.ActorNumber.Value == actorNumber
+                        && x.ValidFrom <= DateTime.UtcNow && x.ValidTo >= DateTime.UtcNow)
+            .Select(g => g.Code.Value)
+            .ToList();
+        return await _electricityMarketClient.VerifyMeteringPointIsInGridAreaAsync(request.MeteringPointId, activeGridAreasCodes).ConfigureAwait(false);
     }
 }

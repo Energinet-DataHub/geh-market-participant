@@ -66,6 +66,45 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
         Assert.True(accessValidatorResponse.Valid);
     }
 
+    [Fact]
+    public async Task Validate_MeteringPointMeasurementDataWhenCalledWithRoleGridAccessProvider_ReturnsTrueValidate()
+    {
+        // arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var gridAreaOverviewRepository = MockGridAreaOverviewRepository();
+
+        var service = new Mock<IElectricityMarketClient>();
+        service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync(_gridAreaId.ToString(), new List<string> { "1234" })).ReturnsAsync(true);
+
+        var electricityMarketClient = service.Object;
+
+        var validationRequest = new MeteringPointMeasurementDataAccessValidationRequest
+        {
+            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)),
+            MarketRole = Authorization.Model.EicFunction.GridAccessProvider,
+            MeteringPointId = "1234",
+            ActorNumber = ValidGln
+        };
+
+        // Act + Assert
+        var target = new MeteringPointMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
+        var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
+        Assert.True(response.Valid);
+
+
+        if (response.ValidAccessPeriods != null)
+        {
+            var accessPeriodsCount = response.ValidAccessPeriods;
+            foreach (var item in accessPeriodsCount)
+            {
+                Assert.Equal("1234", item.MeteringPointId);
+            }
+        }
+    }
+
     private IGridAreaOverviewRepository MockGridAreaOverviewRepository()
     {
         // arrange
