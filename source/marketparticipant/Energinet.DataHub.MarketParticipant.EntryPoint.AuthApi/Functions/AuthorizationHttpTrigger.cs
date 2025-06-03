@@ -32,6 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.AuthApi.Functions;
 internal sealed class AuthorizationHttpTrigger
 {
     private const string BlockSignatureAuthorizationFeatureKey = "BlockSignatureAuthorization";
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     private readonly IFeatureManager _featureManager;
     private readonly AuthorizationService _authorizationService;
@@ -50,13 +54,14 @@ internal sealed class AuthorizationHttpTrigger
         _revisionLogClient = revisionLogClient;
     }
 
-    [Function("CreateSignature")]
+    [Function("CreateAuthorizationSignature")]
     public async Task<HttpResponseData> CreateSignatureAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "createSignature")]
-        string validationRequestJson,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "authorize")]
         HttpRequestData httpRequest)
     {
         ArgumentNullException.ThrowIfNull(httpRequest);
+
+        var validationRequestJson = await httpRequest.ReadAsStringAsync().ConfigureAwait(false);
 
         if (Guid.TryParse(httpRequest.Query["userId"], out var userId))
         {
@@ -73,7 +78,7 @@ internal sealed class AuthorizationHttpTrigger
                 occurredOn: SystemClock.Instance.GetCurrentInstant(),
                 origin: nameof(AuthorizationHttpTrigger),
                 userId: userId,
-                payload: validationRequestJson))
+                payload: validationRequestJson ?? "NO_CONTENT"))
             .ConfigureAwait(false);
 
         var blockSignatureAuthorization = await _featureManager
@@ -105,25 +110,32 @@ internal sealed class AuthorizationHttpTrigger
         return response;
     }
 
-    private AccessValidationRequest? DeserializeAccessValidationRequest(string validationRequestJson)
+    private AccessValidationRequest? DeserializeAccessValidationRequest(string? validationRequestJson)
     {
+        if (string.IsNullOrWhiteSpace(validationRequestJson))
+        {
+            _logger.LogWarning("Can't deserialize validationRequestJson as it is null.");
+            return null;
+        }
+
         try
         {
-            var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson);
-
+            _logger.LogWarning("trying to deserialize validationRequestJson: {ValidationRequestJson}", validationRequestJson);
+            var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson, _jsonSerializerOptions);
+            _logger.LogWarning("accessValidationRequest is null: {AccessValidationRequest}", accessValidationRequest);
             return accessValidationRequest;
         }
         catch (JsonException jsonEx)
         {
-            _logger.LogDebug(jsonEx, "Failed to deserialize validation request JSON");
+            _logger.LogWarning(jsonEx, "Failed to deserialize validation request JSON");
         }
         catch (InvalidOperationException invalidOpEx)
         {
-            _logger.LogDebug(invalidOpEx, "An invalid operation occurred during access validation");
+            _logger.LogWarning(invalidOpEx, "An invalid operation occurred during access validation");
         }
         catch (Exception ex) when (ex is ArgumentNullException or ArgumentException)
         {
-            _logger.LogDebug(ex, "An argument-related error occurred during access validation");
+            _logger.LogWarning(ex, "An argument-related error occurred during access validation");
         }
 
         return null;
