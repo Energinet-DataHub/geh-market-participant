@@ -122,7 +122,7 @@ internal sealed class AuthorizationHttpTrigger
         {
             _logger.LogWarning("trying to deserialize validationRequestJson: {ValidationRequestJson}", validationRequestJson);
             var accessValidationRequest = JsonSerializer.Deserialize<AccessValidationRequest>(validationRequestJson, _jsonSerializerOptions);
-            _logger.LogWarning("accessValidationRequest is null: {AccessValidationRequest}", accessValidationRequest);
+            _logger.LogWarning("accessValidationRequest: {AccessValidationRequest}", accessValidationRequest);
             return accessValidationRequest;
         }
         catch (JsonException jsonEx)
