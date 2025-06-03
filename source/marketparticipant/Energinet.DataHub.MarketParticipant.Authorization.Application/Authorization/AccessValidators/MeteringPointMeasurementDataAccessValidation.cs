@@ -46,7 +46,7 @@ public sealed class MeteringPointMeasurementDataAccessValidation : IAccessValida
 
     private static AccessValidatorResponse IsAllowedForDataHubAdministrator(MeteringPointMeasurementDataAccessValidationRequest request)
     {
-        //For administrator the result is always ok for the requested period
+        // For administrator the result is always ok for the requested period
         var accessPeriods = new List<AccessPeriod>();
 
         accessPeriods.Add(new AccessPeriod(request.MeteringPointId, request.RequestedPeriod.FromDate, request.RequestedPeriod.ToDate));
@@ -59,8 +59,9 @@ public sealed class MeteringPointMeasurementDataAccessValidation : IAccessValida
     private async Task<AccessValidatorResponse> IsAllowedForBalanceSupplierAsync(MeteringPointMeasurementDataAccessValidationRequest request)
     {
         var accessPeriods = new List<AccessPeriod>();
-        //Dummy result because no implemention of validation is created yet
-        //TODO implement logic to verify metering point is allowed and requested period is allowed or provide new period within the requested period
+
+        // Dummy result because no implemention of validation is created yet. This will be implemented with a new task.
+        // TODO implement logic to verify metering point is allowed and requested period is allowed or provide new period within the requested period
         accessPeriods.Add(new AccessPeriod(request.MeteringPointId, DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)));
 
         var result = new AccessValidatorResponse(true, accessPeriods);

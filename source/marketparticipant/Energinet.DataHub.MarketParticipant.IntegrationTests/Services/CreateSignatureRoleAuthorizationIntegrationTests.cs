@@ -130,6 +130,5 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
           Assert.NotNull(accessPeriod);
           Assert.Equal("1234", accessPeriod.MeteringPointId);
         }
-
     }
 }

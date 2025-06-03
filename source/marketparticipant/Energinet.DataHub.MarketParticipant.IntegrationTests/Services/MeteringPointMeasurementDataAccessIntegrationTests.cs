@@ -59,6 +59,7 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
             ActorNumber = "56789",
             RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10))
         };
+
         // Act + Assert
         var target = new MeteringPointMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
 
@@ -93,7 +94,6 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
         var target = new MeteringPointMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.True(response.Valid);
-
 
         if (response.ValidAccessPeriods != null)
         {
