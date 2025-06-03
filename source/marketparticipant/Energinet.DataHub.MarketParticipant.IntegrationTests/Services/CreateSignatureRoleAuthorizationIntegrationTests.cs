@@ -102,6 +102,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         var accessValidatorDispatchService = new Mock<IAccessValidatorDispatchService>();
         var accessPeriods = new List<AccessPeriod>();
         accessPeriods.Add(new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)));
+        accessPeriods.Add(new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-190), DateTimeOffset.UtcNow.AddDays(-110)));
 
         accessValidatorDispatchService.Setup(x => x.ValidateAsync(It.IsAny<AccessValidationRequest>()))
             .ReturnsAsync(new AccessValidatorResponse(true, accessPeriods));
@@ -123,6 +124,8 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         Assert.NotNull(actual.AccessPeriods);
         if (actual.AccessPeriods != null)
         {
+          var accessPeriodsCount = actual.AccessPeriods.Count();
+          Assert.Equal(2, accessPeriodsCount);
           var accessPeriod = actual.AccessPeriods.FirstOrDefault(i => i.MeteringPointId == "1234");
           Assert.NotNull(accessPeriod);
           Assert.Equal("1234", accessPeriod.MeteringPointId);
