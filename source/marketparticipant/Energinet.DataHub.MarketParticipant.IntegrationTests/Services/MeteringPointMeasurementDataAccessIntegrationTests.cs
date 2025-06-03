@@ -77,7 +77,7 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
         var gridAreaOverviewRepository = MockGridAreaOverviewRepository();
 
         var service = new Mock<IElectricityMarketClient>();
-        service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync(_gridAreaId.ToString(), new List<string> { "1234" })).ReturnsAsync(true);
+        service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync("1234", new List<string> { "1234" })).ReturnsAsync(true);
 
         var electricityMarketClient = service.Object;
 
