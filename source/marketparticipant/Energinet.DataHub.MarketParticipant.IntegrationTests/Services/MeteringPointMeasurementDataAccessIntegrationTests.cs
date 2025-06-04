@@ -95,14 +95,8 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.True(response.Valid);
 
-        if (response.ValidAccessPeriods != null)
-        {
-            var accessPeriodsCount = response.ValidAccessPeriods;
-            foreach (var item in accessPeriodsCount)
-            {
-                Assert.Equal("1234", item.MeteringPointId);
-            }
-        }
+        Assert.NotNull(response.ValidAccessPeriods);
+        Assert.All(response.ValidAccessPeriods, x => Assert.Equal("1234", x.MeteringPointId));
     }
 
     private IGridAreaOverviewRepository MockGridAreaOverviewRepository()

@@ -122,13 +122,8 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         Assert.NotNull(actual.Value);
         Assert.NotEmpty(actual.Value);
         Assert.NotNull(actual.AccessPeriods);
-        if (actual.AccessPeriods != null)
-        {
-          var accessPeriodsCount = actual.AccessPeriods.Count();
-          Assert.Equal(2, accessPeriodsCount);
-          var accessPeriod = actual.AccessPeriods.FirstOrDefault(i => i.MeteringPointId == "1234");
-          Assert.NotNull(accessPeriod);
-          Assert.Equal("1234", accessPeriod.MeteringPointId);
-        }
+        Assert.Equal(2, actual.AccessPeriods.Count());
+        var accessPeriod = actual.AccessPeriods.FirstOrDefault(i => i.MeteringPointId == "1234");
+        Assert.NotNull(accessPeriod);
     }
 }
