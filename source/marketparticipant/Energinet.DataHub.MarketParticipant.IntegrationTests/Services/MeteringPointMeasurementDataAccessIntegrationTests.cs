@@ -94,7 +94,6 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
         var target = new MeteringPointMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.True(response.Valid);
-
         Assert.NotNull(response.ValidAccessPeriods);
         Assert.All(response.ValidAccessPeriods, x => Assert.Equal("1234", x.MeteringPointId));
     }
