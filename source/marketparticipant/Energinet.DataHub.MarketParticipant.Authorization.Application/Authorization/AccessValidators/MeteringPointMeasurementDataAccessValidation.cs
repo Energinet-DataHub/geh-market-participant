@@ -16,6 +16,7 @@ using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorizatio
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using NodaTime;
 using EicFunction = Energinet.DataHub.MarketParticipant.Authorization.Model.EicFunction;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
@@ -56,11 +57,9 @@ public sealed class MeteringPointMeasurementDataAccessValidation : IAccessValida
 
     private async Task<AccessValidatorResponse> IsAllowedForBalanceSupplierAsync(MeteringPointMeasurementDataAccessValidationRequest request)
     {
-        // Dummy result because no implementation of validation is created yet. This will be implemented with a new task.
-        // TODO implement logic to verify metering point is allowed and requested period is allowed or provide new period within the requested period
-        var accessPeriods = new List<AccessPeriod> { new(request.MeteringPointId, DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)) };
-
-        return await Task.FromResult(new AccessValidatorResponse(true, accessPeriods)).ConfigureAwait(false);
+        var requestedPeriod = new Interval(Instant.FromDateTimeOffset(request.RequestedPeriod.FromDate), Instant.FromDateTimeOffset(request.RequestedPeriod.ToDate));
+        var accessPeriods = await _electricityMarketClient.GetSupplierPeriodsAsync(request.MeteringPointId, request.ActorNumber, requestedPeriod).ConfigureAwait(false);
+        return new AccessValidatorResponse(accessPeriods == null || !accessPeriods.Any() ? false : true, accessPeriods);
     }
 
     private async Task<AccessValidatorResponse> IsAllowedForGridAccessProviderAsync(MeteringPointMeasurementDataAccessValidationRequest request)

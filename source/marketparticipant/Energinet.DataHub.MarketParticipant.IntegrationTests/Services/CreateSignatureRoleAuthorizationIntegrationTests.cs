@@ -100,9 +100,11 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
         await using var scope = host.BeginScope();
 
         var accessValidatorDispatchService = new Mock<IAccessValidatorDispatchService>();
-        var accessPeriods = new List<AccessPeriod>();
-        accessPeriods.Add(new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)));
-        accessPeriods.Add(new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-190), DateTimeOffset.UtcNow.AddDays(-110)));
+        var accessPeriods = new List<AccessPeriod>()
+        {
+            new("1234", DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)),
+            new("1234", DateTimeOffset.UtcNow.AddDays(-190), DateTimeOffset.UtcNow.AddDays(-110))
+        };
 
         accessValidatorDispatchService.Setup(x => x.ValidateAsync(It.IsAny<AccessValidationRequest>()))
             .ReturnsAsync(new AccessValidatorResponse(true, accessPeriods));

@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Moq;
+using NodaTime;
 using Xunit;
 using Xunit.Categories;
 
@@ -89,6 +90,42 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
             MeteringPointId = "1234",
             ActorNumber = ValidGln
         };
+
+        // Act + Assert
+        var target = new MeteringPointMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
+        var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
+        Assert.True(response.Valid);
+        Assert.NotNull(response.ValidAccessPeriods);
+        Assert.All(response.ValidAccessPeriods, x => Assert.Equal("1234", x.MeteringPointId));
+    }
+
+    [Fact]
+    public async Task Validate_MeteringPointMeasurementDataWhenCalledWithRoleBalanceSupplier_ReturnsTrueValidate()
+    {
+        // arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var gridAreaOverviewRepository = MockGridAreaOverviewRepository();
+        var validationRequest = new MeteringPointMeasurementDataAccessValidationRequest
+        {
+            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)),
+            MarketRole = Authorization.Model.EicFunction.EnergySupplier,
+            MeteringPointId = "1234",
+            ActorNumber = ValidGln
+        };
+        var accessPeriods = new List<AccessPeriod>()
+        {
+            new("1234", DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)),
+            new("1234", DateTimeOffset.UtcNow.AddDays(-190), DateTimeOffset.UtcNow.AddDays(-110))
+        };
+
+        var service = new Mock<IElectricityMarketClient>();
+
+        var requestedPeriod = new Interval(Instant.FromDateTimeOffset(validationRequest.RequestedPeriod.FromDate), Instant.FromDateTimeOffset(validationRequest.RequestedPeriod.ToDate));
+        service.Setup(x => x.GetSupplierPeriodsAsync("1234", ValidGln, requestedPeriod)).ReturnsAsync(accessPeriods);
+        var electricityMarketClient = service.Object;
 
         // Act + Assert
         var target = new MeteringPointMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
