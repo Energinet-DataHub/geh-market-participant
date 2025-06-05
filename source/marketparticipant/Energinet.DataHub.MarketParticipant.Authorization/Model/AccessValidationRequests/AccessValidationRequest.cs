@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
 [JsonDerivedType(typeof(MeteringPointMasterDataAccessValidationRequest), typeDiscriminator: "mpm")]
+[JsonDerivedType(typeof(MeteringPointMeasurementDataAccessValidationRequest), typeDiscriminator: "mmd")]
 public abstract class AccessValidationRequest : ILoggableAccessRequest
 {
     public virtual bool LogOnSuccess { get; init; }

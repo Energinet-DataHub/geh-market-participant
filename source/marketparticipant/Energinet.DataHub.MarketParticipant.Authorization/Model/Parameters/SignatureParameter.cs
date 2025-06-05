@@ -29,7 +29,7 @@ public abstract class SignatureParameter
     public static SignatureParameterLong FromLong(string key, long value) => new(value) { Key = key };
     public static SignatureParameterDatetimeOffset FromDateTimeOffset(string key, DateTimeOffset value) => new(value) { Key = key };
     public static SignatureParameterString FromString(string key, string value) => new(value) { Key = key };
-
+    public static SignatureParameterAccessPeriods FromAccessPeriods(string key, IEnumerable<AccessPeriod> value) => new(value) { Key = key };
     public static SignatureParameterEnum<T> FromEnum<T>(string key, T value)
         where T : Enum => new(value) { Key = key };
 }

@@ -29,4 +29,7 @@ public sealed class Signature
 
     [JsonPropertyName("requestId")]
     public required Guid RequestId { get; init; }
+
+    [JsonPropertyName("accessPeriods")]
+    public IEnumerable<AccessPeriod>? AccessPeriods { get; init; }
 }

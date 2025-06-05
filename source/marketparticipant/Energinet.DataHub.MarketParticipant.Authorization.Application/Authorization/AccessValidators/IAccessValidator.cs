@@ -19,5 +19,5 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authoriz
 public interface IAccessValidator<in TRequest>
     where TRequest : AccessValidationRequest
 {
-    Task<bool> ValidateAsync(TRequest request);
+    Task<AccessValidatorResponse> ValidateAsync(TRequest request);
 }

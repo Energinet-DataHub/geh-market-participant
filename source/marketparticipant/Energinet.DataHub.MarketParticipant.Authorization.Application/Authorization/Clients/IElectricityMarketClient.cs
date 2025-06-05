@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 
@@ -25,4 +26,13 @@ public interface IElectricityMarketClient
     /// <param name="gridAreaCodes">List of grid Areas that are valid for the grid access provider as of now.</param>
     /// <returns>The list of metering point master data changes within the specified period.</returns>
     Task<bool> VerifyMeteringPointIsInGridAreaAsync(string meteringPointId, IEnumerable<string> gridAreaCodes);
+
+    /// <summary>
+    /// Get the list of periods where the balance suoplier has a commercial relation on the metering point with the requested period.
+    /// </summary>
+    /// <param name="meteringPointId">The identifier of the metering point.</param>
+    /// <param name="actorNumber">The id of the balance supplier.</param>
+    /// <param name="requestedPeriod">The period where the results should fit.</param>
+    /// <returns>List of periods where the balance supllier has a commercial relation with the metering point.</returns>
+    Task<IEnumerable<AccessPeriod>> GetSupplierPeriodsAsync(string meteringPointId, string actorNumber, Interval requestedPeriod);
 }

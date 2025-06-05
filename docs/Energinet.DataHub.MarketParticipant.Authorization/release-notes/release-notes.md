@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
+## Version 1.5.0
+
+- Extended signature with access periods for MeteringPoint to be used with measurement data request.
+
 ## Version 1.4.0
 
 - Moved MeteringPointMasterDataAccessValidation logic to new Authorization.Application project
