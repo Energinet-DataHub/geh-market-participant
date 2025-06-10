@@ -34,7 +34,6 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
 {
     private const string ValidGln = "5790000555550";
     private readonly MarketParticipantDatabaseFixture _fixture;
-    private readonly GridAreaId _gridAreaId = new(Guid.NewGuid());
 
     public MeteringPointYearlySumMeasurementDataAccessIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
@@ -44,11 +43,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
     [Fact]
     public async Task Validate_MeteringPointYearlySumMeasurementDataWhenCalledWithRoleDataHubAdministrator_ReturnsFalse()
     {
-        var gridAreaOverviewRepository = MockGridAreaOverviewRepository();
-
         var service = new Mock<IElectricityMarketClient>();
-        service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync(_gridAreaId.ToString(), new List<string> { "1234" })).ReturnsAsync(true);
-
         var electricityMarketClient = service.Object;
 
         var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
@@ -60,7 +55,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         };
 
         // Act + Assert
-        var target = new MeteringPointYearlySumMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
+        var target = new MeteringPointYearlySumMeasurementDataAccessValidation(electricityMarketClient);
 
         var accessValidatorResponse = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.False(accessValidatorResponse.Valid);
@@ -74,10 +69,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var gridAreaOverviewRepository = MockGridAreaOverviewRepository();
-
         var service = new Mock<IElectricityMarketClient>();
-        service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync("1234", new List<string> { "1234" })).ReturnsAsync(true);
 
         var electricityMarketClient = service.Object;
 
@@ -90,7 +82,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         };
 
         // Act + Assert
-        var target = new MeteringPointYearlySumMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
+        var target = new MeteringPointYearlySumMeasurementDataAccessValidation(electricityMarketClient);
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.False(response.Valid);
     }
@@ -103,10 +95,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var gridAreaOverviewRepository = MockGridAreaOverviewRepository();
-
         var service = new Mock<IElectricityMarketClient>();
-        service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync("1234", new List<string> { "1234" })).ReturnsAsync(true);
 
         var electricityMarketClient = service.Object;
         var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
@@ -117,30 +106,9 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
             ActorNumber = ValidGln
         };
         //TODO: when implementation is ready (in another task). For now always false is returned.
-        var target = new MeteringPointYearlySumMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
+        var target = new MeteringPointYearlySumMeasurementDataAccessValidation(electricityMarketClient);
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.False(response.Valid);
     }
 
-    private IGridAreaOverviewRepository MockGridAreaOverviewRepository()
-    {
-        // arrange
-        var gridAreaOverviewItem = new GridAreaOverviewItem(
-            _gridAreaId,
-            new GridAreaName("name"),
-            new Domain.Model.GridAreaCode("1234"),
-            PriceAreaCode.Dk1,
-            DateTime.UtcNow,
-            DateTime.UtcNow.AddDays(1),
-            ActorNumber.Create(ValidGln),
-            new ActorName("Test"),
-            null,
-            null,
-            GridAreaType.Distribution);
-
-        var repository = new Mock<IGridAreaOverviewRepository>();
-        repository.Setup(x => x.GetAsync()).ReturnsAsync([gridAreaOverviewItem]);
-
-        return repository.Object;
-    }
 }

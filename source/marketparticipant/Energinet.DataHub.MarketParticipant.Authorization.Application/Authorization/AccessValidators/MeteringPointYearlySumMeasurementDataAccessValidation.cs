@@ -22,12 +22,10 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authoriz
 public sealed class MeteringPointYearlySumMeasurementDataAccessValidation : IAccessValidator<MeteringPointYearlySumMeasurementDataAccessValidationRequest>
 {
     private readonly IElectricityMarketClient _electricityMarketClient;
-    private readonly IGridAreaOverviewRepository _gridAreaRepository;
 
-    public MeteringPointYearlySumMeasurementDataAccessValidation(IElectricityMarketClient electricityMarketClient, IGridAreaOverviewRepository gridAreaRepository)
+    public MeteringPointYearlySumMeasurementDataAccessValidation(IElectricityMarketClient electricityMarketClient)
     {
         _electricityMarketClient = electricityMarketClient;
-        _gridAreaRepository = gridAreaRepository;
     }
 
     public async Task<AccessValidatorResponse> ValidateAsync(MeteringPointYearlySumMeasurementDataAccessValidationRequest request)
