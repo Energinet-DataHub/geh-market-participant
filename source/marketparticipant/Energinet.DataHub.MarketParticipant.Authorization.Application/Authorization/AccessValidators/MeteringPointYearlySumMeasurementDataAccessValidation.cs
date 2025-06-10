@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using EicFunction = Energinet.DataHub.MarketParticipant.Authorization.Model.EicFunction;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
@@ -28,21 +27,20 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessValidation : IAcc
         _electricityMarketClient = electricityMarketClient;
     }
 
-    public async Task<AccessValidatorResponse> ValidateAsync(MeteringPointYearlySumMeasurementDataAccessValidationRequest request)
+    public Task<AccessValidatorResponse> ValidateAsync(MeteringPointYearlySumMeasurementDataAccessValidationRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        return request.MarketRole switch
+        return Task.FromResult(request.MarketRole switch
         {
-            EicFunction.EnergySupplier => await IsAllowedForBalanceSupplierAsync(request).ConfigureAwait(false),
+            EicFunction.EnergySupplier => IsAllowedForBalanceSupplier(request),
             _ => new AccessValidatorResponse(false, null)
-        };
+        });
     }
 
-    private static async Task<AccessValidatorResponse> IsAllowedForBalanceSupplierAsync(MeteringPointYearlySumMeasurementDataAccessValidationRequest request)
+    private static AccessValidatorResponse IsAllowedForBalanceSupplier(MeteringPointYearlySumMeasurementDataAccessValidationRequest request)
     {
-        //TODO in next task implement validation rules
+        // TODO in next task implement validation rules.
         return new AccessValidatorResponse(false, null);
     }
-
 }

@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Moq;
 using Xunit;
@@ -105,10 +100,10 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
             MeteringPointId = "1234",
             ActorNumber = ValidGln
         };
-        //TODO: when implementation is ready (in another task). For now always false is returned.
+
+        // TODO: when implementation is ready (in another task). For now always false is returned.
         var target = new MeteringPointYearlySumMeasurementDataAccessValidation(electricityMarketClient);
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.False(response.Valid);
     }
-
 }
