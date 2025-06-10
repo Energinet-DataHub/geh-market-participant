@@ -30,16 +30,16 @@ public sealed class MeteringPointMasterDataAccessValidation : IAccessValidator<M
         _gridAreaRepository = gridAreaRepository;
     }
 
-    public async Task<bool> ValidateAsync(MeteringPointMasterDataAccessValidationRequest request)
+    public async Task<AccessValidatorResponse> ValidateAsync(MeteringPointMasterDataAccessValidationRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         return request.MarketRole switch
         {
-            EicFunction.DataHubAdministrator => true,
-            EicFunction.GridAccessProvider => await ValidateMeteringPointIsOfOwnedGridAreaAsync(request).ConfigureAwait(false),
-            EicFunction.EnergySupplier => true,
-            _ => false,
+            EicFunction.DataHubAdministrator => new AccessValidatorResponse(true, null),
+            EicFunction.GridAccessProvider => new AccessValidatorResponse(await ValidateMeteringPointIsOfOwnedGridAreaAsync(request).ConfigureAwait(false), null),
+            EicFunction.EnergySupplier => new AccessValidatorResponse(true, null),
+            _ => new AccessValidatorResponse(false, null)
         };
     }
 

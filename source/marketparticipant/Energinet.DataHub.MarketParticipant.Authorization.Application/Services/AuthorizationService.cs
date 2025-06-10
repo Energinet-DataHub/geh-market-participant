@@ -17,6 +17,7 @@ using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Services;
@@ -41,13 +42,20 @@ public sealed class AuthorizationService
     {
         ArgumentNullException.ThrowIfNull(accessValidationRequest);
 
-        if (!await _accessValidatorDispatchService.ValidateAsync(accessValidationRequest).ConfigureAwait(false))
+        var validationResponse = await _accessValidatorDispatchService.ValidateAsync(accessValidationRequest).ConfigureAwait(false);
+
+        if (!validationResponse.Valid)
             throw new ArgumentException("CreateSignatureAsync: caller was not authorized to the requested resource");
 
         var signatureRequest = new SignatureRequest();
         foreach (var signatureParam in accessValidationRequest.GetSignatureParams())
         {
             signatureRequest.AddSignatureParameter(signatureParam);
+        }
+
+        if (validationResponse.ValidAccessPeriods != null)
+        {
+            signatureRequest.AddSignatureParameter(SignatureParameter.FromAccessPeriods("AccessPeriods", validationResponse.ValidAccessPeriods));
         }
 
         var key = await _keyClient.GetKeyAsync(_keyName, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -60,6 +68,7 @@ public sealed class AuthorizationService
             KeyVersion = key.Value.Properties.Version,
             Expires = signatureRequest.Expiration,
             RequestId = signatureRequest.RequestId,
+            AccessPeriods = validationResponse.ValidAccessPeriods
         };
     }
 }

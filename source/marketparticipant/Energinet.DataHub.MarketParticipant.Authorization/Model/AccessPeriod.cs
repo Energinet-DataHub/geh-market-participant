@@ -12,12 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Factories;
-
-public interface IAccessValidatorDispatchService
-{
-    Task<AccessValidatorResponse> ValidateAsync(AccessValidationRequest request);
-}
+public sealed record AccessPeriod(string MeteringPointId, DateTimeOffset FromDate, DateTimeOffset ToDate);

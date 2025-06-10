@@ -27,12 +27,12 @@ public class AccessValidatorDispatchService : IAccessValidatorDispatchService
         _provider = provider;
     }
 
-    public Task<bool> ValidateAsync(AccessValidationRequest request)
+    public Task<AccessValidatorResponse> ValidateAsync(AccessValidationRequest request)
     {
        return CreateCoreAsync((dynamic)request);
     }
 
-    private Task<bool> CreateCoreAsync<T>(T request)
+    private Task<AccessValidatorResponse> CreateCoreAsync<T>(T request)
         where T : AccessValidationRequest
     {
        var validator = _provider.GetRequiredService<IAccessValidator<T>>();

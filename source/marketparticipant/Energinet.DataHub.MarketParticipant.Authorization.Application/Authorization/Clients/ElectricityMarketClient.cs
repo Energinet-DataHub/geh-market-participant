@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
-using System.Net;
 using System.Net.Http.Json;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
 
@@ -40,5 +39,22 @@ public sealed class ElectricityMarketClient : IElectricityMarketClient
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<bool>().ConfigureAwait(false);
+    }
+
+    public async Task<IEnumerable<AccessPeriod>> GetSupplierPeriodsAsync(string meteringPointId, string actorNumber, Interval requestedPeriod)
+    {
+        ArgumentNullException.ThrowIfNull(meteringPointId);
+        ArgumentNullException.ThrowIfNull(actorNumber);
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"api/metering-point/get-supplier-periods?meteringPointId={meteringPointId}&actorNumber={actorNumber}");
+        request.Content = JsonContent.Create(requestedPeriod);
+
+        using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<Interval>().ConfigureAwait(false);
+
+        return await response.Content.ReadFromJsonAsync<IEnumerable<AccessPeriod>>().ConfigureAwait(false);
     }
 }

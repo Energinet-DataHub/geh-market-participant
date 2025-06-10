@@ -66,7 +66,7 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
         // Act + Assert
         var target = new MeteringPointMasterDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
 
-        Assert.True(await target.ValidateAsync(validationRequest));
+        Assert.True((await target.ValidateAsync(validationRequest)).Valid);
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public sealed class MeteringPointMasterDataAccessIntegrationTests
         // Act + Assert
         var target = new MeteringPointMasterDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
 
-        Assert.False(await target.ValidateAsync(validationRequest));
+        Assert.False((await target.ValidateAsync(validationRequest)).Valid);
     }
 
     private IGridAreaOverviewRepository MockGridAreaOverviewRepository()
