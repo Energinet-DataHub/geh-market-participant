@@ -2,6 +2,11 @@
 
 ## Version 1.5.0
 
+- Added new request type for the signature to support the measurement yearly sum data request.
+
+
+## Version 1.5.0
+
 - Extended signature with access periods for MeteringPoint to be used with measurement data request.
 
 ## Version 1.4.0
