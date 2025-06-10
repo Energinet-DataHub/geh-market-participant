@@ -32,7 +32,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessValidationRequest
 
     public required string MeteringPointId { get; init; }
 
-    public required AccessPeriod RequestedPeriod { get; init; }
+    public required int Year { get; init; }
 
     public override string LoggedEntityType => "MeteringPoint";
 

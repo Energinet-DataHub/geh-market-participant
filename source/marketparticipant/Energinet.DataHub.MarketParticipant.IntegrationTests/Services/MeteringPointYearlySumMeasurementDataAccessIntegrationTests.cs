@@ -51,12 +51,12 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
 
         var electricityMarketClient = service.Object;
 
-        var validationRequest = new MeteringPointMeasurementDataAccessValidationRequest
+        var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
         {
             MarketRole = Authorization.Model.EicFunction.DataHubAdministrator,
             MeteringPointId = "1234",
             ActorNumber = "56789",
-            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1))
+            Year = 2024
         };
 
         // Act + Assert
@@ -67,7 +67,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
     }
 
     [Fact]
-    public async Task Validate_MeteringPointYearlySumMeasurementDataWhenCalledWithRoleGridAccessProvider_ReturnsTrueValidate()
+    public async Task Validate_MeteringPointYearlySumMeasurementDataWhenCalledWithRoleGridAccessProvider_ReturnsFalseValidate()
     {
         // arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -81,9 +81,9 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
 
         var electricityMarketClient = service.Object;
 
-        var validationRequest = new MeteringPointMeasurementDataAccessValidationRequest
+        var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
         {
-            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1)),
+            Year = 2024,
             MarketRole = Authorization.Model.EicFunction.GridAccessProvider,
             MeteringPointId = "1234",
             ActorNumber = ValidGln
@@ -109,14 +109,14 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         service.Setup(x => x.VerifyMeteringPointIsInGridAreaAsync("1234", new List<string> { "1234" })).ReturnsAsync(true);
 
         var electricityMarketClient = service.Object;
-        var validationRequest = new MeteringPointMeasurementDataAccessValidationRequest
+        var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
         {
-            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1)),
+            Year = 2024,
             MarketRole = Authorization.Model.EicFunction.EnergySupplier,
             MeteringPointId = "1234",
             ActorNumber = ValidGln
         };
-        //TODO when implementation is ready
+        //TODO: when implementation is ready (in another task). For now always false is returned.
         var target = new MeteringPointYearlySumMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.False(response.Valid);
