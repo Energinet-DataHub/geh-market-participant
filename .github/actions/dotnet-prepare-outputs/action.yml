@@ -72,6 +72,16 @@ runs:
           --configuration Release \
           --output '${{ inputs.output_path }}\functions\authapi'
 
+    - name: Publish Data Api Function
+      shell: bash
+      run: |
+        dotnet publish \
+          '.\source\marketparticipant\Energinet.DataHub.MarketParticipant.EntryPoint.DataApi\Energinet.DataHub.MarketParticipant.EntryPoint.DataApi.csproj' \
+          --no-build \
+          --no-restore \
+          --configuration Release \
+          --output '${{ inputs.output_path }}\functions\dataapi'
+
     - name: Publish Database Migration
       shell: bash
       run: |
