@@ -56,6 +56,8 @@ public sealed class ElectricityMarketClient : IElectricityMarketClient
             .ReadFromJsonAsync<IEnumerable<AccessPeriod>>()
             .ConfigureAwait(false);
 
-        return result ?? [];
+         return await response.Content
+            .ReadFromJsonAsync<IEnumerable<AccessPeriod>>()
+            .ConfigureAwait(false) ?? [];
     }
 }
