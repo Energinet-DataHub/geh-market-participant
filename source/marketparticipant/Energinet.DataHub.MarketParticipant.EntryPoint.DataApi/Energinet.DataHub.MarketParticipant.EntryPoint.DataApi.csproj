@@ -27,11 +27,6 @@ limitations under the License.
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Options\**" />
-    <EmbeddedResource Remove="Options\**" />
-    <None Remove="Options\**" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="15.5.0" />
     <PackageReference Include="Energinet.DataHub.Core.Logging.LoggingMiddleware" Version="5.0.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.0.0" />
