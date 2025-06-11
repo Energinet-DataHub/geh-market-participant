@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationVerify;
 
-[JsonDerivedType(typeof(MeteringPointMasterDataAccessValidationRequest), typeDiscriminator: "mpm")]
-[JsonDerivedType(typeof(MeasurementsAccessValidationRequest), typeDiscriminator: "mmd")]
-public abstract class AccessValidationRequest : ILoggableAccessRequest
+public abstract class AccessValidationVerifyRequest : ILoggableAccessRequest
 {
     public virtual bool LogOnSuccess { get; init; }
     public virtual string LoggedActivity => GetType().Name;
@@ -28,7 +26,9 @@ public abstract class AccessValidationRequest : ILoggableAccessRequest
 
     public IReadOnlyList<SignatureParameter> GetSignatureParams()
     {
-        return GetSignatureParamsCore().Append(SignatureParameter.FromString(SignatureParamKeys.ValidationContextKey, GetType().Name)).ToList();
+        return GetSignatureParamsCore()
+            .Append(SignatureParameter.FromString(SignatureParamKeys.VerifyContextKey, GetType().Name))
+            .ToList();
     }
 
     protected abstract IEnumerable<SignatureParameter> GetSignatureParamsCore();

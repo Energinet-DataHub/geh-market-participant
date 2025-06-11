@@ -11,13 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationVerify;
-
-namespace Energinet.DataHub.MarketParticipant.Authorization.Http;
-
-public interface IEndpointAuthorizationContext
-{
-    Task<AuthorizationResult> VerifyAsync(AccessValidationVerifyRequest verifyRequest);
-}
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("Energinet.DataHub.MarketParticipant.IntegrationTests")]
+[assembly: InternalsVisibleTo("Energinet.DataHub.MarketParticipant.Tests")]

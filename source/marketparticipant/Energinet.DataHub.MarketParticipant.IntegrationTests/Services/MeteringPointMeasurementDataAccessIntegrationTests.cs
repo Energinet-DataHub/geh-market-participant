@@ -53,7 +53,7 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
 
         var electricityMarketClient = service.Object;
 
-        var validationRequest = new MeteringPointMeasurementDataAccessValidationRequest
+        var validationRequest = new MeasurementsAccessValidationRequest
         {
             MarketRole = Authorization.Model.EicFunction.DataHubAdministrator,
             MeteringPointId = "1234",
@@ -83,7 +83,7 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
 
         var electricityMarketClient = service.Object;
 
-        var validationRequest = new MeteringPointMeasurementDataAccessValidationRequest
+        var validationRequest = new MeasurementsAccessValidationRequest
         {
             RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)),
             MarketRole = Authorization.Model.EicFunction.GridAccessProvider,
@@ -108,7 +108,7 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
         var gridAreaOverviewRepository = MockGridAreaOverviewRepository();
-        var validationRequest = new MeteringPointMeasurementDataAccessValidationRequest
+        var validationRequest = new MeasurementsAccessValidationRequest
         {
             RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(-10)),
             MarketRole = Authorization.Model.EicFunction.EnergySupplier,

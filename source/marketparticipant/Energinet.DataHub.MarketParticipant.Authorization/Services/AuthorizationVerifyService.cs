@@ -16,8 +16,7 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationVerify;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
@@ -32,20 +31,15 @@ public sealed class AuthorizationVerifyService : IVerifyAuthorization
         _keyClient = new KeyClient(keyVault, new DefaultAzureCredential());
     }
 
-    public async Task<bool> VerifySignatureAsync(AccessValidationRequest validationRequest, Signature signature)
+    public async Task<bool> VerifySignatureAsync(AccessValidationVerifyRequest verifyRequest, Signature signature)
     {
-        ArgumentNullException.ThrowIfNull(validationRequest);
+        ArgumentNullException.ThrowIfNull(verifyRequest);
         ArgumentNullException.ThrowIfNull(signature);
 
         var signatureRequest = new VerifyRequest(signature.Expires, signature.RequestId);
-        foreach (var signatureParam in validationRequest.GetSignatureParams())
+        foreach (var signatureParam in verifyRequest.GetSignatureParams())
         {
             signatureRequest.AddSignatureParameter(signatureParam);
-        }
-
-        if (signature.AccessPeriods != null)
-        {
-            signatureRequest.AddSignatureParameter(SignatureParameter.FromAccessPeriods("AccessPeriods", signature.AccessPeriods));
         }
 
         var conversionResult = Convert.FromBase64String(signature.Value);

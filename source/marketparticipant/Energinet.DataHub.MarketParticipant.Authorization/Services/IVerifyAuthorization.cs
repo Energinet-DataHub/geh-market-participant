@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationVerify;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Services;
 
 public interface IVerifyAuthorization
 {
-    Task<bool> VerifySignatureAsync(AccessValidationRequest validationRequest, Signature signature);
+    Task<bool> VerifySignatureAsync(AccessValidationVerifyRequest verifyRequest, Signature signature);
 }

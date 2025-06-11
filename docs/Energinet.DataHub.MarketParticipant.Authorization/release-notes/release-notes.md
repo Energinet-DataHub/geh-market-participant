@@ -2,6 +2,10 @@
 
 ## Version 1.5.1
 
+- Changed how verify is done, it now takes it own object types, since not all information required for an access request, is needed for a verification of the signature
+
+## Version 1.5.1
+
 - Added new request type for the signature to support the measurement yearly sum data request.
 
 ## Version 1.5.0

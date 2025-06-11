@@ -18,7 +18,7 @@ using EicFunction = Energinet.DataHub.MarketParticipant.Authorization.Model.EicF
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 
-public sealed class MeteringPointYearlySumMeasurementDataAccessValidation : IAccessValidator<MeteringPointYearlySumMeasurementDataAccessValidationRequest>
+public sealed class MeteringPointYearlySumMeasurementDataAccessValidation : IAccessValidator<MeasurementYearlySumAccessValidationRequest>
 {
     private readonly IElectricityMarketClient _electricityMarketClient;
 
@@ -27,7 +27,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessValidation : IAcc
         _electricityMarketClient = electricityMarketClient;
     }
 
-    public Task<AccessValidatorResponse> ValidateAsync(MeteringPointYearlySumMeasurementDataAccessValidationRequest request)
+    public Task<AccessValidatorResponse> ValidateAsync(MeasurementYearlySumAccessValidationRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -38,7 +38,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessValidation : IAcc
         });
     }
 
-    private static AccessValidatorResponse IsAllowedForBalanceSupplier(MeteringPointYearlySumMeasurementDataAccessValidationRequest request)
+    private static AccessValidatorResponse IsAllowedForBalanceSupplier(MeasurementYearlySumAccessValidationRequest request)
     {
         // TODO in next task implement validation rules.
         return new AccessValidatorResponse(false, null);

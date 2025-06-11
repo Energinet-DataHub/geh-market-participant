@@ -43,7 +43,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         var service = new Mock<IElectricityMarketClient>();
         var electricityMarketClient = service.Object;
 
-        var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
+        var validationRequest = new MeasurementYearlySumAccessValidationRequest
         {
             MarketRole = Authorization.Model.EicFunction.DataHubAdministrator,
             MeteringPointId = "1234",
@@ -70,7 +70,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
 
         var electricityMarketClient = service.Object;
 
-        var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
+        var validationRequest = new MeasurementYearlySumAccessValidationRequest
         {
             RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1)),
             MarketRole = Authorization.Model.EicFunction.GridAccessProvider,
@@ -95,7 +95,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         var service = new Mock<IElectricityMarketClient>();
 
         var electricityMarketClient = service.Object;
-        var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
+        var validationRequest = new MeasurementYearlySumAccessValidationRequest
         {
             RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1)),
             MarketRole = Authorization.Model.EicFunction.EnergySupplier,

@@ -16,9 +16,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.MarketParticipant.Authorization.Model;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationVerify;
 using Energinet.DataHub.MarketParticipant.Authorization.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Http;
 
@@ -27,18 +28,21 @@ public sealed class EndpointAuthorizationContext : IEndpointAuthorizationContext
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IVerifyAuthorization _verifyAuthorization;
     private readonly IEndpointAuthorizationLogger _endpointAuthorizationLogger;
+    private readonly ILogger<EndpointAuthorizationContext> _logger;
 
     public EndpointAuthorizationContext(
         IHttpContextAccessor httpContextAccessor,
         IVerifyAuthorization verifyAuthorization,
-        IEndpointAuthorizationLogger endpointAuthorizationLogger)
+        IEndpointAuthorizationLogger endpointAuthorizationLogger,
+        ILogger<EndpointAuthorizationContext> logger)
     {
         _httpContextAccessor = httpContextAccessor;
         _verifyAuthorization = verifyAuthorization;
         _endpointAuthorizationLogger = endpointAuthorizationLogger;
+        _logger = logger;
     }
 
-    public async Task<AuthorizationResult> VerifyAsync(AccessValidationRequest accessValidationRequest)
+    public async Task<AuthorizationResult> VerifyAsync(AccessValidationVerifyRequest verifyRequest)
     {
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext == null)
@@ -51,7 +55,7 @@ public sealed class EndpointAuthorizationContext : IEndpointAuthorizationContext
         if (TryReadSignature(httpContext, out var signature))
         {
             var result = await _verifyAuthorization
-                .VerifySignatureAsync(accessValidationRequest, signature)
+                .VerifySignatureAsync(verifyRequest, signature)
                 .ConfigureAwait(false);
 
             authorizationResult = result
@@ -66,13 +70,13 @@ public sealed class EndpointAuthorizationContext : IEndpointAuthorizationContext
         }
 
         await _endpointAuthorizationLogger
-            .LogAsync(accessValidationRequest, authorizationResult)
+            .LogAsync(verifyRequest, authorizationResult)
             .ConfigureAwait(false);
 
         return authorizationResult;
     }
 
-    private static bool TryReadSignature(HttpContext httpContext, [NotNullWhen(true)] out Signature? signature)
+    private bool TryReadSignature(HttpContext httpContext, [NotNullWhen(true)] out Signature? signature)
     {
         if (!httpContext.Request.Headers.TryGetValue(EndpointAuthorizationConfig.AuthorizationHeaderName, out var headers)
             || headers.Count != 1
@@ -82,6 +86,7 @@ public sealed class EndpointAuthorizationContext : IEndpointAuthorizationContext
             return false;
         }
 
+        _logger.LogWarning("Read Base64 signature from header: {Header}", headers[0]!);
         var signatureBase64 = Convert.FromBase64String(headers[0]!);
         var signatureJson = Encoding.UTF8.GetString(signatureBase64);
         signature = JsonSerializer.Deserialize<Signature>(signatureJson);

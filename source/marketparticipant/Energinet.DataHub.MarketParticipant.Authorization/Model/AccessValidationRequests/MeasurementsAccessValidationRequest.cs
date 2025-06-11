@@ -18,11 +18,11 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-public sealed class MeteringPointYearlySumMeasurementDataAccessValidationRequest : AccessValidationRequest
+public sealed class MeasurementsAccessValidationRequest : AccessValidationRequest
 {
     [JsonConstructor]
     [Browsable(false)]
-    public MeteringPointYearlySumMeasurementDataAccessValidationRequest()
+    public MeasurementsAccessValidationRequest()
     {
     }
 
@@ -42,9 +42,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessValidationRequest
     {
         return
         [
-            SignatureParameter.FromString("MeteringPointId", MeteringPointId),
-            SignatureParameter.FromString("ActorNumber", ActorNumber),
-            SignatureParameter.FromEnum("MarketRole", MarketRole)
+            SignatureParameter.FromString(SignatureParamKeys.MeteringPointIdKey, MeteringPointId),
         ];
     }
 }
