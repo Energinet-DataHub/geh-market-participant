@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Authorization.Model;
-using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationVerify;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Http;
-
-public interface IEndpointAuthorizationContext
+public static class SignatureParamKeys
 {
-    Task<AuthorizationResult> VerifyAsync(AccessValidationVerifyRequest verifyRequest);
+    public static string AccessPeriodsKey => "AccessPeriods";
+    public static string MeteringPointIdKey => "MeteringPointId";
+    public static string ActorNumberKey => "ActorNumber";
+    public static string MarketRoleKey => "MarketRole";
+    public static string ValidationContextKey => "ValidationContext";
+    public static string VerifyContextKey => "VerifyContext";
 }

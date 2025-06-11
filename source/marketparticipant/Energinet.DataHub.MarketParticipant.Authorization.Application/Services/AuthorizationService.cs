@@ -55,7 +55,7 @@ public sealed class AuthorizationService
 
         if (validationResponse.ValidAccessPeriods != null)
         {
-            signatureRequest.AddSignatureParameter(SignatureParameter.FromAccessPeriods("AccessPeriods", validationResponse.ValidAccessPeriods));
+            signatureRequest.AddSignatureParameter(SignatureParameter.FromAccessPeriods(SignatureParamKeys.AccessPeriodsKey, validationResponse.ValidAccessPeriods));
         }
 
         var key = await _keyClient.GetKeyAsync(_keyName, cancellationToken: cancellationToken).ConfigureAwait(false);

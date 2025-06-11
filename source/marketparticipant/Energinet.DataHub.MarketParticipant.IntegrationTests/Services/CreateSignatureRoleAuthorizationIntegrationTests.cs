@@ -108,7 +108,7 @@ public sealed class CreateSignatureRoleAuthorizationIntegrationTests : IClassFix
 
         accessValidatorDispatchService.Setup(x => x.ValidateAsync(It.IsAny<AccessValidationRequest>()))
             .ReturnsAsync(new AccessValidatorResponse(true, accessPeriods));
-        var request = new MeteringPointMeasurementDataAccessValidationRequest
+        var request = new MeasurementsAccessValidationRequest
         {
             MarketRole = EicFunction.DataHubAdministrator,
             MeteringPointId = "1234",

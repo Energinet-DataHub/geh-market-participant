@@ -27,12 +27,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 
-public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
+public sealed class MeasurementsYearlySumAccessIntegrationTests
 {
     private const string ValidGln = "5790000555550";
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public MeteringPointYearlySumMeasurementDataAccessIntegrationTests(MarketParticipantDatabaseFixture fixture)
+    public MeasurementsYearlySumAccessIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -43,7 +43,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         var service = new Mock<IElectricityMarketClient>();
         var electricityMarketClient = service.Object;
 
-        var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
+        var validationRequest = new MeasurementsYearlySumAccessValidationRequest
         {
             MarketRole = Authorization.Model.EicFunction.DataHubAdministrator,
             MeteringPointId = "1234",
@@ -52,7 +52,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         };
 
         // Act + Assert
-        var target = new MeteringPointYearlySumMeasurementDataAccessValidation(electricityMarketClient);
+        var target = new MeasurementsYearlySumDataAccessValidation(electricityMarketClient);
 
         var accessValidatorResponse = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.False(accessValidatorResponse.Valid);
@@ -70,7 +70,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
 
         var electricityMarketClient = service.Object;
 
-        var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
+        var validationRequest = new MeasurementsYearlySumAccessValidationRequest
         {
             RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1)),
             MarketRole = Authorization.Model.EicFunction.GridAccessProvider,
@@ -79,7 +79,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         };
 
         // Act + Assert
-        var target = new MeteringPointYearlySumMeasurementDataAccessValidation(electricityMarketClient);
+        var target = new MeasurementsYearlySumDataAccessValidation(electricityMarketClient);
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.False(response.Valid);
     }
@@ -95,7 +95,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         var service = new Mock<IElectricityMarketClient>();
 
         var electricityMarketClient = service.Object;
-        var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
+        var validationRequest = new MeasurementsYearlySumAccessValidationRequest
         {
             RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1)),
             MarketRole = Authorization.Model.EicFunction.EnergySupplier,
@@ -104,7 +104,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         };
 
         // TODO: when implementation is ready (in another task). For now always false is returned.
-        var target = new MeteringPointYearlySumMeasurementDataAccessValidation(electricityMarketClient);
+        var target = new MeasurementsYearlySumDataAccessValidation(electricityMarketClient);
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.False(response.Valid);
     }

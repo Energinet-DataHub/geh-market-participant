@@ -16,21 +16,19 @@ using System.ComponentModel;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationVerify;
 
-public sealed class MeteringPointMasterDataAccessValidationRequest : AccessValidationRequest
+public sealed class MeasurementsYearlySumAccessVerifyRequest : AccessValidationVerifyRequest
 {
     [JsonConstructor]
     [Browsable(false)]
-    public MeteringPointMasterDataAccessValidationRequest()
+    public MeasurementsYearlySumAccessVerifyRequest()
     {
     }
 
-    public required string ActorNumber { get; init; }
-
-    public required EicFunction MarketRole { get; init; }
-
     public required string MeteringPointId { get; init; }
+
+    public IReadOnlyCollection<AccessPeriod> Periods { get; init; } = new List<AccessPeriod>();
 
     public override string LoggedEntityType => "MeteringPoint";
 
@@ -41,8 +39,6 @@ public sealed class MeteringPointMasterDataAccessValidationRequest : AccessValid
         return
         [
             SignatureParameter.FromString(SignatureParamKeys.MeteringPointIdKey, MeteringPointId),
-            SignatureParameter.FromString(SignatureParamKeys.ActorNumberKey, ActorNumber),
-            SignatureParameter.FromEnum(SignatureParamKeys.MarketRoleKey, MarketRole)
         ];
     }
 }

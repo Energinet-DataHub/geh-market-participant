@@ -16,13 +16,13 @@ using System.ComponentModel;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
-namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
+namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationVerify;
 
-public sealed class MeteringPointMasterDataAccessValidationRequest : AccessValidationRequest
+public sealed class MeteringPointMasterDataAccessVerifyRequest : AccessValidationVerifyRequest
 {
     [JsonConstructor]
     [Browsable(false)]
-    public MeteringPointMasterDataAccessValidationRequest()
+    public MeteringPointMasterDataAccessVerifyRequest()
     {
     }
 

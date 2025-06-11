@@ -21,18 +21,18 @@ using EicFunction = Energinet.DataHub.MarketParticipant.Authorization.Model.EicF
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 
-public sealed class MeteringPointMeasurementDataAccessValidation : IAccessValidator<MeteringPointMeasurementDataAccessValidationRequest>
+public sealed class MeasurementsDataAccessValidation : IAccessValidator<MeasurementsAccessValidationRequest>
 {
     private readonly IElectricityMarketClient _electricityMarketClient;
     private readonly IGridAreaOverviewRepository _gridAreaRepository;
 
-    public MeteringPointMeasurementDataAccessValidation(IElectricityMarketClient electricityMarketClient, IGridAreaOverviewRepository gridAreaRepository)
+    public MeasurementsDataAccessValidation(IElectricityMarketClient electricityMarketClient, IGridAreaOverviewRepository gridAreaRepository)
     {
         _electricityMarketClient = electricityMarketClient;
         _gridAreaRepository = gridAreaRepository;
     }
 
-    public async Task<AccessValidatorResponse> ValidateAsync(MeteringPointMeasurementDataAccessValidationRequest request)
+    public async Task<AccessValidatorResponse> ValidateAsync(MeasurementsAccessValidationRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -45,7 +45,7 @@ public sealed class MeteringPointMeasurementDataAccessValidation : IAccessValida
         };
     }
 
-    private static AccessValidatorResponse IsAllowedForDataHubAdministrator(MeteringPointMeasurementDataAccessValidationRequest request)
+    private static AccessValidatorResponse IsAllowedForDataHubAdministrator(MeasurementsAccessValidationRequest request)
     {
         // For administrator the result is always ok for the requested period
         var accessPeriods = new List<AccessPeriod>
@@ -55,21 +55,21 @@ public sealed class MeteringPointMeasurementDataAccessValidation : IAccessValida
         return new AccessValidatorResponse(true, accessPeriods);
     }
 
-    private async Task<AccessValidatorResponse> IsAllowedForBalanceSupplierAsync(MeteringPointMeasurementDataAccessValidationRequest request)
+    private async Task<AccessValidatorResponse> IsAllowedForBalanceSupplierAsync(MeasurementsAccessValidationRequest request)
     {
         var requestedPeriod = new Interval(Instant.FromDateTimeOffset(request.RequestedPeriod.FromDate), Instant.FromDateTimeOffset(request.RequestedPeriod.ToDate));
         var accessPeriods = await _electricityMarketClient.GetSupplierPeriodsAsync(request.MeteringPointId, request.ActorNumber, requestedPeriod).ConfigureAwait(false);
         return new AccessValidatorResponse(accessPeriods == null || !accessPeriods.Any() ? false : true, accessPeriods);
     }
 
-    private async Task<AccessValidatorResponse> IsAllowedForGridAccessProviderAsync(MeteringPointMeasurementDataAccessValidationRequest request)
+    private async Task<AccessValidatorResponse> IsAllowedForGridAccessProviderAsync(MeasurementsAccessValidationRequest request)
     {
         var accessPeriods = new List<AccessPeriod>() { request.RequestedPeriod };
         var valid = await ValidateMeteringPointIsOfOwnedGridAreaAsync(request).ConfigureAwait(false);
         return new AccessValidatorResponse(valid, valid ? accessPeriods : null);
     }
 
-    private async Task<bool> ValidateMeteringPointIsOfOwnedGridAreaAsync(MeteringPointMeasurementDataAccessValidationRequest request)
+    private async Task<bool> ValidateMeteringPointIsOfOwnedGridAreaAsync(MeasurementsAccessValidationRequest request)
     {
         var actorNumber = request.ActorNumber;
         var gridAreas = await _gridAreaRepository.GetAsync().ConfigureAwait(false);

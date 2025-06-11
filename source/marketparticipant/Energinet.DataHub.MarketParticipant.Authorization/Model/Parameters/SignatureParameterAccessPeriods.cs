@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters
 
             foreach (var accessPeriod in sortedAccessPeriods)
             {
-                parameterDataSet.Add(SignatureParameter.FromString("MeteringPointId", accessPeriod.MeteringPointId).ParameterData);
+                parameterDataSet.Add(SignatureParameter.FromString(SignatureParamKeys.MeteringPointIdKey, accessPeriod.MeteringPointId).ParameterData);
                 parameterDataSet.Add(SignatureParameter.FromDateTimeOffset("FromDate", accessPeriod.FromDate).ParameterData);
                 parameterDataSet.Add(SignatureParameter.FromDateTimeOffset("ToDate", accessPeriod.ToDate).ParameterData);
             }
