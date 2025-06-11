@@ -1,6 +1,6 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
-## Version 1.5.0
+## Version 1.5.1
 
 - Added new request type for the signature to support the measurement yearly sum data request.
 

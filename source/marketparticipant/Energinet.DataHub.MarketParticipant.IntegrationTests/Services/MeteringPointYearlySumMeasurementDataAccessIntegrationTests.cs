@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.Clients;
+using Energinet.DataHub.MarketParticipant.Authorization.Model;
 using Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Moq;
@@ -46,7 +48,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
             MarketRole = Authorization.Model.EicFunction.DataHubAdministrator,
             MeteringPointId = "1234",
             ActorNumber = "56789",
-            Year = 2024
+            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1))
         };
 
         // Act + Assert
@@ -70,7 +72,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
 
         var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
         {
-            Year = 2024,
+            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1)),
             MarketRole = Authorization.Model.EicFunction.GridAccessProvider,
             MeteringPointId = "1234",
             ActorNumber = ValidGln
@@ -95,7 +97,7 @@ public sealed class MeteringPointYearlySumMeasurementDataAccessIntegrationTests
         var electricityMarketClient = service.Object;
         var validationRequest = new MeteringPointYearlySumMeasurementDataAccessValidationRequest
         {
-            Year = 2024,
+            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1)),
             MarketRole = Authorization.Model.EicFunction.EnergySupplier,
             MeteringPointId = "1234",
             ActorNumber = ValidGln
