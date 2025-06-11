@@ -27,7 +27,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
-public class CertificateService : ICertificateService
+public sealed class CertificateService : ICertificateService
 {
     private readonly SecretClient _keyVault;
     private readonly ICertificateValidation _certificateValidation;

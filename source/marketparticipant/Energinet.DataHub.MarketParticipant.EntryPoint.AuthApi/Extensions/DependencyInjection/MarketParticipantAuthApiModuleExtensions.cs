@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.Authorization.Application.Options;
@@ -34,7 +37,10 @@ internal static class MarketParticipantAuthApiModuleExtensions
         services.AddMarketParticipantCore();
         services.AddAuthorizationCore();
         services.AddSignatureAuthorizationCore();
-        services.AddScoped<IAuditIdentityProvider>(_ => KnownAuditIdentityProvider.AuthApiBackgroundService);
+
+        services.AddScoped<IAuditIdentityProvider>(_ => new ForbiddenAuditIdentityProvider());
+        services.AddScoped<IUserContext<FrontendUser>>(_ => new ForbiddenUser());
+        services.AddScoped<ICertificateService>(_ => throw new InvalidOperationException("The current host is not configured to use certificates."));
         services.AddFeatureManagement();
 
         services.AddOptions<KeyVaultOptions>().BindConfiguration(KeyVaultOptions.SectionName).ValidateDataAnnotations();

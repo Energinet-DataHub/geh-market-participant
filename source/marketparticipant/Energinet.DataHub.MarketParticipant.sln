@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketPar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketParticipant.Authorization.Application", "Energinet.DataHub.MarketParticipant.Authorization.Application\Energinet.DataHub.MarketParticipant.Authorization.Application.csproj", "{7993F36E-1CCA-4894-A36D-CF19F8C9DDE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketParticipant.EntryPoint.DataApi", "Energinet.DataHub.MarketParticipant.EntryPoint.DataApi\Energinet.DataHub.MarketParticipant.EntryPoint.DataApi.csproj", "{FD3B2110-D7E3-001B-FCAE-5765A9617C9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,10 @@ Global
 		{7993F36E-1CCA-4894-A36D-CF19F8C9DDE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7993F36E-1CCA-4894-A36D-CF19F8C9DDE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7993F36E-1CCA-4894-A36D-CF19F8C9DDE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD3B2110-D7E3-001B-FCAE-5765A9617C9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD3B2110-D7E3-001B-FCAE-5765A9617C9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD3B2110-D7E3-001B-FCAE-5765A9617C9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD3B2110-D7E3-001B-FCAE-5765A9617C9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -110,6 +116,7 @@ Global
 		{0F73D67D-7E5E-4835-AB93-D386D1E6C532} = {42E5FF3B-CE64-4AF4-B02C-0F6BEA6B8205}
 		{0248AF69-FEEF-4E87-B575-A09C7A3FF248} = {42E5FF3B-CE64-4AF4-B02C-0F6BEA6B8205}
 		{757B8CD0-6BC7-43A2-CC2B-289DAF6415FC} = {42E5FF3B-CE64-4AF4-B02C-0F6BEA6B8205}
+		{FD3B2110-D7E3-001B-FCAE-5765A9617C9B} = {42E5FF3B-CE64-4AF4-B02C-0F6BEA6B8205}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4BD498E-8E3E-415F-B556-35D01B8F556A}

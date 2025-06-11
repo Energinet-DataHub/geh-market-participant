@@ -50,11 +50,12 @@ public sealed class ElectricityMarketClient : IElectricityMarketClient
         request.Content = JsonContent.Create(requestedPeriod);
 
         using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
-
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<Interval>().ConfigureAwait(false);
+        var result = await response.Content
+            .ReadFromJsonAsync<IEnumerable<AccessPeriod>>()
+            .ConfigureAwait(false);
 
-        return await response.Content.ReadFromJsonAsync<IEnumerable<AccessPeriod>>().ConfigureAwait(false);
+        return result ?? [];
     }
 }

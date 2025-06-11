@@ -17,7 +17,7 @@ using Azure.Core;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization;
 
-internal class AuthorizationHeaderProvider : IAuthorizationHeaderProvider
+internal sealed class AuthorizationHeaderProvider : IAuthorizationHeaderProvider
 {
     private readonly TokenCredential _credential;
     private readonly string _applicationIdUri;
