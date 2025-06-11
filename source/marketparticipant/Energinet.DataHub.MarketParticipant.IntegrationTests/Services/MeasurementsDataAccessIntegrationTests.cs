@@ -32,13 +32,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 
-public sealed class MeteringPointMeasurementDataAccessIntegrationTests
+public sealed class MeasurementsDataAccessIntegrationTests
 {
     private const string ValidGln = "5790000555550";
     private readonly MarketParticipantDatabaseFixture _fixture;
     private readonly GridAreaId _gridAreaId = new(Guid.NewGuid());
 
-    public MeteringPointMeasurementDataAccessIntegrationTests(MarketParticipantDatabaseFixture fixture)
+    public MeasurementsDataAccessIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -62,7 +62,7 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
         };
 
         // Act + Assert
-        var target = new MeteringPointMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
+        var target = new MeasurementsDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
 
         var accessValidatorResponse = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.True(accessValidatorResponse.Valid);
@@ -92,7 +92,7 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
         };
 
         // Act + Assert
-        var target = new MeteringPointMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
+        var target = new MeasurementsDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.True(response.Valid);
         Assert.NotNull(response.ValidAccessPeriods);
@@ -128,7 +128,7 @@ public sealed class MeteringPointMeasurementDataAccessIntegrationTests
         var electricityMarketClient = service.Object;
 
         // Act + Assert
-        var target = new MeteringPointMeasurementDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
+        var target = new MeasurementsDataAccessValidation(electricityMarketClient, gridAreaOverviewRepository);
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.True(response.Valid);
         Assert.NotNull(response.ValidAccessPeriods);

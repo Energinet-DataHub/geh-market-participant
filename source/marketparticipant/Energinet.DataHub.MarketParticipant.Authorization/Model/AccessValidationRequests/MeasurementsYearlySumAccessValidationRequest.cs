@@ -18,11 +18,11 @@ using Energinet.DataHub.MarketParticipant.Authorization.Model.Parameters;
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model.AccessValidationRequests;
 
-public sealed class MeasurementYearlySumAccessValidationRequest : AccessValidationRequest
+public sealed class MeasurementsYearlySumAccessValidationRequest : AccessValidationRequest
 {
     [JsonConstructor]
     [Browsable(false)]
-    public MeasurementYearlySumAccessValidationRequest()
+    public MeasurementsYearlySumAccessValidationRequest()
     {
     }
 

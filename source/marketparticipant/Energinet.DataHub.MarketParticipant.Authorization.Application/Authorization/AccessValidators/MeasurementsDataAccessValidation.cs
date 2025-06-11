@@ -21,12 +21,12 @@ using EicFunction = Energinet.DataHub.MarketParticipant.Authorization.Model.EicF
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Application.Authorization.AccessValidators;
 
-public sealed class MeteringPointMeasurementDataAccessValidation : IAccessValidator<MeasurementsAccessValidationRequest>
+public sealed class MeasurementsDataAccessValidation : IAccessValidator<MeasurementsAccessValidationRequest>
 {
     private readonly IElectricityMarketClient _electricityMarketClient;
     private readonly IGridAreaOverviewRepository _gridAreaRepository;
 
-    public MeteringPointMeasurementDataAccessValidation(IElectricityMarketClient electricityMarketClient, IGridAreaOverviewRepository gridAreaRepository)
+    public MeasurementsDataAccessValidation(IElectricityMarketClient electricityMarketClient, IGridAreaOverviewRepository gridAreaRepository)
     {
         _electricityMarketClient = electricityMarketClient;
         _gridAreaRepository = gridAreaRepository;
