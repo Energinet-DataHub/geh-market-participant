@@ -1,5 +1,10 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
+## Version 1.6.1
+
+- Fix problem with Base64 decoding
+- Changed how expiration is transmitted to ensure correct deserialization on the verify end
+
 ## Version 1.6.0
 
 - Changed how verify is done, it now takes it own object types, since not all information required for an access request, is needed for a verification of the signature
