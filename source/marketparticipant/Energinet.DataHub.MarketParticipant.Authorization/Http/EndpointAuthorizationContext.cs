@@ -94,6 +94,4 @@ public sealed class EndpointAuthorizationContext : IEndpointAuthorizationContext
         signature = JsonSerializer.Deserialize<Signature>(signatureJson);
         return signature != null;
     }
-
-
 }
