@@ -88,10 +88,12 @@ public sealed class EndpointAuthorizationContext : IEndpointAuthorizationContext
 
         _logger.LogWarning("Read Base64 signature from header: {Header}", headers[0]!);
         var signatureHeader = headers[0]!;
-        signatureHeader = signatureHeader.PadRight(signatureHeader.Length + (signatureHeader.Length % 4), '=');
+        signatureHeader = signatureHeader.PadRight(signatureHeader.Length + ((4 - (signatureHeader.Length % 4)) % 4), '=');
         var signatureBase64 = Convert.FromBase64String(signatureHeader);
         var signatureJson = Encoding.UTF8.GetString(signatureBase64);
         signature = JsonSerializer.Deserialize<Signature>(signatureJson);
         return signature != null;
     }
+
+
 }
