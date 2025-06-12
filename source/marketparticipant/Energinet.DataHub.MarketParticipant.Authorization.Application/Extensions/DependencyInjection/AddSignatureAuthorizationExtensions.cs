@@ -64,9 +64,10 @@ public static class AddSignatureAuthorizationExtensions
         });
 
         services.AddSingleton<IAccessValidatorDispatchService, AccessValidatorDispatchService>();
-        services.AddSingleton<IAccessValidator<MeteringPointMasterDataAccessValidationRequest>, MeteringPointMasterDataAccessValidation>();
-        services.AddSingleton<IAccessValidator<MeasurementsAccessValidationRequest>, MeasurementsDataAccessValidation>();
-        services.AddSingleton<IAccessValidator<MeasurementsYearlySumAccessValidationRequest>, MeasurementsYearlySumDataAccessValidation>();
+
+        services.AddScoped<IAccessValidator<MeteringPointMasterDataAccessValidationRequest>, MeteringPointMasterDataAccessValidation>();
+        services.AddScoped<IAccessValidator<MeasurementsAccessValidationRequest>, MeasurementsDataAccessValidation>();
+        services.AddScoped<IAccessValidator<MeasurementsYearlySumAccessValidationRequest>, MeasurementsYearlySumDataAccessValidation>();
 
         services.AddSingleton<AuthorizationService>(provider =>
         {

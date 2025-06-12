@@ -3,6 +3,7 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+	"FUNCTIONS_INPROC_NET9ENABLED": 1,
 
     "KeyVault:AuthSignKeyVault": "",
     "KeyVault:AuthSignKeyName": "",
