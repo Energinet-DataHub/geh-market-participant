@@ -38,7 +38,7 @@ public sealed class MeasurementsYearlySumAccessIntegrationTests
     }
 
     [Fact]
-    public async Task Validate_MeteringPointYearlySumMeasurementDataWhenCalledWithRoleDataHubAdministrator_ReturnsFalse()
+    public async Task Validate_MeasurementsYearlySumWhenCalledWithRoleDataHubAdministrator_ReturnsFalse()
     {
         var service = new Mock<IElectricityMarketClient>();
         var electricityMarketClient = service.Object;
@@ -58,7 +58,7 @@ public sealed class MeasurementsYearlySumAccessIntegrationTests
     }
 
     [Fact]
-    public async Task Validate_MeteringPointYearlySumMeasurementDataWhenCalledWithRoleGridAccessProvider_ReturnsFalseValidate()
+    public async Task Validate_MeasurementsYearlySumWhenCalledWithRoleGridAccessProvider_ReturnsFalseValidate()
     {
         // arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -83,7 +83,7 @@ public sealed class MeasurementsYearlySumAccessIntegrationTests
     }
 
     [Fact]
-    public async Task Validate_MeteringPointMeasurementDataWhenCalledWithRoleBalanceSupplier_ReturnsTrueValidate()
+    public async Task Validate_MeasurementsYearlySumWhenCalledWithRoleBalanceSupplier_ReturnsTrueValidate()
     {
         // arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -112,7 +112,7 @@ public sealed class MeasurementsYearlySumAccessIntegrationTests
     }
 
     [Fact]
-    public async Task Validate_MeteringPointMeasurementDataWhenCalledWithRoleBalanceSupplier_ReturnsFalseValidate()
+    public async Task Validate_MeasurementsYearlySumWhenCalledWithRoleBalanceSupplier_ReturnsFalseValidate()
     {
         // arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
