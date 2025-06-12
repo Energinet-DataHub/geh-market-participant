@@ -66,7 +66,8 @@ public sealed class AuthorizationService
         {
             Value = Convert.ToBase64String(signResult.Signature),
             KeyVersion = key.Value.Properties.Version,
-            Expires = signatureRequest.Expiration,
+            ExpiresTicks = signatureRequest.Expiration.UtcTicks,
+            ExpiresOffsetTicks = signatureRequest.Expiration.Offset.Ticks,
             RequestId = signatureRequest.RequestId,
             AccessPeriods = validationResponse.ValidAccessPeriods
         };

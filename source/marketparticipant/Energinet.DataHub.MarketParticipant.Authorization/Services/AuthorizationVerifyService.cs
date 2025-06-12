@@ -36,7 +36,7 @@ public sealed class AuthorizationVerifyService : IVerifyAuthorization
         ArgumentNullException.ThrowIfNull(verifyRequest);
         ArgumentNullException.ThrowIfNull(signature);
 
-        var signatureRequest = new VerifyRequest(signature.Expires, signature.RequestId);
+        var signatureRequest = new VerifyRequest(new DateTimeOffset(signature.ExpiresTicks, TimeSpan.FromTicks(signature.ExpiresOffsetTicks)), signature.RequestId);
         foreach (var signatureParam in verifyRequest.GetSignatureParams())
         {
             signatureRequest.AddSignatureParameter(signatureParam);

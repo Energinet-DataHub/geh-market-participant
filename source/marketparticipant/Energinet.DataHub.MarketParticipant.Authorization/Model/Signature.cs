@@ -21,8 +21,11 @@ public sealed class Signature
     [JsonPropertyName("signature")]
     public required string Value { get; init; }
 
-    [JsonPropertyName("expires")]
-    public required DateTimeOffset Expires { get; init; }
+    [JsonPropertyName("expiresticks")]
+    public required long ExpiresTicks { get; init; }
+
+    [JsonPropertyName("expiresoffset")]
+    public required long ExpiresOffsetTicks { get; init; }
 
     [JsonPropertyName("keyVersion")]
     public required string KeyVersion { get; init; }
