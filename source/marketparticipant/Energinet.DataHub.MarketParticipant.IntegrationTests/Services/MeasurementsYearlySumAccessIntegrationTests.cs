@@ -47,8 +47,7 @@ public sealed class MeasurementsYearlySumAccessIntegrationTests
         {
             MarketRole = Authorization.Model.EicFunction.DataHubAdministrator,
             MeteringPointId = "1234",
-            ActorNumber = "56789",
-            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1))
+            ActorNumber = "56789"
         };
 
         // Act + Assert
@@ -72,7 +71,6 @@ public sealed class MeasurementsYearlySumAccessIntegrationTests
 
         var validationRequest = new MeasurementsYearlySumAccessValidationRequest
         {
-            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1)),
             MarketRole = Authorization.Model.EicFunction.GridAccessProvider,
             MeteringPointId = "1234",
             ActorNumber = ValidGln
@@ -93,19 +91,49 @@ public sealed class MeasurementsYearlySumAccessIntegrationTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
         var service = new Mock<IElectricityMarketClient>();
-
+        var accessPeriod = new AccessPeriod("1234", DateTime.Today.ToUniversalTime().AddDays(-365), DateTime.Today.ToUniversalTime());
+        service.Setup(x => x.GetYearlySumPeriodAsync("1234")).ReturnsAsync(accessPeriod);
         var electricityMarketClient = service.Object;
         var validationRequest = new MeasurementsYearlySumAccessValidationRequest
         {
-            RequestedPeriod = new AccessPeriod("1234", DateTimeOffset.UtcNow.AddDays(-365), DateTimeOffset.UtcNow.AddDays(-1)),
             MarketRole = Authorization.Model.EicFunction.EnergySupplier,
             MeteringPointId = "1234",
             ActorNumber = ValidGln
         };
 
-        // TODO: when implementation is ready (in another task). For now always false is returned.
+        // Act + Assert
+        var target = new MeasurementsYearlySumDataAccessValidation(electricityMarketClient);
+        var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
+        Assert.True(response.Valid);
+        Assert.NotNull(response.ValidAccessPeriods);
+        Assert.All(response.ValidAccessPeriods, x => Assert.Equal("1234", x.MeteringPointId));
+        Assert.All(response.ValidAccessPeriods, x => Assert.Equal(DateTime.Today.ToUniversalTime().AddDays(-365), x.FromDate));
+        Assert.All(response.ValidAccessPeriods, x => Assert.Equal(DateTime.Today.ToUniversalTime(), x.ToDate));
+    }
+
+    [Fact]
+    public async Task Validate_MeteringPointMeasurementDataWhenCalledWithRoleBalanceSupplier_ReturnsFalseValidate()
+    {
+        // arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var service = new Mock<IElectricityMarketClient>();
+        var accessPeriod = new AccessPeriod("1234", DateTime.Today.ToUniversalTime().AddDays(-365), DateTime.Today.ToUniversalTime());
+        service.Setup(x => x.GetYearlySumPeriodAsync("1234")).ReturnsAsync((AccessPeriod?)null);
+        var electricityMarketClient = service.Object;
+        var validationRequest = new MeasurementsYearlySumAccessValidationRequest
+        {
+            MarketRole = Authorization.Model.EicFunction.EnergySupplier,
+            MeteringPointId = "1234",
+            ActorNumber = ValidGln
+        };
+
+        // Act + Assert
         var target = new MeasurementsYearlySumDataAccessValidation(electricityMarketClient);
         var response = await target.ValidateAsync(validationRequest).ConfigureAwait(true);
         Assert.False(response.Valid);
+        Assert.Null(response.ValidAccessPeriods);
     }
 }

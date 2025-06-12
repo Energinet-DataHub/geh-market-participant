@@ -35,4 +35,11 @@ public interface IElectricityMarketClient
     /// <param name="requestedPeriod">The period where the results should fit.</param>
     /// <returns>List of periods where the balance supllier has a commercial relation with the metering point.</returns>
     Task<IEnumerable<AccessPeriod>> GetSupplierPeriodsAsync(string meteringPointId, string actorNumber, Interval requestedPeriod);
+
+    /// <summary>
+    /// Get the period where the yearly sum amount will be calculated on.
+    /// </summary>
+    /// <param name="meteringPointId">The identifier of the metering point.</param>
+    /// <returns>The period of 365 days in the past till today. It will be shorter when a move-in/move-out did happen in the past. Null when no period can be found in the last 365 days.</returns>
+    Task<AccessPeriod?> GetYearlySumPeriodAsync(string meteringPointId);
 }

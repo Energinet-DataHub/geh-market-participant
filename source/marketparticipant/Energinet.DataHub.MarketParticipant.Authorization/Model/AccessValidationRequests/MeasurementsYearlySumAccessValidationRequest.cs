@@ -32,8 +32,6 @@ public sealed class MeasurementsYearlySumAccessValidationRequest : AccessValidat
 
     public required string MeteringPointId { get; init; }
 
-    public required AccessPeriod RequestedPeriod { get; init; }
-
     public override string LoggedEntityType => "MeteringPoint";
 
     public override string LoggedEntityKey => MeteringPointId;

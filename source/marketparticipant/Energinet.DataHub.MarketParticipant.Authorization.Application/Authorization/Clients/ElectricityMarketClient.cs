@@ -56,4 +56,16 @@ public sealed class ElectricityMarketClient : IElectricityMarketClient
            .ReadFromJsonAsync<IEnumerable<AccessPeriod>>()
            .ConfigureAwait(false) ?? [];
     }
+
+    public async Task<AccessPeriod?> GetYearlySumPeriodAsync(string meteringPointId)
+    {
+        ArgumentNullException.ThrowIfNull(meteringPointId);
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"api/metering-point/get-yearly-sum-period?meteringPointId={meteringPointId}");
+
+        using var response = await _apiHttpClient.SendAsync(request).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<AccessPeriod?>().ConfigureAwait(false);
+    }
 }

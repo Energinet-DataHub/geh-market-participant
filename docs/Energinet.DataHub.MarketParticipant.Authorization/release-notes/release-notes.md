@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
+## Version 1.6.1
+
+- removed requestPeriod in signature request for GetYearlySum because it's not needed due to a static period of 365 days.
+
 ## Version 1.6.0
 
 - Changed how verify is done, it now takes it own object types, since not all information required for an access request, is needed for a verification of the signature
