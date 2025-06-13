@@ -30,6 +30,7 @@ internal static class DomainServiceRegistration
         services.AddScoped<IOverlappingActorContactCategoriesRuleService, OverlappingActorContactCategoriesRuleService>();
         services.AddScoped<IAllowedMarketRoleCombinationsForDelegationRuleService, AllowedMarketRoleCombinationsForDelegationRuleService>();
         services.AddScoped<IProcessDelegationHelperService, ProcessDelegationHelperService>();
+        services.AddScoped<IExistingActorConsolidationService, ExistingActorConsolidationService>();
 
         services.AddScoped<IExternalActorIdConfigurationService, ExternalActorIdConfigurationService>();
         services.AddScoped<IUniqueMarketRoleGridAreaRuleService, UniqueMarketRoleGridAreaRuleService>();

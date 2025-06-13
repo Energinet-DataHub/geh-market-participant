@@ -14,6 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands.AdditionalRecipients;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -22,15 +24,27 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.DataApi.Functions;
 
 internal sealed class AdditionalRecipientsHttpTrigger
 {
+    private readonly IMediator _mediator;
+
+    public AdditionalRecipientsHttpTrigger(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
     [Function("GetAdditionalRecipientsAsync")]
-#pragma warning disable CA1822
-    public Task<IActionResult> GetAdditionalRecipientsAsync(
+    public async Task<IActionResult> GetAdditionalRecipientsAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "metering-point/{meteringPointId}/additionalRecipients")]
         HttpRequest httpRequest,
         string meteringPointId)
-#pragma warning restore CA1822
     {
         ArgumentNullException.ThrowIfNull(httpRequest);
-        return Task.FromResult<IActionResult>(new NoContentResult());
+
+        var command = new GetAdditionalRecipientsOfMeteringPointCommand(meteringPointId);
+
+        var result = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return new OkObjectResult(result.Recipients);
     }
 }
