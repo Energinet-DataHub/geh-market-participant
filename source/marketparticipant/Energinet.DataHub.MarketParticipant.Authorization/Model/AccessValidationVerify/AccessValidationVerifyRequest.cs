@@ -23,12 +23,11 @@ public abstract class AccessValidationVerifyRequest : ILoggableAccessRequest
     public virtual string LoggedActivity => GetType().Name;
     public abstract string LoggedEntityType { get; }
     public abstract string LoggedEntityKey { get; }
+    protected abstract string ContextKey { get; }
 
     public IReadOnlyList<SignatureParameter> GetSignatureParams()
     {
-        return GetSignatureParamsCore()
-            .Append(SignatureParameter.FromString(SignatureParamKeys.VerifyContextKey, GetType().Name))
-            .ToList();
+        return [.. GetSignatureParamsCore(), SignatureParameter.FromString(SignatureParamKeys.ValidationContextKey, ContextKey)];
     }
 
     protected abstract IEnumerable<SignatureParameter> GetSignatureParamsCore();

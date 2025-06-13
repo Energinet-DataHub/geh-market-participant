@@ -36,6 +36,8 @@ public sealed class MeteringPointMasterDataAccessVerifyRequest : AccessValidatio
 
     public override string LoggedEntityKey => MeteringPointId;
 
+    protected override string ContextKey => SignatureParamContextKeys.MeteringPointMasterDataAccessValidation;
+
     protected override IEnumerable<SignatureParameter> GetSignatureParamsCore()
     {
         return
