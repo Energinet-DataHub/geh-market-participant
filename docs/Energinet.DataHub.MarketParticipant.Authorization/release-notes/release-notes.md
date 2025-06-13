@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
+## Version 1.6.2
+
+- Fix bug with Base64 decode padding
+
 ## Version 1.6.1
 
 - Fix problem with Base64 decoding
