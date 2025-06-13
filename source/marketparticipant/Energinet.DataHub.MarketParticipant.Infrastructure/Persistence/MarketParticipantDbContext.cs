@@ -82,6 +82,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<OrganizationDomainEntity> OrganizationDomains { get; private set; } = null!;
     public DbSet<ActorConsolidationEntity> ActorConsolidations { get; private set; } = null!;
     public DbSet<ActorConsolidationAuditLogEntryEntity> ActorConsolidationAuditLogEntries { get; private set; } = null!;
+    public DbSet<AdditionalRecipientEntity> AdditionalRecipients { get; private set; } = null!;
 
     public async Task<int> SaveChangesAsync()
     {
@@ -155,6 +156,8 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new OrganizationDomainEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorConsolidationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorConsolidationAuditLogEntryEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new AdditionalRecipientEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new AdditionalRecipientOfMeteringPointEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 

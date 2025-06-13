@@ -62,10 +62,4 @@ limitations under the License.
     </Protobuf>
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Handlers\NewFolder\**" />
-    <EmbeddedResource Remove="Handlers\NewFolder\**" />
-    <None Remove="Handlers\NewFolder\**" />
-  </ItemGroup>
-
 </Project>

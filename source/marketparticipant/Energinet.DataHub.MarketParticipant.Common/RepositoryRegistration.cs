@@ -14,8 +14,8 @@
 
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
-using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories.Query;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.Common;
@@ -35,7 +35,7 @@ internal static class RepositoryRegistration
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserRoleRepository, UserRoleRepository>();
         services.AddScoped<IActorRepository, ActorRepository>();
-        services.AddScoped<IUserQueryRepository, Infrastructure.Persistence.Repositories.Query.UserQueryRepository>();
+        services.AddScoped<IUserQueryRepository, UserQueryRepository>();
         services.AddScoped<IUserIdentityRepository, UserIdentityRepository>();
         services.AddScoped<IUserRoleAssignmentAuditLogRepository, UserRoleAssignmentAuditLogRepository>();
         services.AddScoped<IUserRoleAuditLogRepository, UserRoleAuditLogRepository>();
@@ -58,6 +58,7 @@ internal static class RepositoryRegistration
         services.AddScoped<IDownloadTokenRespository, DownloadTokenRespository>();
         services.AddScoped<IB2CLogRepository, B2CLogRepository>();
         services.AddScoped<ICutoffRepository, CutoffRepository>();
-        services.AddScoped<IExistingActorConsolidationService, ExistingActorConsolidationService>();
+        services.AddScoped<IAdditionalRecipientRepository, AdditionalRecipientRepository>();
+        services.AddScoped<IAdditionalRecipientQueryRepository, AdditionalRecipientQueryRepository>();
     }
 }
