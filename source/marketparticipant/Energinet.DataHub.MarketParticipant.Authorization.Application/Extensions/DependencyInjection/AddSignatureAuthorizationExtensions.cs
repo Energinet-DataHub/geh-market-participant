@@ -70,10 +70,9 @@ public static class AddSignatureAuthorizationExtensions
 
         services.AddSingleton<AuthorizationService>(provider =>
         {
-            var tokenCredentials = new DefaultAzureCredential();
             var options = provider.GetRequiredService<IOptions<KeyVaultOptions>>();
             var accessValidatorDispatchService = provider.GetRequiredService<IAccessValidatorDispatchService>();
-            var keyClient = new KeyClient(options.Value.AuthSignKeyVault, tokenCredentials);
+            var keyClient = new KeyClient(options.Value.AuthSignKeyVault, new DefaultAzureCredential());
             return new AuthorizationService(keyClient, options.Value.AuthSignKeyName, accessValidatorDispatchService);
         });
 

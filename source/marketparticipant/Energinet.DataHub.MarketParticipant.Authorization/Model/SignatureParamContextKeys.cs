@@ -14,11 +14,9 @@
 
 namespace Energinet.DataHub.MarketParticipant.Authorization.Model;
 
-public static class SignatureParamKeys
+public static class SignatureParamContextKeys
 {
-    public static string AccessPeriodsKey => "AccessPeriods";
-    public static string MeteringPointIdKey => "MeteringPointId";
-    public static string ActorNumberKey => "ActorNumber";
-    public static string MarketRoleKey => "MarketRole";
-    public static string ValidationContextKey => "ValidationContext";
+    public static string MeasurementsAccessValidation => "MeasurementsAccessValidation";
+    public static string MeasurementsYearlySumAccessValidation => "MeasurementsYearlySumAccessValidation";
+    public static string MeteringPointMasterDataAccessValidation => "MeteringPointMasterDataAccessValidation";
 }

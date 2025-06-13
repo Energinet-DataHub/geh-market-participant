@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Authorization release notes
 
+## Version 1.6.3
+
+- Fix bug with incorrect param names in signature verify request.
+
 ## Version 1.6.2
 
 - Fix bug with Base64 decode padding
