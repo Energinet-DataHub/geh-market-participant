@@ -34,6 +34,8 @@ public sealed class MeasurementsYearlySumAccessVerifyRequest : AccessValidationV
 
     public override string LoggedEntityKey => MeteringPointId;
 
+    protected override string ContextKey => SignatureParamContextKeys.MeasurementsYearlySumAccessValidation;
+
     protected override IEnumerable<SignatureParameter> GetSignatureParamsCore()
     {
         return

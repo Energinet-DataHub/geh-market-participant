@@ -38,6 +38,8 @@ public sealed class MeasurementsAccessValidationRequest : AccessValidationReques
 
     public override string LoggedEntityKey => MeteringPointId;
 
+    protected override string ContextKey => SignatureParamContextKeys.MeasurementsAccessValidation;
+
     protected override IEnumerable<SignatureParameter> GetSignatureParamsCore()
     {
         return
