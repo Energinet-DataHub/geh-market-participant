@@ -2,7 +2,7 @@
 
 ## Version 1.6.3
 
-- Fix bug with incorrect param names in signature verify request. 
+- Fix bug with incorrect param names in signature verify request.
 
 ## Version 1.6.2
 
